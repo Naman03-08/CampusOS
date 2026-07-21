@@ -1,14 +1,9 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAnalytics, Analytics, isSupported } from 'firebase/analytics';
 
-let app: FirebaseApp | null = null;
-let auth: Auth | null = null;
-let db: Firestore | null = null;
-const googleProvider = new GoogleAuthProvider();
-
-// User provided explicit Firebase credentials as fallback
-const userProvidedConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyAb6FmKQc0ncQG_0HmENX5ZTZI5I6uUdqI",
   authDomain: "campusos01.firebaseapp.com",
   projectId: "campusos01",
@@ -18,32 +13,24 @@ const userProvidedConfig = {
   measurementId: "G-P9HY0FFQ53"
 };
 
-try {
-  // @ts-ignore
-  const globConfig = import.meta.glob('../firebase-applet-config.json', { eager: true });
-  const configKeys = Object.keys(globConfig);
-  let activeConfig: any = null;
-  let firestoreDbId: string | undefined = undefined;
-
-  if (configKeys.length > 0) {
-    activeConfig = (globConfig[configKeys[0]] as any).default || globConfig[configKeys[0]];
-    firestoreDbId = activeConfig.firestoreDatabaseId;
-  } else {
-    activeConfig = userProvidedConfig;
-  }
-
-  if (activeConfig) {
-    if (!getApps().length) {
-      app = initializeApp(activeConfig);
-    } else {
-      app = getApp();
-    }
-    auth = getAuth(app);
-    db = firestoreDbId ? getFirestore(app, firestoreDbId) : getFirestore(app);
-    console.log("Firebase initialized successfully with project:", activeConfig.projectId);
-  }
-} catch (e) {
-  console.warn("Firebase initialization warning:", e);
+let app: FirebaseApp;
+if (!getApps().length) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApp();
 }
 
-export { app, auth, db, googleProvider };
+const auth: Auth = getAuth(app);
+const db: Firestore = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+let analytics: Analytics | null = null;
+if (typeof window !== 'undefined') {
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  }).catch(() => {});
+}
+
+export { app, auth, db, analytics, googleProvider };
