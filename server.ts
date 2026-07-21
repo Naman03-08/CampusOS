@@ -28,6 +28,38 @@ function checkApiKey() {
   }
 }
 
+// Multi-model Gemini Free Tier Fallback Manager
+const GEMINI_MODELS = [
+  "gemini-2.5-flash",
+  "gemini-3.6-flash",
+  "gemini-2.5-pro",
+  "gemini-1.5-flash",
+];
+
+async function generateContentWithFallback(options: {
+  contents: any;
+  config?: any;
+}) {
+  let lastError: any = null;
+  for (const model of GEMINI_MODELS) {
+    try {
+      console.log(`[Gemini Engine] Querying model: ${model}`);
+      const response = await ai.models.generateContent({
+        model,
+        contents: options.contents,
+        config: options.config,
+      });
+      if (response && response.text && response.text.trim().length > 0) {
+        return response;
+      }
+    } catch (err: any) {
+      console.warn(`[Gemini Fallback] Model ${model} rate-limited or error:`, err?.message || err);
+      lastError = err;
+    }
+  }
+  throw lastError || new Error("All Gemini models failed or quota exceeded.");
+}
+
 // Rich Fallback Response Generator for Chat
 function generateComprehensiveChatFallback(query: string): string {
   const qLower = query.toLowerCase();
@@ -153,8 +185,7 @@ Generate a complete, structured study suite in JSON format with:
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        const response = await ai.models.generateContent({
-          model: "gemini-3.6-flash",
+        const response = await generateContentWithFallback({
           contents: prompt,
           config: {
             responseMimeType: "application/json",
@@ -338,8 +369,7 @@ ${documentContext ? `Document Context:\n"""${documentContext}"""` : ""}`;
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        const response = await ai.models.generateContent({
-          model: "gemini-3.6-flash",
+        const response = await generateContentWithFallback({
           contents: `${systemPrompt}\n\nUser Question: ${userQuery}`,
         });
         const replyText = response.text || "";
@@ -381,8 +411,7 @@ Provide output in JSON format with:
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        const response = await ai.models.generateContent({
-          model: "gemini-3.6-flash",
+        const response = await generateContentWithFallback({
           contents: prompt,
           config: {
             responseMimeType: "application/json",
@@ -456,8 +485,7 @@ Provide JSON output with:
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        const response = await ai.models.generateContent({
-          model: "gemini-3.6-flash",
+        const response = await generateContentWithFallback({
           contents: prompt,
           config: {
             responseMimeType: "application/json",
@@ -524,8 +552,7 @@ Evaluate in JSON:
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        const response = await ai.models.generateContent({
-          model: "gemini-3.6-flash",
+        const response = await generateContentWithFallback({
           contents: prompt,
           config: {
             responseMimeType: "application/json",
