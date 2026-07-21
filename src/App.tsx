@@ -30,6 +30,9 @@ import { SettingsView } from './components/settings/SettingsView';
 import { AdminPanelView } from './components/admin/AdminPanelView';
 
 import { StorageService } from './lib/storage';
+import { FirestoreService } from './lib/firestoreService';
+import { auth } from './lib/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { UserProfile, StudySuite, AssignmentItem, AttendanceSubject, ScheduleEvent, DSAProblem, ResumeData, AppNotification } from './types';
 
 export function App() {
@@ -49,6 +52,63 @@ export function App() {
   const [resumeData, setResumeData] = useState<ResumeData>(StorageService.getResume());
   const [notifications, setNotifications] = useState<AppNotification[]>(StorageService.getNotifications());
 
+  // Listen to Firebase Auth state changes
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        setIsLoggedIn(true);
+        // Load Profile from Firestore
+        const fsProfile = await FirestoreService.getProfile(fbUser.uid);
+        if (fsProfile) {
+          setUser(fsProfile);
+          StorageService.saveProfile(fsProfile);
+        } else {
+          const newProfile: UserProfile = {
+            uid: fbUser.uid,
+            email: fbUser.email || 'student@campus.edu',
+            displayName: fbUser.displayName || fbUser.email?.split('@')[0] || 'Campus Student',
+            photoURL: fbUser.photoURL || undefined,
+            role: 'student',
+            university: 'Stanford University',
+            major: 'Computer Science',
+            year: 'Junior Year',
+            gpaGoal: 3.9,
+            targetRole: 'Software Engineer',
+            createdAt: new Date().toISOString(),
+          };
+          setUser(newProfile);
+          StorageService.saveProfile(newProfile);
+          await FirestoreService.saveProfile(newProfile);
+        }
+
+        // Hydrate data from Firestore
+        try {
+          const fsSuites = await FirestoreService.getStudySuites(fbUser.uid);
+          if (fsSuites.length > 0) setStudySuites(fsSuites);
+
+          const fsAssignments = await FirestoreService.getAssignments(fbUser.uid);
+          if (fsAssignments.length > 0) setAssignments(fsAssignments);
+
+          const fsAttendance = await FirestoreService.getAttendance(fbUser.uid);
+          if (fsAttendance.length > 0) setAttendance(fsAttendance);
+
+          const fsSchedule = await FirestoreService.getSchedule(fbUser.uid);
+          if (fsSchedule.length > 0) setSchedule(fsSchedule);
+
+          const fsDSA = await FirestoreService.getDSA(fbUser.uid);
+          if (fsDSA.length > 0) setDSA(fsDSA);
+
+          const fsResume = await FirestoreService.getResume(fbUser.uid);
+          if (fsResume) setResumeData(fsResume);
+        } catch (e) {
+          console.warn("Error hydrating student data from Firestore:", e);
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   const handleOpenAuth = (mode: 'login' | 'register') => {
     setAuthMode(mode);
     setShowAuthModal(true);
@@ -60,7 +120,14 @@ export function App() {
     setShowAuthModal(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (auth) {
+      try {
+        await signOut(auth);
+      } catch (e) {
+        console.warn("SignOut error:", e);
+      }
+    }
     setIsLoggedIn(false);
   };
 
@@ -68,46 +135,68 @@ export function App() {
     const updated = [suite, ...studySuites];
     setStudySuites(updated);
     StorageService.saveStudySuites(updated);
+    if (user.uid) {
+      FirestoreService.saveStudySuite(user.uid, suite);
+    }
   };
 
   const handleDeleteSuite = (id: string) => {
     const updated = studySuites.filter((s) => s.id !== id);
     setStudySuites(updated);
     StorageService.saveStudySuites(updated);
+    FirestoreService.deleteStudySuite(id);
   };
 
   const handleAddAssignment = (item: AssignmentItem) => {
     const updated = [item, ...assignments];
     setAssignments(updated);
     StorageService.saveAssignments(updated);
+    if (user.uid) {
+      FirestoreService.saveAssignment(user.uid, item);
+    }
   };
 
   const handleUpdateAttendance = (subs: AttendanceSubject[]) => {
     setAttendance(subs);
     StorageService.saveAttendance(subs);
+    if (user.uid) {
+      FirestoreService.saveAttendance(user.uid, subs);
+    }
   };
 
   const handleAddEvent = (evt: ScheduleEvent) => {
     const updated = [...schedule, evt];
     setSchedule(updated);
     StorageService.saveSchedule(updated);
+    if (user.uid) {
+      FirestoreService.saveSchedule(user.uid, updated);
+    }
   };
 
   const handleDeleteEvent = (id: string) => {
     const updated = schedule.filter((e) => e.id !== id);
     setSchedule(updated);
     StorageService.saveSchedule(updated);
+    if (user.uid) {
+      FirestoreService.saveSchedule(user.uid, updated);
+    }
   };
 
   const handleToggleDSA = (id: string) => {
     const updated = dsa.map((p) => (p.id === id ? { ...p, solved: !p.solved } : p));
     setDSA(updated);
     StorageService.saveDSA(updated);
+    if (user.uid) {
+      FirestoreService.saveDSA(user.uid, updated);
+    }
   };
 
   const handleUpdateResume = (r: ResumeData) => {
     setResumeData(r);
     StorageService.saveResume(r);
+    if (user.uid) {
+      FirestoreService.saveResume(user.uid, r);
+    }
   };
 
   const handleMarkReadNotification = (id: string) => {

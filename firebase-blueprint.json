@@ -1,0 +1,117 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profiles",
+      "description": "Student user profile information and academic target settings.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string" },
+        "university": { "type": "string" },
+        "major": { "type": "string" },
+        "year": { "type": "string" },
+        "gpaGoal": { "type": "number" },
+        "targetRole": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "studySuites": {
+      "title": "AI Study Suites",
+      "description": "Generated course notes, quizzes, flashcards, and mindmaps.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "subject": { "type": "string" },
+        "summary": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "title"]
+    },
+    "assignments": {
+      "title": "Student Assignments",
+      "description": "Course assignments and step-by-step AI solutions.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "subject": { "type": "string" },
+        "dueDate": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "userId", "title"]
+    },
+    "attendance": {
+      "title": "Subject Attendance",
+      "description": "Attendance tracking per course subject.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "code": { "type": "string" },
+        "name": { "type": "string" },
+        "totalClasses": { "type": "number" },
+        "attendedClasses": { "type": "number" }
+      },
+      "required": ["id", "userId", "code"]
+    },
+    "schedules": {
+      "title": "Smart Calendar Events",
+      "description": "Class schedule, study sessions, and interviews.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" }
+      },
+      "required": ["id", "userId", "title"]
+    },
+    "dsaProblems": {
+      "title": "DSA Practice Items",
+      "description": "Coding hub problems solved and bookmarked by student.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "solved": { "type": "boolean" },
+        "bookmarked": { "type": "boolean" }
+      },
+      "required": ["id", "userId", "title"]
+    }
+  },
+  "securityRules": {
+    "users": {
+      "read": "auth != null && auth.uid == resource.id",
+      "write": "auth != null && auth.uid == resource.id"
+    },
+    "studySuites": {
+      "read": "auth != null && auth.uid == resource.data.userId",
+      "write": "auth != null && auth.uid == request.resource.data.userId"
+    },
+    "assignments": {
+      "read": "auth != null && auth.uid == resource.data.userId",
+      "write": "auth != null && auth.uid == request.resource.data.userId"
+    },
+    "attendance": {
+      "read": "auth != null && auth.uid == resource.data.userId",
+      "write": "auth != null && auth.uid == request.resource.data.userId"
+    },
+    "schedules": {
+      "read": "auth != null && auth.uid == resource.data.userId",
+      "write": "auth != null && auth.uid == request.resource.data.userId"
+    },
+    "dsaProblems": {
+      "read": "auth != null && auth.uid == resource.data.userId",
+      "write": "auth != null && auth.uid == request.resource.data.userId"
+    }
+  }
+}

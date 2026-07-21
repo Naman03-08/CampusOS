@@ -4,6 +4,7 @@ import { auth, googleProvider } from '../../lib/firebase';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { UserProfile } from '../../types';
 import { StorageService } from '../../lib/storage';
+import { FirestoreService } from '../../lib/firestoreService';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -37,7 +38,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       if (auth) {
         const result = await signInWithPopup(auth, googleProvider);
         const fbUser = result.user;
-        const profile: UserProfile = {
+        
+        // Try fetching existing profile from Firestore
+        let existingProfile = await FirestoreService.getProfile(fbUser.uid);
+
+        const profile: UserProfile = existingProfile || {
           uid: fbUser.uid,
           email: fbUser.email || 'user@campus.edu',
           displayName: fbUser.displayName || 'Campus Student',
@@ -50,7 +55,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           targetRole: 'Software Engineer',
           createdAt: new Date().toISOString(),
         };
+
         StorageService.saveProfile(profile);
+        await FirestoreService.saveProfile(profile);
         onSuccess(profile);
       } else {
         // Fallback local Google Auth
@@ -70,18 +77,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onSuccess(profile);
       }
     } catch (err: any) {
-      console.warn("Google Auth error, falling back to instant guest session:", err);
-      const profile: UserProfile = {
-        uid: 'demo_user_' + Date.now(),
-        email: email || 'student@campus.edu',
-        displayName: displayName || 'Alex Rivers',
-        role: 'student',
-        university,
-        major,
-        createdAt: new Date().toISOString(),
-      };
-      StorageService.saveProfile(profile);
-      onSuccess(profile);
+      console.warn("Google Auth error:", err);
+      setErrorMsg(err.message || 'Google Auth Error');
     } finally {
       setLoading(false);
     }
@@ -106,7 +103,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         if (auth) {
           try {
             const res = await signInWithEmailAndPassword(auth, email, password);
-            const profile: UserProfile = {
+            let existingProfile = await FirestoreService.getProfile(res.user.uid);
+            
+            const profile: UserProfile = existingProfile || {
               uid: res.user.uid,
               email: res.user.email || email,
               displayName: res.user.displayName || email.split('@')[0],
@@ -115,11 +114,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               major,
               createdAt: new Date().toISOString(),
             };
+
             StorageService.saveProfile(profile);
+            await FirestoreService.saveProfile(profile);
             onSuccess(profile);
             return;
-          } catch (e) {
-            // fallback
+          } catch (e: any) {
+            console.warn("Firebase email login error:", e);
+            setErrorMsg(e.message || 'Invalid email or password.');
+            return;
           }
         }
         // Local fallback
@@ -141,11 +144,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               major,
               createdAt: new Date().toISOString(),
             };
+
             StorageService.saveProfile(profile);
+            await FirestoreService.saveProfile(profile);
             onSuccess(profile);
             return;
-          } catch (e) {
-            // fallback
+          } catch (e: any) {
+            console.warn("Firebase registration error:", e);
+            setErrorMsg(e.message || 'Failed to create account.');
+            return;
           }
         }
         const profile: UserProfile = {
