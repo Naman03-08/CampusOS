@@ -78,10 +78,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       }
     } catch (err: any) {
       console.warn("Google Auth error:", err);
-      setErrorMsg(err.message || 'Google Auth Error');
+      if (err?.code === 'auth/unauthorized-domain' || err?.message?.includes('unauthorized-domain')) {
+        setErrorMsg('UNAUTHORIZED_DOMAIN');
+      } else {
+        setErrorMsg(err.message || 'Google Auth Error');
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleInstantGuestLogin = () => {
+    const profile: UserProfile = {
+      uid: 'guest_' + Date.now(),
+      email: email || 'student@campus.edu',
+      displayName: displayName || 'Alex Rivers',
+      role: 'student',
+      university,
+      major,
+      year: 'Junior Year',
+      gpaGoal: 3.9,
+      targetRole: 'Software Engineer',
+      createdAt: new Date().toISOString(),
+    };
+    StorageService.saveProfile(profile);
+    onSuccess(profile);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -205,9 +226,41 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </p>
 
         {errorMsg && (
-          <div className="p-3 mb-4 text-xs rounded-xl bg-red-50 text-red-600 border border-red-200 font-medium">
-            {errorMsg}
-          </div>
+          errorMsg === 'UNAUTHORIZED_DOMAIN' || errorMsg.includes('unauthorized-domain') ? (
+            <div className="p-3.5 mb-4 text-xs rounded-2xl bg-amber-50 text-amber-900 border border-amber-200 space-y-2">
+              <div className="font-bold flex items-center gap-1.5 text-amber-800">
+                <span>⚠️ Firebase Domain Not Authorized</span>
+              </div>
+              <p className="text-[11px] leading-relaxed text-amber-700">
+                Firebase Project <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">campusos01</code> requires authorizing this preview URL domain in Firebase Console:
+              </p>
+              <div className="bg-amber-100/70 p-2 rounded-xl text-[10px] font-mono text-amber-900 break-all select-all">
+                {typeof window !== 'undefined' ? window.location.hostname : 'aistudio.google.com'}
+              </div>
+              <p className="text-[10px] text-amber-600">
+                Fix in Firebase Console: <b>Authentication</b> &rarr; <b>Settings</b> &rarr; <b>Authorized domains</b> &rarr; <b>Add domain</b>.
+              </p>
+              <button
+                type="button"
+                onClick={handleInstantGuestLogin}
+                className="w-full mt-1 py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-xs transition-all flex items-center justify-center gap-1.5"
+              >
+                <span>Continue as Guest / Local Session</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <div className="p-3 mb-4 text-xs rounded-xl bg-red-50 text-red-600 border border-red-200 font-medium flex flex-col gap-2">
+              <span>{errorMsg}</span>
+              <button
+                type="button"
+                onClick={handleInstantGuestLogin}
+                className="self-start text-[11px] font-bold text-red-700 underline hover:text-red-900"
+              >
+                Or Continue with Guest Demo Mode
+              </button>
+            </div>
+          )
         )}
 
         {resetSent ? (
