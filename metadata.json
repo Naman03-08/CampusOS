@@ -1,0 +1,11 @@
+{
+  "name": "CampusOS AI",
+  "description": "The AI Operating System For College Students - Complete academic & career hub with study suites, assignment solver, attendance manager, smart calendar, coding hub, placement & resume builder, and mock interviews.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
