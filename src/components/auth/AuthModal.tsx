@@ -126,19 +126,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             const res = await signInWithEmailAndPassword(auth, email, password);
             let existingProfile = await FirestoreService.getProfile(res.user.uid);
             
-            const profile: UserProfile = existingProfile || {
-              uid: res.user.uid,
-              email: res.user.email || email,
-              displayName: res.user.displayName || email.split('@')[0],
-              role: 'student',
-              university,
-              major,
-              createdAt: new Date().toISOString(),
-            };
+            if (!existingProfile) {
+              const init = StorageService.initializeZeroUserStorage(res.user.uid, res.user.email || email, res.user.displayName || email.split('@')[0]);
+              existingProfile = await FirestoreService.initializeNewUserWithZeroData(res.user.uid, res.user.email || email, res.user.displayName || email.split('@')[0]);
+            } else {
+              StorageService.saveProfile(existingProfile);
+            }
 
-            StorageService.saveProfile(profile);
-            await FirestoreService.saveProfile(profile);
-            onSuccess(profile);
+            onSuccess(existingProfile);
             return;
           } catch (e: any) {
             console.warn("Firebase email login error:", e);
@@ -147,27 +142,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           }
         }
         // Local fallback
-        const profile: UserProfile = StorageService.getProfile();
-        profile.email = email || profile.email;
-        StorageService.saveProfile(profile);
-        onSuccess(profile);
+        const init = StorageService.initializeZeroUserStorage('user_local_' + Date.now(), email || 'student@campus.edu', displayName || email.split('@')[0]);
+        onSuccess(init.profile);
       } else {
-        // Register
+        // Register New User - Initialize ZERO data across all sections
         if (auth) {
           try {
             const res = await createUserWithEmailAndPassword(auth, email, password);
-            const profile: UserProfile = {
-              uid: res.user.uid,
-              email,
-              displayName: displayName || 'Campus Student',
-              role: 'student',
-              university,
-              major,
-              createdAt: new Date().toISOString(),
-            };
+            const init = StorageService.initializeZeroUserStorage(res.user.uid, email, displayName || 'Campus Student');
+            const profile = await FirestoreService.initializeNewUserWithZeroData(res.user.uid, email, displayName || 'Campus Student');
 
-            StorageService.saveProfile(profile);
-            await FirestoreService.saveProfile(profile);
             onSuccess(profile);
             return;
           } catch (e: any) {
@@ -176,17 +160,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             return;
           }
         }
-        const profile: UserProfile = {
-          uid: 'user_' + Date.now(),
-          email,
-          displayName: displayName || 'Campus Student',
-          role: 'student',
-          university,
-          major,
-          createdAt: new Date().toISOString(),
-        };
-        StorageService.saveProfile(profile);
-        onSuccess(profile);
+        const init = StorageService.initializeZeroUserStorage('user_' + Date.now(), email, displayName || 'Campus Student');
+        onSuccess(init.profile);
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Authentication error');

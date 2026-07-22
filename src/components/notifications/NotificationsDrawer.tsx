@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bell, Check, Trash2, X, AlertCircle, Info, Calendar, Flame } from 'lucide-react';
 import { AppNotification } from '../../types';
+import { SectionUsageBanner } from '../common/SectionUsageBanner';
 
 interface NotificationsDrawerProps {
   notifications: AppNotification[];
@@ -14,7 +15,23 @@ export const NotificationsDrawer: React.FC<NotificationsDrawerProps> = ({
   onClearAll,
 }) => {
   return (
-    <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4 animate-in fade-in duration-200">
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Section Usage Banner */}
+      <SectionUsageBanner
+        title="Academic Notifications & Event Reminders"
+        subtitle="Stay notified about upcoming classes, debarment warnings, assignment deadlines & coding streaks"
+        purpose="This section displays critical real-time alerts, attendance debarment warnings, study milestone achievements, upcoming assignment deadlines, and daily DSA streak notifications."
+        keyFeatures={[
+          'Real-time Class & Exam Timetable Alerts',
+          'Attendance Debarment Risk Warnings',
+          'Daily DSA Problem Streak Milestones',
+          'One-click Notification Dismissal & Management'
+        ]}
+        icon={<Bell className="w-6 h-6 text-white" />}
+        badge="Notifications Purpose"
+      />
+
+      <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
       <div className="flex items-center justify-between pb-3 border-b border-slate-200">
         <div className="flex items-center gap-2">
           <Bell className="w-5 h-5 text-blue-600" />
@@ -58,5 +75,6 @@ export const NotificationsDrawer: React.FC<NotificationsDrawerProps> = ({
         ))}
       </div>
     </div>
+  </div>
   );
 };

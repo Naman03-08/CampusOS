@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, Plus, Zap, Clock, Trash2, CheckCircle2 } from 'lucide-react';
 import { ScheduleEvent } from '../../types';
+import { SectionUsageBanner } from '../common/SectionUsageBanner';
 
 interface CalendarViewProps {
   schedule: ScheduleEvent[];
@@ -83,6 +84,21 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
+      {/* Section Usage Banner */}
+      <SectionUsageBanner
+        title="AI Timetable & Academic Scheduler"
+        subtitle="Manage lectures, assignment deadlines, exam timetables & AI focus blocks"
+        purpose="This section is used to schedule and organize your daily academic routine. You can manually log upcoming lectures, lab sessions, and exams, or trigger the AI Auto-Planner to generate optimized focus blocks matched with your workload."
+        keyFeatures={[
+          'Daily Academic Class & Exam Timetable',
+          'One-Click AI Auto-Planner Optimization',
+          'Category Tagging (Class, Study, Exam, Assignment)',
+          'Completion Checklists & Time Management Tracking'
+        ]}
+        icon={<CalendarIcon className="w-6 h-6 text-white" />}
+        badge="Academic Calendar Purpose"
+      />
+
       {/* Header */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

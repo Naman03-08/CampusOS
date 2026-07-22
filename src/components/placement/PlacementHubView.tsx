@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Briefcase, Zap, Award, FileText, Bot, Download, CheckCircle2, RefreshCw, Mic, Video, Star } from 'lucide-react';
 import { ResumeData, UserProfile } from '../../types';
 import { exportTextToPDF } from '../../lib/pdfExport';
+import { SectionUsageBanner } from '../common/SectionUsageBanner';
 
 interface PlacementHubProps {
   user: UserProfile;
@@ -105,6 +106,22 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
+      {/* Section Usage Banner */}
+      <SectionUsageBanner
+        title="Placement Hub & AI Mock Interview Suite"
+        subtitle="ATS Resume Scoring, AI Voice/Text Mock Interviews & Targeted Cover Letter Builder"
+        purpose="This section is used to prepare for campus hiring, software engineering roles, and corporate internships. It includes AI ATS Resume Audit tools, simulated technical mock interviews with instant feedback scores, and personalized cover letter generators."
+        keyFeatures={[
+          'AI ATS Resume Score & Keyword Optimizer',
+          'Simulated AI Technical & Behavioral Mock Interviews',
+          'Instant Scoring & Answer Refinement Critique',
+          'Custom Cover Letter Generator for Target Companies',
+          'Export Professional Resume to PDF'
+        ]}
+        icon={<Briefcase className="w-6 h-6 text-white" />}
+        badge="Placement Hub Purpose"
+      />
+
       {/* Header */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

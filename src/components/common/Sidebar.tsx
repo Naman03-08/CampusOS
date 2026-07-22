@@ -14,18 +14,23 @@ import {
   Zap, 
   GraduationCap 
 } from 'lucide-react';
+import { UserProfile } from '../../types';
 
 interface SidebarProps {
   activeTab: string;
   onSelectTab: (tab: string) => void;
   unreadNotificationsCount: number;
+  user?: UserProfile;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onSelectTab,
   unreadNotificationsCount,
+  user,
 }) => {
+  const isAdminUser = user?.email?.trim().toLowerCase() === 'naman03mgs@gmail.com';
+
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'studyhub', label: 'AI Study Hub', icon: BookOpen, badge: 'AI' },
@@ -37,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'placement', label: 'Placement & Interview', icon: Briefcase, badge: 'Jobs' },
     { id: 'notifications', label: 'Notifications', icon: Bell, count: unreadNotificationsCount },
     { id: 'settings', label: 'Settings', icon: Settings },
-    { id: 'admin', label: 'Admin Panel', icon: ShieldAlert },
+    ...(isAdminUser ? [{ id: 'admin', label: 'Admin Panel', icon: ShieldAlert, badge: 'Lock' }] : []),
   ];
 
   return (

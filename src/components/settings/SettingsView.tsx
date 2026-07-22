@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Settings as SettingsIcon, User, Save, ShieldCheck, Database, Key } from 'lucide-react';
 import { UserProfile } from '../../types';
 import { StorageService } from '../../lib/storage';
+import { SectionUsageBanner } from '../common/SectionUsageBanner';
 
 interface SettingsViewProps {
   user: UserProfile;
@@ -22,6 +23,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile 
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in duration-300">
+      {/* Section Usage Banner */}
+      <SectionUsageBanner
+        title="Student Account & Profile Settings"
+        subtitle="Configure university background, target GPA, dream career role & cloud database synchronization"
+        purpose="This section is used to customize your student profile settings. Your target GPA and career goals (e.g. Software Engineer) customize the AI models across the study hub, assignment solver, and placement mock interviews."
+        keyFeatures={[
+          'University & Major Profile Management',
+          'Target GPA & Dream Career Role Configuration',
+          'Real-time Firestore Database Persistence',
+          'Zero-Trust Security & Cloud Privacy Settings'
+        ]}
+        icon={<SettingsIcon className="w-6 h-6 text-white" />}
+        badge="Settings Purpose"
+      />
+
       {/* Header */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between">
         <div>

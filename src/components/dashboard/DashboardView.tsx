@@ -15,6 +15,7 @@ import {
   CheckCircle2 
 } from 'lucide-react';
 import { UserProfile, AttendanceSubject, ScheduleEvent, DSAProblem, StudySuite, AssignmentItem } from '../../types';
+import { SectionUsageBanner } from '../common/SectionUsageBanner';
 
 interface DashboardViewProps {
   user: UserProfile;
@@ -51,6 +52,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
+      {/* Section Usage Banner */}
+      <SectionUsageBanner
+        title="Command Dashboard & Telemetry Central"
+        subtitle="Your personalized AI-powered academic command center"
+        purpose="This Dashboard section serves as your primary academic hub. It aggregates real-time attendance statistics, active study material suites, upcoming assignment deadlines, DSA problem-solving progress, and quick action shortcuts into a single view."
+        keyFeatures={[
+          'Real-time Academic Health Overview',
+          'Quick AI Notes & PDF Study Suite Generator',
+          'Instant Class Attendance Tracker',
+          'DSA Problem Solving Progress Meter',
+          'Upcoming Class & Assignment Schedule'
+        ]}
+        icon={<Bot className="w-6 h-6 text-white" />}
+        badge="Main Dashboard Overview"
+      />
+
       {/* Personalized Welcome Banner */}
       <div className="p-6 sm:p-8 rounded-[28px] bg-gradient-to-br from-[#2563EB] via-blue-600 to-indigo-600 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -308,7 +325,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </h3>
             <div className="space-y-3.5">
               {attendance.slice(0, 3).map((sub) => {
-                const pct = Math.round((sub.attendedClasses / sub.totalClasses) * 100);
+                const total = sub.totalClasses || 0;
+                const attended = sub.attendedClasses || 0;
+                const pct = total > 0 ? Math.round((attended / total) * 100) : 0;
                 return (
                   <div key={sub.id} className="text-xs">
                     <div className="flex justify-between font-bold text-slate-800 mb-1">

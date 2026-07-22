@@ -32,28 +32,31 @@ export const CanvasBackground: React.FC = () => {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('resize', handleResize);
 
-    // Glowing Golden & Cream Particles
+    // Glowing Particles (Golden + Soft Violet/Purplish)
     const particleCount = 75;
     const particles = Array.from({ length: particleCount }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
       radius: Math.random() * 3.5 + 1.5,
-      color: Math.random() > 0.4 ? 'rgba(217, 119, 6, ' : 'rgba(245, 158, 11, ',
-      alpha: Math.random() * 0.55 + 0.25,
-      speedX: (Math.random() - 0.5) * 0.6,
-      speedY: (Math.random() - 0.5) * 0.6,
+      color: Math.random() > 0.5 
+        ? 'rgba(124, 58, 237, ' // Soft Purplish Violet
+        : Math.random() > 0.5 
+          ? 'rgba(217, 119, 6, ' 
+          : 'rgba(99, 102, 241, ',
+      alpha: Math.random() * 0.45 + 0.2,
+      speedX: (Math.random() - 0.5) * 0.5,
+      speedY: (Math.random() - 0.5) * 0.5,
       pulse: Math.random() * Math.PI * 2,
     }));
 
-    // Floating 3D Golden Light Spheres / Orbs
+    // Floating Light Orbs (Added subtle lavender/purplish soft glows)
     const orbs = [
-      { x: width * 0.2, y: height * 0.25, radius: 360, color: 'rgba(251, 191, 36, 0.28)', vx: 0.3, vy: 0.2, phase: 0 },
-      { x: width * 0.82, y: height * 0.65, radius: 420, color: 'rgba(254, 215, 170, 0.40)', vx: -0.25, vy: -0.25, phase: 1.5 },
-      { x: width * 0.48, y: height * 0.85, radius: 300, color: 'rgba(245, 158, 11, 0.22)', vx: 0.2, vy: -0.18, phase: 3.1 },
-      { x: width * 0.15, y: height * 0.75, radius: 280, color: 'rgba(252, 211, 77, 0.25)', vx: -0.18, vy: 0.2, phase: 4.2 },
+      { x: width * 0.2, y: height * 0.25, radius: 380, color: 'rgba(139, 92, 246, 0.12)', vx: 0.25, vy: 0.18, phase: 0 }, // Soft Purplish
+      { x: width * 0.82, y: height * 0.65, radius: 420, color: 'rgba(99, 102, 241, 0.10)', vx: -0.2, vy: -0.22, phase: 1.5 }, // Indigo/Purple
+      { x: width * 0.48, y: height * 0.85, radius: 320, color: 'rgba(251, 191, 36, 0.15)', vx: 0.18, vy: -0.15, phase: 3.1 }, // Soft Golden
+      { x: width * 0.15, y: height * 0.75, radius: 300, color: 'rgba(168, 85, 247, 0.10)', vx: -0.15, vy: 0.18, phase: 4.2 }, // Subtle Lavender
     ];
 
-    // Rotating 3D Geometric Ring Nodes
     let time = 0;
 
     const render = () => {
@@ -63,7 +66,7 @@ export const CanvasBackground: React.FC = () => {
 
       ctx.clearRect(0, 0, width, height);
 
-      // Base Golden Cream Soft Radial Gradient Atmosphere
+      // Base Soft Cream Gradient with subtle Purplish Lavender Hue
       const baseGrad = ctx.createRadialGradient(
         width / 2 + (mouseX - width / 2) * 0.05,
         height / 2 + (mouseY - height / 2) * 0.05,
@@ -72,9 +75,9 @@ export const CanvasBackground: React.FC = () => {
         height / 2,
         Math.max(width, height)
       );
-      baseGrad.addColorStop(0, '#FFFDF7');
-      baseGrad.addColorStop(0.5, '#FAF6EE');
-      baseGrad.addColorStop(1, '#F7F0E3');
+      baseGrad.addColorStop(0, '#FAF7FF');   // Ultra-light lavender cream
+      baseGrad.addColorStop(0.5, '#F7F2FD'); // Light purplish tint
+      baseGrad.addColorStop(1, '#F3ECFB');   // Soft purple-tinted canvas
       ctx.fillStyle = baseGrad;
       ctx.fillRect(0, 0, width, height);
 
@@ -94,7 +97,7 @@ export const CanvasBackground: React.FC = () => {
           parallaxX, parallaxY, orb.radius
         );
         gradient.addColorStop(0, orb.color);
-        gradient.addColorStop(0.7, orb.color.replace(/[\d\.]+\)$/, '0.03)'));
+        gradient.addColorStop(0.7, orb.color.replace(/[\d\.]+\)$/, '0.02)'));
         gradient.addColorStop(1, 'transparent');
 
         ctx.fillStyle = gradient;
@@ -103,7 +106,7 @@ export const CanvasBackground: React.FC = () => {
         ctx.fill();
       });
 
-      // Draw 3D Rotating Golden Wireframe Rings in Background
+      // Draw 3D Rotating Purplish & Golden Wireframe Rings in Background
       const cx = width * 0.75 + (mouseX - width / 2) * 0.03;
       const cy = height * 0.3 + (mouseY - height / 2) * 0.03;
 
@@ -114,22 +117,22 @@ export const CanvasBackground: React.FC = () => {
       // Ring 1
       ctx.beginPath();
       ctx.ellipse(0, 0, 180, 70, time * 0.3, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(217, 119, 6, 0.32)';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(139, 92, 246, 0.22)';
+      ctx.lineWidth = 1.8;
       ctx.stroke();
 
       // Ring 2
       ctx.beginPath();
       ctx.ellipse(0, 0, 260, 100, -time * 0.25, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(245, 158, 11, 0.28)';
-      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = 'rgba(168, 85, 247, 0.18)';
+      ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Ring 3 (Inner dynamic node)
+      // Ring 3
       ctx.beginPath();
       ctx.ellipse(0, 0, 110, 45, time * 0.5, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(251, 191, 36, 0.35)';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(217, 119, 6, 0.25)';
+      ctx.lineWidth = 1.2;
       ctx.stroke();
 
       ctx.restore();
@@ -141,11 +144,11 @@ export const CanvasBackground: React.FC = () => {
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 140) {
+          if (dist < 130) {
             ctx.beginPath();
-            const alpha = 0.30 * (1 - dist / 140);
-            ctx.strokeStyle = `rgba(217, 119, 6, ${alpha})`;
-            ctx.lineWidth = 1;
+            const alpha = 0.22 * (1 - dist / 130);
+            ctx.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
+            ctx.lineWidth = 0.8;
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.stroke();
@@ -153,7 +156,7 @@ export const CanvasBackground: React.FC = () => {
         }
       }
 
-      // Render & move particles with pulse and mouse influence
+      // Render & move particles
       particles.forEach((p) => {
         p.pulse += 0.03;
         const currentAlpha = p.alpha + Math.sin(p.pulse) * 0.1;
@@ -169,12 +172,6 @@ export const CanvasBackground: React.FC = () => {
         ctx.beginPath();
         ctx.fillStyle = `${p.color}${Math.max(0.05, currentAlpha)})`;
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Subtle glow halo on particles
-        ctx.beginPath();
-        ctx.fillStyle = `${p.color}0.08)`;
-        ctx.arc(p.x, p.y, p.radius * 3, 0, Math.PI * 2);
         ctx.fill();
       });
 
@@ -197,4 +194,3 @@ export const CanvasBackground: React.FC = () => {
     />
   );
 };
-

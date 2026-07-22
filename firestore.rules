@@ -2,44 +2,48 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    function isAdmin() {
+      return request.auth != null && (request.auth.token.email == 'naman03mgs@gmail.com' || request.auth.uid == 'admin');
+    }
+
     // User Profiles
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null && (request.auth.uid == userId || isAdmin());
     }
     
     // AI Study Suites
     match /studySuites/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
     
     // Assignments
     match /assignments/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
     
     // Attendance Records
     match /attendance/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
     
     // Schedule Events
     match /schedules/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
     
     // DSA Problems
     match /dsaProblems/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
 
     // Resumes
     match /resumes/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
 
     // Mock Interviews
     match /mockInterviews/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
   }
 }

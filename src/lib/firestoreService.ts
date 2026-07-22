@@ -19,6 +19,24 @@ import {
   ResumeData, 
   MockInterviewResult 
 } from '../types';
+import { 
+  getZeroAttendance, 
+  getZeroDSA, 
+  getZeroResume, 
+  getZeroNotifications, 
+  getZeroStats 
+} from './storage';
+
+export interface UserFullData {
+  profile: UserProfile;
+  attendance: AttendanceSubject[];
+  dsa: DSAProblem[];
+  assignments: AssignmentItem[];
+  studySuites: StudySuite[];
+  mockInterviews: MockInterviewResult[];
+  resume: ResumeData | null;
+  schedule: ScheduleEvent[];
+}
 
 export class FirestoreService {
   // User Profile
@@ -42,6 +60,89 @@ export class FirestoreService {
       console.warn("Firestore getProfile error:", e);
     }
     return null;
+  }
+
+  // Admin Method: Get all registered users from Firestore
+  static async getAllUsers(): Promise<UserProfile[]> {
+    if (!db) return [];
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      const list: UserProfile[] = [];
+      snap.forEach(d => {
+        const data = d.data() as UserProfile;
+        if (data && data.uid) {
+          list.push(data);
+        }
+      });
+      return list;
+    } catch (e) {
+      console.warn("Firestore getAllUsers error:", e);
+      return [];
+    }
+  }
+
+  // Admin Method: Fetch complete progress & activity data for a specific user
+  static async getUserFullData(uid: string): Promise<UserFullData | null> {
+    if (!db || !uid) return null;
+    try {
+      const profile = await this.getProfile(uid);
+      if (!profile) return null;
+
+      const [attendance, dsa, assignments, studySuites, mockInterviews, resume, schedule] = await Promise.all([
+        this.getAttendance(uid),
+        this.getDSA(uid),
+        this.getAssignments(uid),
+        this.getStudySuites(uid),
+        this.getMockInterviews(uid),
+        this.getResume(uid),
+        this.getSchedule(uid),
+      ]);
+
+      return {
+        profile,
+        attendance,
+        dsa,
+        assignments,
+        studySuites,
+        mockInterviews,
+        resume,
+        schedule
+      };
+    } catch (e) {
+      console.warn("Firestore getUserFullData error:", e);
+      return null;
+    }
+  }
+
+  // Helper: Initialize zero data across all collections in Firestore for a new registered user
+  static async initializeNewUserWithZeroData(uid: string, email: string, displayName: string): Promise<UserProfile> {
+    const isAdmin = email.trim().toLowerCase() === 'naman03mgs@gmail.com';
+    const profile: UserProfile = {
+      uid,
+      email: email || 'student@campus.edu',
+      displayName: displayName || email.split('@')[0] || 'New Student',
+      role: isAdmin ? 'admin' : 'student',
+      university: 'Campus University',
+      major: 'Computer Science',
+      year: '1st Year',
+      gpaGoal: 4.0,
+      targetRole: 'Software Engineer',
+      createdAt: new Date().toISOString(),
+      stats: getZeroStats(),
+    };
+
+    const zeroAttendance = getZeroAttendance(uid);
+    const zeroDSA = getZeroDSA(uid);
+    const zeroResume = getZeroResume(uid, profile.displayName, profile.email);
+
+    await Promise.all([
+      this.saveProfile(profile),
+      this.saveAttendance(uid, zeroAttendance),
+      this.saveDSA(uid, zeroDSA),
+      this.saveResume(uid, zeroResume)
+    ]);
+
+    return profile;
   }
 
   // Study Suites

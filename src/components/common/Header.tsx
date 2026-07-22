@@ -132,16 +132,18 @@ export const Header: React.FC<HeaderProps> = ({
                 Profile & Settings
               </button>
 
-              <button
-                onClick={() => {
-                  setShowProfileMenu(false);
-                  onNavigateTab('admin');
-                }}
-                className="w-full text-left px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"
-              >
-                <ShieldCheck className="w-4 h-4 text-blue-500" />
-                Admin Panel
-              </button>
+              {user?.email?.trim().toLowerCase() === 'naman03mgs@gmail.com' && (
+                <button
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    onNavigateTab('admin');
+                  }}
+                  className="w-full text-left px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                >
+                  <ShieldCheck className="w-4 h-4 text-blue-500" />
+                  Admin Panel
+                </button>
+              )}
 
               <div className="border-t border-slate-100 my-1"></div>
 

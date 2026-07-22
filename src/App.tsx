@@ -29,7 +29,7 @@ import { NotificationsDrawer } from './components/notifications/NotificationsDra
 import { SettingsView } from './components/settings/SettingsView';
 import { AdminPanelView } from './components/admin/AdminPanelView';
 
-import { StorageService } from './lib/storage';
+import { StorageService, getZeroAttendance, getZeroDSA, getZeroResume } from './lib/storage';
 import { FirestoreService } from './lib/firestoreService';
 import { auth } from './lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -52,6 +52,52 @@ export function App() {
   const [resumeData, setResumeData] = useState<ResumeData>(StorageService.getResume());
   const [notifications, setNotifications] = useState<AppNotification[]>(StorageService.getNotifications());
 
+  // Helper to recalculate and sync user stats to Firestore for real-time Admin Monitoring
+  const syncUserStats = async (
+    currentProfile: UserProfile,
+    currentAttendance: AttendanceSubject[],
+    currentDSA: DSAProblem[],
+    currentAssignments: AssignmentItem[],
+    currentSuites: StudySuite[],
+    currentResume: ResumeData
+  ) => {
+    if (!currentProfile || !currentProfile.uid) return;
+
+    const totalAttended = currentAttendance.reduce((acc, s) => acc + s.attendedClasses, 0);
+    const totalClasses = currentAttendance.reduce((acc, s) => acc + s.totalClasses, 0);
+    const attPct = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 0;
+
+    const dsaSolved = currentDSA.filter((p) => p.solved).length;
+    const assignmentsSolved = currentAssignments.filter((a) => a.status === 'solved').length;
+    const mockList = StorageService.getMockInterviews();
+    const avgMockScore = mockList.length > 0
+      ? Math.round(mockList.reduce((acc, i) => acc + i.overallScore, 0) / mockList.length)
+      : 0;
+
+    const updatedProfile: UserProfile = {
+      ...currentProfile,
+      stats: {
+        attendancePercentage: attPct,
+        totalClassesAttended: totalAttended,
+        totalClassesHeld: totalClasses,
+        dsaSolvedCount: dsaSolved,
+        dsaTotalCount: currentDSA.length,
+        dsaStreak: dsaSolved > 0 ? 1 : 0,
+        assignmentsSolvedCount: assignmentsSolved,
+        assignmentsTotalCount: currentAssignments.length,
+        studySuitesCount: currentSuites.length,
+        mockInterviewsCount: mockList.length,
+        avgMockInterviewScore: avgMockScore,
+        resumeAtsScore: currentResume?.atsScore || 0,
+        lastActiveAt: new Date().toISOString(),
+      },
+    };
+
+    setUser(updatedProfile);
+    StorageService.saveProfile(updatedProfile);
+    await FirestoreService.saveProfile(updatedProfile);
+  };
+
   // Listen to Firebase Auth state changes
   useEffect(() => {
     if (!auth) return;
@@ -59,48 +105,56 @@ export function App() {
       if (fbUser) {
         setIsLoggedIn(true);
         // Load Profile from Firestore
-        const fsProfile = await FirestoreService.getProfile(fbUser.uid);
-        if (fsProfile) {
-          setUser(fsProfile);
-          StorageService.saveProfile(fsProfile);
-        } else {
-          const newProfile: UserProfile = {
-            uid: fbUser.uid,
-            email: fbUser.email || 'student@campus.edu',
-            displayName: fbUser.displayName || fbUser.email?.split('@')[0] || 'Campus Student',
-            photoURL: fbUser.photoURL || undefined,
-            role: 'student',
-            university: 'Stanford University',
-            major: 'Computer Science',
-            year: 'Junior Year',
-            gpaGoal: 3.9,
-            targetRole: 'Software Engineer',
-            createdAt: new Date().toISOString(),
-          };
-          setUser(newProfile);
-          StorageService.saveProfile(newProfile);
-          await FirestoreService.saveProfile(newProfile);
+        let fsProfile = await FirestoreService.getProfile(fbUser.uid);
+        if (!fsProfile) {
+          // Initialize NEW registered user with 100% ZERO data
+          StorageService.initializeZeroUserStorage(fbUser.uid, fbUser.email || '', fbUser.displayName || '');
+          fsProfile = await FirestoreService.initializeNewUserWithZeroData(
+            fbUser.uid,
+            fbUser.email || '',
+            fbUser.displayName || ''
+          );
         }
+        setUser(fsProfile);
+        StorageService.saveProfile(fsProfile);
 
         // Hydrate data from Firestore
         try {
           const fsSuites = await FirestoreService.getStudySuites(fbUser.uid);
-          if (fsSuites.length > 0) setStudySuites(fsSuites);
+          setStudySuites(fsSuites);
 
           const fsAssignments = await FirestoreService.getAssignments(fbUser.uid);
-          if (fsAssignments.length > 0) setAssignments(fsAssignments);
+          setAssignments(fsAssignments);
 
           const fsAttendance = await FirestoreService.getAttendance(fbUser.uid);
-          if (fsAttendance.length > 0) setAttendance(fsAttendance);
+          if (fsAttendance.length > 0) {
+            setAttendance(fsAttendance);
+          } else {
+            const zeroAtt = getZeroAttendance(fbUser.uid);
+            setAttendance(zeroAtt);
+            await FirestoreService.saveAttendance(fbUser.uid, zeroAtt);
+          }
 
           const fsSchedule = await FirestoreService.getSchedule(fbUser.uid);
-          if (fsSchedule.length > 0) setSchedule(fsSchedule);
+          setSchedule(fsSchedule);
 
           const fsDSA = await FirestoreService.getDSA(fbUser.uid);
-          if (fsDSA.length > 0) setDSA(fsDSA);
+          if (fsDSA.length > 0) {
+            setDSA(fsDSA);
+          } else {
+            const zeroD = getZeroDSA(fbUser.uid);
+            setDSA(zeroD);
+            await FirestoreService.saveDSA(fbUser.uid, zeroD);
+          }
 
           const fsResume = await FirestoreService.getResume(fbUser.uid);
-          if (fsResume) setResumeData(fsResume);
+          if (fsResume) {
+            setResumeData(fsResume);
+          } else {
+            const zeroRes = getZeroResume(fbUser.uid, fsProfile.displayName, fsProfile.email);
+            setResumeData(zeroRes);
+            await FirestoreService.saveResume(fbUser.uid, zeroRes);
+          }
         } catch (e) {
           console.warn("Error hydrating student data from Firestore:", e);
         }
@@ -137,6 +191,7 @@ export function App() {
     StorageService.saveStudySuites(updated);
     if (user.uid) {
       FirestoreService.saveStudySuite(user.uid, suite);
+      syncUserStats(user, attendance, dsa, assignments, updated, resumeData);
     }
   };
 
@@ -145,6 +200,9 @@ export function App() {
     setStudySuites(updated);
     StorageService.saveStudySuites(updated);
     FirestoreService.deleteStudySuite(id);
+    if (user.uid) {
+      syncUserStats(user, attendance, dsa, assignments, updated, resumeData);
+    }
   };
 
   const handleAddAssignment = (item: AssignmentItem) => {
@@ -153,6 +211,7 @@ export function App() {
     StorageService.saveAssignments(updated);
     if (user.uid) {
       FirestoreService.saveAssignment(user.uid, item);
+      syncUserStats(user, attendance, dsa, updated, studySuites, resumeData);
     }
   };
 
@@ -161,6 +220,7 @@ export function App() {
     StorageService.saveAttendance(subs);
     if (user.uid) {
       FirestoreService.saveAttendance(user.uid, subs);
+      syncUserStats(user, subs, dsa, assignments, studySuites, resumeData);
     }
   };
 
@@ -188,6 +248,16 @@ export function App() {
     StorageService.saveDSA(updated);
     if (user.uid) {
       FirestoreService.saveDSA(user.uid, updated);
+      syncUserStats(user, attendance, updated, assignments, studySuites, resumeData);
+    }
+  };
+
+  const handleResetDSASheet = (newSheet: DSAProblem[]) => {
+    setDSA(newSheet);
+    StorageService.saveDSA(newSheet);
+    if (user.uid) {
+      FirestoreService.saveDSA(user.uid, newSheet);
+      syncUserStats(user, attendance, newSheet, assignments, studySuites, resumeData);
     }
   };
 
@@ -196,6 +266,7 @@ export function App() {
     StorageService.saveResume(r);
     if (user.uid) {
       FirestoreService.saveResume(user.uid, r);
+      syncUserStats(user, attendance, dsa, assignments, studySuites, r);
     }
   };
 
@@ -267,6 +338,7 @@ export function App() {
               activeTab={activeTab}
               onSelectTab={setActiveTab}
               unreadNotificationsCount={notifications.filter((n) => !n.read).length}
+              user={user}
             />
 
             {/* Main Stage View Area */}
@@ -320,6 +392,7 @@ export function App() {
                 <CodingHubView
                   dsa={dsa}
                   onToggleSolved={handleToggleDSA}
+                  onResetDSASheet={handleResetDSASheet}
                 />
               )}
 
@@ -343,7 +416,9 @@ export function App() {
                 <SettingsView user={user} onSaveProfile={setUser} />
               )}
 
-              {activeTab === 'admin' && <AdminPanelView />}
+              {activeTab === 'admin' && (
+                <AdminPanelView user={user} onNavigateTab={setActiveTab} />
+              )}
             </main>
           </div>
         </div>

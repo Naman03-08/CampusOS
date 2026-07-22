@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { StudySuite, Flashcard, QuizQuestion } from '../../types';
 import { exportTextToPDF } from '../../lib/pdfExport';
+import { SectionUsageBanner } from '../common/SectionUsageBanner';
 
 interface StudyHubViewProps {
   studySuites: StudySuite[];
@@ -107,6 +108,23 @@ export const StudyHubView: React.FC<StudyHubViewProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
+      {/* Section Usage Banner */}
+      <SectionUsageBanner
+        title="AI Study Hub & Document Synthesizer"
+        subtitle="Automated study suites, flashcards, interactive quizzes & revision roadmaps"
+        purpose="This section is used to convert raw textbook chapters, lecture notes, and syllabus topics into comprehensive study suites. The AI automatically generates full notes, active recall flashcards, practice quizzes, formula cheat sheets, viva voice Q&A, and a 7-day exam revision roadmap."
+        keyFeatures={[
+          'AI Note & Summary Synthesis',
+          'Interactive Active Recall Flashcards',
+          'Self-Scoring Exam Quizzes',
+          'Formula & Mindmap Breakdown',
+          'Viva Q&A & 7-Day Revision Planner',
+          'Export Notes & Quizzes to PDF'
+        ]}
+        icon={<BookOpen className="w-6 h-6 text-white" />}
+        badge="Study Hub Purpose"
+      />
+
       {/* Top Action Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs">
         <div>

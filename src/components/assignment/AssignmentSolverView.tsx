@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FileCheck, Zap, Download, CheckCircle2, RefreshCw, Upload, FileText } from 'lucide-react';
 import { AssignmentItem } from '../../types';
 import { exportTextToPDF } from '../../lib/pdfExport';
+import { SectionUsageBanner } from '../common/SectionUsageBanner';
 
 interface AssignmentSolverProps {
   assignments: AssignmentItem[];
@@ -68,6 +69,22 @@ export const AssignmentSolverView: React.FC<AssignmentSolverProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
+      {/* Section Usage Banner */}
+      <SectionUsageBanner
+        title="AI Step-by-Step Assignment Solver"
+        subtitle="Detailed solutions, mathematical proofs, code implementations & downloadable PDFs"
+        purpose="This section is used to solve complex academic homework, engineering problem sets, discrete math proofs, algorithmic questions, and laboratory assignments. The AI generates complete step-by-step reasoning, key mathematical formulas, and textbook references."
+        keyFeatures={[
+          'AI Multi-Subject Homework Solver',
+          'Detailed Mathematical & Algorithmic Step-by-Step Proofs',
+          'Key Formula Extraction & Reference Mapping',
+          'Export Solved Assignments to Formatted PDF',
+          'Historical Assignment Solution Archive'
+        ]}
+        icon={<FileCheck className="w-6 h-6 text-white" />}
+        badge="Assignment Solver Purpose"
+      />
+
       {/* Header */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

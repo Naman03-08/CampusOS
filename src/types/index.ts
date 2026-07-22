@@ -1,5 +1,21 @@
 export type Role = 'student' | 'admin';
 
+export interface UserStats {
+  attendancePercentage: number;
+  totalClassesAttended: number;
+  totalClassesHeld: number;
+  dsaSolvedCount: number;
+  dsaTotalCount: number;
+  dsaStreak: number;
+  assignmentsSolvedCount: number;
+  assignmentsTotalCount: number;
+  studySuitesCount: number;
+  mockInterviewsCount: number;
+  avgMockInterviewScore: number;
+  resumeAtsScore: number;
+  lastActiveAt: string;
+}
+
 export interface UserProfile {
   uid: string;
   email: string;
@@ -12,6 +28,7 @@ export interface UserProfile {
   gpaGoal?: number;
   targetRole?: string;
   createdAt: string;
+  stats?: UserStats;
 }
 
 export interface Flashcard {
@@ -108,7 +125,24 @@ export interface DSAProblem {
   id: string;
   userId: string;
   title: string;
-  category: 'Arrays' | 'Strings' | 'Linked List' | 'Trees' | 'Graphs' | 'Dynamic Programming' | 'System Design';
+  category: 
+    | 'Arrays' 
+    | 'Strings' 
+    | '2D Arrays' 
+    | 'Searching & Sorting' 
+    | 'Backtracking' 
+    | 'Linked List' 
+    | 'Stacks & Queues' 
+    | 'Greedy' 
+    | 'Binary Trees' 
+    | 'Binary Search Trees' 
+    | 'Heaps & Hashing' 
+    | 'Graphs' 
+    | 'Tries' 
+    | 'Dynamic Programming' 
+    | 'Bit Manipulation' 
+    | 'Segment Trees' 
+    | string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   platformUrl?: string;
   solved: boolean;
