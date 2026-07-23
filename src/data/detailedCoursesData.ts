@@ -318,6 +318,17 @@ export const COURSES: CourseItem[] = [
           'Dynamic Programming',
           'Segment Trees'
         ]
+      },
+      {
+        title: 'Quant, Reasoning & Aptitude',
+        description: 'Quantitative aptitude, logical reasoning, verbal reasoning, data interpretation, and numerical ability for tech campus placements.',
+        topics: [
+          'Quantitative Aptitude',
+          'Logical Reasoning',
+          'Verbal Reasoning',
+          'Data Interpretation',
+          'Numerical Ability'
+        ]
       }
     ]
   },
@@ -345,73 +356,59 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Java OOP Mechanics & Memory Architecture',
-        description: 'JVM/JRE/JDK mechanics, Heap vs Stack memory, Object-Oriented Java, Generics, and Big-O.',
+        title: 'Programming with Java',
+        description: 'Foundations of Java programming including logic building, flowcharts, variables, operators, conditionals, loops, patterns, functions, and scope.',
         topics: [
-          'JVM, JRE & JDK Internal Architecture Breakdown',
-          'Heap vs Stack Memory Allocation & Reference Types',
-          'Object-Oriented Programming (Classes, Interfaces, Abstract Classes)',
-          'Java Generics, Type Erasure & Wildcards (? extends T)',
-          'Garbage Collection Mechanics & Memory Leak Avoidance',
-          'String Pool Mechanics, StringBuilder & StringBuffer',
-          'Big-O Complexity Analysis & Benchmarking in Java',
-          'Exception Handling, Try-With-Resources & Custom Exceptions'
+          'Flowcharts & Pseudocode',
+          'Variables & Data Types',
+          'Operators',
+          'Conditional Statements',
+          'Loops (Flow Control)',
+          'Patterns',
+          'Functions & Scope'
         ]
       },
       {
-        title: 'Module 2: Java Collections Framework (JCF) Deep Dive',
-        description: 'ArrayList, LinkedList, HashSet, HashMap bucketing, TreeMap, PriorityQueue, and Comparators.',
+        title: 'Data Structures & Algorithms',
+        description: 'Core data structures and algorithms covering arrays, sorting, strings, pointers, Collections Framework, recursion, OOPs, trees, and search trees.',
         topics: [
-          'List Interface: ArrayList vs LinkedList Performance Analysis',
-          'Set Interface: HashSet, LinkedHashSet & TreeSet Guarantees',
-          'Map Interface: HashMap Bucketing & Collision Resolution',
-          'NavigableMap, TreeMap & Red-Black Tree Guarantees',
-          'Queue & Deque Interface: ArrayDeque vs LinkedList',
-          'PriorityQueue Min-Heap & Max-Heap Custom Comparators',
-          'Comparable vs Comparator Interfaces Implementation',
-          'Collections Utility Class Methods (binarySearch, reverse, sort)'
+          'Arrays & 2D Arrays',
+          'Sorting Algorithms',
+          'Strings',
+          'Pointers (additional chapter for Interviews)',
+          'Collections Framework (similar to STL)',
+          'Time & Space Complexity',
+          'Recursion & Backtracking',
+          'Divide & Conquer',
+          'Object Oriented Programming (OOPs)',
+          'Linked Lists',
+          'Stacks & Queues',
+          'Binary Trees',
+          'Binary Search Trees'
         ]
       },
       {
-        title: 'Module 3: Linear Data Structures & Algorithmic Patterns',
-        description: 'Arrays, Two-Pointers, Sliding Window, Subarray HashMaps, Monotonic Stacks, and Linked Lists.',
+        title: 'Advanced DSA',
+        description: 'Advanced problem-solving techniques including heaps, HashMaps, HashSets, tries, graph algorithms, greedy strategies, dynamic programming, and segment trees.',
         topics: [
-          'Arrays, Two-Pointer Techniques & Subarray Problems',
-          'Sliding Window Patterns (Maximum Sum, Longest Substring)',
-          'HashMap Frequency Counter & Subarray Sum Equals K',
-          'Binary Search Variants & Rotated Array Search',
-          'Custom Stack & Queue Implementation using Arrays/Lists',
-          'Monotonic Stack Problems (Next Greater Element)',
-          'Singly & Doubly Linked Lists with In-Place Operations',
-          'Recursion Trees & Mathematical Induction Proofs'
+          'Heaps (Priority Queue)',
+          'HashMaps & HashSets',
+          'Tries',
+          'Graph',
+          'Greedy Algorithms',
+          'Dynamic Programming',
+          'Segment Trees'
         ]
       },
       {
-        title: 'Module 4: Trees, Heaps, Graphs & Trie Architectures',
-        description: 'Binary Trees, BST, Heaps, Graph BFS/DFS, Topological Sort, Shortest Path, and Trie.',
+        title: 'Quant, Reasoning & Aptitude',
+        description: 'Quantitative aptitude, logical reasoning, verbal reasoning, data interpretation, and numerical ability for tech campus placements.',
         topics: [
-          'Binary Tree Traversal (Recursive & Iterative Methods)',
-          'Tree Views (Top, Bottom, Left, Right) & Boundary Traversal',
-          'BST Operations, Validation & Kth Smallest Element',
-          'Heap Construction & Median Finder Stream in Java',
-          'Graph Representation using Adjacency List of Lists/Maps',
-          'Graph BFS, DFS & Topological Sort (Kahn Algorithm)',
-          'Shortest Path Algorithms in Java (Dijkstra, Bellman-Ford)',
-          'Trie Implementation with Insert, Search & StartsWith'
-        ]
-      },
-      {
-        title: 'Module 5: Dynamic Programming & Tech Placement Interviews',
-        description: 'Recursion to Memoization, Tabulation Matrix DP, Stock DP, and System Design OOP fundamentals.',
-        topics: [
-          'Recursion to Memoization (Top-Down DP Pattern)',
-          'Tabulation Matrix Optimization (Bottom-Up DP)',
-          'Standard DP: Unbounded Knapsack, Partition Equal Subset',
-          'DP on Strings: Longest Palindromic Subsequence',
-          'DP on Stocks & Buy/Sell Multiple Transactions',
-          'System Design Principles & OOP Interview Questions',
-          'Java Concurrency & Multithreading Thread Pools Basics',
-          'Top 50 Java Product Company Interview Questions'
+          'Quantitative Aptitude',
+          'Logical Reasoning',
+          'Verbal Reasoning',
+          'Data Interpretation',
+          'Numerical Ability'
         ]
       }
     ]
@@ -440,73 +437,378 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Python & JS Engine Mechanisms for DSA',
-        description: 'Memory models, V8 engine call stack, built-in data structures, list comprehensions, and Big-O.',
+        title: 'Programming Fundamentals',
+        description: 'Core programming concepts, syntax, control structures, functions, OOP, exception & file handling, comprehensions, iterators, and decorators.',
         topics: [
-          'Python Memory Model, Objects, References & Garbage Collector',
-          'JavaScript V8 Engine, Call Stack, Event Loop & Memory Heap',
-          'Python Built-in Structures: Lists, Dicts, Tuples, Sets, Counter',
-          'JS Built-in Structures: Arrays, Map, Set & Objects',
-          'Python List Comprehensions & Generator Expressions',
-          'JS Higher-Order Array Methods (map, filter, reduce, flat)',
-          'Big-O Time & Space Complexity Analysis in Py/JS',
-          'Recursion Call Stack & Tail Call Optimization'
+          'Variables',
+          'Data Types',
+          'Operators',
+          'Input/Output',
+          'Type Casting',
+          'Conditional Statements',
+          'Loops',
+          'Functions',
+          'Recursion',
+          'OOP',
+          'Exception Handling',
+          'File Handling',
+          'Modules & Packages',
+          'Iterators & Generators',
+          'Lambda Functions',
+          'Decorators',
+          'List/Dictionary/Set Comprehensions'
         ]
       },
       {
-        title: 'Module 2: Arrays, Strings, HashMaps & Two-Pointers',
-        description: 'Array traversals, Two-Pointers, Sliding Window, Frequency Counter, and String manipulation.',
+        title: 'Time & Space Complexity',
+        description: 'Asymptotic notations, execution time, space complexity, auxiliary space, and amortized analysis.',
         topics: [
-          'Array Traversals, In-Place Rotations & Matrix Transformations',
-          'Two-Pointer Pattern (Opposite, Same Direction, Pair Sum)',
-          'Sliding Window Pattern (Fixed vs Variable Window)',
-          'Python Counter / JS Map Frequency Counting Strategies',
-          'Prefix Sum Arrays & Hash Lookups',
-          'String Slicing, Regex Matching & Palindrome Checks',
-          'Binary Search Algorithms & Bisect Module in Python',
-          'Sorting Algorithms (Timsort in Python, V8 Sorting)'
+          'Big O',
+          'Big Ω',
+          'Big Θ',
+          'Time Complexity',
+          'Space Complexity',
+          'Auxiliary Space',
+          'Amortized Analysis'
         ]
       },
       {
-        title: 'Module 3: Linked Lists, Stacks & Queues',
-        description: 'Node implementation in Python/JS, cycle detection, Monotonic Stacks, and LRU Cache.',
+        title: 'Mathematics',
+        description: 'Essential mathematical foundations, number theory, prime numbers, modular arithmetic, and combinatorics for algorithmic efficiency.',
         topics: [
-          'Implementing Node Classes in Python & JavaScript',
-          'Single & Doubly Linked List Operations',
-          'Fast & Slow Pointer Cycle Detection',
-          'Reversing Linked List (Iterative & Recursive)',
-          'Stack Implementation using Python List / JS Array',
-          'Queue Implementation using collections.deque / JS Array',
-          'Monotonic Stack Problems (Daily Temperatures)',
-          'LRU Cache Implementation using Dict / Map'
+          'Prime Numbers',
+          'Factors',
+          'GCD & LCM',
+          'Euclidean Algorithm',
+          'Fast Exponentiation',
+          'Modular Arithmetic',
+          'Sieve of Eratosthenes',
+          'Prefix Sum',
+          'Number Theory',
+          'Combinatorics',
+          'Permutations & Combinations',
+          'Probability'
         ]
       },
       {
-        title: 'Module 4: Trees, BST & Graph Traversals',
-        description: 'Binary Trees, Level-Order BFS, BST validation, Graph Adjacency Lists, BFS/DFS, and Shortest Path.',
+        title: 'Bit Manipulation',
+        description: 'Binary representations, bitwise operators, bit masking, subsets generation, and bitwise optimization techniques.',
         topics: [
-          'Binary Tree Class Node Setup & Traversal Methods',
-          'Level-Order BFS Traversal using Queue',
-          'BST Search, Insert, Delete & Validation',
-          'Lowest Common Ancestor (LCA) in Trees',
-          'Graph Adjacency List & Matrix Setup',
-          'Graph Traversal: BFS & DFS Implementations',
-          'Topological Sort & Cycle Detection',
-          'Dijkstra Shortest Path with heapq (Python)'
+          'Binary Numbers',
+          'Bitwise Operators',
+          'AND, OR, XOR, NOT',
+          'Left & Right Shift',
+          'Set Bits',
+          'Bit Masking',
+          'Power of Two',
+          'Subsets using Bits'
         ]
       },
       {
-        title: 'Module 5: Dynamic Programming & LeetCode Interview Sets',
-        description: 'Top-Down Memoization, Bottom-Up Tabulation, 1D/2D DP, Backtracking, and interview sets.',
+        title: 'Arrays',
+        description: 'Array traversals, insertion, searching, sliding window, two pointers, matrices, and interval problems.',
         topics: [
-          'Top-Down Memoization using @functools.cache / Memo Obj',
-          'Bottom-Up Tabulation Matrix Techniques',
-          '1D DP Problems: Climbing Stairs, Coin Change, LIS',
-          '2D DP Problems: 0/1 Knapsack, LCS, Edit Distance',
-          'Backtracking: Subsets, Permutations & Combination Sum',
-          'Top 50 LeetCode Medium/Hard Questions in Python',
-          'Top 50 Machine Coding & Algorithmic Problems in JS',
-          'Mock Interview Walkthroughs & Time Management'
+          'Traversal',
+          'Insertion & Deletion',
+          'Searching',
+          'Prefix Sum',
+          'Sliding Window',
+          'Two Pointers',
+          'Kadane\'s Algorithm',
+          'Dutch National Flag',
+          'Rotate Array',
+          'Merge Arrays',
+          'Matrix Problems',
+          'Circular Arrays',
+          'Interval Problems'
+        ]
+      },
+      {
+        title: 'Strings',
+        description: 'String manipulation, pattern matching algorithms (KMP, Rabin-Karp, Z Algorithm), rolling hash, and compression techniques.',
+        topics: [
+          'String Operations',
+          'Reverse',
+          'Palindrome',
+          'Anagrams',
+          'Frequency Count',
+          'KMP',
+          'Rabin-Karp',
+          'Z Algorithm',
+          'Rolling Hash',
+          'String Compression'
+        ]
+      },
+      {
+        title: 'Searching',
+        description: 'Search techniques including linear, binary search variants, matrix search, and ternary search.',
+        topics: [
+          'Linear Search',
+          'Binary Search',
+          'Lower & Upper Bound',
+          'Binary Search on Answer',
+          'Rotated Array Search',
+          'Matrix Search',
+          'Ternary Search'
+        ]
+      },
+      {
+        title: 'Sorting',
+        description: 'Standard sorting algorithms, comparison vs non-comparison sorts, time complexities, and stability.',
+        topics: [
+          'Bubble Sort',
+          'Selection Sort',
+          'Insertion Sort',
+          'Merge Sort',
+          'Quick Sort',
+          'Heap Sort',
+          'Counting Sort',
+          'Radix Sort',
+          'Bucket Sort'
+        ]
+      },
+      {
+        title: 'Recursion',
+        description: 'Recursive call stacks, tail recursion, recursion trees, and backtracking foundations.',
+        topics: [
+          'Basic Recursion',
+          'Tail Recursion',
+          'Recursive Arrays',
+          'Recursive Strings',
+          'Recursion Trees',
+          'Backtracking Basics'
+        ]
+      },
+      {
+        title: 'Linked List',
+        description: 'Singly, Doubly, and Circular Linked Lists, cycle detection, reordering, LRU cache, and memory management.',
+        topics: [
+          'Singly Linked List',
+          'Doubly Linked List',
+          'Circular Linked List',
+          'Reverse Linked List',
+          'Cycle Detection',
+          'Merge Lists',
+          'Middle Node',
+          'Clone List',
+          'LRU Cache'
+        ]
+      },
+      {
+        title: 'Stack',
+        description: 'Stack operations, expression evaluation, monotonic stacks, histogram problems, and parentheses matching.',
+        topics: [
+          'Stack Implementation',
+          'Prefix/Infix/Postfix',
+          'Expression Evaluation',
+          'Next Greater Element',
+          'Stock Span',
+          'Histogram',
+          'Balanced Parentheses',
+          'Monotonic Stack'
+        ]
+      },
+      {
+        title: 'Queue',
+        description: 'Queue, circular queue, deque, priority queue, monotonic queues, and queue/stack inter-conversions.',
+        topics: [
+          'Queue',
+          'Circular Queue',
+          'Deque',
+          'Priority Queue',
+          'Queue using Stack',
+          'Stack using Queue',
+          'Monotonic Queue'
+        ]
+      },
+      {
+        title: 'Hashing',
+        description: 'HashMaps, HashSets, frequency counting, collision resolution techniques, and hash functions.',
+        topics: [
+          'HashMap',
+          'HashSet',
+          'Frequency Map',
+          'Collision Handling',
+          'Hash Functions'
+        ]
+      },
+      {
+        title: 'Trees',
+        description: 'Binary Trees, BSTs, balanced search trees (AVL, Red-Black), Segment Trees, Fenwick Trees, Tries, and B-Trees.',
+        topics: [
+          'Binary Tree',
+          'Tree Traversals',
+          'DFS & BFS',
+          'Height & Diameter',
+          'Binary Search Tree',
+          'AVL Tree',
+          'Red-Black Tree',
+          'Segment Tree',
+          'Fenwick Tree',
+          'Trie',
+          'B-Tree',
+          'B+ Tree'
+        ]
+      },
+      {
+        title: 'Heap',
+        description: 'Min/Max Heaps, heapify mechanics, priority queues, stream median finder, and K-way merging.',
+        topics: [
+          'Min Heap',
+          'Max Heap',
+          'Heapify',
+          'Heap Sort',
+          'Priority Queue',
+          'K Largest/Smallest',
+          'Merge K Lists',
+          'Median Finder'
+        ]
+      },
+      {
+        title: 'Graphs',
+        description: 'Graph representations, BFS/DFS, shortest path algorithms (Dijkstra, Bellman-Ford, Floyd-Warshall), MST, DSU, topological sort, and advanced graph theorems.',
+        topics: [
+          'Graph Representation',
+          'BFS',
+          'DFS',
+          'Connected Components',
+          'Cycle Detection',
+          'Bipartite Graph',
+          'Dijkstra',
+          'Bellman-Ford',
+          'Floyd-Warshall',
+          'Prim\'s Algorithm',
+          'Kruskal\'s Algorithm',
+          'Union-Find (DSU)',
+          'Topological Sort',
+          'SCC (Kosaraju)',
+          'Tarjan\'s Algorithm',
+          'Bridges & Articulation Points',
+          'Euler Path',
+          'Hamiltonian Path',
+          'Maximum Flow'
+        ]
+      },
+      {
+        title: 'Greedy Algorithms',
+        description: 'Greedy strategy optimization, interval scheduling, Huffman coding, knapsack variants, and platform allocation.',
+        topics: [
+          'Activity Selection',
+          'Job Scheduling',
+          'Huffman Coding',
+          'Fractional Knapsack',
+          'Minimum Platforms',
+          'Gas Station',
+          'Candy Distribution'
+        ]
+      },
+      {
+        title: 'Backtracking',
+        description: 'Combinatorial state-space search, subsets, permutations, N-Queens, Sudoku solver, and maze exploration.',
+        topics: [
+          'Subsets',
+          'Permutations',
+          'Combination Sum',
+          'N-Queens',
+          'Sudoku Solver',
+          'Rat in a Maze',
+          'Word Search'
+        ]
+      },
+      {
+        title: 'Dynamic Programming',
+        description: 'Memoization, tabulation, space optimization, 1D/2D DP, matrix chain multiplication, tree DP, bitmask DP, and digit DP.',
+        topics: [
+          'Memoization',
+          'Tabulation',
+          'Space Optimization',
+          'Fibonacci',
+          'Climbing Stairs',
+          'House Robber',
+          'Coin Change',
+          'Knapsack',
+          'Rod Cutting',
+          'Matrix Chain Multiplication',
+          'LIS',
+          'LCS',
+          'Edit Distance',
+          'Partition DP',
+          'Digit DP',
+          'Bitmask DP',
+          'Tree DP',
+          'Interval DP',
+          'DP on Graphs'
+        ]
+      },
+      {
+        title: 'Advanced Data Structures',
+        description: 'Advanced tree structures, Segment Trees with Lazy Propagation, Fenwick Trees, Sparse Tables, Treaps, and Skip Lists.',
+        topics: [
+          'Trie',
+          'Segment Tree',
+          'Lazy Propagation',
+          'Fenwick Tree',
+          'Sparse Table',
+          'Treap',
+          'Skip List',
+          'Rope',
+          'Ordered Set',
+          'Policy-Based Data Structures'
+        ]
+      },
+      {
+        title: 'Advanced Algorithms',
+        description: 'Divide & conquer, Mo\'s algorithm, sweep line, convex hull, string structures, and heavy-light decomposition.',
+        topics: [
+          'Divide & Conquer',
+          'Meet in the Middle',
+          'Sweep Line',
+          'Mo\'s Algorithm',
+          'Convex Hull',
+          'Aho-Corasick',
+          'Manacher\'s Algorithm',
+          'Suffix Array',
+          'Suffix Tree',
+          'Heavy-Light Decomposition',
+          'Centroid Decomposition'
+        ]
+      },
+      {
+        title: 'Interview Patterns',
+        description: 'Master top LeetCode patterns for FAANG and product-based company coding rounds.',
+        topics: [
+          'Two Pointers',
+          'Sliding Window',
+          'Binary Search Pattern',
+          'Fast & Slow Pointer',
+          'Prefix Sum',
+          'Monotonic Stack',
+          'DFS/BFS Pattern',
+          'Heap Pattern',
+          'Greedy Pattern',
+          'DP Pattern',
+          'Backtracking Pattern',
+          'Union-Find Pattern',
+          'Trie Pattern'
+        ]
+      },
+      {
+        title: 'Competitive Programming',
+        description: 'High-level competitive programming techniques, fast I/O, game theory, computational geometry, and bitmasking.',
+        topics: [
+          'Fast I/O',
+          'Modular Arithmetic',
+          'Binary Exponentiation',
+          'Number Theory',
+          'Segment Tree',
+          'Fenwick Tree',
+          'DSU',
+          'Sparse Table',
+          'Graph Algorithms',
+          'String Algorithms',
+          'Computational Geometry',
+          'Game Theory',
+          'Bitmasking'
         ]
       }
     ]
@@ -535,59 +837,197 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Networking Fundamentals, Protocols & Reconnaissance',
-        description: 'OSI 7-Layer Model, TCP/IP, Linux security tools, OSINT, Nmap port scanning, and Wireshark.',
+        title: 'Phase 1: Computer Basics & Windows Fundamentals',
+        description: 'Core computer architecture, operating system basics, boot process, Windows architecture, PowerShell, CMD, registry, and Active Directory basics.',
         topics: [
-          'OSI 7-Layer Model & TCP/IP Protocol Stack Deep Dive',
-          'IPv4, IPv6, Subnetting, CIDR Notation & Routing',
-          'DNS, HTTP/HTTPS, ARP, DHCP, SSH & FTP Protocols',
-          'Linux CLI Tools for Security Engineers (grep, awk, netstat, nmap)',
-          'Passive Reconnaissance: OSINT, Google Dorking & Shodan',
-          'Active Reconnaissance: Nmap Port Scanning & OS Fingerprinting',
-          'Wireshark Packet Sniffing, Filters & Network Analysis',
-          'Network Vulnerability Scanning with OpenVAS & Nessus'
+          'Computer Architecture',
+          'CPU, GPU, RAM',
+          'HDD, SSD',
+          'BIOS & UEFI',
+          'Motherboard',
+          'Boot Process',
+          'File Systems',
+          'Operating System Basics',
+          'Windows Architecture',
+          'CMD',
+          'PowerShell',
+          'Registry',
+          'Services',
+          'Active Directory Basics',
+          'File Permissions',
+          'Task Manager'
         ]
       },
       {
-        title: 'Module 2: Web Application Security & OWASP Top 10',
-        description: 'Burp Suite proxy, SQL Injection, XSS, CSRF, Access Control Bypasses, and RCE.',
+        title: 'Phase 1: Linux Fundamentals & Networking',
+        description: 'Linux installation, Kali Linux, terminal commands, OSI model, TCP/IP, DNS, DHCP, HTTP/HTTPS, VPN, routing, firewalls, and subnetting.',
         topics: [
-          'Burp Suite Setup, Proxying & HTTP Request Interception',
-          'SQL Injection (SQLi): In-band, Blind & Time-based Exploitation',
-          'Cross-Site Scripting (XSS): Stored, Reflected & DOM-based',
-          'Cross-Site Request Forgery (CSRF) & SameSite Cookie Policies',
-          'Broken Access Control, IDOR & Privilege Escalation',
-          'Command Injection & Remote Code Execution (RCE)',
-          'Server-Side Request Forgery (SSRF) Attacks & Defenses',
-          'Authentication Bypasses & Session Hijacking'
+          'Linux Installation',
+          'Kali Linux',
+          'Ubuntu',
+          'Linux File System',
+          'Terminal Commands',
+          'Bash',
+          'Permissions',
+          'Users & Groups',
+          'SSH',
+          'Cron Jobs',
+          'Package Management',
+          'OSI Model',
+          'TCP/IP',
+          'IPv4 & IPv6',
+          'MAC Address',
+          'DNS',
+          'DHCP',
+          'HTTP & HTTPS',
+          'FTP',
+          'SMTP',
+          'IMAP',
+          'POP3',
+          'SNMP',
+          'SMB',
+          'VLAN',
+          'VPN',
+          'NAT',
+          'Routing',
+          'Switching',
+          'Firewalls',
+          'Wi-Fi Security',
+          'Subnetting'
         ]
       },
       {
-        title: 'Module 3: System Penetration Testing & Metasploit',
-        description: 'Vulnerability assessment, Metasploit payloads, Linux/Windows privilege escalation, and password cracking.',
+        title: 'Phase 1: Programming for Cyber Security',
+        description: 'Essential programming languages and scripting tools for automation, exploit writing, and regular expression pattern matching.',
         topics: [
-          'Vulnerability Assessment & CVE / CVSS Scoring',
-          'Metasploit Framework Architecture, Modules & Payloads',
-          'Creating Reverse Shells & Bind Shells',
-          'Linux Privilege Escalation (SUDO, SUID, Cron Jobs)',
-          'Windows Privilege Escalation (UAC Bypass, Unquoted Paths)',
-          'Password Cracking with John the Ripper & Hashcat',
-          'Wireless Network Hacking (WPA2/WPA3 Cracking)',
-          'Social Engineering & Phishing Attack Vectors'
+          'Python',
+          'Bash',
+          'PowerShell',
+          'JavaScript Basics',
+          'SQL',
+          'C Programming Basics',
+          'Regular Expressions'
         ]
       },
       {
-        title: 'Module 4: Bug Bounty Workflows, Cryptography & Defense',
-        description: 'Recon methodology, subdomain enumeration, cryptography, security headers, and penetration testing reports.',
+        title: 'Phase 2: Security Fundamentals & Cryptography',
+        description: 'CIA Triad, risk, threat, vulnerability, Cyber Kill Chain, MITRE ATT&CK, NIST framework, encryption, SSL/TLS, and PKI.',
         topics: [
-          'Bug Bounty Hunting Recon Methodology',
-          'Subdomain Enumeration (Amass, Subfinder, Assetfinder)',
-          'Cryptography: Symmetric (AES), Asymmetric (RSA) & Hashing',
-          'Web Application Firewalls (WAF) & Bypass Techniques',
-          'Security Headers (CSP, HSTS, CORS & X-Frame-Options)',
-          'Writing Professional Penetration Testing Reports',
-          'Security Operations Center (SOC) & SIEM Monitoring',
-          'Ethical Hacking Rules of Engagement & Responsible Disclosure'
+          'CIA Triad',
+          'Risk',
+          'Threat',
+          'Vulnerability',
+          'Exploit',
+          'Attack Surface',
+          'Security Controls',
+          'Cyber Kill Chain',
+          'MITRE ATT&CK',
+          'NIST Framework',
+          'Encryption',
+          'Decryption',
+          'Hashing',
+          'AES',
+          'RSA',
+          'ECC',
+          'SSL/TLS',
+          'Certificates',
+          'PKI',
+          'Digital Signatures'
+        ]
+      },
+      {
+        title: 'Phase 2: Web Technologies & Web Security',
+        description: 'Web development mechanics, cookies, sessions, JWT, OWASP Top 10 vulnerabilities (SQLi, XSS, CSRF, SSRF, IDOR), and auditing tools.',
+        topics: [
+          'HTML, CSS & JavaScript',
+          'Cookies, Sessions & JWT',
+          'REST APIs, GraphQL & WebSockets',
+          'OWASP Top 10',
+          'SQL Injection',
+          'XSS',
+          'CSRF',
+          'SSRF',
+          'XXE',
+          'SSTI',
+          'File Upload Vulnerabilities',
+          'Command Injection',
+          'IDOR',
+          'LFI & RFI',
+          'JWT Attacks',
+          'Authentication Bypass',
+          'Burp Suite',
+          'OWASP ZAP',
+          'Wireshark',
+          'Fiddler',
+          'Postman'
+        ]
+      },
+      {
+        title: 'Phase 3: Information Gathering & Reconnaissance',
+        description: 'Google Dorking, WHOIS, DNS enumeration, OSINT, Shodan, Censys, Nmap, Masscan, service enumeration, and vulnerability assessment.',
+        topics: [
+          'Google Dorking',
+          'WHOIS',
+          'DNS Enumeration',
+          'OSINT',
+          'Shodan',
+          'Censys',
+          'Nmap',
+          'Masscan',
+          'Netdiscover',
+          'Banner Grabbing',
+          'Service Enumeration',
+          'Vulnerability Assessment (Nessus, OpenVAS, Nikto, WhatWeb)'
+        ]
+      },
+      {
+        title: 'Phase 3: Exploitation, Password Attacks & Active Directory',
+        description: 'Metasploit, reverse shells, password attacks, wireless hacking, Active Directory exploitation, privilege escalation, and pivoting.',
+        topics: [
+          'Metasploit & Searchsploit',
+          'Reverse Shell & Bind Shell',
+          'Payloads & Exploit Development Basics',
+          'Password Attacks (Hydra, Hashcat, John the Ripper)',
+          'Brute Force & Password Spraying',
+          'Wireless Hacking (Aircrack-ng, WPA2/WPA3, Evil Twin)',
+          'Active Directory (Kerberos, NTLM, BloodHound, Pass-the-Hash, Kerberoasting)',
+          'Golden Ticket & Silver Ticket',
+          'Linux & Windows PrivEsc',
+          'Persistence, Lateral Movement & Pivoting'
+        ]
+      },
+      {
+        title: 'Phase 4: Cloud, Container & API Security',
+        description: 'Securing AWS, Azure, Google Cloud, IAM, Docker, Kubernetes container hardening, API security, OAuth, and rate limiting.',
+        topics: [
+          'Cloud Security (AWS, Azure, Google Cloud)',
+          'IAM, S3, EC2 & Security Groups',
+          'Container Security (Docker, Kubernetes, Hardening)',
+          'API Security (REST APIs, GraphQL, OAuth)',
+          'JWT Security & Rate Limiting'
+        ]
+      },
+      {
+        title: 'Phase 4: Malware Analysis & Reverse Engineering',
+        description: 'Analyzing viruses, worms, ransomware, static & dynamic analysis, assembly language, Ghidra, IDA Free, and x64dbg.',
+        topics: [
+          'Virus, Worm, Trojan, Ransomware, Spyware',
+          'Static Analysis & Dynamic Analysis',
+          'Reverse Engineering',
+          'x86 & x64 Assembly Basics',
+          'Ghidra',
+          'IDA Free',
+          'x64dbg'
+        ]
+      },
+      {
+        title: 'Phase 4: Digital Forensics, Incident Response & Blue Team',
+        description: 'Memory/disk forensics, incident response, SOC SIEM threat hunting, YARA/Sigma rules, and Android mobile security.',
+        topics: [
+          'Digital Forensics (Memory, Disk, Log, Browser, Email)',
+          'Incident Response (Detection, Containment, Eradication, Recovery, Reporting)',
+          'Blue Team (SOC, SIEM, Threat Hunting, Detection Rules, YARA, Sigma Rules)',
+          'Mobile Security (Android Security, APK Analysis, Frida, Objection)'
         ]
       }
     ]
