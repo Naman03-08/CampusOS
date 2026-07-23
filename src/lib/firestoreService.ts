@@ -327,4 +327,83 @@ export class FirestoreService {
       return [];
     }
   }
+
+  // ==========================================
+  // CODING COURSES & USER COURSE PROGRESS
+  // ==========================================
+
+  /**
+   * Seed/save coding courses into Firebase Firestore collection `codingCourses`.
+   */
+  static async seedCodingCourses(coursesList: any[]): Promise<void> {
+    if (!db || !coursesList || coursesList.length === 0) return;
+    try {
+      for (const course of coursesList) {
+        if (!course.id) continue;
+        await setDoc(doc(db, 'codingCourses', course.id), course, { merge: true });
+      }
+      console.log(`Successfully synced ${coursesList.length} coding courses to Firebase Firestore.`);
+    } catch (e) {
+      console.warn("Firestore seedCodingCourses error:", e);
+    }
+  }
+
+  /**
+   * Get all coding courses from Firebase Firestore collection `codingCourses`.
+   */
+  static async getCodingCourses(): Promise<any[]> {
+    if (!db) return [];
+    try {
+      const snap = await getDocs(collection(db, 'codingCourses'));
+      const list: any[] = [];
+      snap.forEach(d => list.push(d.data()));
+      return list;
+    } catch (e) {
+      console.warn("Firestore getCodingCourses error:", e);
+      return [];
+    }
+  }
+
+  /**
+   * Save user course progress for a specific course into Firestore collection `userCourseProgress`.
+   */
+  static async saveUserCourseProgress(uid: string, courseId: string, progressData: any): Promise<void> {
+    if (!db || !uid || !courseId) return;
+    try {
+      const docId = `${uid}_${courseId}`;
+      const payload = {
+        id: docId,
+        userId: uid,
+        courseId,
+        ...progressData,
+        updatedAt: new Date().toISOString()
+      };
+      await setDoc(doc(db, 'userCourseProgress', docId), payload, { merge: true });
+    } catch (e) {
+      console.warn("Firestore saveUserCourseProgress error:", e);
+    }
+  }
+
+  /**
+   * Get all course progress for a user from Firestore collection `userCourseProgress`.
+   */
+  static async getUserCourseProgress(uid: string): Promise<Record<string, any>> {
+    if (!db || !uid) return {};
+    try {
+      const q = query(collection(db, 'userCourseProgress'), where('userId', '==', uid));
+      const snap = await getDocs(q);
+      const progressMap: Record<string, any> = {};
+      snap.forEach(d => {
+        const data = d.data();
+        if (data.courseId) {
+          progressMap[data.courseId] = data;
+        }
+      });
+      return progressMap;
+    } catch (e) {
+      console.warn("Firestore getUserCourseProgress error:", e);
+      return {};
+    }
+  }
 }
+

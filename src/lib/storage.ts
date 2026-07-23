@@ -13,6 +13,7 @@ import {
 import { getCampusOSDSASheet } from '../data/dsaSheet375';
 
 const STORAGE_KEYS = {
+  LOGGED_IN: 'campusos_is_logged_in',
   PROFILE: 'campusos_user_profile',
   STUDY_SUITES: 'campusos_study_suites',
   ASSIGNMENTS: 'campusos_assignments',
@@ -101,6 +102,24 @@ export class StorageService {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (e) {
       console.error("Storage error:", e);
+    }
+  }
+
+  // Persistent Login State
+  static getIsLoggedIn(): boolean {
+    return this.get<boolean>(STORAGE_KEYS.LOGGED_IN, false);
+  }
+
+  static setIsLoggedIn(isLoggedIn: boolean): void {
+    this.set(STORAGE_KEYS.LOGGED_IN, isLoggedIn);
+  }
+
+  static clearUserData(): void {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.LOGGED_IN);
+      localStorage.removeItem(STORAGE_KEYS.PROFILE);
+    } catch (e) {
+      console.error("Storage clear error:", e);
     }
   }
 

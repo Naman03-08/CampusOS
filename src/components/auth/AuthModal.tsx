@@ -57,6 +57,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         };
 
         StorageService.saveProfile(profile);
+        StorageService.setIsLoggedIn(true);
         await FirestoreService.saveProfile(profile);
         onSuccess(profile);
       } else {
@@ -74,6 +75,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           createdAt: new Date().toISOString(),
         };
         StorageService.saveProfile(profile);
+        StorageService.setIsLoggedIn(true);
         onSuccess(profile);
       }
     } catch (err: any) {
@@ -102,6 +104,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       createdAt: new Date().toISOString(),
     };
     StorageService.saveProfile(profile);
+    StorageService.setIsLoggedIn(true);
     onSuccess(profile);
   };
 
@@ -133,6 +136,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               StorageService.saveProfile(existingProfile);
             }
 
+            StorageService.setIsLoggedIn(true);
             onSuccess(existingProfile);
             return;
           } catch (e: any) {
@@ -143,6 +147,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         }
         // Local fallback
         const init = StorageService.initializeZeroUserStorage('user_local_' + Date.now(), email || 'student@campus.edu', displayName || email.split('@')[0]);
+        StorageService.setIsLoggedIn(true);
         onSuccess(init.profile);
       } else {
         // Register New User - Initialize ZERO data across all sections
@@ -152,6 +157,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             const init = StorageService.initializeZeroUserStorage(res.user.uid, email, displayName || 'Campus Student');
             const profile = await FirestoreService.initializeNewUserWithZeroData(res.user.uid, email, displayName || 'Campus Student');
 
+            StorageService.setIsLoggedIn(true);
             onSuccess(profile);
             return;
           } catch (e: any) {
@@ -161,6 +167,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           }
         }
         const init = StorageService.initializeZeroUserStorage('user_' + Date.now(), email, displayName || 'Campus Student');
+        StorageService.setIsLoggedIn(true);
         onSuccess(init.profile);
       }
     } catch (err: any) {

@@ -1,17 +1,10 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, Auth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAnalytics, Analytics, isSupported } from 'firebase/analytics';
+import rawFirebaseConfig from '../../firebase-applet-config.json';
 
-export const firebaseConfig = {
-  apiKey: "AIzaSyAb6FmKQc0ncQG_0HmENX5ZTZI5I6uUdqI",
-  authDomain: "campusos01.firebaseapp.com",
-  projectId: "campusos01",
-  storageBucket: "campusos01.firebasestorage.app",
-  messagingSenderId: "635929031441",
-  appId: "1:635929031441:web:bf5f51f9ff6ac0460f12b0",
-  measurementId: "G-P9HY0FFQ53"
-};
+export const firebaseConfig = rawFirebaseConfig;
 
 let app: FirebaseApp;
 if (!getApps().length) {
@@ -21,11 +14,18 @@ if (!getApps().length) {
 }
 
 const auth: Auth = getAuth(app);
-const db: Firestore = getFirestore(app);
+
+if (typeof window !== 'undefined') {
+  setPersistence(auth, browserLocalPersistence).catch((err) => {
+    console.warn("Firebase persistence error:", err);
+  });
+}
+
+const db: Firestore = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
 const googleProvider = new GoogleAuthProvider();
 
 let analytics: Analytics | null = null;
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && firebaseConfig.measurementId) {
   isSupported().then((supported) => {
     if (supported) {
       analytics = getAnalytics(app);

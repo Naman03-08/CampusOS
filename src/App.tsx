@@ -38,10 +38,16 @@ import { auth } from './lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { UserProfile, StudySuite, AssignmentItem, AttendanceSubject, ScheduleEvent, DSAProblem, ResumeData, AppNotification } from './types';
 import { calculatePlanDetails } from './lib/planUtils';
+import { CODING_COURSES } from './data/codingCourses';
+import { COURSES } from './components/courses/CodingCoursesView';
 
 export function App() {
   const [user, setUser] = useState<UserProfile>(StorageService.getProfile());
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    const cachedLoggedIn = StorageService.getIsLoggedIn();
+    const cachedProfile = StorageService.getProfile();
+    return cachedLoggedIn || (!!cachedProfile && cachedProfile.uid !== 'guest_user');
+  });
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
@@ -151,12 +157,35 @@ export function App() {
     await FirestoreService.saveProfile(updatedProfile);
   };
 
+  // Automatically seed coding courses catalog to Firebase Firestore database
+  useEffect(() => {
+    const seedAllCourses = async () => {
+      try {
+        const combined = [...CODING_COURSES, ...COURSES];
+        await FirestoreService.seedCodingCourses(combined);
+      } catch (e) {
+        console.warn("Course seeding error:", e);
+      }
+    };
+    seedAllCourses();
+  }, []);
+
+  // Ensure current active user profile is saved/connected in Firestore database
+  useEffect(() => {
+    if (user && user.uid) {
+      FirestoreService.saveProfile(user).catch(err => {
+        console.warn("User profile sync warning:", err);
+      });
+    }
+  }, [user]);
+
   // Listen to Firebase Auth state changes
   useEffect(() => {
     if (!auth) return;
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
         setIsLoggedIn(true);
+        StorageService.setIsLoggedIn(true);
         // Load Profile from Firestore
         let fsProfile = await FirestoreService.getProfile(fbUser.uid);
         if (!fsProfile) {
@@ -211,6 +240,11 @@ export function App() {
         } catch (e) {
           console.warn("Error hydrating student data from Firestore:", e);
         }
+      } else {
+        // If not authenticated in Firebase and local storage says not logged in
+        if (!StorageService.getIsLoggedIn()) {
+          setIsLoggedIn(false);
+        }
       }
     });
     return () => unsubscribe();
@@ -224,10 +258,14 @@ export function App() {
   const handleAuthSuccess = (newProfile: UserProfile) => {
     setUser(newProfile);
     setIsLoggedIn(true);
+    StorageService.setIsLoggedIn(true);
+    StorageService.saveProfile(newProfile);
     setShowAuthModal(false);
   };
 
   const handleLogout = async () => {
+    StorageService.setIsLoggedIn(false);
+    StorageService.clearUserData();
     if (auth) {
       try {
         await signOut(auth);
@@ -236,6 +274,7 @@ export function App() {
       }
     }
     setIsLoggedIn(false);
+    setUser(StorageService.getProfile());
   };
 
   const handleSaveSuite = (suite: StudySuite) => {
@@ -357,7 +396,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF6EE] text-slate-900 font-sans selection:bg-amber-600 selection:text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-slate-900 font-sans selection:bg-purple-600 selection:text-white relative overflow-x-hidden">
       {/* 3D WebGL Canvas Ambient Particle Background */}
       <CanvasBackground />
 

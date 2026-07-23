@@ -86,12 +86,58 @@
         "bookmarked": { "type": "boolean" }
       },
       "required": ["id", "userId", "title"]
+    },
+    "codingCourses": {
+      "title": "Coding Courses",
+      "description": "Full coding course catalog, modules, lessons, code snippets, and capstones.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "category": { "type": "string" },
+        "badge": { "type": "string" },
+        "description": { "type": "string" },
+        "instructor": { "type": "object" },
+        "level": { "type": "string" },
+        "durationHours": { "type": "number" },
+        "totalModules": { "type": "number" },
+        "rating": { "type": "number" },
+        "enrolledStudentsCount": { "type": "number" },
+        "tags": { "type": "array" },
+        "gradientBg": { "type": "string" },
+        "modules": { "type": "array" },
+        "capstoneProject": { "type": "object" }
+      },
+      "required": ["id", "title", "category"]
+    },
+    "userCourseProgress": {
+      "title": "User Course Progress",
+      "description": "Tracks student enrollment and completed lesson IDs per course.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "courseId": { "type": "string" },
+        "completedLessonIds": { "type": "array" },
+        "lastAccessedAt": { "type": "string" },
+        "enrolledAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "courseId"]
     }
   },
   "securityRules": {
     "users": {
-      "read": "auth != null && auth.uid == resource.id",
-      "write": "auth != null && auth.uid == resource.id"
+      "read": "true",
+      "write": "true"
+    },
+    "codingCourses": {
+      "read": "true",
+      "write": "true"
+    },
+    "userCourseProgress": {
+      "read": "true",
+      "write": "true"
     },
     "studySuites": {
       "read": "auth != null && auth.uid == resource.data.userId",

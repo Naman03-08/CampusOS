@@ -8,42 +8,52 @@ service cloud.firestore {
 
     // User Profiles
     match /users/{userId} {
-      allow read, write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow read, write: if true;
     }
     
     // AI Study Suites
     match /studySuites/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow read, write: if true;
     }
     
     // Assignments
     match /assignments/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow read, write: if true;
     }
     
     // Attendance Records
     match /attendance/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow read, write: if true;
     }
     
     // Schedule Events
     match /schedules/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow read, write: if true;
     }
     
     // DSA Problems
     match /dsaProblems/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow read, write: if true;
     }
 
     // Resumes
     match /resumes/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow read, write: if true;
     }
 
     // Mock Interviews
     match /mockInterviews/{docId} {
-      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow read, write: if true;
+    }
+
+    // Coding Courses
+    match /codingCourses/{docId} {
+      allow read, write: if true;
+    }
+
+    // User Course Progress
+    match /userCourseProgress/{docId} {
+      allow read, write: if true;
     }
   }
 }

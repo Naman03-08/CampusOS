@@ -33,12 +33,14 @@ import {
 } from 'lucide-react';
 import { UserProfile } from '../../types';
 
+import { FirestoreService } from '../../lib/firestoreService';
+
 interface CodingCoursesViewProps {
   user: UserProfile;
   onNavigateTab?: (tab: string) => void;
 }
 
-interface CourseItem {
+export interface CourseItem {
   id: string;
   title: string;
   tagline: string;
@@ -47,6 +49,7 @@ interface CourseItem {
   linkType: 'telegram' | 'drive';
   linkUrl: string;
   bgGradient: string;
+  bgImageUrl?: string;
   accentColor: string;
   badgeBg: string;
   icon: React.ElementType;
@@ -61,7 +64,7 @@ interface CourseItem {
   }[];
 }
 
-const COURSES: CourseItem[] = [
+export const COURSES: CourseItem[] = [
   {
     id: 'mern-webdev',
     title: 'Web Development: Interactive MERN Core',
@@ -1186,8 +1189,19 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
       setPaymentSuccessMessage(true);
 
       setTimeout(() => {
-        setUnlockedCourses((prev) => [...new Set([...prev, payingForCourse.id])]);
-        setActiveCourseId(payingForCourse.id);
+        const courseId = payingForCourse.id;
+        setUnlockedCourses((prev) => [...new Set([...prev, courseId])]);
+        setActiveCourseId(courseId);
+
+        if (user && user.uid) {
+          FirestoreService.saveUserCourseProgress(user.uid, courseId, {
+            enrolled: true,
+            enrolledAt: new Date().toISOString(),
+            courseTitle: payingForCourse.title,
+            courseCategory: payingForCourse.category
+          });
+        }
+
         setPayingForCourse(null);
         setPaymentSuccessMessage(false);
       }, 1000);
@@ -1430,24 +1444,34 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
               key={course.id}
               className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group"
             >
-              {/* Card Header Gradient */}
-              <div className={`p-6 bg-gradient-to-br ${course.bgGradient} text-white relative`}>
-                <div className="flex items-center justify-between mb-4">
-                  <span className={`px-3 py-1 rounded-full text-[11px] font-black border ${course.badgeBg}`}>
+              {/* Card Header with Background Image Overlay */}
+              <div className={`p-6 bg-gradient-to-br ${course.bgGradient} text-white relative min-h-[170px] flex flex-col justify-between overflow-hidden`}>
+                {course.bgImageUrl && (
+                  <img
+                    src={course.bgImageUrl}
+                    alt={course.title}
+                    className="absolute inset-0 w-full h-full object-cover object-center opacity-30 mix-blend-overlay group-hover:scale-105 transition-transform duration-500"
+                    referrerPolicy="no-referrer"
+                  />
+                )}
+                <div className="relative z-10 flex items-center justify-between mb-3">
+                  <span className={`px-3 py-1 rounded-full text-[11px] font-black border backdrop-blur-md ${course.badgeBg}`}>
                     {course.category}
                   </span>
-                  <div className="p-2.5 rounded-2xl bg-white/20 backdrop-blur-md text-white">
+                  <div className="p-2.5 rounded-2xl bg-white/20 backdrop-blur-md text-white shadow-sm">
                     <IconComp className="w-6 h-6" />
                   </div>
                 </div>
 
-                <h3 className="text-lg font-black text-white tracking-tight leading-snug mb-2">
-                  {course.title}
-                </h3>
-                
-                <p className="text-xs text-white/90 line-clamp-2 font-medium">
-                  {course.tagline}
-                </p>
+                <div className="relative z-10">
+                  <h3 className="text-lg font-black text-white tracking-tight leading-snug mb-1.5 drop-shadow-sm">
+                    {course.title}
+                  </h3>
+                  
+                  <p className="text-xs text-white/90 line-clamp-2 font-medium drop-shadow-xs">
+                    {course.tagline}
+                  </p>
+                </div>
               </div>
 
               {/* Card Body */}
