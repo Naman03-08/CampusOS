@@ -2407,33 +2407,174 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Low-Level Design (LLD) & Design Patterns',
-        description: 'SOLID design principles, design patterns, and UML class diagrams.',
+        title: 'Phase 1: System Design Fundamentals',
+        description: 'Introduction to System Design, Functional vs Non-Functional Requirements, CAP Theorem, Scalability, Latency vs Throughput, Availability, Reliability, Consistency, and Fault Tolerance.',
         topics: [
-          'SOLID Principles & Clean Code Standards',
-          'Creational, Structural & Behavioral Patterns',
-          'Class Diagrams & Object-Oriented Modeling',
-          'LLD Case Studies: Parking Lot & Elevator System'
+          'What is System Design?',
+          'Functional vs Non-Functional Requirements',
+          'CAP Theorem',
+          'Scalability',
+          'Latency vs Throughput',
+          'Availability',
+          'Reliability',
+          'Consistency',
+          'Fault Tolerance'
         ]
       },
       {
-        title: 'Module 2: High-Level System Design (HLD) & Distributed Systems',
-        description: 'Scalability fundamentals, Load Balancing, CAP Theorem, and Consistent Hashing.',
+        title: 'Phase 2: Networking & Communication',
+        description: 'OSI Model, TCP vs UDP, HTTP / HTTPS, REST APIs, WebSockets, gRPC, DNS, CDN, Reverse Proxy, Load Balancer, and SSL/TLS.',
         topics: [
-          'Horizontal vs Vertical Scaling & Load Balancers',
-          'CAP & PACELC Theorems',
-          'Consistent Hashing & Data Partitioning',
-          'Database Sharding, Replication & CAP'
+          'OSI Model',
+          'TCP vs UDP',
+          'HTTP / HTTPS',
+          'REST APIs',
+          'WebSockets',
+          'gRPC',
+          'DNS',
+          'CDN',
+          'Reverse Proxy',
+          'Load Balancer',
+          'SSL/TLS'
         ]
       },
       {
-        title: 'Module 3: Caching, Message Queues & System Architectures',
-        description: 'Redis caching strategies, Kafka message queues, and case studies.',
+        title: 'Phase 3: Protocols',
+        description: 'HTTP Methods, Status Codes, Cookies, Sessions, JWT Authentication, OAuth, Webhooks, API Gateway, and Rate Limiting.',
         topics: [
-          'Redis Cache Strategies (Cache-Aside, Write-Through)',
-          'Kafka Event Streaming & Message Queues',
-          'Designing Distributed Rate Limiters',
-          'HLD Case Studies: WhatsApp, Uber & YouTube'
+          'HTTP Methods',
+          'Status Codes',
+          'Cookies',
+          'Sessions',
+          'JWT Authentication',
+          'OAuth',
+          'Webhooks',
+          'API Gateway',
+          'Rate Limiting'
+        ]
+      },
+      {
+        title: 'Phase 4: Software Architecture',
+        description: 'Monolithic Architecture, Microservices, Service-Oriented Architecture (SOA), Event-Driven Architecture, Layered Architecture, Client-Server Architecture, CQRS, and Event Sourcing.',
+        topics: [
+          'Monolithic Architecture',
+          'Microservices',
+          'Service-Oriented Architecture (SOA)',
+          'Event-Driven Architecture',
+          'Layered Architecture',
+          'Client-Server Architecture',
+          'CQRS',
+          'Event Sourcing'
+        ]
+      },
+      {
+        title: 'Phase 5: Web Concepts',
+        description: 'Caching, Browser Cache, Redis, Memcached, CDN, API Caching, Cache Invalidation, Compression, and Pagination.',
+        topics: [
+          'Caching',
+          'Browser Cache',
+          'Redis',
+          'Memcached',
+          'CDN',
+          'API Caching',
+          'Cache Invalidation',
+          'Compression',
+          'Pagination'
+        ]
+      },
+      {
+        title: 'Phase 6: Scalability',
+        description: 'Vertical Scaling, Horizontal Scaling, Auto Scaling, Stateless Servers, Sticky Sessions, Load Balancing Algorithms, Consistent Hashing, Sharding, and Replication.',
+        topics: [
+          'Vertical Scaling',
+          'Horizontal Scaling',
+          'Auto Scaling',
+          'Stateless Servers',
+          'Sticky Sessions',
+          'Load Balancing Algorithms',
+          'Consistent Hashing',
+          'Sharding',
+          'Replication'
+        ]
+      },
+      {
+        title: 'Phase 7: Databases & Storage',
+        description: 'SQL (MySQL, PostgreSQL, ACID, Transactions, Indexing, Normalization), NoSQL (MongoDB, Cassandra, DynamoDB, Redis, Key-Value, Document, Wide Column, Graph), and Storage (Blob, Object, File, Distributed, Partitioning).',
+        topics: [
+          'SQL (MySQL, PostgreSQL, ACID, Transactions)',
+          'Indexing & Normalization',
+          'NoSQL (MongoDB, Cassandra, DynamoDB, Redis)',
+          'Key-Value, Document & Wide Column Stores',
+          'Graph Databases',
+          'Blob, Object & File Storage',
+          'Distributed Storage & Data Partitioning'
+        ]
+      },
+      {
+        title: 'Phase 8: Performance Optimization',
+        description: 'Caching Strategies, Query Optimization, Database Indexing, Compression, Lazy Loading, Connection Pooling, Batch Processing, Asynchronous Processing, and CDN Optimization.',
+        topics: [
+          'Caching Strategies',
+          'Query Optimization',
+          'Database Indexing',
+          'Compression',
+          'Lazy Loading',
+          'Connection Pooling',
+          'Batch Processing',
+          'Asynchronous Processing',
+          'CDN Optimization'
+        ]
+      },
+      {
+        title: 'Phase 9: Reliability & Availability',
+        description: 'Replication, Backups, Disaster Recovery, Failover, Health Checks, Circuit Breaker, Retry Mechanism, Idempotency, Monitoring, and Logging.',
+        topics: [
+          'Replication & Backups',
+          'Disaster Recovery & Failover',
+          'Health Checks',
+          'Circuit Breaker Pattern',
+          'Retry Mechanism & Idempotency',
+          'Monitoring & Logging'
+        ]
+      },
+      {
+        title: 'Phase 10: Security',
+        description: 'Authentication, Authorization, JWT, OAuth 2.0, HTTPS, Encryption, Hashing, SQL Injection Prevention, XSS Prevention, CSRF Prevention, Rate Limiting, and API Security.',
+        topics: [
+          'Authentication & Authorization',
+          'JWT & OAuth 2.0',
+          'HTTPS, Encryption & Hashing',
+          'SQL Injection Prevention',
+          'XSS & CSRF Prevention',
+          'Rate Limiting & API Security'
+        ]
+      },
+      {
+        title: 'Phase 11: System Design Blueprint',
+        description: 'Requirement Gathering, Capacity Estimation, API Design, Database Design, High-Level Design, Low-Level Components, Bottleneck Analysis, Scaling Strategy, Trade-offs, and Final Architecture.',
+        topics: [
+          'Requirement Gathering',
+          'Capacity Estimation',
+          'API & Database Design',
+          'High-Level & Low-Level Component Design',
+          'Bottleneck Analysis',
+          'Scaling Strategy & Trade-offs',
+          'Final Architecture Layout'
+        ]
+      },
+      {
+        title: 'Phase 12: Real-World System Design Problems',
+        description: 'Designing TinyURL, BookMyShow, Twitter/X Feed, Instagram Feed, Notification Service, WhatsApp, eBay Auction System, Airbnb, Google Drive, Dropbox, YouTube, Google Search, Amazon, Uber, and Google Docs.',
+        topics: [
+          'TinyURL (URL Shortener)',
+          'BookMyShow',
+          'Twitter/X Feed & Instagram Feed',
+          'Notification Service & WhatsApp',
+          'eBay Auction System & Airbnb',
+          'Google Drive & Dropbox',
+          'YouTube & Google Search',
+          'Amazon & Uber',
+          'Google Docs'
         ]
       }
     ]
@@ -2462,33 +2603,183 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Node.js Runtime, Event Loop & Core Modules',
-        description: 'Understanding V8 Engine, Non-blocking I/O, Event Loop phases, FS module, Streams, and Buffers.',
+        title: 'Phase 1: JavaScript Fundamentals (Bonus)',
+        description: 'JavaScript basics, V8 Engine, Node.js Runtime, Variables & Data Types, Functions, Scope, Closures, Objects & Arrays, Modules, Callbacks, Promises, Async/Await, Event Loop, Error Handling, and ES Modules vs CommonJS.',
         topics: [
-          'Node.js Architecture & V8 Engine',
-          'Asynchronous Non-blocking I/O & Event Loop',
-          'File System (FS) & Event Emitters',
-          'Streams, Buffers & Pipeline Handling'
+          'JavaScript basics',
+          'V8 Engine',
+          'Node.js Runtime',
+          'Variables & Data Types',
+          'Functions',
+          'Scope',
+          'Closures',
+          'Objects & Arrays',
+          'Modules',
+          'Callbacks',
+          'Promises',
+          'Async/Await',
+          'Event Loop',
+          'Error Handling',
+          'ES Modules vs CommonJS'
         ]
       },
       {
-        title: 'Module 2: Express.js Framework & MongoDB Database',
-        description: 'Routing, custom middleware, error handling, MongoDB connection, Mongoose validation, and CRUD operations.',
+        title: 'Phase 2: Node.js Core',
+        description: 'Installing Node.js, npm & package.json, REPL, Running Node Scripts, Modules, File System (fs), Path Module, OS Module, Process Object, Events Module, Buffers, Streams, and Timers.',
         topics: [
-          'Express Routing & Middleware Pipelines',
-          'MongoDB Setup & Mongoose Schemas',
-          'Database Indexing & Aggregation Pipelines',
-          'Centralized Error Handling & Validation'
+          'Installing Node.js',
+          'npm & package.json',
+          'REPL',
+          'Running Node Scripts',
+          'Modules',
+          'File System (fs)',
+          'Path Module',
+          'OS Module',
+          'Process Object',
+          'Events Module',
+          'Buffers',
+          'Streams',
+          'Timers'
         ]
       },
       {
-        title: 'Module 3: Authentication, WebSockets & Capstone Backend Project',
-        description: 'JWT Auth, bcrypt password hashing, Socket.io real-time chat, file uploads (Multer/Cloudinary), and production deployment.',
+        title: 'Phase 3: HTTP & Native Web Server',
+        description: 'HTTP Module, Creating Web Servers, Routing, Request & Response, Serving Static Files, JSON APIs, Status Codes, Headers, and URL Parsing.',
         topics: [
-          'JWT Authentication & Cookie Sessions',
-          'Real-Time Communication with WebSockets',
-          'File Uploads with Multer & Cloudinary',
-          'Full Capstone E-Commerce REST API Deployment'
+          'HTTP Module',
+          'Creating Web Servers',
+          'Routing',
+          'Request & Response',
+          'Serving Static Files',
+          'JSON APIs',
+          'Status Codes',
+          'Headers',
+          'URL Parsing'
+        ]
+      },
+      {
+        title: 'Phase 4: Express.js Fundamentals',
+        description: 'Express Installation, Express Routing, Route Parameters, Query Parameters, Middleware, Static Middleware, Error Middleware, MVC Architecture, Controllers, Routers, Services, Environment Variables, and Book Store REST API Project.',
+        topics: [
+          'Express Installation & Routing',
+          'Route Parameters & Query Parameters',
+          'Middleware, Static & Error Middleware',
+          'MVC Architecture (Controllers, Routers, Services)',
+          'Environment Variables',
+          'Project: Book Store REST API'
+        ]
+      },
+      {
+        title: 'Phase 5: Databases (SQL)',
+        description: 'SQL vs NoSQL, PostgreSQL, Docker PostgreSQL, Database Design, Tables, Relationships, Primary Keys, Foreign Keys, Indexes, and CRUD Operations.',
+        topics: [
+          'SQL vs NoSQL',
+          'PostgreSQL & Docker PostgreSQL',
+          'Database Design & Tables',
+          'Relationships (Primary & Foreign Keys)',
+          'Indexes & CRUD Operations'
+        ]
+      },
+      {
+        title: 'Phase 6: Drizzle ORM',
+        description: 'ORM Basics, Drizzle ORM Setup, Schema Design, Migrations, Queries, Relations, and CRUD using ORM.',
+        topics: [
+          'ORM Basics & Drizzle ORM Setup',
+          'Schema Design & Migrations',
+          'Queries & Relations',
+          'CRUD using Drizzle ORM'
+        ]
+      },
+      {
+        title: 'Phase 7: REST API Development',
+        description: 'REST Principles, CRUD APIs, Validation, Request Parsing, API Architecture, API Testing, and Postman Collections.',
+        topics: [
+          'REST Principles & CRUD APIs',
+          'Validation & Request Parsing',
+          'API Architecture',
+          'API Testing & Postman Collections'
+        ]
+      },
+      {
+        title: 'Phase 8: Authentication & Authorization',
+        description: 'Sessions, Cookies, JWT Authentication, Password Hashing, Login, Signup, Protected Routes, Authorization, Role-Based Access Control (RBAC), and Middleware Security.',
+        topics: [
+          'Sessions & Cookies',
+          'JWT Authentication & Password Hashing',
+          'Login & Signup Workflows',
+          'Protected Routes & Authorization',
+          'Role-Based Access Control (RBAC)',
+          'Middleware Security'
+        ]
+      },
+      {
+        title: 'Phase 9: MongoDB (Bonus)',
+        description: 'MongoDB Installation, Collections, Documents, CRUD Operations, Queries, Indexes, Aggregation Framework, and MongoDB with Node.js.',
+        topics: [
+          'MongoDB Installation',
+          'Collections & Documents',
+          'CRUD Operations & Queries',
+          'Indexes & Aggregation Framework',
+          'MongoDB with Node.js'
+        ]
+      },
+      {
+        title: 'Phase 10: Mega Project – URL Shortener',
+        description: 'User Authentication, PostgreSQL Database, Drizzle ORM, URL Generation, Short Links, Analytics, Protected Dashboard, API Development, and Production Structure.',
+        topics: [
+          'User Authentication & Protected Dashboard',
+          'PostgreSQL Database & Drizzle ORM',
+          'URL Generation & Short Links Engine',
+          'Analytics & Production Structure'
+        ]
+      },
+      {
+        title: 'Phase 11: Docker (Bonus)',
+        description: 'Docker Basics, Images, Containers, Docker CLI, Dockerfile, Docker Compose, and Containerizing Node.js Apps.',
+        topics: [
+          'Docker Basics & CLI',
+          'Images & Containers',
+          'Dockerfile & Docker Compose',
+          'Containerizing Node.js Applications'
+        ]
+      },
+      {
+        title: 'Phase 12: MongoDB Aggregation',
+        description: 'Aggregation Pipeline, Match, Group, Project, Sort, Lookup, and Advanced Aggregation Queries.',
+        topics: [
+          'Aggregation Pipeline Fundamentals',
+          '$match, $group, $project, $sort, $lookup',
+          'Advanced Aggregation Queries'
+        ]
+      },
+      {
+        title: 'Phase 13: Major Project – Basecamp Clone',
+        description: 'Project Planning, Team Management, Authentication, Projects, Tasks, APIs, Database Design, and Full Backend Architecture.',
+        topics: [
+          'Project Planning & Database Design',
+          'Team Management & Authentication',
+          'Projects & Tasks APIs',
+          'Full Backend Architecture'
+        ]
+      },
+      {
+        title: 'Phase 14: System Design',
+        description: 'Scaling Applications, Monolith vs Microservices, Caching, Load Balancers, Databases, Architecture Patterns, API Design, Performance Optimization, and Production Readiness.',
+        topics: [
+          'Scaling Applications & Architecture Patterns',
+          'Monolith vs Microservices',
+          'Caching & Load Balancers',
+          'API Design & Performance Optimization',
+          'Production Readiness'
+        ]
+      },
+      {
+        title: 'Phase 15: Git (Bonus)',
+        description: 'Git Basics, GitHub, Branches, Merge, Pull Requests, Collaboration, and Version Control Workflow.',
+        topics: [
+          'Git Basics & GitHub',
+          'Branches, Merge & Pull Requests',
+          'Collaboration & Version Control Workflow'
         ]
       }
     ]
@@ -2517,33 +2808,230 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Spring Boot Microservices & REST API Fundamentals',
-        description: 'Building RESTful web services with Spring Boot, Spring Data JPA, H2/PostgreSQL databases, and Bean Validation.',
+        title: 'Phase 1: Microservices Fundamentals',
+        description: 'Introduction to Microservices, Monolithic vs SOA vs Microservices, Benefits & Challenges, Service Boundaries, Domain Driven Design (DDD) Basics, Cloud Native Applications, 12/15 Factor Methodology, and Distributed Systems Concepts.',
         topics: [
-          'Spring Boot Architecture & Auto-configuration',
-          'Spring Data JPA & Entity Relationships',
-          'REST API Design & Swagger/OpenAPI Specs',
-          'Exception Handling & Input Validation'
+          'Introduction to Microservices',
+          'Monolithic vs SOA vs Microservices',
+          'Benefits & Challenges',
+          'Service Boundaries',
+          'Domain Driven Design (DDD) Basics',
+          'Cloud Native Applications',
+          '12/15 Factor Methodology',
+          'Distributed Systems Concepts'
         ]
       },
       {
-        title: 'Module 2: Spring Cloud Ecosystem & Microservice Patterns',
-        description: 'Service discovery with Eureka, Centralized Config Server, Spring Cloud Gateway, Resilience4j, and Kafka messaging.',
+        title: 'Phase 2: Spring Boot Fundamentals',
+        description: 'Spring Boot Setup, Maven, REST APIs, Controllers, Services, Repository Layer, Spring Data JPA, Hibernate, MySQL Integration, Validation, Exception Handling, and Configuration Properties.',
         topics: [
-          'Eureka Service Registry & Discovery',
-          'Spring Cloud Gateway Routing & Security',
-          'Resilience4j Circuit Breaker & Rate Limiting',
-          'Event-Driven Microservices with Kafka'
+          'Spring Boot Setup & Maven',
+          'REST APIs, Controllers & Services',
+          'Repository Layer, Spring Data JPA & Hibernate',
+          'MySQL Integration',
+          'Validation & Exception Handling',
+          'Configuration Properties'
         ]
       },
       {
-        title: 'Module 3: Docker Containerization & Kubernetes Orchestration',
-        description: 'Building OCI Docker images, Docker Compose multi-container environments, Kubernetes deployment, and ConfigMaps/Secrets.',
+        title: 'Phase 3: Building Production Microservices',
+        description: 'Building Accounts Service, Cards Service, Loans Service, Gateway Service, Config Server, Eureka Server with CRUD APIs, DTOs, Mapping, Layered Architecture, Externalized Configuration, Profiles, and Environment Variables.',
         topics: [
-          'Dockerizing Spring Boot Applications',
-          'Docker Compose Microservice Stacks',
-          'Kubernetes Deployments, Pods & Services',
-          'K8s ConfigMaps, Secrets & Helm Charts'
+          'Accounts, Cards & Loans Services',
+          'Gateway Service, Config Server & Eureka Server',
+          'CRUD APIs, DTOs & Mapping',
+          'Layered Architecture',
+          'Externalized Configuration & Profiles',
+          'Environment Variables'
+        ]
+      },
+      {
+        title: 'Phase 4: Spring Cloud',
+        description: 'Spring Cloud Overview, Config Server, Config Client, Git-based Configuration, Refresh Configuration, and Distributed Configuration.',
+        topics: [
+          'Spring Cloud Overview',
+          'Config Server & Config Client',
+          'Git-based Configuration',
+          'Refresh Configuration',
+          'Distributed Configuration'
+        ]
+      },
+      {
+        title: 'Phase 5: Service Discovery',
+        description: 'Eureka Server, Eureka Client, Service Registration, Service Discovery, Load Balancing, and Dynamic Scaling.',
+        topics: [
+          'Eureka Server & Eureka Client',
+          'Service Registration & Service Discovery',
+          'Load Balancing',
+          'Dynamic Scaling'
+        ]
+      },
+      {
+        title: 'Phase 6: API Gateway',
+        description: 'Spring Cloud Gateway, Routing, Filters, Global Filters, Authentication Filters, Rate Limiting, and Cross-cutting Concerns.',
+        topics: [
+          'Spring Cloud Gateway',
+          'Routing & Filters',
+          'Global & Authentication Filters',
+          'Rate Limiting & Cross-cutting Concerns'
+        ]
+      },
+      {
+        title: 'Phase 7: Inter-Service Communication',
+        description: 'REST Communication, OpenFeign Client, Service-to-Service Calls, Load Balanced Communication, and Timeout Handling.',
+        topics: [
+          'REST Communication',
+          'OpenFeign Client',
+          'Service-to-Service Calls',
+          'Load Balanced Communication',
+          'Timeout Handling'
+        ]
+      },
+      {
+        title: 'Phase 8: Resilience & Fault Tolerance',
+        description: 'Resilience4j, Circuit Breaker, Retry, Bulkhead, Rate Limiter, Time Limiter, Fallback Methods, and Failure Handling.',
+        topics: [
+          'Resilience4j Overview',
+          'Circuit Breaker & Retry',
+          'Bulkhead & Rate Limiter',
+          'Time Limiter & Fallback Methods',
+          'Failure Handling'
+        ]
+      },
+      {
+        title: 'Phase 9: Docker',
+        description: 'Docker Basics, Containers, Images, Docker Architecture, Docker CLI, Docker Hub, Dockerfile, Image Optimization, Docker Networking, Docker Volumes, Multi-stage Builds, Docker Compose, and Running Complete Microservices Stack.',
+        topics: [
+          'Docker Basics, Containers & Images',
+          'Docker Architecture, CLI & Docker Hub',
+          'Dockerfile & Image Optimization',
+          'Docker Networking & Volumes',
+          'Multi-stage Builds & Docker Compose',
+          'Running Complete Microservices Stack'
+        ]
+      },
+      {
+        title: 'Phase 10: Kubernetes',
+        description: 'Kubernetes Architecture, Pods, ReplicaSets, Deployments, Services, Labels, Selectors, Namespaces, ConfigMaps, Secrets, Ingress, Rolling Updates, Rollbacks, Auto Scaling, Resource Limits, Health Checks, Liveness Probe, and Readiness Probe.',
+        topics: [
+          'Kubernetes Architecture, Pods & ReplicaSets',
+          'Deployments & Services',
+          'Labels, Selectors & Namespaces',
+          'ConfigMaps & Secrets',
+          'Ingress, Rolling Updates & Rollbacks',
+          'Auto Scaling & Resource Limits',
+          'Health Checks (Liveness & Readiness Probes)'
+        ]
+      },
+      {
+        title: 'Phase 11: Helm',
+        description: 'Helm Introduction, Helm Charts, Templates, Values Files, Releases, Installing Applications, and Managing Helm Deployments.',
+        topics: [
+          'Helm Introduction & Helm Charts',
+          'Templates & Values Files',
+          'Releases & Installing Applications',
+          'Managing Helm Deployments'
+        ]
+      },
+      {
+        title: 'Phase 12: Security',
+        description: 'Spring Security, OAuth2, OpenID Connect, JWT Authentication, Authorization, Authentication Flow, Resource Server, and Secure APIs.',
+        topics: [
+          'Spring Security Overview',
+          'OAuth2 & OpenID Connect',
+          'JWT Authentication & Authorization',
+          'Authentication Flow & Resource Server',
+          'Securing REST APIs'
+        ]
+      },
+      {
+        title: 'Phase 13: Event-Driven Microservices',
+        description: 'Event-Driven Architecture, Asynchronous Communication, RabbitMQ, Kafka, Producers, Consumers, Topics, Queues, Message Routing, and Dead Letter Queues.',
+        topics: [
+          'Event-Driven Architecture & Async Messaging',
+          'RabbitMQ & Apache Kafka',
+          'Producers, Consumers, Topics & Queues',
+          'Message Routing & Dead Letter Queues'
+        ]
+      },
+      {
+        title: 'Phase 14: Spring Cloud Stream',
+        description: 'Spring Cloud Stream, Functional Programming Model, Message Binding, Event Publishing, and Event Consumption.',
+        topics: [
+          'Spring Cloud Stream Fundamentals',
+          'Functional Programming Model',
+          'Message Binding',
+          'Event Publishing & Consumption'
+        ]
+      },
+      {
+        title: 'Phase 15: Spring Cloud Function',
+        description: 'Functional Beans, Function Composition, Event Processing, and Cloud Function Integration.',
+        topics: [
+          'Functional Beans & Function Composition',
+          'Event Processing',
+          'Cloud Function Integration'
+        ]
+      },
+      {
+        title: 'Phase 16: Observability & Monitoring',
+        description: 'Micrometer, Prometheus, Grafana, Loki, Promtail, Tempo, Distributed Tracing, Metrics Collection, Log Aggregation, and Dashboard Creation.',
+        topics: [
+          'Micrometer, Prometheus & Grafana',
+          'Loki, Promtail & Tempo',
+          'Distributed Tracing & Metrics Collection',
+          'Log Aggregation & Dashboard Creation'
+        ]
+      },
+      {
+        title: 'Phase 17: API Documentation',
+        description: 'OpenAPI Specification, Swagger UI, API Documentation, and Testing Endpoints.',
+        topics: [
+          'OpenAPI Specification',
+          'Swagger UI',
+          'API Documentation',
+          'Testing Endpoints'
+        ]
+      },
+      {
+        title: 'Phase 18: Configuration & Deployment',
+        description: 'Profiles, Environment Variables, External Configuration, Secrets Management, and Production Configuration.',
+        topics: [
+          'Profiles & Environment Variables',
+          'External Configuration',
+          'Secrets Management',
+          'Production Configuration'
+        ]
+      },
+      {
+        title: 'Phase 19: Cloud Native Practices',
+        description: 'Cloud Native Principles, Containerized Applications, Scalability, Stateless Services, High Availability, and Microservice Best Practices.',
+        topics: [
+          'Cloud Native Principles',
+          'Containerized Applications & Scalability',
+          'Stateless Services & High Availability',
+          'Microservice Best Practices'
+        ]
+      },
+      {
+        title: 'Phase 20: End-to-End Deployment',
+        description: 'Build Complete Microservices System, Docker Deployment, Docker Compose Deployment, Kubernetes Deployment, Helm Deployment, Monitoring Setup, Logging Setup, and Security Setup.',
+        topics: [
+          'Build Complete Microservices System',
+          'Docker & Docker Compose Deployment',
+          'Kubernetes & Helm Deployment',
+          'Monitoring, Logging & Security Setup'
+        ]
+      },
+      {
+        title: 'Phase 21: Best Practices',
+        description: 'Production Architecture, Microservice Design Patterns, API Versioning, Error Handling, Logging Standards, Monitoring Standards, Performance Optimization, Scalability, and Production Readiness Checklist.',
+        topics: [
+          'Production Architecture & Design Patterns',
+          'API Versioning & Error Handling',
+          'Logging & Monitoring Standards',
+          'Performance Optimization & Scalability',
+          'Production Readiness Checklist'
         ]
       }
     ]
@@ -2572,33 +3060,325 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Java Basics, Control Flow & OOP Fundamentals',
-        description: 'JDK setup, JVM/JRE architecture, variables, loops, methods, classes, objects, and encapsulation.',
+        title: 'Phase 1: Java Setup',
+        description: 'Install JDK, Java Installation (Windows, Mac, Linux), Environment Variables, JShell, IDE Setup, and Troubleshooting.',
         topics: [
-          'JVM, JRE & JDK Architecture',
-          'Data Types & Control Flow Statements',
+          'Install JDK',
+          'Java Installation (Windows, Mac, Linux)',
+          'Environment Variables',
+          'JShell',
+          'IDE Setup',
+          'Troubleshooting'
+        ]
+      },
+      {
+        title: 'Phase 2: Java Fundamentals',
+        description: 'Java History, JDK vs JRE vs JVM, Bytecode, Java Compilation Process, Hello World, Java Program Structure, and Comments.',
+        topics: [
+          'Java History',
+          'JDK vs JRE vs JVM',
+          'Bytecode',
+          'Java Compilation Process',
+          'Hello World',
+          'Java Program Structure',
+          'Comments'
+        ]
+      },
+      {
+        title: 'Phase 3: Variables & Data Types',
+        description: 'Primitive Data Types, Non-Primitive Types, Variables, Constants, Type Casting, Wrapper Classes, and Literals.',
+        topics: [
+          'Primitive Data Types',
+          'Non-Primitive Types',
+          'Variables & Constants',
+          'Type Casting',
+          'Wrapper Classes',
+          'Literals'
+        ]
+      },
+      {
+        title: 'Phase 4: Operators',
+        description: 'Arithmetic, Assignment, Relational, Logical, Unary, Bitwise, Ternary, Operator Precedence, and Short Circuit Operators.',
+        topics: [
+          'Arithmetic & Assignment Operators',
+          'Relational & Logical Operators',
+          'Unary, Bitwise & Ternary Operators',
+          'Operator Precedence & Short Circuit Operators'
+        ]
+      },
+      {
+        title: 'Phase 5: Input & Output',
+        description: 'Scanner Class, Reading Numbers, Reading Strings, and Formatted Output.',
+        topics: [
+          'Scanner Class',
+          'Reading Numbers',
+          'Reading Strings',
+          'Formatted Output'
+        ]
+      },
+      {
+        title: 'Phase 6: Methods',
+        description: 'Methods, Parameters, Arguments, Return Values, Method Overloading, and Pass by Value.',
+        topics: [
+          'Methods, Parameters & Arguments',
+          'Return Values',
+          'Method Overloading',
+          'Pass by Value'
+        ]
+      },
+      {
+        title: 'Phase 7: Conditional Statements',
+        description: 'if, if-else, Nested if, Switch, Switch Expressions (Java 14+), and Ternary Operator.',
+        topics: [
+          'if & if-else Statements',
+          'Nested if & Switch',
+          'Switch Expressions (Java 14+)',
+          'Ternary Operator'
+        ]
+      },
+      {
+        title: 'Phase 8: Loops',
+        description: 'for Loop, while Loop, do-while, Nested Loops, break, continue, and Enhanced for Loop.',
+        topics: [
+          'for, while & do-while Loops',
+          'Nested Loops',
+          'break & continue',
+          'Enhanced for Loop'
+        ]
+      },
+      {
+        title: 'Phase 9: Object-Oriented Programming (OOP)',
+        description: 'Classes, Objects, Constructors, this Keyword, Encapsulation, Abstraction, Inheritance, Polymorphism, Method Overriding, Method Overloading, and Access Modifiers.',
+        topics: [
           'Classes, Objects & Constructors',
-          'Encapsulation & Access Modifiers'
+          'this Keyword & Encapsulation',
+          'Abstraction & Inheritance',
+          'Polymorphism, Method Overriding & Overloading',
+          'Access Modifiers'
         ]
       },
       {
-        title: 'Module 2: Advanced OOPs, Interfaces & Exception Handling',
-        description: 'Inheritance, Polymorphism, Abstraction, Interfaces, Packages, and Custom Exception Handling.',
+        title: 'Phase 10: Strings',
+        description: 'String, String Methods, StringBuilder, StringBuffer, Text Blocks, and String Comparison.',
         topics: [
-          'Method Overloading & Overriding',
-          'Abstract Classes & Interfaces',
-          'Exception Handling with Try-Catch-Finally',
-          'Custom Exceptions & Packages'
+          'String & String Methods',
+          'StringBuilder & StringBuffer',
+          'Text Blocks',
+          'String Comparison'
         ]
       },
       {
-        title: 'Module 3: Java Collections Framework, Streams & Multithreading',
-        description: 'ArrayList, LinkedList, HashMap, HashSet, Iterators, Lambda expressions, Streams API, and Threads.',
+        title: 'Phase 11: Arrays',
+        description: '1D Arrays, 2D Arrays, Array of Objects, Arrays Utility Class, and Array Algorithms.',
         topics: [
-          'ArrayList, HashSet & HashMap Mastery',
-          'Generics & Iterators',
-          'Java 8 Lambdas & Stream API',
-          'Multithreading & Concurrency Basics'
+          '1D Arrays & 2D Arrays',
+          'Array of Objects',
+          'Arrays Utility Class',
+          'Array Algorithms'
+        ]
+      },
+      {
+        title: 'Phase 12: Collections Framework',
+        description: 'ArrayList, LinkedList, Vector, Stack, Queue, PriorityQueue, HashSet, LinkedHashSet, TreeSet, HashMap, LinkedHashMap, TreeMap, and Iterator.',
+        topics: [
+          'ArrayList, LinkedList, Vector & Stack',
+          'Queue & PriorityQueue',
+          'HashSet, LinkedHashSet & TreeSet',
+          'HashMap, LinkedHashMap & TreeMap',
+          'Iterator'
+        ]
+      },
+      {
+        title: 'Phase 13: Exception Handling',
+        description: 'try, catch, finally, throw, throws, Custom Exceptions, Checked Exceptions, and Unchecked Exceptions.',
+        topics: [
+          'try, catch & finally',
+          'throw & throws',
+          'Custom Exceptions',
+          'Checked & Unchecked Exceptions'
+        ]
+      },
+      {
+        title: 'Phase 14: Packages',
+        description: 'Creating Packages, Import Statements, and Package Structure.',
+        topics: [
+          'Creating Packages',
+          'Import Statements',
+          'Package Structure'
+        ]
+      },
+      {
+        title: 'Phase 15: Java Built-in Classes',
+        description: 'Math, Random, BigInteger, BigDecimal, Objects Class, and Wrapper Classes.',
+        topics: [
+          'Math & Random Classes',
+          'BigInteger & BigDecimal',
+          'Objects Class & Wrapper Classes'
+        ]
+      },
+      {
+        title: 'Phase 16: Date & Time API',
+        description: 'LocalDate, LocalTime, LocalDateTime, and Formatting Dates.',
+        topics: [
+          'LocalDate & LocalTime',
+          'LocalDateTime',
+          'Formatting Dates'
+        ]
+      },
+      {
+        title: 'Phase 17: File Handling',
+        description: 'File Class, Reading Files, Writing Files, BufferedReader, BufferedWriter, and Scanner with Files.',
+        topics: [
+          'File Class',
+          'Reading & Writing Files',
+          'BufferedReader & BufferedWriter',
+          'Scanner with Files'
+        ]
+      },
+      {
+        title: 'Phase 18: Java Generics',
+        description: 'Generic Classes, Generic Methods, and Wildcards.',
+        topics: [
+          'Generic Classes',
+          'Generic Methods',
+          'Wildcards'
+        ]
+      },
+      {
+        title: 'Phase 19: Functional Programming',
+        description: 'Lambda Expressions, Functional Interfaces, and Method References.',
+        topics: [
+          'Lambda Expressions',
+          'Functional Interfaces',
+          'Method References'
+        ]
+      },
+      {
+        title: 'Phase 20: Streams API',
+        description: 'Stream Basics, Filter, Map, Reduce, Collect, Sorting, Parallel Streams, and Stream Gatherers (Java 24).',
+        topics: [
+          'Stream Basics, Filter, Map & Reduce',
+          'Collect & Sorting',
+          'Parallel Streams',
+          'Stream Gatherers (Java 24)'
+        ]
+      },
+      {
+        title: 'Phase 21: Modern Java Features',
+        description: 'Records, Sealed Classes, Pattern Matching, Switch Expressions, Text Blocks, Virtual Threads (Project Loom), Markdown Documentation Comments, Unnamed Variables, and New Java 24 Features.',
+        topics: [
+          'Records & Sealed Classes',
+          'Pattern Matching & Switch Expressions',
+          'Text Blocks & Virtual Threads (Project Loom)',
+          'Markdown Documentation Comments & Unnamed Variables',
+          'New Java 24 Features'
+        ]
+      },
+      {
+        title: 'Phase 22: Object Class',
+        description: 'equals(), hashCode(), toString(), and clone().',
+        topics: [
+          'equals() & hashCode()',
+          'toString() & clone()'
+        ]
+      },
+      {
+        title: 'Phase 23: Interfaces',
+        description: 'Interface Basics, Default Methods, Static Methods, and Functional Interfaces.',
+        topics: [
+          'Interface Basics',
+          'Default Methods & Static Methods',
+          'Functional Interfaces'
+        ]
+      },
+      {
+        title: 'Phase 24: Abstract Classes',
+        description: 'Abstract Methods, Abstract Classes, and Difference Between Interface & Abstract Class.',
+        topics: [
+          'Abstract Methods',
+          'Abstract Classes',
+          'Difference Between Interface & Abstract Class'
+        ]
+      },
+      {
+        title: 'Phase 25: Enums',
+        description: 'Enum Basics and Enum Methods.',
+        topics: [
+          'Enum Basics',
+          'Enum Methods'
+        ]
+      },
+      {
+        title: 'Phase 26: Java Memory',
+        description: 'Stack Memory, Heap Memory, and Garbage Collection.',
+        topics: [
+          'Stack Memory & Heap Memory',
+          'Garbage Collection'
+        ]
+      },
+      {
+        title: 'Phase 27: Multithreading',
+        description: 'Threads, Runnable, Thread Lifecycle, Synchronization, and Virtual Threads.',
+        topics: [
+          'Threads & Runnable Interface',
+          'Thread Lifecycle & Synchronization',
+          'Virtual Threads'
+        ]
+      },
+      {
+        title: 'Phase 28: Maven',
+        description: 'Maven Introduction, pom.xml, and Dependency Management.',
+        topics: [
+          'Maven Introduction',
+          'pom.xml Configuration',
+          'Dependency Management'
+        ]
+      },
+      {
+        title: 'Phase 29: Spring Framework Basics',
+        description: 'Spring Introduction, Dependency Injection, and IoC Container.',
+        topics: [
+          'Spring Introduction',
+          'Dependency Injection',
+          'IoC Container'
+        ]
+      },
+      {
+        title: 'Phase 30: Spring Boot',
+        description: 'Spring Boot Setup, REST APIs, Controllers, Services, Dependency Injection, and Spring Boot Project Structure.',
+        topics: [
+          'Spring Boot Setup & Project Structure',
+          'REST APIs, Controllers & Services',
+          'Dependency Injection'
+        ]
+      },
+      {
+        title: 'Phase 31: JPA & Hibernate',
+        description: 'ORM Basics, Entities, Repositories, CRUD Operations, Relationships, and Hibernate.',
+        topics: [
+          'ORM Basics & Entities',
+          'Repositories & CRUD Operations',
+          'Relationships & Hibernate'
+        ]
+      },
+      {
+        title: 'Phase 32: REST API Project',
+        description: 'REST Endpoints, JSON, HTTP Methods, Request Mapping, and ResponseEntity.',
+        topics: [
+          'REST Endpoints & JSON',
+          'HTTP Methods & Request Mapping',
+          'ResponseEntity'
+        ]
+      },
+      {
+        title: 'Phase 33: Interview Preparation & Projects Included',
+        description: 'Java & OOP Interview Questions, Coding Exercises, Best Practices, Puzzles, Multiple Console Apps, OOP Mini Projects, Spring Boot REST API Project, and CRUD Application using Spring Boot + JPA + Hibernate.',
+        topics: [
+          'Java & OOP Interview Questions',
+          'Coding Exercises, Best Practices & Puzzles',
+          'Multiple Console Applications & OOP Mini Projects',
+          'Spring Boot REST API Project',
+          'CRUD Application using Spring Boot + JPA + Hibernate'
         ]
       }
     ]
@@ -2627,33 +3407,231 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: MLOps Foundations, Data Versioning & MLflow',
-        description: 'MLOps lifecycle, modular coding structure, DVC data versioning, MLflow experiment tracking, and model registry.',
+        title: 'Phase 1: Python Fundamentals',
+        description: 'Python Syntax, Variables & Data Types, Operators, Conditional Statements, Loops, Strings, Lists, Tuples, Sets, Dictionaries, Functions, Lambda Functions, map(), filter(), Modules & Packages, File Handling, Exception Handling, OOP, Inheritance, Polymorphism, Encapsulation, Abstraction, Magic Methods, Custom Exceptions, Operator Overloading, Iterators, Generators, Decorators, NumPy, Pandas, Data Manipulation, Reading CSV/Excel/SQL Data, Logging, Multiple Loggers, and Production Logging.',
         topics: [
-          'MLOps Lifecycle & Project Architecture',
-          'Data Version Control (DVC) Pipelines',
-          'MLflow Experiment Tracking & Logging',
-          'Model Packaging & Registry'
+          'Python Syntax, Variables & Data Types',
+          'Operators & Conditional Statements',
+          'Loops (for, while, break, continue)',
+          'Strings, Lists, Tuples, Sets & Dictionaries',
+          'Functions, Lambda Functions, map() & filter()',
+          'Modules, Packages & File Handling',
+          'Exception Handling & Custom Exceptions',
+          'OOP: Inheritance, Polymorphism, Encapsulation & Abstraction',
+          'Magic Methods & Operator Overloading',
+          'Iterators, Generators & Decorators',
+          'NumPy, Pandas & Data Manipulation',
+          'Reading CSV/Excel/SQL Data',
+          'Logging, Multiple Loggers & Production Logging'
         ]
       },
       {
-        title: 'Module 2: Model Serving, Containerization & CI/CD',
-        description: 'FastAPI model endpoints, Docker containerization, BentoML serving, and GitHub Actions CI/CD workflows.',
+        title: 'Phase 2: Flask',
+        description: 'Flask Introduction, Routing, HTML Templates, Jinja2, Forms, GET & POST Requests, Dynamic URLs, REST APIs, and PUT & DELETE APIs.',
         topics: [
-          'FastAPI & Flask REST Endpoints for ML Models',
-          'Dockerizing ML Pipelines & Containers',
-          'BentoML & Triton Model Server',
-          'GitHub Actions CI/CD Automation'
+          'Flask Introduction & Routing',
+          'HTML Templates, Jinja2 & Forms',
+          'GET & POST Requests & Dynamic URLs',
+          'REST APIs (PUT & DELETE APIs)'
         ]
       },
       {
-        title: 'Module 3: Cloud Deployment (AWS) & Model Monitoring',
-        description: 'Deploying ML pipelines on AWS EC2/ECR/S3, monitoring data drift, Evidently AI, and 10+ Capstone Projects.',
+        title: 'Phase 3: Git & GitHub',
+        description: 'Git Installation, Repository Creation, Commit, Push, Pull, Branching, Merge, Checkout, Git Log, Merge Conflicts, and GitHub Workflow.',
         topics: [
-          'AWS EC2, S3 & ECR Deployment Pipelines',
-          'Data & Concept Drift Monitoring with Evidently AI',
-          'Prometheus & Grafana ML Dashboards',
-          '10+ Industry Capstone ML Project Walkthroughs'
+          'Git Installation & Repository Creation',
+          'Commit, Push, Pull & Git Log',
+          'Branching, Merge & Checkout',
+          'Merge Conflicts & GitHub Workflow'
+        ]
+      },
+      {
+        title: 'Phase 4: MLflow',
+        description: 'MLflow Introduction, Experiment Tracking, Tracking Server, ML Projects, Model Logging, Model Registry, Artifact Management, Model Inference, and Production Tracking.',
+        topics: [
+          'MLflow Introduction & Experiment Tracking',
+          'Tracking Server & ML Projects',
+          'Model Logging & Model Registry',
+          'Artifact Management & Model Inference',
+          'Production Tracking'
+        ]
+      },
+      {
+        title: 'Phase 5: MLflow Integration',
+        description: 'House Price Prediction, Data Preprocessing, Training, Logging Metrics, Logging Parameters, and Registering Models.',
+        topics: [
+          'House Price Prediction Project',
+          'Data Preprocessing & Training',
+          'Logging Metrics & Logging Parameters',
+          'Registering Models'
+        ]
+      },
+      {
+        title: 'Phase 6: Deep Learning + MLflow',
+        description: 'ANN, TensorFlow Integration, Model Tracking, and Experiment Comparison.',
+        topics: [
+          'Artificial Neural Networks (ANN)',
+          'TensorFlow Integration',
+          'Model Tracking & Experiment Comparison'
+        ]
+      },
+      {
+        title: 'Phase 7: Data Version Control (DVC)',
+        description: 'DVC Installation, Dataset Versioning, Pipeline Creation, Data Tracking, and Model Versioning.',
+        topics: [
+          'DVC Installation',
+          'Dataset Versioning & Data Tracking',
+          'Pipeline Creation',
+          'Model Versioning'
+        ]
+      },
+      {
+        title: 'Phase 8: DagsHub',
+        description: 'DagsHub Introduction, Remote Repository, Git + DVC Integration, and Experiment Tracking.',
+        topics: [
+          'DagsHub Introduction & Remote Repository',
+          'Git + DVC Integration',
+          'Experiment Tracking on DagsHub'
+        ]
+      },
+      {
+        title: 'Phase 9: End-to-End MLOps Pipeline',
+        description: 'Git, DVC, MLflow, DagsHub, Complete Pipeline, Version Control, and Experiment Tracking.',
+        topics: [
+          'Git, DVC, MLflow & DagsHub Integration',
+          'Complete MLOps Pipeline',
+          'Version Control & Experiment Tracking'
+        ]
+      },
+      {
+        title: 'Phase 10: MLflow + AWS',
+        description: 'AWS Setup, S3, MLflow Server on AWS, Artifact Storage, and Cloud Experiment Tracking.',
+        topics: [
+          'AWS Setup & S3 Configuration',
+          'MLflow Server on AWS',
+          'Artifact Storage & Cloud Experiment Tracking'
+        ]
+      },
+      {
+        title: 'Phase 11: Docker (Basic to Advanced)',
+        description: 'Docker Installation, Docker Images, Containers, Dockerfile, Docker Compose, Volumes, Networking, Environment Variables, and Production Deployment.',
+        topics: [
+          'Docker Installation, Images & Containers',
+          'Dockerfile & Docker Compose',
+          'Volumes, Networking & Environment Variables',
+          'Production Deployment'
+        ]
+      },
+      {
+        title: 'Phase 12: Apache Airflow',
+        description: 'Airflow Basics, DAGs, Operators, Scheduling, Task Dependencies, Airflow UI, and Workflow Automation.',
+        topics: [
+          'Airflow Basics & Architecture',
+          'DAGs, Operators & Scheduling',
+          'Task Dependencies & Airflow UI',
+          'Workflow Automation'
+        ]
+      },
+      {
+        title: 'Phase 13: ETL Pipelines',
+        description: 'Extract, Transform, Load, PostgreSQL, API Integration, Airflow, Astro Cloud, and AWS Deployment.',
+        topics: [
+          'Extract, Transform, Load (ETL)',
+          'PostgreSQL & API Integration',
+          'Airflow & Astro Cloud',
+          'AWS Deployment'
+        ]
+      },
+      {
+        title: 'Phase 14: GitHub Actions (CI/CD)',
+        description: 'GitHub Actions Basics, YAML Workflow, Build Pipeline, Testing, Docker Build, DockerHub Push, and Automated Deployment.',
+        topics: [
+          'GitHub Actions Basics & YAML Workflow',
+          'Build Pipeline & Automated Testing',
+          'Docker Build & DockerHub Push',
+          'Automated Deployment'
+        ]
+      },
+      {
+        title: 'Phase 15: End-to-End Data Science Project',
+        description: 'Project Structure, Modular Coding, Configuration Files, Data Ingestion, Data Validation, Data Transformation, Model Trainer, Prediction Pipeline, and Flask Deployment.',
+        topics: [
+          'Project Structure & Modular Coding',
+          'Configuration Files & Settings',
+          'Data Ingestion, Validation & Transformation',
+          'Model Trainer & Prediction Pipeline',
+          'Flask Deployment'
+        ]
+      },
+      {
+        title: 'Phase 16: Network Security System Project',
+        description: 'ETL Pipeline, Feature Engineering, Model Training, Pipeline Automation, and Deployment.',
+        topics: [
+          'ETL Pipeline & Feature Engineering',
+          'Model Training & Pipeline Automation',
+          'Network Security Deployment'
+        ]
+      },
+      {
+        title: 'Phase 17: Cloud Deployment',
+        description: 'AWS Deployment, Azure Deployment, CI/CD Integration, and Production Deployment.',
+        topics: [
+          'AWS Deployment',
+          'Azure Deployment',
+          'CI/CD Integration & Production Deployment'
+        ]
+      },
+      {
+        title: 'Phase 18: NLP Project',
+        description: 'Hugging Face, Transformers, Tokenizers, Fine-Tuning, Model Deployment, and Inference APIs.',
+        topics: [
+          'Hugging Face, Transformers & Tokenizers',
+          'Fine-Tuning Transformer Models',
+          'Model Deployment & Inference APIs'
+        ]
+      },
+      {
+        title: 'Phase 19: AWS SageMaker',
+        description: 'SageMaker Studio, Training Jobs, Model Registry, Deployment, Endpoints, and Real-time Inference.',
+        topics: [
+          'SageMaker Studio & Training Jobs',
+          'SageMaker Model Registry',
+          'Deployment, Endpoints & Real-time Inference'
+        ]
+      },
+      {
+        title: 'Phase 20: Monitoring',
+        description: 'Grafana, PostgreSQL, Dashboards, Monitoring, Logs, Metrics, and Alerts.',
+        topics: [
+          'Grafana & PostgreSQL Integration',
+          'Dashboards, Monitoring, Logs, Metrics & Alerts'
+        ]
+      },
+      {
+        title: 'Phase 21: Generative AI & LLMOps',
+        description: 'AWS Bedrock, Large Language Models, LLM Deployment, LLM Monitoring, and Production GenAI Pipelines.',
+        topics: [
+          'AWS Bedrock & Large Language Models',
+          'LLM Deployment & LLM Monitoring',
+          'Production GenAI Pipelines'
+        ]
+      },
+      {
+        title: '10+ End-to-End Projects Included',
+        description: 'House Price Prediction, ANN Model with MLflow, MLflow Tracking Project, Git + DVC + MLflow Pipeline, Dockerized ML Application, Airflow ETL Pipeline, GitHub Actions CI/CD Pipeline, Complete Data Science Deployment Project, Network Security System, NLP Project using Hugging Face Transformers, AWS SageMaker Deployment Project, and GenAI/LLMOps Deployment Project.',
+        topics: [
+          'House Price Prediction',
+          'ANN Model with MLflow',
+          'MLflow Tracking Project',
+          'Git + DVC + MLflow Pipeline',
+          'Dockerized ML Application',
+          'Airflow ETL Pipeline',
+          'GitHub Actions CI/CD Pipeline',
+          'Complete Data Science Deployment Project',
+          'Network Security System',
+          'NLP Project using Hugging Face Transformers',
+          'AWS SageMaker Deployment Project',
+          'GenAI/LLMOps Deployment Project'
         ]
       }
     ]
@@ -2682,33 +3660,152 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Foundations of Spoken English & Grammar',
-        description: 'Tenses made simple, sentence structures, common grammar mistakes, daily usage vocabulary, and pronunciation.',
+        title: 'Phase 1: English Fundamentals',
+        description: 'Course Introduction, Study Tips, Learning Strategy, and How to Use the Course.',
         topics: [
-          'Tenses & Practical Grammar Rules',
-          'Building Everyday English Vocabulary',
-          'Correct Pronunciation & Phonetics',
-          'Eliminating Hesitation & Fear of Speaking'
+          'Course Introduction',
+          'Study Tips',
+          'Learning Strategy',
+          'How to Use the Course'
         ]
       },
       {
-        title: 'Module 2: Fluency, Conversation & Accent Building',
-        description: 'Real-life conversation scenarios (shopping, traveling, office), thought framing in English, and accent neutralization.',
+        title: 'Phase 2: Mastering the Basics',
+        description: 'Parts of Speech, Nouns, Pronouns, Verbs, Irregular Verbs, Subject-Verb Agreement, Adjectives, Adverbs, Articles, Demonstratives, Possessives, Comparatives & Superlatives, Prefixes & Suffixes, Homonyms, Homophones, Homographs, Phrasal Verbs, Collocations, Idioms, Slang, Contractions, Sentence Types, Subject & Predicate, and Complete Tense Masterclass.',
         topics: [
-          'Framing Thoughts Directly in English',
-          'Real-Life Conversation Roleplays',
-          'Accent Neutralization & Voice Modulation',
-          'Listening Comprehension & Expressive Speaking'
+          'Parts of Speech, Nouns & Pronouns',
+          'Verbs, Irregular Verbs & Subject-Verb Agreement',
+          'Adjectives, Adverbs, Articles, Demonstratives & Possessives',
+          'Comparatives & Superlatives, Prefixes & Suffixes',
+          'Homonyms, Homophones & Homographs',
+          'Phrasal Verbs, Collocations, Idioms & Slang',
+          'Contractions, Sentence Types, Subject & Predicate',
+          'Complete Tense Masterclass: Present Tenses (Simple, Continuous, Perfect, Perfect Continuous)',
+          'Complete Tense Masterclass: Past Tenses (Simple, Continuous, Perfect, Perfect Continuous)',
+          'Complete Tense Masterclass: Future Tenses (Simple, Continuous, Perfect, Perfect Continuous)'
         ]
       },
       {
-        title: 'Module 3: Professional English, Interviews & Public Speaking',
-        description: 'Job interview preparation, corporate presentation skills, email writing etiquettes, and public speaking confidence.',
+        title: 'Phase 3: English Speaking Modules',
+        description: 'Real-world conversational modules: Introductions, Greetings, Describing People/Places/Things, Opinions, Daily Routine, Hobbies, Doubts, University Life, Restaurants, Requests, Travel, Debates, Food, Giving Advice, Relationships & Listening Tests.',
         topics: [
-          'Job Interview Q&A Mastery',
-          'Corporate Email Writing & Business Etiquettes',
-          'Public Speaking & Presentation Skills',
-          'Group Discussion (GD) Strategies'
+          'M1: Introductions, Greetings, Small Talk, Asking Questions, Politeness & Present Tense',
+          'M2: Describing People, Places & Things, Quantifiers, Linking Words & Feelings Vocabulary',
+          'M3: Opinions, Likes & Dislikes, Agreeing, Disagreeing, Preferences, Opinion Expressions & Listening Test 1',
+          'M5: Daily Routine, Time Expressions, Morning Routine, Prepositions & Common Phrasal Verbs',
+          'M6: Hobbies, Interests, Achievements, Past Experiences, Present Perfect & Pronunciation Practice',
+          'M7: Doubts, Certainty, Uncertainty, Modal Verbs, First Conditional, Continuous Tenses & Listening Test 2',
+          'M9: University Life',
+          'M10: Sharing Experiences',
+          'M11: Restaurants, Ordering Food & Listening Test 3',
+          'M13: Requests & Offers',
+          'M14: Travel, Vacations & Planning Trips',
+          'M15: Debates, Arguments, Discussions & Listening Test 4',
+          'M17: Food & Cooking',
+          'M18: Giving Advice',
+          'M19: Relationships, Dating & Listening Test 5'
+        ]
+      },
+      {
+        title: 'Phase 4: Business English',
+        description: 'Professional Introductions, Meetings, Presentations, Emails, Workplace Communication, Telephone English, Negotiation, Interview English, and Business Vocabulary.',
+        topics: [
+          'Professional Introductions & Workplace Communication',
+          'Meetings, Presentations & Negotiations',
+          'Corporate Emails & Professional Correspondence',
+          'Telephone English & Etiquette',
+          'Interview English & Business Vocabulary'
+        ]
+      },
+      {
+        title: 'Phase 5: English Pronunciation',
+        description: 'English Sounds, Vowels, Consonants, Stress, Rhythm, Intonation, Silent Letters, Linking Sounds, Difficult Pronunciation, and Natural Speech.',
+        topics: [
+          'English Sounds, Vowels & Consonants',
+          'Stress, Rhythm & Intonation',
+          'Silent Letters & Linking Sounds',
+          'Difficult Pronunciation & Natural Speech'
+        ]
+      },
+      {
+        title: 'Phase 6: English Grammar Masterplan',
+        description: 'Clauses, Active & Passive Voice, Direct & Indirect Speech, Modal Verbs, Conditionals, Relative Clauses, Gerunds, Infinitives, Determiners, Conjunctions, Punctuation, and Advanced Grammar.',
+        topics: [
+          'Clauses, Active & Passive Voice',
+          'Direct & Indirect Speech',
+          'Modal Verbs, Conditionals & Relative Clauses',
+          'Gerunds, Infinitives, Determiners & Conjunctions',
+          'Punctuation & Advanced Grammar'
+        ]
+      },
+      {
+        title: 'Phase 7: English Writing',
+        description: 'Writing Basics, Sentence Structure, Paragraph Writing, Grammar in Writing, Core Writing, Essays, Emails, Reports, Formal & Informal Writing, Story Writing, Advanced Writing, Business Emails, Professional Writing, Academic Writing, Advanced Style, Clarity & Cohesion.',
+        topics: [
+          'Writing Basics, Sentence Structure & Paragraph Writing',
+          'Grammar in Writing & Core Writing',
+          'Essays, Emails, Reports, Formal & Informal Writing',
+          'Story Writing, Business Emails & Professional Writing',
+          'Academic Writing, Advanced Style, Clarity & Cohesion'
+        ]
+      },
+      {
+        title: 'Phase 8: Advanced English',
+        description: 'Advanced Grammar, Advanced Vocabulary, Natural Expressions, Native-Level Speaking, Fluent Conversation, and Complex Sentence Structures.',
+        topics: [
+          'Advanced Grammar & Complex Sentence Structures',
+          'Advanced Vocabulary & Natural Expressions',
+          'Native-Level Speaking & Fluent Conversation'
+        ]
+      },
+      {
+        title: 'Phase 9: Listening Practice',
+        description: 'Monologues, Everyday Conversations, Real-Life Listening, Listening Comprehension, and Accent Understanding.',
+        topics: [
+          'Monologues & Everyday Conversations',
+          'Real-Life Listening & Listening Comprehension',
+          'Accent Understanding & Native Speech'
+        ]
+      },
+      {
+        title: 'Phase 10: English Phrasal Verb Mastery',
+        description: 'Common Phrasal Verbs, Daily Use, Business Use, Travel, Work, Education, Relationships, and Communication.',
+        topics: [
+          'Common Phrasal Verbs & Daily Use',
+          'Business Use & Workplace Phrasal Verbs',
+          'Travel, Work & Education Phrasal Verbs',
+          'Relationships & Communication Phrasal Verbs'
+        ]
+      },
+      {
+        title: 'Phase 11: Vocabulary Booster (12 Modules)',
+        description: 'Everyday Vocabulary, Education, Work, Technology, Business, Travel, Food, Health, Personality, Environment, Emotions, and Advanced Vocabulary.',
+        topics: [
+          'Everyday & Education Vocabulary',
+          'Work, Technology & Business Vocabulary',
+          'Travel, Food & Health Vocabulary',
+          'Personality, Environment & Emotions Vocabulary',
+          'Advanced Vocabulary'
+        ]
+      },
+      {
+        title: 'Phase 12: Synonyms Mastery',
+        description: 'Common Synonyms, Academic Vocabulary, Professional Vocabulary, and Advanced Word Choice.',
+        topics: [
+          'Common Synonyms',
+          'Academic Vocabulary',
+          'Professional Vocabulary',
+          'Advanced Word Choice'
+        ]
+      },
+      {
+        title: 'Phase 13: Practice',
+        description: 'Speaking Activities, Listening Tests, Vocabulary Exercises, Grammar Exercises, Role Plays, Conversation Practice, Review Lessons, and Fluency Challenges.',
+        topics: [
+          'Speaking Activities & Role Plays',
+          'Listening Tests & Audio Exercises',
+          'Vocabulary & Grammar Exercises',
+          'Conversation Practice, Review Lessons & Fluency Challenges'
         ]
       }
     ]
@@ -2737,33 +3834,146 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Engine Mechanics, Scope, Closures & ES6+',
-        description: 'Execution context, hoisting, lexical scope, closures, TDZ, arrow functions, and ES6+ features.',
+        title: 'Phase 1: JavaScript Language Fundamentals',
+        description: 'Variables (var, let, const), Data Types, Primitive vs Reference Types, null vs undefined, Hoisting, Temporal Dead Zone (TDZ), Scope (Global, Function, Block), Closures, Lexical Environment, Execution Context, Call Stack, Type Coercion, Equality (== vs ===), Truthy & Falsy Values, Memory Management, Garbage Collection, Strict Mode, and IIFE.',
         topics: [
+          'Variables (var, let, const) & Data Types',
+          'Primitive vs Reference Types & null vs undefined',
+          'Hoisting, Temporal Dead Zone (TDZ) & Scope (Global, Function, Block)',
+          'Closures & Lexical Environment',
           'Execution Context & Call Stack',
-          'Hoisting, Let, Var & Const TDZ',
-          'Lexical Scope & Closure Patterns',
-          'ES6+ Destructuring, Rest/Spread & Modules'
+          'Type Coercion, Equality (== vs ===) & Truthy/Falsy Values',
+          'Memory Management, Garbage Collection, Strict Mode & IIFE'
         ]
       },
       {
-        title: 'Module 2: Asynchronous JS, Promises & Event Loop Deep Dive',
-        description: 'Callbacks, Promises, Async/Await, Microtask vs Macrotask Queue, and Event Loop.',
+        title: 'Phase 2: Functions',
+        description: 'Function Declaration, Function Expression, Arrow Functions, Anonymous Functions, Callback Functions, Higher Order Functions, First Class Functions, Pure Functions, Currying, Function Composition, this Keyword, call(), apply(), bind(), Rest Parameters, Spread Operator, and Default Parameters.',
         topics: [
-          'Event Loop & Event Queue Mechanics',
-          'Promises Chaining & Error Handling',
-          'Async/Await & Try-Catch Best Practices',
-          'Building Custom Polyfills (Promise.all, Race)'
+          'Function Declaration, Expression, Arrow & Anonymous Functions',
+          'Callback Functions, Higher Order Functions & First Class Functions',
+          'Pure Functions, Currying & Function Composition',
+          'this Keyword, call(), apply() & bind()',
+          'Rest Parameters, Spread Operator & Default Parameters'
         ]
       },
       {
-        title: 'Module 3: Prototypal Inheritance, DOM & Machine Coding Interviews',
-        description: 'Prototypes, class syntax, DOM event delegation, debouncing, throttling, and machine coding problems.',
+        title: 'Phase 3: Arrays',
+        description: 'Array Methods (map, filter, reduce, forEach, find, findIndex, some, every, sort, slice, splice, flat, flatMap), Array Destructuring, Deep Copy vs Shallow Copy, and Array Interview Problems.',
         topics: [
-          'Prototype Chain & Object Inheritance',
-          'DOM Event Delegation, Bubbling & Capturing',
-          'Debouncing, Throttling & Currying',
-          'Top 50 Machine Coding & Output Interview Questions'
+          'Array Methods: map(), filter(), reduce() & forEach()',
+          'Search & Check Methods: find(), findIndex(), some(), every() & sort()',
+          'Manipulation Methods: slice(), splice(), flat() & flatMap()',
+          'Array Destructuring, Deep Copy vs Shallow Copy & Array Interview Problems'
+        ]
+      },
+      {
+        title: 'Phase 4: Strings',
+        description: 'String Methods, Template Literals, Regular Expressions, String Manipulation, and String Interview Questions.',
+        topics: [
+          'String Methods & Template Literals',
+          'Regular Expressions (RegEx)',
+          'String Manipulation & String Interview Questions'
+        ]
+      },
+      {
+        title: 'Phase 5: Objects (OOJS)',
+        description: 'Objects, Object Literals, Property Descriptors, Object Methods, Object Destructuring, Prototype, Prototype Chain, Constructor Functions, Classes, Inheritance, Encapsulation, Polymorphism, Static Methods, Getters & Setters, Object.create(), Object.freeze(), Object.seal(), and Object.assign().',
+        topics: [
+          'Objects, Object Literals, Property Descriptors & Object Methods',
+          'Object Destructuring & Object Utilities (create, freeze, seal, assign)',
+          'Prototype, Prototype Chain & Constructor Functions',
+          'Classes, Inheritance, Encapsulation, Polymorphism, Static Methods, Getters & Setters'
+        ]
+      },
+      {
+        title: 'Phase 6: DOM & Browser',
+        description: 'DOM Tree, DOM Traversal, Selecting Elements, Creating Elements, Removing Elements, Event Handling, Event Bubbling, Event Capturing, Event Delegation, Forms, Browser APIs, Local Storage, Session Storage, and Cookies.',
+        topics: [
+          'DOM Tree, Traversal, Selecting, Creating & Removing Elements',
+          'Event Handling: Event Bubbling, Event Capturing & Event Delegation',
+          'Forms & Browser APIs',
+          'Local Storage, Session Storage & Cookies'
+        ]
+      },
+      {
+        title: 'Phase 7: Asynchronous JavaScript',
+        description: 'Synchronous vs Asynchronous, Event Loop, Web APIs, Callback Functions, Callback Hell, Promises, Promise Chaining, Promise Methods (all, race, allSettled, any), Async/Await, Fetch API, AJAX Basics, and Error Handling.',
+        topics: [
+          'Synchronous vs Asynchronous, Web APIs & Callback Hell',
+          'Promises, Promise Chaining & Promise Methods (all, race, allSettled, any)',
+          'Async/Await, Fetch API, AJAX Basics & Error Handling'
+        ]
+      },
+      {
+        title: 'Phase 8: ES6+ Features',
+        description: 'Template Literals, Destructuring, Spread Operator, Rest Operator, Optional Chaining, Nullish Coalescing, Modules, Import / Export, Symbols, and BigInt.',
+        topics: [
+          'Template Literals, Destructuring, Spread & Rest Operators',
+          'Optional Chaining & Nullish Coalescing',
+          'ES6 Modules (Import / Export), Symbols & BigInt'
+        ]
+      },
+      {
+        title: 'Phase 9: Map & Set',
+        description: 'Map, WeakMap, Set, WeakSet, and Interview Questions.',
+        topics: [
+          'Map & WeakMap Data Structures',
+          'Set & WeakSet Data Structures',
+          'Map & Set Interview Questions'
+        ]
+      },
+      {
+        title: 'Phase 10: Timers',
+        description: 'setTimeout, setInterval, clearTimeout, clearInterval, and Timer Interview Questions.',
+        topics: [
+          'setTimeout & setInterval Mechanics',
+          'clearTimeout & clearInterval',
+          'Timer Interview Questions & Async Execution Order'
+        ]
+      },
+      {
+        title: 'Phase 11: Error Handling',
+        description: 'try, catch, finally, throw, and Custom Errors.',
+        topics: [
+          'try, catch & finally Blocks',
+          'throw Statement & Custom Error Classes'
+        ]
+      },
+      {
+        title: 'Phase 12: JavaScript Internals',
+        description: 'Execution Context, Call Stack, Memory Heap, Event Loop, Microtask Queue, Macrotask Queue, Hoisting, Closures, and Prototype Chain.',
+        topics: [
+          'Execution Context, Call Stack & Memory Heap',
+          'Event Loop: Microtask Queue vs Macrotask Queue',
+          'Internals of Hoisting, Closures & Prototype Chain'
+        ]
+      },
+      {
+        title: 'Phase 13: Automated Testing',
+        description: 'JavaScript Testing Basics, Unit Testing Concepts, and Practical Examples.',
+        topics: [
+          'JavaScript Testing Basics & Frameworks',
+          'Unit Testing Concepts & Practical Examples'
+        ]
+      },
+      {
+        title: 'Phase 14: Real-world Coding Problems',
+        description: 'Polyfills, Debounce, Throttle, Deep Clone, Memoization, Flatten Array, Object Comparison, Custom map(), Custom filter(), Custom reduce(), LRU-style logic, and Interview Coding Challenges.',
+        topics: [
+          'Polyfills: Custom map(), filter(), reduce(), bind()',
+          'Debounce & Throttle Implementations',
+          'Deep Clone, Memoization & Flatten Array',
+          'Object Comparison, LRU-style logic & Interview Coding Challenges'
+        ]
+      },
+      {
+        title: 'Phase 15: JavaScript Interview Questions',
+        description: 'Course built around 100+ real interview questions: null vs undefined, closures, hoisting, this, event loop, promises, async/await, prototype vs class, deep vs shallow copy, event delegation, currying, debouncing, throttling, polyfills, company-style coding questions.',
+        topics: [
+          '100+ Real Interview Questions & Core Concept Defensability',
+          'Output-Based Code Snippets & Scenario-Based Challenges',
+          'Company-Style Machine Coding & Live Problem Solving'
         ]
       }
     ]
@@ -2792,33 +4002,123 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Python Built-in Data Structures & Algorithm Foundations',
-        description: 'Time/space complexity, Python list/dict internals, collections module, and string/array tricks.',
+        title: 'Phase 1: Getting Started',
+        description: 'Course Introduction, Code Editor Setup, How to Use the Course, and Coding Exercises.',
         topics: [
-          'Big-O Notation & Memory Footprint in Python',
-          'Lists, Dicts, Sets & Collections (defaultdict, Counter)',
-          'String Manipulation & Regex Tricks',
-          'Heapq & Bisect Modules for Fast Searching'
+          'Course Introduction',
+          'Code Editor Setup',
+          'How to Use the Course',
+          'Coding Exercises'
         ]
       },
       {
-        title: 'Module 2: Core Data Structures: Linked Lists, Trees & Graphs',
-        description: 'Two-Pointers, Fast & Slow pointers, Recursion, Trees, Graphs, BFS/DFS in Python.',
+        title: 'Phase 2: Time Complexity (Big O)',
+        description: 'What is Big O, Worst Case Analysis, O(1), O(log n), O(n), O(n²), Drop Constants, Drop Non-Dominant Terms, Different Inputs, Space Complexity, and Big O Interview Questions.',
         topics: [
-          'Two Pointers & Sliding Window Patterns',
-          'Linked Lists & Fast/Slow Pointer Pattern',
-          'Binary Trees, BST & Tree Traversals',
-          'Graph Adjacency Lists, BFS & DFS'
+          'What is Big O? & Worst Case Analysis',
+          'Complexity Classes: O(1), O(log n), O(n) & O(n²)',
+          'Simplifying Rules: Drop Constants & Drop Non-Dominant Terms',
+          'Handling Different Inputs & Space Complexity',
+          'Big O Interview Questions'
         ]
       },
       {
-        title: 'Module 3: Backtracking, Dynamic Programming & Mock Interview Sets',
-        description: 'Recursion, 1D/2D DP, and top Python technical interview problems.',
+        title: 'Phase 3: Core Data Structures',
+        description: 'Arrays, Dynamic Arrays, Operations, Time Complexity, Coding Problems, Linked Lists (Singly, Doubly, Circular, Reverse, Remove Node, Detect Loop, Merge Lists), Stacks (List & Linked List implementations, Interview Questions), Queues (Basics, Linked List, Circular Queue, Interview Problems), Hash Tables (Hash Functions, Collision Handling, Separate Chaining, Dictionaries in Python, Interview Questions).',
         topics: [
-          'Recursion & Backtracking (Subsets, Permutations)',
-          '1D & 2D Dynamic Programming in Python',
-          'Top 100 LeetCode Python Interview Problems',
-          'Mock Technical Interview Strategies'
+          'Arrays & Dynamic Arrays: Operations, Time Complexity & Coding Problems',
+          'Linked Lists: Singly, Doubly & Circular Linked Lists',
+          'Linked List Operations: Reverse, Remove Node, Detect Loop & Merge Lists',
+          'Stacks: List & Linked List Implementations & Stack Interview Questions',
+          'Queues: Linked List & Circular Queue Implementations & Queue Interview Problems',
+          'Hash Tables: Hash Functions, Collision Handling & Separate Chaining',
+          'Dictionaries in Python & Hash Table Interview Questions'
+        ]
+      },
+      {
+        title: 'Phase 4: Trees',
+        description: 'Binary Trees (Terminology, Traversals: DFS, BFS, Level Order, Recursive Traversals, Tree Height, Tree Problems), Binary Search Trees (Insert, Search, Delete, Min/Max, Traversals, BST Interview Questions), Heap (Max Heap, Min Heap, Insert/Delete, Heapify, Priority Queue, Heap Interview Questions).',
+        topics: [
+          'Binary Trees: Terminology, DFS, BFS & Level Order Traversals',
+          'Recursive Traversals, Tree Height & Tree Problems',
+          'Binary Search Trees (BST): Insert, Search, Delete & Min/Max',
+          'BST Traversals & BST Interview Questions',
+          'Heap: Max Heap & Min Heap Mechanics',
+          'Heap Insert/Delete, Heapify & Priority Queue',
+          'Heap Interview Questions'
+        ]
+      },
+      {
+        title: 'Phase 5: Graphs',
+        description: 'Graph Representation (Adjacency List, Adjacency Matrix), DFS, BFS, Connected Components, and Graph Interview Questions.',
+        topics: [
+          'Graph Representation: Adjacency List & Adjacency Matrix',
+          'Graph Traversals: DFS & BFS',
+          'Connected Components & Graph Interview Questions'
+        ]
+      },
+      {
+        title: 'Phase 6: Recursion',
+        description: 'Recursion Basics, Call Stack, Recursive Thinking, Tail Recursion, Tree Recursion, Backtracking Basics, and Interview Problems.',
+        topics: [
+          'Recursion Basics, Call Stack & Recursive Thinking',
+          'Tail Recursion & Tree Recursion',
+          'Backtracking Basics & Recursion Interview Problems'
+        ]
+      },
+      {
+        title: 'Phase 7: Sorting Algorithms',
+        description: 'Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, Quick Sort, Complexity Analysis, and Comparison of Sorting Algorithms.',
+        topics: [
+          'Elementary Sorting: Bubble Sort, Selection Sort & Insertion Sort',
+          'Advanced Sorting: Merge Sort & Quick Sort',
+          'Complexity Analysis & Comparison of Sorting Algorithms'
+        ]
+      },
+      {
+        title: 'Phase 8: Searching Algorithms',
+        description: 'Linear Search, Binary Search, Recursive Binary Search, and Searching Interview Questions.',
+        topics: [
+          'Linear Search & Binary Search Mechanics',
+          'Recursive Binary Search & Searching Interview Questions'
+        ]
+      },
+      {
+        title: 'Phase 9: Dynamic Programming',
+        description: 'Introduction, Memoization, Tabulation, Fibonacci, Climbing Stairs, Coin Change, and Common DP Patterns.',
+        topics: [
+          'Dynamic Programming Intro: Memoization vs Tabulation',
+          'Classic DP Problems: Fibonacci, Climbing Stairs & Coin Change',
+          'Common DP Patterns & Subproblems'
+        ]
+      },
+      {
+        title: 'Phase 10: LeetCode Interview Patterns',
+        description: 'Two Pointers, Sliding Window, Fast & Slow Pointers, Prefix Sum, Binary Search Pattern, DFS Pattern, BFS Pattern, Tree Pattern, Heap Pattern, and Hash Map Pattern.',
+        topics: [
+          'Two Pointers, Sliding Window & Fast & Slow Pointers',
+          'Prefix Sum & Binary Search Pattern',
+          'DFS & BFS Graph/Tree Patterns',
+          'Tree Pattern, Heap Pattern & Hash Map Pattern'
+        ]
+      },
+      {
+        title: 'Phase 11: Coding Interview Questions',
+        description: 'Array Problems, String Problems, Linked List Problems, Stack & Queue Problems, Tree Problems, BST Problems, Graph Problems, Heap Problems, Sorting Problems, and Dynamic Programming Problems.',
+        topics: [
+          'Array & String Interview Problems',
+          'Linked List, Stack & Queue Interview Problems',
+          'Tree, BST & Heap Interview Problems',
+          'Graph, Sorting & Dynamic Programming Interview Problems'
+        ]
+      },
+      {
+        title: 'Phase 12: Final Interview Preparation',
+        description: 'Problem Solving Strategy, Optimizing Solutions, Time & Space Complexity Analysis, Common Interview Mistakes, and Whiteboard Interview Tips.',
+        topics: [
+          'Problem Solving Strategy & Solution Optimization',
+          'Time & Space Complexity Analysis Defense',
+          'Common Interview Mistakes & Whiteboard Interview Tips'
         ]
       }
     ]
