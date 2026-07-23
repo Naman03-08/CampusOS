@@ -4153,6 +4153,9 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
   // Search filter query inside course syllabus detail view
   const [syllabusSearchQuery, setSyllabusSearchQuery] = useState('');
 
+  // Lock warning message toast state
+  const [lockWarningMessage, setLockWarningMessage] = useState<string | null>(null);
+
   // Accordion state for modules (open/close)
   const [expandedModules, setExpandedModules] = useState<Record<number, boolean>>({
     0: true,
@@ -4242,15 +4245,72 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
     }, 1200);
   };
 
-  // Toggle individual topic checkbox completion
+  const activeCourse = COURSES.find((c) => c.id === activeCourseId);
+
+  // Ordered topics list for sequential progress tracking across active course
+  const activeCourseTopics = useMemo(() => {
+    if (!activeCourse) return [];
+    const list: { topic: string; key: string; moduleIdx: number; topicIdx: number; globalIdx: number }[] = [];
+    let count = 0;
+    activeCourse.modules.forEach((mod, mIdx) => {
+      mod.topics.forEach((t, tIdx) => {
+        const key = `${activeCourse.id}::${t}`;
+        list.push({
+          topic: t,
+          key,
+          moduleIdx: mIdx,
+          topicIdx: tIdx,
+          globalIdx: count++
+        });
+      });
+    });
+    return list;
+  }, [activeCourse]);
+
+  const topicGlobalIndexMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    activeCourseTopics.forEach((item) => {
+      map[item.key] = item.globalIdx;
+    });
+    return map;
+  }, [activeCourseTopics]);
+
+  // Check if a topic at globalIdx is unlocked (i.e. previous topic is completed)
+  const isTopicUnlocked = (globalIdx: number) => {
+    if (globalIdx === 0) return true;
+    const prevKey = activeCourseTopics[globalIdx - 1]?.key;
+    return !!completedTopics[prevKey];
+  };
+
+  // Toggle individual topic checkbox completion (with sequential lock enforcement)
   const handleToggleTopicCheckbox = (courseId: string, topicName: string) => {
     const topicKey = `${courseId}::${topicName}`;
-    const nextValue = !completedTopics[topicKey];
+    const globalIdx = topicGlobalIndexMap[topicKey];
 
-    const updated = {
-      ...completedTopics,
-      [topicKey]: nextValue
-    };
+    if (globalIdx === undefined) return;
+
+    // Guard: Topic is locked if previous topic is not completed
+    if (!isTopicUnlocked(globalIdx)) {
+      const prevTopic = activeCourseTopics[globalIdx - 1]?.topic;
+      setLockWarningMessage(`🔒 Checkpoint Locked! Complete "${prevTopic}" first.`);
+      setTimeout(() => setLockWarningMessage(null), 3500);
+      return;
+    }
+
+    const isCurrentlyChecked = !!completedTopics[topicKey];
+    const updated = { ...completedTopics };
+
+    if (!isCurrentlyChecked) {
+      updated[topicKey] = true;
+      setLockWarningMessage(null);
+    } else {
+      // Unchecking this topic -> also uncheck all subsequent topics in this course to maintain sequence
+      activeCourseTopics.forEach((item) => {
+        if (item.globalIdx >= globalIdx) {
+          updated[item.key] = false;
+        }
+      });
+    }
 
     setCompletedTopics(updated);
     localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
@@ -4268,13 +4328,35 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
     }
   };
 
-  // Toggle all topics in a module (check all or uncheck all)
-  const handleToggleModuleTopics = (courseId: string, moduleTopics: string[], forceCheck: boolean) => {
+  // Toggle all topics in a module (check up to module end or uncheck from module start)
+  const handleToggleModuleTopics = (courseId: string, mIdx: number, forceCheck: boolean) => {
+    if (!activeCourse) return;
     const updated = { ...completedTopics };
-    moduleTopics.forEach((t) => {
-      const topicKey = `${courseId}::${t}`;
-      updated[topicKey] = forceCheck;
-    });
+
+    if (forceCheck) {
+      // Complete all topics up to the end of this module
+      const moduleLastTopic = activeCourse.modules[mIdx]?.topics.slice(-1)[0];
+      const moduleLastKey = `${courseId}::${moduleLastTopic}`;
+      const targetGlobalIdx = topicGlobalIndexMap[moduleLastKey] ?? 0;
+
+      activeCourseTopics.forEach((item) => {
+        if (item.globalIdx <= targetGlobalIdx) {
+          updated[item.key] = true;
+        }
+      });
+      setLockWarningMessage(null);
+    } else {
+      // Uncheck all topics starting from the first topic of this module onwards
+      const moduleFirstTopic = activeCourse.modules[mIdx]?.topics[0];
+      const moduleFirstKey = `${courseId}::${moduleFirstTopic}`;
+      const startGlobalIdx = topicGlobalIndexMap[moduleFirstKey] ?? 0;
+
+      activeCourseTopics.forEach((item) => {
+        if (item.globalIdx >= startGlobalIdx) {
+          updated[item.key] = false;
+        }
+      });
+    }
 
     setCompletedTopics(updated);
     localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
@@ -4309,8 +4391,6 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
     const percentage = totalTopics > 0 ? Math.round((completedCount / totalTopics) * 100) : 0;
     return { totalTopics, completedCount, percentage };
   };
-
-  const activeCourse = COURSES.find((c) => c.id === activeCourseId);
 
   // Filter logic
   const filteredCourses = selectedCategory === 'All' 
@@ -4460,16 +4540,33 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
 
         {/* DETAILED INTERACTIVE SYLLABUS & CHECKBOX ROADMAP */}
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+          
+          {/* Sequential Lock Warning Toast */}
+          {lockWarningMessage && (
+            <div className="p-4 rounded-2xl bg-amber-500 text-white font-extrabold text-xs sm:text-sm flex items-center justify-between gap-3 shadow-lg animate-in fade-in slide-in-from-top duration-300">
+              <div className="flex items-center gap-2">
+                <Lock className="w-4 h-4 text-amber-200 shrink-0" />
+                <span>{lockWarningMessage}</span>
+              </div>
+              <button
+                onClick={() => setLockWarningMessage(null)}
+                className="px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-white font-black text-xs cursor-pointer"
+              >
+                Got it
+              </button>
+            </div>
+          )}
+
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-black uppercase tracking-wider mb-2">
-                <CheckSquare className="w-3.5 h-3.5" /> Interactive Syllabus Tracker
+                <CheckSquare className="w-3.5 h-3.5 text-purple-600" /> Sequential Checkpoint Syllabus Tracker
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                Complete Course Syllabus & Topic Tracker
+                Complete Course Syllabus & Topic Roadmap
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-                Mark off topics as you finish studying them. Your progress automatically syncs with Firebase!
+                🔒 Checkpoints unlock sequentially! Complete the current topic to unlock the next one.
               </p>
             </div>
 
@@ -4503,13 +4600,20 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
               const isModuleAllCompleted = completedInModule === mod.topics.length && mod.topics.length > 0;
               const isExpanded = expandedModules[mIdx] !== false;
 
+              // Check if module is locked (i.e. first topic of module is locked)
+              const firstTopicKey = `${activeCourse.id}::${mod.topics[0]}`;
+              const firstTopicGlobalIdx = topicGlobalIndexMap[firstTopicKey] ?? 0;
+              const isModuleUnlocked = isTopicUnlocked(firstTopicGlobalIdx);
+
               return (
                 <div 
                   key={mIdx} 
                   className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
                     isModuleAllCompleted 
                       ? 'bg-emerald-50/40 border-emerald-200' 
-                      : 'bg-white border-slate-200 shadow-xs'
+                      : isModuleUnlocked
+                      ? 'bg-white border-slate-200 shadow-xs'
+                      : 'bg-slate-50/70 border-slate-200 opacity-80'
                   }`}
                 >
                   {/* Module Header */}
@@ -4521,13 +4625,26 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
                       <div className={`w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center shrink-0 ${
                         isModuleAllCompleted 
                           ? 'bg-emerald-600 text-white' 
-                          : 'bg-purple-100 text-purple-700'
+                          : isModuleUnlocked
+                          ? 'bg-purple-100 text-purple-700'
+                          : 'bg-slate-200 text-slate-500'
                       }`}>
-                        {isModuleAllCompleted ? <CheckCircle2 className="w-5 h-5" /> : `0${mIdx + 1}`}
+                        {isModuleAllCompleted ? (
+                          <CheckCircle2 className="w-5 h-5" />
+                        ) : isModuleUnlocked ? (
+                          `0${mIdx + 1}`
+                        ) : (
+                          <Lock className="w-4 h-4" />
+                        )}
                       </div>
                       <div>
                         <h4 className="font-black text-slate-900 text-base flex items-center gap-2">
                           {mod.title}
+                          {!isModuleUnlocked && (
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <Lock className="w-3 h-3" /> Locked Phase
+                            </span>
+                          )}
                         </h4>
                         <p className="text-xs text-slate-500 font-medium mt-0.5">{mod.description}</p>
                       </div>
@@ -4537,14 +4654,16 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
                       <span className={`text-xs font-black px-3 py-1 rounded-full border ${
                         isModuleAllCompleted
                           ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                          : 'bg-purple-50 text-purple-700 border-purple-200'
+                          : isModuleUnlocked
+                          ? 'bg-purple-50 text-purple-700 border-purple-200'
+                          : 'bg-slate-100 text-slate-500 border-slate-200'
                       }`}>
                         {completedInModule} / {mod.topics.length} Done
                       </span>
 
                       {/* Toggle All Topics Button */}
                       <button
-                        onClick={() => handleToggleModuleTopics(activeCourse.id, mod.topics, !isModuleAllCompleted)}
+                        onClick={() => handleToggleModuleTopics(activeCourse.id, mIdx, !isModuleAllCompleted)}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                           isModuleAllCompleted
                             ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
@@ -4568,39 +4687,64 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
                     <div className="p-5 space-y-3 bg-white">
                       {filteredTopics.map((topic, tIdx) => {
                         const topicKey = `${activeCourse.id}::${topic}`;
+                        const globalIdx = topicGlobalIndexMap[topicKey] ?? 0;
                         const isChecked = !!completedTopics[topicKey];
+                        const unlocked = isTopicUnlocked(globalIdx);
+                        const isNextAvailable = unlocked && !isChecked;
 
                         return (
                           <div
                             key={tIdx}
                             onClick={() => handleToggleTopicCheckbox(activeCourse.id, topic)}
-                            className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-4 group ${
+                            className={`p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-4 group ${
                               isChecked
-                                ? 'bg-emerald-50/70 border-emerald-300 text-slate-900'
-                                : 'bg-slate-50/50 hover:bg-purple-50/50 border-slate-200/80 hover:border-purple-200 text-slate-800'
+                                ? 'bg-emerald-50/70 border-emerald-300 text-slate-900 cursor-pointer'
+                                : unlocked
+                                ? 'bg-slate-50 hover:bg-purple-50/60 border-purple-200 hover:border-purple-400 text-slate-900 cursor-pointer shadow-2xs'
+                                : 'bg-slate-100/60 border-slate-200 text-slate-400 cursor-not-allowed opacity-75'
                             }`}
                           >
                             <div className="flex items-center gap-3.5">
-                              <div className="shrink-0 transition-transform group-hover:scale-110">
+                              <div className="shrink-0 transition-transform group-hover:scale-105">
                                 {isChecked ? (
                                   <CheckSquare className="w-5 h-5 text-emerald-600" />
+                                ) : unlocked ? (
+                                  <Square className="w-5 h-5 text-purple-600 group-hover:text-purple-700" />
                                 ) : (
-                                  <Square className="w-5 h-5 text-slate-400 group-hover:text-purple-600" />
+                                  <Lock className="w-4 h-4 text-slate-400" />
                                 )}
                               </div>
 
                               <span className={`text-xs sm:text-sm font-bold transition-all ${
-                                isChecked ? 'line-through text-slate-500 font-semibold' : 'text-slate-800'
+                                isChecked
+                                  ? 'line-through text-slate-500 font-semibold'
+                                  : unlocked
+                                  ? 'text-slate-900'
+                                  : 'text-slate-400'
                               }`}>
                                 {topic}
                               </span>
                             </div>
 
-                            {isChecked && (
-                              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full shrink-0 flex items-center gap-1">
-                                <CheckCircle2 className="w-3 h-3" /> Completed
-                              </span>
-                            )}
+                            <div className="flex items-center gap-2 shrink-0">
+                              {isChecked && (
+                                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3" /> Completed
+                                </span>
+                              )}
+
+                              {isNextAvailable && (
+                                <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full animate-pulse flex items-center gap-1">
+                                  <Zap className="w-3 h-3 text-amber-500" /> Next Checkpoint
+                                </span>
+                              )}
+
+                              {!unlocked && (
+                                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 bg-slate-200/80 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                  <Lock className="w-3 h-3" /> Locked
+                                </span>
+                              )}
+                            </div>
                           </div>
                         );
                       })}
