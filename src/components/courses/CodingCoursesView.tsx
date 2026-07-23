@@ -1053,43 +1053,146 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Python Data Science & Statistical Analysis',
-        description: 'Data wrangling with Pandas, matrix computations with NumPy, data visualization, and statistical modeling.',
+        title: 'Phase 1: Foundations',
+        description: 'Python programming, mathematics for data science, SQL, Git & GitHub, and Linux basics.',
         topics: [
-          'Pandas Data Wrangling & Cleaning',
-          'NumPy High-Performance Matrix Computations',
-          'Seaborn & Plotly Data Visualization',
-          'Descriptive & Inferential Statistics'
+          'Python Programming',
+          'Mathematics (Linear Algebra, Calculus, Probability, Statistics)',
+          'SQL',
+          'Git & GitHub',
+          'Linux Basics'
         ]
       },
       {
-        title: 'Module 2: Machine Learning & Deep Neural Networks',
-        description: 'Supervised/Unsupervised Machine Learning algorithms, Scikit-Learn pipelines, and PyTorch deep learning.',
+        title: 'Phase 2: Data Analysis',
+        description: 'NumPy, Pandas, data cleaning, Exploratory Data Analysis (EDA), visualization, feature engineering, and preprocessing.',
         topics: [
-          'Supervised Learning (Regression & Classification)',
-          'Unsupervised Learning (K-Means & PCA)',
-          'Model Evaluation, ROC-AUC & Cross-Validation',
-          'PyTorch Neural Network Architecture'
+          'NumPy',
+          'Pandas',
+          'Data Cleaning',
+          'Exploratory Data Analysis (EDA)',
+          'Data Visualization (Matplotlib, Seaborn, Plotly)',
+          'Feature Engineering',
+          'Data Preprocessing'
         ]
       },
       {
-        title: 'Module 3: Natural Language Processing (NLP) & Transformers',
-        description: 'Text preprocessing, embeddings, and Transformer models.',
+        title: 'Phase 3: Machine Learning',
+        description: 'ML fundamentals, supervised & unsupervised learning, ensemble methods, recommendation systems, time series analysis, and model evaluation.',
         topics: [
-          'Text Preprocessing & TF-IDF Vectors',
-          'Word Embeddings (Word2Vec, GloVe)',
-          'Recurrent Neural Networks (RNN/LSTM)',
-          'Transformer Architecture & Hugging Face'
+          'ML Fundamentals',
+          'Supervised Learning',
+          'Unsupervised Learning',
+          'Ensemble Learning',
+          'Recommendation Systems',
+          'Time Series Analysis',
+          'Model Evaluation & Hyperparameter Tuning'
         ]
       },
       {
-        title: 'Module 4: Generative AI, RAG Systems & LangChain Agents',
-        description: 'LLM fine-tuning, Prompt engineering, RAG vector pipelines, and LangChain AI Agents.',
+        title: 'Phase 4: Deep Learning',
+        description: 'ANN, TensorFlow, PyTorch, CNN, RNN/LSTM/GRU, NLP fundamentals, Transformers, GANs, and Reinforcement Learning.',
         topics: [
-          'Large Language Model Mechanics',
-          'Prompt Engineering Best Practices',
-          'RAG Architecture with Vector Databases',
-          'Building Autonomous AI Agents with LangChain'
+          'Neural Networks (ANN)',
+          'TensorFlow',
+          'PyTorch',
+          'CNN (Computer Vision)',
+          'RNN, LSTM, GRU',
+          'NLP Fundamentals',
+          'Transformers',
+          'GANs',
+          'Reinforcement Learning'
+        ]
+      },
+      {
+        title: 'Phase 5: Generative AI',
+        description: 'LLM fundamentals, prompt engineering, Hugging Face, LangChain, LlamaIndex, vector DBs, RAG, AI agents, fine-tuning, multimodal AI, and guardrails.',
+        topics: [
+          'LLM Fundamentals',
+          'Prompt Engineering',
+          'Hugging Face',
+          'LangChain',
+          'LlamaIndex',
+          'Embeddings',
+          'Vector Databases (FAISS, Pinecone, ChromaDB)',
+          'Retrieval-Augmented Generation (RAG)',
+          'AI Agents',
+          'Function Calling & Tool Use',
+          'Fine-Tuning (LoRA, QLoRA, PEFT)',
+          'Multimodal AI',
+          'Diffusion Models (Stable Diffusion, Flux)',
+          'LLM Evaluation & Guardrails'
+        ]
+      },
+      {
+        title: 'Phase 6: Data Engineering',
+        description: 'ETL pipelines, data warehousing, data lakes, Apache Spark, Hadoop, Kafka, Airflow, and BigQuery / Snowflake.',
+        topics: [
+          'ETL',
+          'Data Warehousing',
+          'Data Lakes',
+          'Apache Spark',
+          'Hadoop',
+          'Kafka',
+          'Airflow',
+          'BigQuery / Snowflake'
+        ]
+      },
+      {
+        title: 'Phase 7: MLOps & LLMOps',
+        description: 'Docker, Kubernetes, FastAPI/Flask, Streamlit/Gradio, MLflow, DVC, CI/CD, model deployment, monitoring, and prompt management.',
+        topics: [
+          'Docker',
+          'Kubernetes',
+          'FastAPI / Flask',
+          'Streamlit / Gradio',
+          'MLflow',
+          'DVC',
+          'CI/CD',
+          'Model Deployment',
+          'Monitoring',
+          'Prompt Management'
+        ]
+      },
+      {
+        title: 'Phase 8: Cloud',
+        description: 'AWS, Google Cloud (Vertex AI), Microsoft Azure AI, SageMaker, cloud storage, and serverless deployment.',
+        topics: [
+          'AWS',
+          'Google Cloud (Vertex AI)',
+          'Microsoft Azure AI',
+          'SageMaker',
+          'Cloud Storage',
+          'Serverless Deployment'
+        ]
+      },
+      {
+        title: 'Phase 9: Deployment',
+        description: 'REST APIs, FastAPI, Docker deployment, Vercel, Render, Railway, and Hugging Face Spaces.',
+        topics: [
+          'REST APIs',
+          'FastAPI',
+          'Docker Deployment',
+          'Vercel',
+          'Render',
+          'Railway',
+          'Hugging Face Spaces'
+        ]
+      },
+      {
+        title: 'Phase 10: Real-World Projects',
+        description: 'Hands-on projects covering Data Analysis, ML, Deep Learning, Computer Vision, NLP, RAG, Chatbots, AI Agents, and AI SaaS.',
+        topics: [
+          'Data Analysis Projects',
+          'Machine Learning Projects',
+          'Deep Learning Projects',
+          'Computer Vision Projects',
+          'NLP Projects',
+          'RAG Applications',
+          'AI Chatbots',
+          'AI Agents',
+          'AI SaaS Products',
+          'End-to-End Data Science Projects'
         ]
       }
     ]
@@ -1118,53 +1221,86 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Math & Python Data Science Stack',
-        description: 'Data manipulation, linear algebra, matrix operations, and feature scaling.',
+        title: 'Module 1: Python & Data',
+        description: 'Python programming language, variables, flow control, functions, data structures, OOPs, file handling, NumPy, Pandas, Matplotlib, and Seaborn.',
         topics: [
-          'Linear Algebra & Calculus for ML',
-          'NumPy Ndarrays & Vectorization',
-          'Pandas DataFrames & Data Cleaning',
-          'Matplotlib & Seaborn Visualizations'
+          'Python (programming language)',
+          'Variables & Operators',
+          'Conditional Statements & Loops (Flow Control)',
+          'Functions & lambda functions',
+          'List & List comprehensions, Tuple, Dictionary, & Set',
+          'File Handling & JSON Module',
+          'Object Oriented Programming (OOPs) - in Detail',
+          'Data collection, preprocessing & visualization',
+          'Numpy, Pandas, Matplotlib, Seaborn etc.'
         ]
       },
       {
-        title: 'Module 2: Supervised Machine Learning Algorithms',
-        description: 'Linear Regression, Logistic Regression, Decision Trees, Random Forests, XGBoost.',
+        title: 'Module 2: Machine Learning',
+        description: 'Mathematics for AI, supervised & unsupervised learning, reinforcement learning, evaluation metrics, Scikit-learn, Kaggle, and hands-on projects.',
         topics: [
-          'Linear & Logistic Regression Models',
-          'Decision Trees & Random Forests',
-          'Support Vector Machines (SVM)',
-          'XGBoost & Gradient Boosting Algorithms'
+          'Mathematics for AI (Statistics, Probability, Linear Algebra, Calculus, Central Limit Theorem)',
+          'Supervised Learning in ML (classification & regression)',
+          'Algorithms - Linear regression, Logistic regression, Naive Bayes, KNN, Decision Trees etc.',
+          'Unsupervised Learning in ML (clustering & association)',
+          'Algorithms - K-means, DBSCAN, PCA for dimensionality reduction etc.',
+          'Reinforcement Learning in ML',
+          'Additional concepts: precision, recall, F1 score, bias/variance tradeoff etc.',
+          'Scikit-learn & Kaggle',
+          'Multiple projects'
         ]
       },
       {
-        title: 'Module 3: Unsupervised Learning & Model Optimization',
-        description: 'Clustering, PCA, Cross-Validation, and Scikit-Learn pipelines.',
+        title: 'Module 3: Deep Learning',
+        description: 'Neural networks, backpropagation, perceptron, FNN, RNN, LSTM, CNN, Transformers, PyTorch, and framework comparisons.',
         topics: [
-          'K-Means & Hierarchical Clustering',
-          'Principal Component Analysis (PCA)',
-          'Cross-Validation & Hyperparameter Tuning',
-          'Scikit-Learn Pipelines & Model Persistence'
+          'Neural Networks & Terminologies',
+          'Forward & Backward Propagation',
+          'Perceptron',
+          'FNN Architecture (Feed forward neural network)',
+          'RNN Architecture (Recurrent neural network)',
+          'LSTM (Long short term memory network) need & advantages',
+          'CNN Architecture (Convolutional neural network)',
+          'Transformers',
+          'PyTorch',
+          'PyTorch vs TensorFlow vs Keras',
+          'Multiple Projects'
         ]
       },
       {
-        title: 'Module 4: Deep Learning & PyTorch Framework',
-        description: 'Perceptrons, Backpropagation, CNNs, and PyTorch tensors.',
+        title: 'Module 4: GenAI',
+        description: 'Introduction to GenAI, LLMs, NLP, GANs, RAG, Agentic AI, Cursor AI, GitHub Copilot, Claude, and OpenAI APIs.',
         topics: [
-          'Artificial Neural Networks (ANN) & Loss Functions',
-          'Backpropagation & Gradient Descent',
-          'Convolutional Neural Networks (CNN) for CV',
-          'PyTorch Tensors, Datasets & Training Loops'
+          'Introduction to GenAI & LLMs (Large Language Models)',
+          'RNNs for NLP (Natural Language Processing)',
+          'GAN (Generative Adversarial Network)',
+          'RAG (Retrieval-Augmented Generation)',
+          'Agentic AI',
+          'Cursor AI, Github co-pilot, Claude etc.',
+          'Working with OpenAI APIs'
         ]
       },
       {
-        title: 'Module 5: Transformers, Hugging Face & Fine-Tuning LLMs',
-        description: 'Attention mechanisms, pretrained models, and LLM fine-tuning.',
+        title: 'Module 5: AI Engineering Stack',
+        description: 'Flask for AI development, frontend fundamentals, SQL for data science, Git & GitHub, Docker, and Kubernetes.',
         topics: [
-          'Attention Mechanisms & Transformer Encoder/Decoder',
-          'Hugging Face Hub & Pretrained Models',
-          'Fine-Tuning Models on Custom Datasets',
-          'Evaluating Model Performance in Production'
+          'Flask (Development with AI)',
+          'Frontend fundamentals (HTML, CSS, JS)',
+          'SQL (for Data Science)',
+          'Git & Github (Version Control)',
+          'Docker',
+          'Kubernetes'
+        ]
+      },
+      {
+        title: 'Module 6: Projects',
+        description: 'Minor & major industry-grade projects across finance, medical, e-commerce, media sentiment analysis, GenAI assistants, and assignments.',
+        topics: [
+          'Multiple minor & major projects',
+          'Industry grade domain specific projects',
+          'Finance, Medical, E-commerce (Clustering), Media (Sentiment Analysis) etc.',
+          'GenAI assistant',
+          'Additional assignment projects'
         ]
       }
     ]
@@ -1193,44 +1329,147 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Advanced Excel & Power Query for Analytics',
-        description: 'XLOOKUP, INDEX-MATCH, Pivot Tables, Conditional Formatting, and Power Query ETL.',
+        title: 'Phase 1: Programming Fundamentals',
+        description: 'Python basics, NumPy, Pandas, Jupyter Notebook, Git & GitHub.',
         topics: [
-          'Advanced Formulas (XLOOKUP, INDEX-MATCH, LET, FILTER)',
-          'Dynamic Pivot Tables, Slicers & Calculated Fields',
-          'Power Query Data Transformation & Cleaning',
-          'Executive Interactive Dashboard Design'
+          'Python Basics',
+          'NumPy',
+          'Pandas',
+          'Jupyter Notebook',
+          'Git & GitHub'
         ]
       },
       {
-        title: 'Module 2: SQL Data Querying & Database Analytics',
-        description: 'SELECT queries, Filtering, JOINs, Grouping, Aggregations, Subqueries, CTEs, and Window Functions.',
+        title: 'Phase 2: SQL & Databases',
+        description: 'SQL basics, CRUD, JOINs, aggregate functions, GROUP BY, HAVING, Window functions, CTE, Views, and query optimization.',
         topics: [
-          'SELECT, WHERE, ORDER BY & Aggregations',
-          'Multi-Table INNER/LEFT/FULL JOINs',
-          'GROUP BY, HAVING & Subqueries',
-          'Common Table Expressions (CTEs)',
-          'Window Functions (ROW_NUMBER, RANK, LEAD/LAG)'
+          'SQL Basics',
+          'CRUD Operations',
+          'Joins',
+          'Aggregate Functions',
+          'Group By & Having',
+          'Window Functions',
+          'CTE',
+          'Views',
+          'Query Optimization'
         ]
       },
       {
-        title: 'Module 3: Power BI & Data Visualization',
-        description: 'Data modeling, DAX measures, interactive dashboard builds, and storytelling.',
+        title: 'Phase 3: Data Cleaning & Preparation',
+        description: 'Data collection, cleaning, missing values, duplicates, outliers, transformations, feature engineering, encoding, and scaling.',
         topics: [
-          'Data Modeling & Star Schema Architecture',
-          'DAX Formulas (CALCULATE, SUMX, DATESYTD)',
-          'Building Interactive Dashboards in Power BI',
-          'Storytelling with Data & KPI Cards'
+          'Data Collection',
+          'Data Cleaning',
+          'Missing Values',
+          'Duplicate Handling',
+          'Outlier Detection',
+          'Data Transformation',
+          'Data Formatting',
+          'Feature Engineering',
+          'Data Encoding',
+          'Feature Scaling'
         ]
       },
       {
-        title: 'Module 4: Python Exploratory Data Analysis (EDA)',
-        description: 'Pandas data wrangling, Seaborn charts, and business case studies.',
+        title: 'Phase 4: Exploratory Data Analysis (EDA)',
+        description: 'Descriptive statistics, univariate, bivariate, multivariate, correlation, distributions, trends, and pattern detection.',
         topics: [
-          'Python Pandas Data Wrangling',
-          'Cleaning Missing & Duplicate Data',
-          'Matplotlib & Seaborn Exploratory Charts',
-          'Business Case Studies & Portfolio Building'
+          'Descriptive Statistics',
+          'Univariate Analysis',
+          'Bivariate Analysis',
+          'Multivariate Analysis',
+          'Correlation Analysis',
+          'Data Distribution',
+          'Trend Analysis',
+          'Pattern Detection'
+        ]
+      },
+      {
+        title: 'Phase 5: Data Visualization',
+        description: 'Matplotlib, Seaborn, Plotly, line/bar/pie charts, histograms, box plots, scatter plots, heatmaps, and dashboards.',
+        topics: [
+          'Matplotlib',
+          'Seaborn',
+          'Plotly',
+          'Line Charts',
+          'Bar Charts',
+          'Pie Charts',
+          'Histograms',
+          'Box Plots',
+          'Scatter Plots',
+          'Heatmaps',
+          'Dashboards'
+        ]
+      },
+      {
+        title: 'Phase 6: Statistics',
+        description: 'Mean/median/mode, variance, standard deviation, probability, sampling, hypothesis testing, confidence intervals, and A/B testing.',
+        topics: [
+          'Mean, Median, Mode',
+          'Variance & Standard Deviation',
+          'Probability',
+          'Probability Distributions',
+          'Correlation & Covariance',
+          'Sampling',
+          'Hypothesis Testing',
+          'Confidence Intervals',
+          'A/B Testing'
+        ]
+      },
+      {
+        title: 'Phase 7: Excel for Data Analysis',
+        description: 'Excel basics, formulas, lookup functions, pivot tables, charts, conditional formatting, Power Query, and Power Pivot.',
+        topics: [
+          'Excel Basics',
+          'Formulas & Functions',
+          'Lookup Functions',
+          'Pivot Tables',
+          'Charts',
+          'Conditional Formatting',
+          'Power Query',
+          'Power Pivot'
+        ]
+      },
+      {
+        title: 'Phase 8: Business Intelligence (BI)',
+        description: 'Power BI, Tableau, data modeling, DAX basics, interactive dashboards, KPI reporting, and business reporting.',
+        topics: [
+          'Power BI',
+          'Tableau',
+          'Data Modeling',
+          'DAX Basics',
+          'Interactive Dashboards',
+          'KPI Reporting',
+          'Business Reporting'
+        ]
+      },
+      {
+        title: 'Phase 9: Real-World Data Analysis',
+        description: 'Business, sales, marketing, financial, HR, customer, product, and web analytics.',
+        topics: [
+          'Business Analysis',
+          'Sales Analysis',
+          'Marketing Analysis',
+          'Financial Analysis',
+          'HR Analytics',
+          'Customer Analytics',
+          'Product Analytics',
+          'Web Analytics'
+        ]
+      },
+      {
+        title: 'Phase 10: Projects',
+        description: 'Real-world dashboards and projects including Sales, Customer Churn, Netflix, E-commerce, IPL, COVID-19, Financial, HR, and End-to-End Business Dashboards.',
+        topics: [
+          'Sales Dashboard',
+          'Customer Churn Analysis',
+          'Netflix Data Analysis',
+          'E-commerce Analysis',
+          'IPL Data Analysis',
+          'COVID-19 Analysis',
+          'Financial Dashboard',
+          'HR Dashboard',
+          'End-to-End Business Dashboard'
         ]
       }
     ]
@@ -1259,44 +1498,180 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Linux Administration, Shell Scripting & Git',
-        description: 'Command line utilities, permissions, process management, bash automation scripts, and Git branching.',
+        title: 'Phase 1: Programming & OS Fundamentals',
+        description: 'Linux basics, commands, shell scripting (Bash), networking fundamentals (HTTP/HTTPS, DNS, SSH), YAML, JSON, Git & GitHub.',
         topics: [
-          'Linux CLI Commands, Permissions & Process Management',
-          'Bash Shell Scripting & Automation',
-          'Git Branching, Merging, Rebasing & Pull Requests',
-          'SSH Keys, Firewall & Server Hardening'
+          'Linux Basics',
+          'Linux Commands',
+          'Shell Scripting (Bash)',
+          'Networking Fundamentals',
+          'HTTP/HTTPS',
+          'DNS',
+          'SSH',
+          'YAML',
+          'JSON',
+          'Git & GitHub'
         ]
       },
       {
-        title: 'Module 2: Docker Containers & Multi-Container Stacks',
-        description: 'Container images, Dockerfiles, Docker Compose, and networking.',
+        title: 'Phase 2: Cloud Fundamentals',
+        description: 'Cloud computing concepts, AWS core services (IAM, EC2, S3, VPC, EBS, Load Balancer, Auto Scaling, Route 53, CloudWatch, AWS CLI), Azure basics, and Google Cloud basics.',
         topics: [
-          'Docker Architecture & Image Creation',
-          'Dockerfile Best Practices & Multi-Stage Builds',
-          'Managing Containers, Networks & Volumes',
-          'Docker Compose Multi-Container Microservices'
+          'Cloud Computing Basics',
+          'AWS Fundamentals',
+          'IAM',
+          'EC2',
+          'S3',
+          'VPC',
+          'EBS',
+          'Load Balancer',
+          'Auto Scaling',
+          'Route 53',
+          'CloudWatch',
+          'AWS CLI',
+          'Azure Basics',
+          'Google Cloud Basics'
         ]
       },
       {
-        title: 'Module 3: Kubernetes Cluster Orchestration',
-        description: 'Kubernetes Pods, Services, Deployments, and Helm package manager.',
+        title: 'Phase 3: Containers',
+        description: 'Docker fundamentals, images, containers, Dockerfile, Docker Compose, networking, volumes, registry, Docker Hub, multi-stage builds, and Docker security.',
         topics: [
-          'Kubernetes Architecture (Control Plane & Worker Nodes)',
-          'Pods, Deployments & ReplicaSets',
-          'K8s Services, NodePort, ClusterIP & Ingress Controllers',
-          'ConfigMaps, Secrets & Helm Package Manager'
+          'Docker Basics',
+          'Docker Images',
+          'Docker Containers',
+          'Dockerfile',
+          'Docker Compose',
+          'Docker Networking',
+          'Docker Volumes',
+          'Docker Registry',
+          'Docker Hub',
+          'Multi-stage Builds',
+          'Docker Security'
         ]
       },
       {
-        title: 'Module 4: CI/CD Pipelines, Infrastructure as Code & Cloud',
-        description: 'GitHub Actions, Jenkins, Terraform IaC, Ansible, and AWS Cloud hosting.',
+        title: 'Phase 4: Container Orchestration',
+        description: 'Kubernetes architecture, Pods, ReplicaSets, Deployments, Services, ConfigMaps, Secrets, Namespaces, Volumes, StatefulSets, DaemonSets, Jobs/CronJobs, Ingress, Helm, and security.',
         topics: [
-          'GitHub Actions Workflows & Automated Testing',
-          'Jenkins Pipeline Setup & Integration',
-          'Terraform Infrastructure as Code (IaC) Provisioning',
-          'Ansible Configuration Management',
-          'AWS EC2, S3 & EKS Cluster Deployments'
+          'Kubernetes Fundamentals',
+          'Pods',
+          'ReplicaSets',
+          'Deployments',
+          'Services',
+          'ConfigMaps',
+          'Secrets',
+          'Namespaces',
+          'Volumes',
+          'StatefulSets',
+          'DaemonSets',
+          'Jobs & CronJobs',
+          'Ingress',
+          'Helm',
+          'Kubernetes Security'
+        ]
+      },
+      {
+        title: 'Phase 5: CI/CD',
+        description: 'CI/CD concepts, Jenkins, GitHub Actions, GitLab CI/CD, Azure DevOps, pipelines, build/testing/deployment automation, and rollback strategies.',
+        topics: [
+          'CI/CD Concepts',
+          'Jenkins',
+          'GitHub Actions',
+          'GitLab CI/CD',
+          'Azure DevOps',
+          'Pipelines',
+          'Build Automation',
+          'Testing Automation',
+          'Deployment Automation',
+          'Rollback Strategy'
+        ]
+      },
+      {
+        title: 'Phase 6: Infrastructure as Code (IaC)',
+        description: 'Terraform modules, state, workspaces, Ansible playbooks, inventory, roles, variables, Puppet basics, and Chef basics.',
+        topics: [
+          'Terraform',
+          'Terraform Modules',
+          'Terraform State',
+          'Terraform Workspaces',
+          'Ansible',
+          'Ansible Playbooks',
+          'Inventory',
+          'Roles',
+          'Variables',
+          'Puppet (Basics)',
+          'Chef (Basics)'
+        ]
+      },
+      {
+        title: 'Phase 7: Monitoring & Logging',
+        description: 'Prometheus, Grafana, ELK Stack, Loki, Fluentd, Jaeger, OpenTelemetry, AlertManager, CloudWatch, logging, and metrics.',
+        topics: [
+          'Prometheus',
+          'Grafana',
+          'ELK Stack',
+          'Loki',
+          'Fluentd',
+          'Jaeger',
+          'OpenTelemetry',
+          'AlertManager',
+          'CloudWatch',
+          'Logging & Metrics'
+        ]
+      },
+      {
+        title: 'Phase 8: Security (DevSecOps)',
+        description: 'DevSecOps fundamentals, IAM best practices, HashiCorp Vault, Trivy, SonarQube, SAST, DAST, dependency scanning, container/K8s security, policy as code.',
+        topics: [
+          'DevSecOps Fundamentals',
+          'IAM Best Practices',
+          'Secrets Management',
+          'HashiCorp Vault',
+          'Trivy',
+          'SonarQube',
+          'SAST',
+          'DAST',
+          'Dependency Scanning',
+          'Container Security',
+          'Kubernetes Security',
+          'Policy as Code'
+        ]
+      },
+      {
+        title: 'Phase 9: Advanced DevOps',
+        description: 'Microservices, API Gateway, Istio Service Mesh, ArgoCD, FluxCD, GitOps, Nginx, HAProxy, Redis, Kafka, RabbitMQ, Serverless, cost optimization, and disaster recovery.',
+        topics: [
+          'Microservices',
+          'API Gateway',
+          'Service Mesh (Istio)',
+          'ArgoCD',
+          'FluxCD',
+          'GitOps',
+          'Nginx',
+          'HAProxy',
+          'Caching (Redis)',
+          'Message Queues (Kafka, RabbitMQ)',
+          'Serverless',
+          'Cost Optimization',
+          'High Availability',
+          'Disaster Recovery'
+        ]
+      },
+      {
+        title: 'Phase 10: Real-World Projects',
+        description: 'Hands-on projects: CI/CD pipelines, MERN Dockerization, K8s deployments, Terraform AWS infra, Jenkins+Docker+K8s pipeline, GitOps with ArgoCD, DevSecOps pipeline, and end-to-end cloud deployments.',
+        topics: [
+          'CI/CD Pipeline',
+          'Dockerized MERN App',
+          'Kubernetes Deployment',
+          'Terraform AWS Infrastructure',
+          'Jenkins + Docker + Kubernetes Pipeline',
+          'GitOps with ArgoCD',
+          'Monitoring Dashboard',
+          'Logging System',
+          'DevSecOps Pipeline',
+          'End-to-End Cloud Deployment'
         ]
       }
     ]
@@ -1325,43 +1700,100 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: JavaScript, TypeScript & React/Next.js Architecture',
-        description: 'Deep dive into JS internals, async programming, TypeScript types, React 18, and Next.js App Router.',
+        title: 'Complete 0-1: Foundation & Backend',
+        description: 'JavaScript async internals, Node.js runtime, MongoDB, PostgreSQL, TypeScript, Express, ORMs, Middlewares, Zod, Monorepos, Serverless, OpenAPI Spec, Auth, and Node.js scaling.',
         topics: [
-          'Callbacks, Promises, Event Loop & Async/Await',
-          'TypeScript Generics, Interfaces & Strict Typing',
-          'React 18 Custom Hooks & State Optimization',
-          'Next.js 14 App Router & Server Components'
+          'Foundation JavaScript & async nature of JS',
+          'Node.js and its runtime',
+          'Databases (NoSQL / SQL)',
+          'Mongo and Postgres deep dive',
+          'Typescript beginner to advance',
+          'Backend architecture',
+          'Backend communication protocols',
+          'Express basic to advance',
+          'ORMs (Prisma / Mongoose)',
+          'Middlewares, routes, status codes & global catches',
+          'Zod schema validation',
+          'MonoRepos & Turborepo',
+          'Serverless Backends',
+          'OpenAPI Spec & Autogenerated clients',
+          'Authentication using external libraries',
+          'Scaling Node.js & performance benchmarks',
+          'Deploying npm packages'
         ]
       },
       {
-        title: 'Module 2: Backend Microservices with Node, PostgreSQL & Prisma',
-        description: 'RESTful API microservices, relational database modeling, Prisma ORM, JWT auth, and middleware.',
+        title: 'Complete 0-1: Frontend Development',
+        description: 'Reconcilers, React, state internals, Context API, Recoil, CSS, Tailwind CSS, Docker containerization, Next.js, Custom hooks, and NextAuth.',
         topics: [
-          'RESTful API Microservices with Express',
-          'PostgreSQL Relational Database Modeling',
-          'Prisma ORM Migrations, Indexing & Relations',
-          'JWT Authentication & Security Headers'
+          'Reconcilers and Frontend frameworks',
+          'React beginner to advance',
+          'Internals of state & Context API',
+          'State management using Recoil',
+          'CSS fundamentals, Flexbox & basic styling',
+          'Frontend UI frameworks & Deep dive into Tailwind',
+          'Containerization & Docker',
+          'Next.js',
+          'Custom hooks',
+          'In-house auth using NextAuth'
         ]
       },
       {
-        title: 'Module 3: Real-Time WebSockets, WebRTC & Monorepos',
-        description: 'Real-time communication, Turborepo monorepos, and WebRTC streaming.',
+        title: 'Complete 0-1: Basic DevOps & Projects',
+        description: 'Docker end-to-end, AWS deployments, Fly.io, Nginx reverse proxies, GSoC issue solving, and full-stack Paytm/Wallet project.',
         topics: [
-          'Real-Time Bidirectional WebSockets',
-          'WebRTC Video/Audio P2P Streaming',
-          'Turborepo Monorepo Architecture',
-          'State Management & Recoil'
+          'Docker end to end',
+          'Deploying to AWS servers',
+          'Newer clouds like Fly.io / Remix',
+          'Nginx and reverse proxies',
+          'GSoC Project setting up and issue solving',
+          'Building Paytm/Wallet End to End'
         ]
       },
       {
-        title: 'Module 4: Docker, CI/CD, System Design & Open Source',
-        description: 'Containerization, automated pipelines, system design, and open source PRs.',
+        title: 'Complete 1-100: Advanced Backend & System Design',
+        description: 'Message queues, PubSubs, Proxies, Redis, Kafka, Design Patterns, Indexing, Normalization, Rate limiting, Sharding, gRPC, Capacity Estimation, and WebRTC.',
         topics: [
-          'Docker Containerization & Networking',
-          'Automated CI/CD Pipelines',
-          'System Design & Rate Limiting',
-          'Open Source Contribution Guidelines & PRs'
+          'Advanced backend communication',
+          'Message queues and PubSubs',
+          'Proxies & Load balancers',
+          'Redis Deep dive',
+          'Kafka Deep dive',
+          'Common Design Patterns in JS',
+          'Advanced DB concepts (Indexing, normalization)',
+          'Rate limiting',
+          'Captchas and DDoS protection',
+          'Sharding, Replication & Resiliency',
+          'Horizontal and vertical scaling',
+          'Polling and WebSockets',
+          'gRPC',
+          'Capacity Estimation',
+          'Load Balancers & CAP Theorem',
+          'Testing Node.js Apps',
+          'Real time communication & basics of WebRTC'
+        ]
+      },
+      {
+        title: 'Complete 1-100: Advanced DevOps',
+        description: 'Container orchestration, Docker Swarm, Kubernetes, CI/CD, Prometheus, Grafana, New Relic, Serverless deep dive, and AWS constructs.',
+        topics: [
+          'Container Orchestration & Docker Swarm',
+          'Kubernetes',
+          'CI/CD Pipelines',
+          'Monitoring systems basics to advance',
+          'Prometheus & Grafana',
+          'New Relic as a paid service',
+          'Serverless Deep dive',
+          'AWS Constructs (EC2, S3, CDNs, LB, EKS)'
+        ]
+      },
+      {
+        title: 'Complete 1-100: Capstone Projects',
+        description: 'End-to-end production projects including Zerodha trading platform, Zapier automation engine, and real-world open-source contributions.',
+        topics: [
+          'Zerodha end to end',
+          'Zapier end to end',
+          'Real world open-source projects'
         ]
       }
     ]
@@ -1390,33 +1822,116 @@ const INLINE_COURSES = [
     ],
     modules: [
       {
-        title: 'Module 1: Web Development & Microservice Backend',
-        description: 'Next.js App Router, TypeScript, PostgreSQL, Prisma, serverless functions, and state management.',
+        title: 'Phase 1: Foundations',
+        description: 'Internet & HTTP, HTML5, CSS3, JavaScript (ES6+), Async JS, DOM manipulation, Git & GitHub, Linux basics, and CLI.',
         topics: [
-          'Next.js 15 App Router & Server Actions',
-          'Relational Schemas in PostgreSQL & Prisma',
-          'Serverless Architectures & Cloudflare Workers',
-          'Custom Middleware & Security Policies'
+          'Internet & HTTP',
+          'HTML5',
+          'CSS3',
+          'JavaScript (ES6+)',
+          'Async JavaScript',
+          'DOM Manipulation',
+          'Git & GitHub',
+          'Linux Basics',
+          'CLI (Command Line)'
         ]
       },
       {
-        title: 'Module 2: DevOps, Kubernetes, Redis, Kafka & Distributed Systems',
-        description: 'Scaling backend services, caching layers with Redis, message queues with Kafka, and Kubernetes management.',
+        title: 'Phase 2: Backend Development',
+        description: 'Node.js, Bun, Cloudflare Workers, Express, REST APIs, JWT/Sessions, Zod, PostgreSQL, MongoDB, Prisma, WebSockets, gRPC, Redis, Kafka, Monorepos, and Node scaling.',
         topics: [
-          'Redis Caching, Pub/Sub & Rate Limiting',
-          'Kafka Message Queues & Event Streaming',
-          'Kubernetes Deployment, Auto-Scaling & Ingress',
-          'Prometheus & Grafana Monitoring'
+          'Node.js',
+          'Bun Runtime',
+          'Cloudflare Workers',
+          'Express.js',
+          'REST APIs',
+          'Authentication & Authorization (JWT, Cookies & Sessions)',
+          'Middleware, Error Handling & File Uploads',
+          'Validation (Zod)',
+          'SQL Databases (PostgreSQL) & NoSQL (MongoDB)',
+          'Prisma ORM & Mongoose',
+          'Backend Communication (WebSockets, Server-Sent Events, gRPC)',
+          'API Design, OpenAPI/Swagger, Rate Limiting',
+          'Caching (Redis) & Message Queues',
+          'Cron Jobs & Serverless Functions',
+          'Monorepos (TurboRepo) & NPM Package Publishing',
+          'Performance Optimization & Scaling Node.js'
         ]
       },
       {
-        title: 'Module 3: Systems Programming in Rust & Web3 Blockchain',
-        description: 'Rust programming fundamentals, Solana/Ethereum smart contracts, decentralized apps (dApps), and cryptography.',
+        title: 'Phase 3: Frontend Development',
+        description: 'React.js, Vite, TypeScript, Tailwind CSS, Routing, State Management, Recoil/Zustand, Forms, React Query, Axios, Auth, UI & Dashboards.',
         topics: [
-          'Rust Ownership, Borrowing, Lifetimes & Enums',
-          'Smart Contract Development on Solana/Anchor',
-          'Building Decentralized Apps (dApps)',
-          'Web3 Security Audits & Cryptography'
+          'React.js',
+          'Vite',
+          'TypeScript',
+          'Tailwind CSS',
+          'Routing & Protected Routes',
+          'State Management (React Hooks, Context API, Recoil/Zustand)',
+          'Forms, React Query & Axios',
+          'Authentication',
+          'Component Libraries, Charts & Dashboard UI',
+          'Responsive Design & Deployment'
+        ]
+      },
+      {
+        title: 'Phase 4: DevOps',
+        description: 'Linux admin, Bash, EC2/GCP VMs, Docker, ECS, Kubernetes, Helm, Terraform, GitHub Actions, GitOps, Monitoring, CDN, Nginx, and deployment.',
+        topics: [
+          'Linux Administration & Bash Scripting',
+          'Virtual Machines (AWS EC2, Google Cloud VMs)',
+          'Auto Scaling Groups',
+          'Docker & Containerization',
+          'Amazon ECS & Kubernetes (Helm)',
+          'Terraform (Infrastructure as Code)',
+          'CI/CD (GitHub Actions) & GitOps',
+          'Monitoring & Logging',
+          'Object Storage, CDN & Reverse Proxy (Nginx)',
+          'Production Deployment'
+        ]
+      },
+      {
+        title: 'Phase 5: Web3 / Blockchain',
+        description: 'Ethereum, EVM, Smart Contracts, Solidity, Hardhat, Ethers.js, Solana, Rust (Basics & Advanced), Anchor Framework, DApps, and Web2+Web3 integration.',
+        topics: [
+          'Blockchain Fundamentals & Ethereum Basics (EVM, Wallets)',
+          'Smart Contracts & Solidity (Basics to Advanced)',
+          'Remix IDE & Hardhat',
+          'Client-side Web3 Apps & Ethers.js',
+          'Solana Basics & Solana Data Model',
+          'Rust Basics & Advanced Rust',
+          'Solana Programs & Anchor Framework',
+          'DApps, Indexing & Blockchain Backend',
+          'Web2 + Web3 Integration & Smart Contract Deployment',
+          'Real-world Blockchain Projects'
+        ]
+      },
+      {
+        title: 'Phase 6: Advanced Engineering',
+        description: 'System design (HLD/LLD), microservices, design patterns, distributed systems, load balancing, caching strategies, database scaling, and security.',
+        topics: [
+          'System Design Basics',
+          'High-Level Design (HLD) & Low-Level Design (LLD)',
+          'Microservices & Design Patterns',
+          'Distributed Systems & Load Balancing',
+          'Caching Strategies & Database Scaling',
+          'Security Best Practices',
+          'Performance Optimization & Production Architecture'
+        ]
+      },
+      {
+        title: 'Phase 7: Projects',
+        description: 'Full-stack MERN applications, authentication systems, SaaS projects, real-time chat apps, Dockerized/K8s deployments, smart contracts, DApps, and portfolio projects.',
+        topics: [
+          'Full-Stack MERN Applications',
+          'Authentication System',
+          'SaaS Project',
+          'Real-time Chat Application',
+          'Production Deployment',
+          'Dockerized Applications',
+          'Kubernetes Deployment',
+          'Smart Contracts & Decentralized Applications (DApps)',
+          'End-to-End Portfolio Projects'
         ]
       }
     ]
