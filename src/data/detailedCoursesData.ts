@@ -2736,45 +2736,66 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: C++ DSA & Competitive Problem Solving',
-        description: 'C++ STL, Big-O complexity, Two Pointers, Sliding Window, Recursion, Trees, Graphs, and 300+ LeetCode problems.',
+        title: 'Module 1: Full-Stack Web Development (Live)',
+        description: 'Internet basics, HTML/CSS/JS, React.js, TypeScript, Node.js, Express.js, MongoDB, Mongoose, Auth, WebSockets, WebRTC, REST APIs, Advanced Projects & Deployment.',
         topics: [
-          'C++ STL Vectors, Maps, Sets & Priority Queues',
-          'Time & Space Complexity Analysis (Big-O)',
-          'Two Pointers & Sliding Window Patterns',
-          'Recursion, Backtracking & Subsets Generation',
-          'Binary Trees, BST Operations & Boundary Traversals',
-          'Graph BFS, DFS, Shortest Path & Cycle Detection',
-          '1D & 2D Dynamic Programming Patterns',
-          '300+ Solved LeetCode & CodeStudio Questions'
+          'Internet & Frontend: HTML, CSS, JavaScript, React.js & TypeScript',
+          'Backend Development: Node.js, Express.js, MongoDB & Mongoose',
+          'Authentication & Authorization Mechanisms',
+          'Real-Time Communication: WebSockets & WebRTC',
+          'APIs: REST APIs & Third-Party Integration',
+          'Advanced Full Stack Projects & Deployment'
         ]
       },
       {
-        title: 'Module 2: Full-Stack Web Development & Blockchain',
-        description: 'React, Node.js microservices, MongoDB/PostgreSQL, REST APIs, JWT Auth, Solidity, and dApps.',
+        title: 'Module 2: Blockchain Engineering',
+        description: 'Blockchain fundamentals, Cryptographic foundations, Ethereum ecosystem, Solidity (Basic to Advanced), Solana client-side apps, Rust (Basic to Advanced), and Projects.',
         topics: [
-          'Frontend Development with React 18 & Tailwind CSS',
-          'Backend REST API Microservices with Node.js & Express',
-          'MongoDB / PostgreSQL Database Modeling & Queries',
-          'JWT Authentication & Security Best Practices',
-          'Blockchain Fundamentals & Ethereum Virtual Machine (EVM)',
-          'Solidity Smart Contract Development & Deployment',
-          'Web3.js & Ethers.js Frontend Integration',
-          'Building Full-Stack Decentralized SaaS Apps'
+          'Blockchain Fundamentals & Cryptographic Foundations',
+          'Internal Working of Blockchains & Consensus Mechanics',
+          'Ethereum Ecosystem, Smart Contracts & Solidity (Basic to Advanced)',
+          'Solana Client-Side Applications & Rust (Basic to Advanced)',
+          'Advanced Blockchain Projects & Deployment'
         ]
       },
       {
-        title: 'Module 3: System Design (LLD & HLD) Architecture',
-        description: 'SOLID principles, design patterns, LLD case studies, HLD load balancers, database sharding, and caching.',
+        title: 'Module 3: Data Structures & Algorithms in C++ (Pre-Recorded)',
+        description: '150+ Hours recorded videos, 300+ company questions, C++, STL, Time/Space complexity, Recursion, Backtracking, OOP, Linked Lists, Stacks, Queues, Trees, Heaps, Graphs, Hashing, Tries, Sliding Window, DP.',
         topics: [
-          'SOLID Principles & Clean Architecture Standards',
-          'Creational, Structural & Behavioral Design Patterns',
-          'Low-Level Design (LLD) Case Studies (Parking Lot, LLD Games)',
-          'High-Level System Design (HLD) Concepts',
-          'Load Balancers, API Gateways & Service Discovery',
-          'Database Sharding, Replication & CAP Theorem',
-          'Distributed Caching with Redis & Content Delivery Networks (CDN)',
-          'HLD Case Studies: Designing WhatsApp, Uber & Rate Limiters'
+          'Programming Basics, Flowcharts, Variables, Loops & Complexity Analysis',
+          'Arrays, Dynamic Arrays, Searching & Sorting Algorithms',
+          'Strings, Mathematics for Coding & C++ Pointers',
+          'Standard Template Library (STL), Functions & Call Stack',
+          'Recursion, Backtracking & Object-Oriented Programming (OOP)',
+          'Data Structures: Linked List, Stack, Queue, Trees, Heaps, Graphs, Hashing & Tries',
+          'Patterns: Sliding Window, Bit Manipulation, Divide & Conquer, Greedy & Dynamic Programming',
+          '150+ Hours Recorded Videos & 300+ Company Coding Questions'
+        ]
+      },
+      {
+        title: 'Module 4: High Level System Design (HLD) - Foundations & Features',
+        description: 'CAP theorem, Monolith vs Microservices, HLD interview framework, Scaling, Load balancing, Caching, Sharding, Message queues (Kafka/RabbitMQ), Rate limiting, CDN, Search engines, and Notifications.',
+        topics: [
+          'HLD Foundations: Goals, Trade-offs, CAP Theorem & Monolith vs Microservices',
+          'Horizontal/Vertical Scaling, Load Balancing & Consistent Hashing',
+          'Caching, SQL vs NoSQL, Database Sharding & Indexing',
+          'Message Queues & Pub/Sub (Kafka, RabbitMQ) - Scaling to Millions of Users',
+          'Real-World Features: Auth Design, Rate Limiting (Token/Leaky Bucket) & API Gateway',
+          'CDN, Monitoring, Logging, Health Checks & Search Engine Design',
+          'Notification System (Email, SMS, Push) & File Upload System'
+        ]
+      },
+      {
+        title: 'Module 5: High Level System Design (HLD) - Complete Design Problems',
+        description: 'End-to-end HLD case studies for top product company interviews: Bit.ly, Instagram, Swiggy/Zomato, YouTube, WhatsApp, Google Docs, and Twitter/X.',
+        topics: [
+          'Bit.ly (URL Shortener System Architecture)',
+          'Instagram Feed System Design',
+          'Swiggy / Zomato Food Delivery Architecture',
+          'YouTube Video Streaming Engine',
+          'WhatsApp Real-Time Messaging Architecture',
+          'Google Docs Collaborative Editing Engine',
+          'Twitter / X Timeline Feed System'
         ]
       }
     ]
@@ -2803,45 +2824,168 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: C++ STL & Linear Data Structures',
-        description: 'Pointers, memory management, STL containers, Arrays, Searching/Sorting, Two Pointers, and Linked Lists.',
+        title: 'Phase 1: Programming Fundamentals',
+        description: 'Flowcharts, pseudocode, C++ basics, variables, operators, loops, pattern problems, functions, 2D arrays, strings, pointers, dynamic memory, macros, bit manipulation, and time/space complexity.',
         topics: [
-          'C++ Fundamentals, Pointers & Memory Allocation',
-          'C++ STL Vectors, Deque, Maps, Sets & Iterators',
-          'Time & Space Complexity Analysis',
-          'Arrays: Searching, Sorting & Matrix Traversals',
-          'Binary Search Variants & Search on Answer Space',
-          'Two Pointers & Sliding Window Problems',
-          'Singly & Doubly Linked List Operations',
-          'Reversing Linked List & Cycle Detection'
+          'Flowcharts & Pseudocode',
+          'C++ Basics, Variables & Data Types',
+          'Operators, Input/Output & Conditional Statements',
+          'Loops & Pattern Problems',
+          'Functions, Arrays & 2D Arrays',
+          'Character Arrays & Strings',
+          'Pointers, References & Dynamic Memory Allocation',
+          'Macros, Bit Manipulation & Time/Space Complexity'
         ]
       },
       {
-        title: 'Module 2: Stacks, Queues, Trees & Heaps',
-        description: 'Stack evaluation, Monotonic Stack, Binary Trees, BST, Heaps, Priority Queues, and Trie structures.',
+        title: 'Phase 2: Basic Data Structures',
+        description: 'Linear/Binary Search, C++ STL, Sorting algorithms, searching techniques, Prefix Sum, Sliding Window, and Two Pointer technique.',
         topics: [
-          'Stack Implementation & Monotonic Stack Problems',
-          'Queue Implementation, Deque & Circular Queue',
-          'Binary Tree Traversals (Inorder, Preorder, Postorder, BFS)',
-          'Binary Search Tree (BST) Search, Insert & Delete',
-          'Lowest Common Ancestor (LCA) & Tree Views',
-          'Max Heap & Min Heap Construction from Scratch',
-          'Priority Queues & Top K Frequent Problems',
-          'Trie Implementation for Prefix Searching'
+          'Linear Search & Binary Search',
+          'STL (Vector, Pair, Map, Set, Queue, Stack, Priority Queue)',
+          'Sorting (Bubble, Selection, Insertion, Merge, Quick Sort)',
+          'Searching Techniques',
+          'Prefix Sum & Sliding Window',
+          'Two Pointer Technique'
         ]
       },
       {
-        title: 'Module 3: Graphs, Backtracking & Dynamic Programming',
-        description: 'Graph algorithms, shortest path, MST, backtracking, 1D/2D DP, and top product company interview questions.',
+        title: 'Phase 3: Recursion & Backtracking',
+        description: 'Basics of recursion, recursive problem solving, backtracking, Rat in a Maze, N Queens, Sudoku Solver, Permutations, Combinations, Subsequences, and Divide & Conquer.',
         topics: [
-          'Graph Adjacency List & Matrix Representation',
-          'Graph BFS, DFS & Cycle Detection Algorithms',
-          'Dijkstra Algorithm & Bellman-Ford Shortest Path',
-          'Minimum Spanning Trees (Kruskal & Prim)',
-          'Backtracking: N-Queens, Sudoku & Rat in a Maze',
-          '1D Dynamic Programming: Climbing Stairs & Coin Change',
-          '2D Dynamic Programming: 0/1 Knapsack & LCS',
-          'Top 250 Company Interview Problems Walkthrough'
+          'Basics of Recursion & Recursive Problem Solving',
+          'Backtracking Fundamentals',
+          'Rat in a Maze & N Queens Problems',
+          'Sudoku Solver & Permutations',
+          'Combinations, Subsequences & Power Set',
+          'Divide & Conquer Approach'
+        ]
+      },
+      {
+        title: 'Phase 4: Linked Lists',
+        description: 'Singly, Doubly, and Circular Linked Lists, reversing, cycle detection/removal, merging, sorting, cloning, and LRU Cache.',
+        topics: [
+          'Singly Linked List & Doubly Linked List',
+          'Circular Linked List',
+          'Reverse Linked List',
+          'Detect Cycle & Remove Cycle',
+          'Merge Lists & Sort Linked List',
+          'Clone Linked List & LRU Cache'
+        ]
+      },
+      {
+        title: 'Phase 5: Stack & Queue',
+        description: 'Stack/Queue implementations, Circular Queue, Deque, Monotonic Stack, Next Greater/Previous Smaller Element, Histogram, Celebrity Problem, and Min Stack.',
+        topics: [
+          'Stack & Queue Implementation',
+          'Circular Queue & Deque',
+          'Priority Queue',
+          'Monotonic Stack Problems',
+          'Next Greater Element & Previous Smaller Element',
+          'Largest Rectangle in Histogram & Celebrity Problem',
+          'Valid Parentheses & Min Stack'
+        ]
+      },
+      {
+        title: 'Phase 6: Trees',
+        description: 'Binary Tree traversals, height, diameter, balanced trees, views, boundary traversal, LCA, Kth Ancestor, Burning Tree, and Morris Traversal.',
+        topics: [
+          'Binary Tree Fundamentals',
+          'Tree Traversals (Preorder, Inorder, Postorder, Level Order)',
+          'Height, Diameter & Balanced Tree Checks',
+          'Views of Tree & Boundary Traversal',
+          'Lowest Common Ancestor (LCA) & Kth Ancestor',
+          'Burning Tree Problem & Morris Traversal'
+        ]
+      },
+      {
+        title: 'Phase 7: Binary Search Tree',
+        description: 'BST operations (insert/delete/search), validation, Kth smallest, LCA, converting, merging BSTs, and largest BST subtree.',
+        topics: [
+          'BST Basics & Insert/Delete/Search',
+          'BST Validation & Kth Smallest Element',
+          'LCA in BST',
+          'Convert BST & Merge BSTs',
+          'Largest BST Subtree in Binary Tree'
+        ]
+      },
+      {
+        title: 'Phase 8: Heap',
+        description: 'Max Heap, Min Heap, Heapify, Heap Sort, Priority Queue, Merge K Sorted Arrays/Lists, Median in Stream, and Top K Elements.',
+        topics: [
+          'Max Heap & Min Heap Construction',
+          'Heapify Algorithm & Heap Sort',
+          'Priority Queue Operations',
+          'Merge K Sorted Arrays & Merge K Sorted Lists',
+          'Find Median in a Data Stream & Top K Elements'
+        ]
+      },
+      {
+        title: 'Phase 9: Hashing',
+        description: 'Hash Maps, Hash Tables, frequency counting, custom hashing, collision handling, and practical applications of hashing.',
+        topics: [
+          'Hash Maps & Hash Tables',
+          'Frequency Counting',
+          'Custom Hashing Functions',
+          'Collision Handling Techniques',
+          'Applications of Hashing'
+        ]
+      },
+      {
+        title: 'Phase 10: Tries',
+        description: 'Trie implementation, insert/search/delete, prefix matching, auto complete, and Maximum XOR problems.',
+        topics: [
+          'Trie Implementation & Operations (Insert/Search/Delete)',
+          'Prefix Matching & Auto Complete',
+          'Maximum XOR Problems using Trie'
+        ]
+      },
+      {
+        title: 'Phase 11: Graphs',
+        description: 'Graph representation, BFS, DFS, cycle detection, Topological Sort, Dijkstra, Bellman-Ford, Floyd Warshall, Prim/Kruskal MST, DSU, Bridges, and Articulation Points.',
+        topics: [
+          'Graph Representation (Adjacency Matrix & List)',
+          'BFS & DFS Traversals',
+          'Cycle Detection in Directed & Undirected Graphs',
+          'Topological Sort & Kahn\'s Algorithm',
+          'Shortest Path: Dijkstra, Bellman Ford & Floyd Warshall',
+          'Minimum Spanning Tree: Prim\'s & Kruskal\'s Algorithm',
+          'Disjoint Set Union (Union Find / DSU)',
+          'Strongly Connected Components (Kosaraju/Tarjan), Bridges & Articulation Points'
+        ]
+      },
+      {
+        title: 'Phase 12: Dynamic Programming',
+        description: 'Memoization, tabulation, space optimization, Fibonacci, Knapsack, Subset Sum, Partition DP, LCS, LIS, MCM, Edit Distance, Coin Change, House Robber, Palindrome DP.',
+        topics: [
+          'DP Introduction: Memoization vs Tabulation vs Space Optimization',
+          '1D DP: Fibonacci, Coin Change, House Robber & Rod Cutting',
+          '2D DP: 0/1 Knapsack, Subset Sum & Partition DP',
+          'Grid DP, Longest Common Subsequence (LCS) & Edit Distance',
+          'Longest Increasing Subsequence (LIS) & Matrix Chain Multiplication (MCM)',
+          'Palindrome DP & Digit DP (Basics)'
+        ]
+      },
+      {
+        title: 'Phase 13: Greedy Algorithms',
+        description: 'Activity Selection, Fractional Knapsack, Huffman Coding, Job Sequencing, Interval Scheduling, Merge Intervals, Gas Station, and Jump Game.',
+        topics: [
+          'Activity Selection & Fractional Knapsack',
+          'Huffman Coding & Job Sequencing',
+          'Interval Scheduling & Merge Intervals',
+          'Gas Station & Jump Game'
+        ]
+      },
+      {
+        title: 'Phase 14: Advanced Algorithms',
+        description: 'Binary Search on Answer, Monotonic Queue, Segment Tree (Basics), Fenwick Tree (BIT), Sparse Table (Basics), and Sweep Line introduction.',
+        topics: [
+          'Binary Search on Answer',
+          'Monotonic Queue',
+          'Segment Tree (Basics)',
+          'Fenwick Tree / Binary Indexed Tree (BIT)',
+          'Sparse Table (Basics)',
+          'Sweep Line Algorithm (Introduction)'
         ]
       }
     ]
