@@ -35,8 +35,10 @@ import {
   RotateCcw,
   Zap
 } from 'lucide-react';
-import { UserProfile } from '../../types';
-
+import { UserProfile, CertificateRecord } from '../../types';
+import confetti from 'canvas-confetti';
+import { CertificateCard } from './CertificateCard';
+import { CertificateVerificationModal } from './CertificateVerificationModal';
 import { FirestoreService } from '../../lib/firestoreService';
 
 interface CodingCoursesViewProps {
@@ -4170,6 +4172,10 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
   const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
   const [paymentSuccessMessage, setPaymentSuccessMessage] = useState<boolean>(false);
 
+  // Certificate Verification Modal State
+  const [showCertVerificationModal, setShowCertVerificationModal] = useState<boolean>(false);
+  const [verificationCodeToView, setVerificationCodeToView] = useState<string | null>(null);
+
   // Sync unlocked courses & completed topics with Firestore on mount
   useEffect(() => {
     if (user && user.uid) {
@@ -4404,6 +4410,46 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
     const isDrive = activeCourse.linkType === 'drive';
     const stats = getCourseStats(activeCourse);
 
+    // Generate unique Certificate Code for this course and user
+    const courseCodeClean = activeCourse.id.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+    const userCodeClean = user?.uid ? user.uid.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase() : '7845';
+    const activeCourseCertCode = `COS-2026-${courseCodeClean}-${userCodeClean}`;
+    const certificateIssuedDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+    const studentDisplayName = user?.displayName && user.displayName.trim() !== 'Guest Student' ? user.displayName : 'Naman Pandey';
+
+    // Auto-save certificate to Firestore & trigger celebration confetti when 100% completed
+    useEffect(() => {
+      if (stats.percentage === 100 && activeCourse) {
+        const certRecord: CertificateRecord = {
+          certificateId: activeCourseCertCode,
+          userId: user.uid || 'guest_user',
+          userName: studentDisplayName,
+          userEmail: user.email || '',
+          joinedAt: user.createdAt ? user.createdAt.split('T')[0] : '2026-01-15',
+          userPlan: user.plan ? (user.plan === 'free_trial' ? '4-Day Free Trial' : user.plan) : 'Pro Student Access',
+          courseId: activeCourse.id,
+          courseTitle: activeCourse.title,
+          issuedAt: certificateIssuedDate,
+          attendancePercentage: user.stats?.attendancePercentage ?? 92,
+          totalClassesAttended: user.stats?.totalClassesAttended ?? 46,
+          totalClassesHeld: user.stats?.totalClassesHeld ?? 50,
+          dsaSolvedCount: user.stats?.dsaSolvedCount ?? 120
+        };
+
+        FirestoreService.saveCertificate(certRecord).catch(e => console.warn("Error auto-saving certificate:", e));
+
+        try {
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        } catch (e) {
+          // ignore
+        }
+      }
+    }, [stats.percentage, activeCourse.id]);
+
     return (
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-300">
         {/* Back navigation */}
@@ -4478,16 +4524,16 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
         </div>
 
         {/* START LEARNING & REDIRECT SECTION */}
-        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-purple-950 rounded-3xl p-6 sm:p-8 border border-purple-900/50 shadow-2xl text-white space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-6">
+        <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 rounded-3xl p-6 sm:p-8 border border-purple-200/80 shadow-sm text-slate-900 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-purple-200/60 pb-6">
             <div className="space-y-2 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-black uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Official Resource Access
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-200 text-xs font-black uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" /> Official Resource Access
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-2">
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 flex items-center gap-2">
                 Start Learning & Stream Lectures
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
                 {isDrive 
                   ? 'Access the official Google Drive repository below to stream video lectures, download Jupyter notebooks, and access complete datasets.'
                   : 'Join the official Telegram channel below to access live lecture streams, study materials, project code repositories, and batch announcements.'}
@@ -4502,9 +4548,9 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
                 rel="noopener noreferrer"
                 className={`w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl ${
                   isDrive 
-                    ? 'bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-400 hover:to-emerald-500 shadow-amber-500/25'
-                    : 'bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 shadow-sky-500/25'
-                } text-white font-black text-sm sm:text-base shadow-xl transition-all transform hover:scale-[1.03] cursor-pointer`}
+                    ? 'bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-600 hover:to-emerald-700 shadow-amber-500/20'
+                    : 'bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 shadow-sky-500/20'
+                } text-white font-black text-sm sm:text-base shadow-md transition-all transform hover:scale-[1.02] cursor-pointer`}
               >
                 {isDrive ? <Folder className="w-5 h-5 text-white" /> : <Send className="w-5 h-5 text-white" />}
                 <span>{isDrive ? 'Open Google Drive Folder' : 'Join Telegram Channel'}</span>
@@ -4513,27 +4559,27 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-300">
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-              <div className="font-extrabold text-white flex items-center gap-1.5">
-                {isDrive ? <Folder className="w-4 h-4 text-amber-400" /> : <MessageSquare className="w-4 h-4 text-sky-400" />}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-600">
+            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-1">
+              <div className="font-extrabold text-slate-900 flex items-center gap-1.5">
+                {isDrive ? <Folder className="w-4 h-4 text-amber-500" /> : <MessageSquare className="w-4 h-4 text-sky-500" />}
                 <span>{isDrive ? 'Google Drive Access' : 'Telegram Community'}</span>
               </div>
-              <p className="text-slate-400">
+              <p className="text-slate-500">
                 {isDrive ? 'Instant access to structured video folders & datasets.' : 'Direct access to mentors and doubt solving with batchmates.'}
               </p>
             </div>
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-              <div className="font-extrabold text-white flex items-center gap-1.5">
-                <Video className="w-4 h-4 text-purple-400" /> High Quality Video Classes
+            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-1">
+              <div className="font-extrabold text-slate-900 flex items-center gap-1.5">
+                <Video className="w-4 h-4 text-purple-600" /> High Quality Video Classes
               </div>
-              <p className="text-slate-400">Stream high-definition class recordings and live sessions anytime.</p>
+              <p className="text-slate-500">Stream high-definition class recordings and live sessions anytime.</p>
             </div>
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-              <div className="font-extrabold text-white flex items-center gap-1.5">
-                <BookOpen className="w-4 h-4 text-emerald-400" /> Source Codes & Projects
+            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-1">
+              <div className="font-extrabold text-slate-900 flex items-center gap-1.5">
+                <BookOpen className="w-4 h-4 text-emerald-600" /> Source Codes & Projects
               </div>
-              <p className="text-slate-400">Complete code repositories, notes, and assignment solutions included.</p>
+              <p className="text-slate-500">Complete code repositories, notes, and assignment solutions included.</p>
             </div>
           </div>
         </div>
@@ -4775,6 +4821,109 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
               <ExternalLink className="w-3.5 h-3.5 opacity-80" />
             </a>
           </div>
+
+          {/* OFFICIAL CERTIFICATE SECTION AT THE LAST OF EVERY CODING COURSE */}
+          <div className="pt-8 border-t-2 border-slate-200 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs font-black uppercase tracking-wider">
+                  <Award className="w-4 h-4 text-amber-600" /> Official Verified Course Certificate
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                  {activeCourse.title} Certificate of Completion
+                </h3>
+                <p className="text-xs text-slate-500 font-medium">
+                  {stats.percentage === 100 
+                    ? '🎉 You have completed 100% of all syllabus topics! Your official verified certificate is ready below.' 
+                    : `Complete all ${stats.totalTopics} syllabus checkpoints above (${stats.completedCount}/${stats.totalTopics} completed) to unlock and claim your official certificate.`}
+                </p>
+              </div>
+
+              {stats.percentage === 100 && (
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="px-3.5 py-1.5 rounded-full bg-emerald-500 text-white font-black text-xs flex items-center gap-1.5 shadow-sm">
+                    <CheckCircle2 className="w-4 h-4" /> 100% Completed & Issued
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {stats.percentage === 100 ? (
+              <div className="space-y-6 animate-in fade-in duration-500">
+                <div className="p-4 sm:p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-purple-950 text-white shadow-xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="space-y-1 text-center sm:text-left">
+                    <h4 className="font-black text-base sm:text-lg text-amber-300 flex items-center justify-center sm:justify-start gap-2">
+                      <Sparkles className="w-5 h-5 text-amber-400" />
+                      Congratulations, {studentDisplayName}!
+                    </h4>
+                    <p className="text-xs sm:text-sm text-slate-300">
+                      You have earned your official <span className="font-bold text-white underline">{activeCourse.title}</span> Certificate. Scan the embedded QR code or verify online anytime.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setVerificationCodeToView(activeCourseCertCode);
+                      setShowCertVerificationModal(true);
+                    }}
+                    className="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-lg transition-all transform hover:scale-[1.02] cursor-pointer shrink-0 flex items-center gap-2"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-slate-950" />
+                    <span>Verify Credentials & Student Data</span>
+                  </button>
+                </div>
+
+                {/* Render Official Certificate Card */}
+                <CertificateCard
+                  certificateId={activeCourseCertCode}
+                  userName={studentDisplayName}
+                  userEmail={user.email}
+                  courseTitle={activeCourse.title}
+                  issuedAt={certificateIssuedDate}
+                  userPlan={user.plan ? (user.plan === 'free_trial' ? '4-Day Free Trial' : user.plan) : 'Pro Student Access'}
+                  joinedAt={user.createdAt ? user.createdAt.split('T')[0] : '2026-01-15'}
+                  attendancePercentage={user.stats?.attendancePercentage ?? 92}
+                  totalClassesAttended={user.stats?.totalClassesAttended ?? 46}
+                  totalClassesHeld={user.stats?.totalClassesHeld ?? 50}
+                  dsaSolvedCount={user.stats?.dsaSolvedCount ?? 120}
+                  showActions={true}
+                  onVerifyClick={() => {
+                    setVerificationCodeToView(activeCourseCertCode);
+                    setShowCertVerificationModal(true);
+                  }}
+                />
+              </div>
+            ) : (
+              /* Locked Certificate Banner */
+              <div className="p-8 sm:p-12 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-300 text-center space-y-4 shadow-2xs">
+                <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-inner">
+                  <Lock className="w-8 h-8" />
+                </div>
+                <div className="max-w-md mx-auto space-y-2">
+                  <h4 className="text-lg font-black text-slate-900">
+                    Certificate Locked ({stats.completedCount} / {stats.totalTopics} Topics Completed)
+                  </h4>
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+                    To earn and download your official CampusOS Certificate for <span className="font-bold text-slate-800">{activeCourse.title}</span>, you must complete all topic checkboxes in the syllabus above.
+                  </p>
+                  
+                  {/* Progress bar */}
+                  <div className="pt-3 max-w-xs mx-auto space-y-1.5">
+                    <div className="flex justify-between text-xs font-extrabold text-slate-600">
+                      <span>Syllabus Checkpoints</span>
+                      <span className="text-amber-600 font-black">{stats.percentage}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-3 p-0.5 overflow-hidden">
+                      <div
+                        className="bg-gradient-to-r from-amber-500 to-amber-400 h-full rounded-full transition-all duration-300"
+                        style={{ width: `${stats.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
     );
@@ -4789,16 +4938,16 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-10 animate-in fade-in duration-300">
       
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-8 sm:p-12 text-white shadow-xl">
-        <div className="absolute -right-10 -bottom-10 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 border border-purple-200/80 p-8 sm:p-12 text-slate-900 shadow-sm">
+        <div className="absolute -right-10 -bottom-10 w-80 h-80 bg-purple-200/40 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-black uppercase tracking-wider">
-            <Sparkles className="w-4 h-4 text-amber-300" /> Interactive Coding Courses & Detailed Syllabi
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100 border border-purple-200 text-purple-800 text-xs font-black uppercase tracking-wider">
+            <Sparkles className="w-4 h-4 text-purple-600" /> Interactive Coding Courses & Detailed Syllabi
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
             Level Up Your Code & Track Your Syllabus Progress
           </h1>
-          <p className="text-sm sm:text-base text-slate-300 font-medium leading-relaxed">
+          <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed">
             Enroll in top-rated structured courses designed by industry experts. Track your topic completion with live interactive checkboxes, access complete syllabus roadmaps, and join official Telegram / Google Drive resources for ₹399 each.
           </p>
         </div>
@@ -5040,6 +5189,13 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
           </div>
         </div>
       )}
+
+      {/* Global Certificate Verification Modal */}
+      <CertificateVerificationModal
+        isOpen={showCertVerificationModal}
+        onClose={() => setShowCertVerificationModal(false)}
+        certificateId={verificationCodeToView}
+      />
 
     </div>
   );

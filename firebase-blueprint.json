@@ -124,6 +124,27 @@
         "enrolledAt": { "type": "string" }
       },
       "required": ["id", "userId", "courseId"]
+    },
+    "certificates": {
+      "title": "Issued Certificates",
+      "description": "Certificates granted upon 100% completion of coding courses.",
+      "type": "object",
+      "properties": {
+        "certificateId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "joinedAt": { "type": "string" },
+        "userPlan": { "type": "string" },
+        "courseId": { "type": "string" },
+        "courseTitle": { "type": "string" },
+        "issuedAt": { "type": "string" },
+        "attendancePercentage": { "type": "number" },
+        "totalClassesAttended": { "type": "number" },
+        "totalClassesHeld": { "type": "number" },
+        "dsaSolvedCount": { "type": "number" }
+      },
+      "required": ["certificateId", "userId", "courseId", "courseTitle", "userName"]
     }
   },
   "securityRules": {
@@ -136,6 +157,10 @@
       "write": "true"
     },
     "userCourseProgress": {
+      "read": "true",
+      "write": "true"
+    },
+    "certificates": {
       "read": "true",
       "write": "true"
     },

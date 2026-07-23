@@ -17,7 +17,8 @@ import {
   ScheduleEvent, 
   DSAProblem, 
   ResumeData, 
-  MockInterviewResult 
+  MockInterviewResult,
+  CertificateRecord
 } from '../types';
 import { 
   getZeroAttendance, 
@@ -446,5 +447,52 @@ export class FirestoreService {
       return {};
     }
   }
+
+  /**
+   * Save issued certificate record into Firestore collection `certificates`.
+   */
+  static async saveCertificate(cert: CertificateRecord): Promise<void> {
+    if (!db || !cert.certificateId) return;
+    try {
+      const payload = sanitizeForFirestore(cert);
+      await setDoc(doc(db, 'certificates', cert.certificateId), payload, { merge: true });
+    } catch (e) {
+      console.warn("Firestore saveCertificate error:", e);
+    }
+  }
+
+  /**
+   * Get certificate record by unique certificate ID code.
+   */
+  static async getCertificateByCode(certCode: string): Promise<CertificateRecord | null> {
+    if (!db || !certCode) return null;
+    try {
+      const snap = await getDoc(doc(db, 'certificates', certCode));
+      if (snap.exists()) {
+        return snap.data() as CertificateRecord;
+      }
+    } catch (e) {
+      console.warn("Firestore getCertificateByCode error:", e);
+    }
+    return null;
+  }
+
+  /**
+   * Get all certificates issued for a user.
+   */
+  static async getUserCertificates(userId: string): Promise<CertificateRecord[]> {
+    if (!db || !userId) return [];
+    try {
+      const q = query(collection(db, 'certificates'), where('userId', '==', userId));
+      const snap = await getDocs(q);
+      const list: CertificateRecord[] = [];
+      snap.forEach(d => list.push(d.data() as CertificateRecord));
+      return list;
+    } catch (e) {
+      console.warn("Firestore getUserCertificates error:", e);
+      return [];
+    }
+  }
 }
+
 

@@ -262,3 +262,20 @@ export interface UserCourseProgress {
   certificateIssued?: boolean;
   certificateIssuedAt?: string;
 }
+
+export interface CertificateRecord {
+  certificateId: string; // Unique ID, e.g. "COS-2026-784563"
+  userId: string;
+  userName: string;
+  userEmail: string;
+  joinedAt: string;
+  userPlan: string;
+  courseId: string;
+  courseTitle: string;
+  issuedAt: string;
+  attendancePercentage: number;
+  totalClassesAttended: number;
+  totalClassesHeld: number;
+  dsaSolvedCount: number;
+  dsaTotalCount?: number;
+}

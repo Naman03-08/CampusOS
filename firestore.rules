@@ -55,5 +55,10 @@ service cloud.firestore {
     match /userCourseProgress/{docId} {
       allow read, write: if true;
     }
+
+    // Certificates
+    match /certificates/{docId} {
+      allow read, write: if true;
+    }
   }
 }

@@ -30,6 +30,7 @@ import { SettingsView } from './components/settings/SettingsView';
 import { AdminPanelView } from './components/admin/AdminPanelView';
 import { UpgradePlansView } from './components/pricing/UpgradePlansView';
 import { UpgradePromptModal } from './components/common/UpgradePromptModal';
+import { CertificateVerificationModal } from './components/courses/CertificateVerificationModal';
 
 import { StorageService, getZeroAttendance, getZeroDSA, getZeroResume } from './lib/storage';
 import { FirestoreService } from './lib/firestoreService';
@@ -54,6 +55,19 @@ export function App() {
   const [showUpgradeModal, setShowUpgradeModal] = useState<boolean>(false);
   const [upgradeFeatureName, setUpgradeFeatureName] = useState<string>('this feature');
   const [pendingTabAfterTrial, setPendingTabAfterTrial] = useState<string | null>(null);
+
+  // Global Certificate QR code verification listener
+  const [globalVerifyCertId, setGlobalVerifyCertId] = useState<string | null>(null);
+  const [showGlobalCertModal, setShowGlobalCertModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const verifyCertCode = params.get('verifyCert');
+    if (verifyCertCode) {
+      setGlobalVerifyCertId(verifyCertCode);
+      setShowGlobalCertModal(true);
+    }
+  }, []);
 
   const gatedTabs = ['studyhub', 'resumebuilder', 'chat', 'assignment', 'attendance', 'coding', 'courses', 'placement'];
 
@@ -575,6 +589,13 @@ export function App() {
         onStartTrial={handleStartFreeTrial}
         onNavigateToPricing={() => setActiveTab('pricing')}
         featureName={upgradeFeatureName}
+      />
+
+      {/* Global QR Code Verification Portal */}
+      <CertificateVerificationModal
+        isOpen={showGlobalCertModal}
+        onClose={() => setShowGlobalCertModal(false)}
+        certificateId={globalVerifyCertId}
       />
     </div>
   );
