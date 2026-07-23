@@ -275,73 +275,48 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: C++ Language Core, STL & Complexity Analysis',
-        description: 'Pointers, dynamic memory, C++ STL containers, iterators, and Big-O time/space complexity proofs.',
+        title: 'Programming with C++',
+        description: 'Foundations of C++ programming including logic building, flow control, functions, and memory basics.',
         topics: [
-          'Pointers, Dynamic Memory Allocation (new/delete) & References',
-          'Big-O, Big-Omega & Big-Theta Time/Space Complexity Proofs',
-          'C++ STL Vectors, Deque, List & Memory Reallocation',
-          'Ordered Maps/Sets vs Unordered Hash Tables (O(1) vs O(log N))',
-          'Priority Queues, Heaps & Custom Comparators in C++',
-          'Iterators, C++ Algorithm Library (sort, lower_bound, upper_bound)',
-          'Structs, Classes & Object-Oriented C++ Basics',
-          'Bitwise Operations, Bitmasks & Fast I/O Techniques'
+          'Flowcharts & Pseudocode',
+          'Variables & Data Types',
+          'Operators',
+          'Conditional Statements',
+          'Loops (Flow Control)',
+          'Patterns',
+          'Functions & Scope'
         ]
       },
       {
-        title: 'Module 2: Arrays, Strings, Two-Pointer & Sliding Window',
-        description: 'Array traversals, Kadane algorithm, sliding window, prefix sums, binary search variants, and strings.',
+        title: 'Data Structures & Algorithms',
+        description: 'Core data structures and algorithms covering arrays, sorting, STL, pointers, recursion, OOPs, trees, and search trees.',
         topics: [
-          'Array Traversals, Rotations & Kadane Algorithm',
-          'Two-Pointer Pattern (Opposite, Same Direction, Triplet Sum)',
-          'Sliding Window Pattern (Fixed Size vs Variable Size)',
-          'Prefix Sum Arrays, Difference Arrays & Range Queries',
-          'String Manipulation, KMP Algorithm & Z-Algorithm',
-          'Binary Search Variants (Lower Bound, Search in Rotated Array)',
-          'Binary Search on Answer Space (Aggressive Cows, Book Allocation)',
-          'Matrix Operations, Rotations & Spiral Traversal Patterns'
+          'Arrays & 2D Arrays',
+          'Sorting Algorithms',
+          'Strings',
+          'Pointers & Dynamic Allocation',
+          'Standard Template Library (STL)',
+          'Time & Space Complexity',
+          'Recursion & Backtracking',
+          'Divide & Conquer',
+          'Object Oriented Programming (OOPs)',
+          'Linked Lists',
+          'Stacks & Queues',
+          'Binary Trees',
+          'Binary Search Trees'
         ]
       },
       {
-        title: 'Module 3: Recursion, Backtracking & Linked Lists',
-        description: 'Recursion tree analysis, backtracking combinatorial search, and Singly/Doubly Linked List operations.',
+        title: 'Advanced DSA',
+        description: 'Advanced problem-solving techniques including heaps, hash mapping, tries, graph algorithms, greedy strategies, dynamic programming, and segment trees.',
         topics: [
-          'Recursion Call Stack, Base Case Design & Master Theorem',
-          'Combinatorial Search (Subsets, Subsequences & Permutations)',
-          'Backtracking: N-Queens, Sudoku Solver & Rat in a Maze',
-          'Singly & Doubly Linked List Operations from Scratch',
-          'Floyd Cycle Detection (Fast & Slow Pointer Pattern)',
-          'Reverse Linked List, K-Group Reverse & Merge Sorted Lists',
-          'Monotonic Stack & Monotonic Queue Applications',
-          'Infix to Postfix Conversion & Valid Parentheses Matching'
-        ]
-      },
-      {
-        title: 'Module 4: Binary Trees, BST, Heaps & Tries',
-        description: 'Binary Tree traversals, BST search/insert/delete, Min/Max Heaps, Priority Queues, and Trie structures.',
-        topics: [
-          'Binary Tree Traversals (Inorder, Preorder, Postorder, Level-Order)',
-          'Tree Properties: Height, Diameter, Balance Factor & Views',
-          'BST Search, Insert, Delete & Range Queries',
-          'Lowest Common Ancestor (LCA) in Binary Trees & BST',
-          'Max/Min Heap Operations, Heapify & HeapSort',
-          'Top K Frequent Elements & Find Median from Data Stream',
-          'Trie Data Structure Insertion, Search & Prefix Matching',
-          'Segment Tree Operations & Range Minimum Query'
-        ]
-      },
-      {
-        title: 'Module 5: Graphs & Dynamic Programming (1D & 2D)',
-        description: 'Graph BFS/DFS, shortest path algorithms, DSU, and 1D/2D Dynamic Programming patterns.',
-        topics: [
-          'Graph Adjacency List & Adjacency Matrix Representation',
-          'Graph Traversals: BFS & DFS Patterns',
-          'Cycle Detection in Undirected & Directed Graphs',
-          'Shortest Path: Dijkstra Algorithm & Bellman-Ford Algorithm',
-          'Minimum Spanning Trees: Kruskal & Prim Algorithms',
-          'Disjoint Set Union (DSU) with Path Compression & Rank',
-          '1D Dynamic Programming: Climbing Stairs, House Robber, Coin Change',
-          '2D DP: 0/1 Knapsack, Longest Common Subsequence (LCS), Edit Distance'
+          'Heaps (Priority Queue)',
+          'Hashmaps',
+          'Tries',
+          'Graph',
+          'Greedy Algorithms',
+          'Dynamic Programming',
+          'Segment Trees'
         ]
       }
     ]
