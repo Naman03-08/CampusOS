@@ -1056,73 +1056,69 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Dart Programming Language & Flutter Basics',
-        description: 'Dart syntax, OOP, Async futures, null safety, widget tree architecture, and Material Design 3.',
+        title: 'Phase 1: Dart Programming & Flutter Basics',
+        description: 'Fundamental Dart programming syntax, data structures, OOP, async mechanics, Flutter CLI setup, project structure, and basic widgets.',
         topics: [
-          'Dart Variables, Data Types, Control Flow & Functions',
-          'Object-Oriented Dart: Classes, Constructors & Mixins',
-          'Asynchronous Dart: Futures, async/await & Streams',
-          'Null Safety Mechanics & Type System in Dart',
-          'Flutter Widget Tree Architecture & Element Tree',
-          'StatelessWidget vs StatefulWidget Lifecycle',
-          'Material Design 3 & Cupertino Component Sets',
-          'Debugging Flutter Apps & Hot Reload Mechanics'
+          'Introduction to Dart, Variables, Data Types & Operators',
+          'Input/Output, Type Casting, String Interpolation & Constants (final & const)',
+          'Conditional Statements, Loops, Functions & Arrow Functions',
+          'Null Safety, Collections (List, Set, Map) & Exception Handling',
+          'Object-Oriented Dart: Classes, Objects, Constructors & Named Constructors',
+          'OOP: Inheritance, Polymorphism, Abstraction, Encapsulation, Mixins & Extensions',
+          'Generics & Async Programming (Future, Stream, async & await)',
+          'Flutter Installation, Android Studio, VS Code, Emulator & Flutter CLI',
+          'Project Structure & pubspec.yaml',
+          'Widgets, Material & Cupertino Design, Hot Reload & Hot Restart',
+          'Build Context, Widget Tree, StatelessWidget & StatefulWidget',
+          'Basic Layout Widgets (Text, Image, Icon, Buttons, Scaffold, AppBar, FAB)',
+          'Theme Basics'
         ]
       },
       {
-        title: 'Module 2: Layouts, Forms & Responsive UI Design',
-        description: 'Container layouts, ListView, GridView, Form validations, responsive design, themes, and navigation.',
+        title: 'Phase 2: UI Development & Navigation',
+        description: 'Advanced layout widgets, scrollable views, form inputs, navigation strategies, responsive UI design, themes, and UI effects.',
         topics: [
-          'Container, Row, Column, Expanded & Flexible Widgets',
-          'ListView, GridView, CustomScrollView & Slivers',
-          'Form Widgets, FormKeys & Input Field Validations',
-          'Responsive Layouts with LayoutBuilder & MediaQuery',
-          'Custom Painter, Animations & Hero Transitions',
-          'Dark Mode Configuration & Custom Theme Extension',
-          'Asset Management (Images, Fonts & SVG Icons)',
-          'Navigation & Routing (Navigator 2.0 & go_router)'
+          'Layout Widgets (Container, Row, Column, Stack, Expanded, Flexible, Wrap, Align, Center, SizedBox, Padding, Margin, AspectRatio, FractionallySizedBox, Spacer)',
+          'Scrollable Widgets (ListView, GridView, SingleChildScrollView, PageView, CustomScrollView, Slivers)',
+          'Input Widgets & Form Validation (TextField, TextFormField, Checkbox, Radio Button, Switch, Slider, Date/Time Picker, Dropdown)',
+          'Navigation (Navigator, Named Routes, Route Arguments, Nested Navigation, Bottom Navigation Bar, Drawer, Tabs, Deep Linking)',
+          'UI Design (Responsive UI, MediaQuery, LayoutBuilder, OrientationBuilder, Dark/Light Mode, Custom Themes & Fonts)',
+          'UI Assets & Effects (SVG, Custom Icons, Lottie Animation, Shimmer Effect)'
         ]
       },
       {
-        title: 'Module 3: State Management with Provider, Riverpod & BLoC',
-        description: 'State management fundamentals, Provider, Riverpod, BLoC pattern, dependency injection, and testing.',
+        title: 'Phase 3: State Management & Backend Integration',
+        description: 'Comprehensive state management, local storage, REST API consumption, Firebase services, Node.js backend, and Supabase fundamentals.',
         topics: [
-          'State Management Fundamentals & Lifting State Up',
-          'Provider Package: ChangeNotifiers, Consumer & Selector',
-          'Riverpod StateNotifier, FutureProvider & StreamProvider',
-          'BLoC / Cubit Pattern Architecture & Event Handling',
-          'Comparing State Management Options for Production Apps',
-          'Dependency Injection with get_it / Injectable',
-          'Immutability in Dart with Freezed & Equatable',
-          'Unit & Widget Testing in Flutter'
+          'State Management (setState, Provider, Riverpod, Bloc, Cubit, GetX, ValueNotifier, ChangeNotifier)',
+          'Local Storage (Shared Preferences, Hive, SQLite, Isar, Secure Storage)',
+          'API Integration (HTTP Package, Dio, REST API, JSON Parsing, Serialization, Error Handling, Pagination, Infinite Scroll)',
+          'Firebase (Setup, Auth Email/Google/Phone, Firestore, Realtime Database, Cloud Storage, Push Notifications FCM, Analytics, Crashlytics)',
+          'Backend Integration (Node.js API, Express API, MongoDB, JWT Authentication, File Upload, Cloudinary, Supabase Basics)'
         ]
       },
       {
-        title: 'Module 4: REST API Integration & Local Storage',
-        description: 'HTTP requests, Dio, JSON serialization, SharedPreferences, Hive NoSQL, and SQLite.',
+        title: 'Phase 4: Advanced Flutter Development',
+        description: 'Software architecture patterns, custom painters, advanced animations, performance profiling, native device features, and payment gateways.',
         topics: [
-          'HTTP Requests using http & Dio Packages',
-          'JSON Parsing & Auto Serialization with json_serializable',
-          'Handling Loading States, Retries & Error SnackBar',
-          'Local Storage with SharedPreferences',
-          'Hive NoSQL Local Key-Value Database',
-          'SQLite Local Relational Database with sqflite',
-          'Secure Storage for Tokens (flutter_secure_storage)',
-          'Caching Network Images & Offline First Support'
+          'Architecture (MVC, MVVM, Clean Architecture, Repository Pattern, Dependency Injection)',
+          'Advanced Concepts (Custom Widgets, Reusable Components, Custom Painter, Canvas)',
+          'Animations (Hero Animation, Implicit & Explicit Animations, Animation Controller, Custom Transitions)',
+          'Performance (Lazy Loading, Memory & Image Optimization, Code Splitting, Tree Shaking, Build Optimization, Profiling)',
+          'Native Features (Camera, Gallery, GPS, Maps, Geolocation, QR/Barcode Scanner, NFC, Bluetooth, Sensors, Biometrics Fingerprint/Face ID)',
+          'Background & Media Services (Local Notifications, Background Services, Deep/App/Dynamic Links, File Picker, PDF Viewer, Video/Audio Player, Speech to Text, Text to Speech)',
+          'Payment Gateway Integration (Razorpay, Stripe, UPI Integration)'
         ]
       },
       {
-        title: 'Module 5: Firebase Integration & App Store Deployment',
-        description: 'Firebase setup, Auth, Cloud Firestore CRUD, Push Notifications, and Play/App Store publishing.',
+        title: 'Phase 5: Deployment, Testing & Professional Development',
+        description: 'Testing methodologies, app security, DevOps CI/CD pipelines, publishing to Google Play & Apple App Store, and app monetization.',
         topics: [
-          'Firebase Project Setup for Android & iOS',
-          'Firebase Authentication (Email/Password & Google Sign-In)',
-          'Cloud Firestore Realtime CRUD Operations',
-          'Firebase Cloud Storage for Image & File Uploads',
-          'Firebase Cloud Messaging (FCM) Push Notifications',
-          'Building Release APK, AAB & iOS IPA Bundles',
-          'Google Play Console & Apple App Store Publishing',
-          'App Monetization with Google AdMob & In-App Purchases'
+          'Testing & Debugging (Unit Testing, Widget Testing, Integration Testing, Mock Testing, Debugging)',
+          'Security (App & API Security, Secure Storage, Encryption, Certificate Pinning, Code Obfuscation)',
+          'DevOps (Git, GitHub, Branching, Git Flow, CI/CD with GitHub Actions & Fastlane)',
+          'Publishing (App Signing, Build APK/AAB, Play Store & App Store Deployment, Store Listing, Screenshots, Privacy Policy, Versioning, Release Notes)',
+          'Monetization (AdMob, In-App Purchases, Subscriptions, RevenueCat)'
         ]
       }
     ]
@@ -1151,73 +1147,207 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Python Basics & Core Language Syntax',
-        description: 'Environment setup, variables, operators, conditional logic, loops, functions, and lambda expressions.',
+        title: 'Introduction to Programming & Python (4 lectures • 24min)',
+        description: 'Fundamentals of programming, installing Python & VS Code, writing first program, and understanding Python syntax.',
         topics: [
-          'Python Installation, Anaconda Setup & VS Code Config',
-          'Variables, Data Types & Type Casting Mechanics',
-          'Operators: Arithmetic, Comparison, Logical & Bitwise',
-          'Control Flow: if, elif, else & Nested Conditions',
-          'Loops: for, while, break, continue & pass',
-          'Functions, Arguments, Return Values & Docstrings',
-          'Lambda Expressions, Map, Filter & Reduce',
-          'Scope Rules: Local, Global & Nonlocal'
+          'Introduction to Programming (2:34)',
+          'Installing Python and VS Code (3:04)',
+          'Writing Our First Python Program (10:13)',
+          'Understanding the Python Syntax (8:36)'
         ]
       },
       {
-        title: 'Module 2: Data Structures & Advanced Python Concepts',
-        description: 'Lists, Tuples, Dictionaries, Sets, Regex pattern matching, modules, and virtual environments.',
+        title: 'Python Fundamentals (6 lectures • 77min)',
+        description: 'Variables, data types, typecasting, user inputs, comments, print statements, operators, and practice problems.',
         topics: [
-          'Lists: Indexing, Slicing, Methods & List Comprehensions',
-          'Tuples: Immutability, Unpacking & Tuple Operations',
-          'Dictionaries: Key-Value Pairs, Methods & Dict Comprehensions',
-          'Sets: Set Operations (Union, Intersection, Difference)',
-          'String Manipulation, Formatting (f-strings) & Methods',
-          'Regular Expressions (Re Module) for Pattern Matching',
-          'Modules, Packages & Virtual Environments (venv)',
-          'Command Line Arguments with argparse / sys'
+          'Variables and Data Types in Python (11:41)',
+          'Typecasting in Python (9:11)',
+          'Taking User Input in Python (9:59)',
+          'Comments, Escape Sequences & Print Statement (15:29)',
+          'Operators in Python (17:50)',
+          'Python Basics - Practice Set (13:25)'
         ]
       },
       {
-        title: 'Module 3: Object-Oriented Programming (OOP) & Exceptions',
-        description: 'Classes, Objects, Inheritance, Polymorphism, Encapsulation, Exception handling, and File I/O.',
+        title: 'Control Flow and Loops (6 lectures • 62min)',
+        description: 'If-Else conditional logic, Match Case statements, for loops, while loops, break/continue/pass, and practice set.',
         topics: [
-          'Classes, Objects & Constructor (__init__) Methods',
-          'Instance vs Class Attributes & Methods',
-          'Inheritance: Single, Multiple & Multilevel',
-          'Polymorphism, Method Overriding & Operator Overloading',
-          'Encapsulation, Name Mangling & Property Decorators',
-          'Exception Handling: try, except, else, finally & Custom Errors',
-          'File I/O: Reading, Writing & Context Managers (with statement)',
-          'Generators & Iterators (__iter__, __next__, yield)'
+          'If-Else Conditional Statements (10:19)',
+          'Match Case Statements in Python (4:28)',
+          'For Loops in Python (8:10)',
+          'While Loops in Python (7:29)',
+          'Break, Continue, and Pass Statements (8:41)',
+          'Python Conditionals & Loops - Practice Set (23:01)'
         ]
       },
       {
-        title: 'Module 4: NumPy & Pandas for AI & Data Science',
-        description: 'NumPy Ndarrays, vectorized computations, Pandas DataFrames, cleaning, and data aggregations.',
+        title: 'Strings (5 lectures • 55min)',
+        description: 'String manipulation, slicing, indexing, string methods, functions, f-strings formatting, and practice set.',
         topics: [
-          'NumPy Ndarrays, Data Types & Shape Manipulations',
-          'NumPy Slicing, Indexing & Vectorized Operations',
-          'NumPy Broadcasting Rules & Matrix Multiplication',
-          'Pandas Series & DataFrame Creation',
-          'Data Cleaning: Handling Missing Values (fillna, dropna)',
-          'Filtering, Querying & Sorting DataFrames',
-          'Grouping Data with groupby() & Aggregations',
-          'Merging, Joining & Concatenating DataFrames'
+          'Strings in Python (10:37)',
+          'String Slicing and Indexing (7:14)',
+          'String Methods and Functions (13:07)',
+          'String Formatting and f-Strings (5:27)',
+          'Python Strings – Practice Set (18:41)'
         ]
       },
       {
-        title: 'Module 5: Matplotlib, Seaborn & Intro to Machine Learning',
-        description: 'Data visualizations, charts, feature preprocessing, and building your first Scikit-Learn script.',
+        title: 'Functions and Modules (7 lectures • 76min)',
+        description: 'Defining functions, arguments, return values, lambda functions, recursion, modules, pip, scope, and docstrings.',
         topics: [
-          'Matplotlib Line Plots, Scatter Plots, Bar Charts & Histograms',
-          'Subplots, Figure Sizing & Styling Visualizations',
-          'Seaborn Statistical Charts, Heatmaps & Pairplots',
-          'Data Preprocessing: Standard Scaling & One-Hot Encoding',
-          'Train-Test Split & Dataset Partitioning',
-          'Scikit-Learn Basics: Linear Regression Model',
-          'Logistic Regression for Classification',
-          'Building First Complete AI Automation Script'
+          'Defining Functions in Python (10:37)',
+          'Function Arguments & Return Values (5:10)',
+          'Lambda Functions in Python (3:06)',
+          'Recursion in Python (13:19)',
+          'Modules and pip - Using External Libraries (11:54)',
+          'Variable Scope and Docstrings (14:31)',
+          'Python Functions & Modules – Practice Set (17:36)'
+        ]
+      },
+      {
+        title: 'Data Structures in Python (6 lectures • 56min)',
+        description: 'Lists, tuples, sets, dictionaries, operations, methods, and python collections practice set.',
+        topics: [
+          'Introduction to Lists (6:38)',
+          'List Methods (9:02)',
+          'Tuples and Operations on Tuples (7:37)',
+          'Sets and Set Methods (8:40)',
+          'Dictionaries and Dictionary Methods (8:52)',
+          'Python Collections – Practice Set (15:49)'
+        ]
+      },
+      {
+        title: 'Object-Oriented Programming (OOP) in Python (7 lectures • 41min)',
+        description: 'Classes, objects, constructors, instance/class attributes, inheritance, polymorphism, method overriding, and OOP practice set.',
+        topics: [
+          'Introduction to OOP (6:59)',
+          'Classes and Objects in Python (9:09)',
+          'Constructors in Python (4:39)',
+          'Instance and class attributes (4:35)',
+          'Inheritance and Polymorphism (5:53)',
+          'Method Overriding and Operator Overloading (4:45)',
+          'Python OOP – Practice Set (5:07)'
+        ]
+      },
+      {
+        title: 'Advanced Python Concepts (9 lectures • 125min)',
+        description: 'Decorators, getters/setters, static & class methods, dunder methods, exception handling, map/filter/reduce, walrus operator, args/kwargs, and practice set.',
+        topics: [
+          'Decorators in Python (15:04)',
+          'Getters and Setters (9:05)',
+          'Static & Class Methods (11:52)',
+          'Magic/Dunder Methods (7:02)',
+          'Exception Handling and Custom Errors (18:41)',
+          'Map filter and reduce (12:07)',
+          'Walrus operator (7:10)',
+          'Args and kwargs (8:39)',
+          'Python Advanced Concepts – Practice Set (35:22)'
+        ]
+      },
+      {
+        title: 'File IO - Working with Files & Related Modules (5 lectures • 51min)',
+        description: 'File reading/writing/appending, OS & Shutil modules, command line utilities, and practice set.',
+        topics: [
+          'File I/O in Python (1:37)',
+          'Read, Write, and Append Files (15:48)',
+          'OS and Shutil Modules in Python (8:48)',
+          'Creating Command Line Utilities (8:49)',
+          'Python File Handling & Utilities – Practice Set (16:05)'
+        ]
+      },
+      {
+        title: 'Working with External Libraries (4 lectures • 41min)',
+        description: 'Virtual environments, package management, Requests module APIs, Regular Expressions, and Multithreading.',
+        topics: [
+          'Virtual Environments & Package Management (21:34)',
+          'Requests Module - Working with APIs (7:12)',
+          'Regular Expressions in Python (6:33)',
+          'Multithreading in Python (6:26)'
+        ]
+      },
+      {
+        title: 'Using AI as a Developer (4 lectures • 43min)',
+        description: 'How to leverage AI tools, ChatGPT prompt workflows, GitHub Copilot, Cursor AI, Llama coder, and LLM APIs.',
+        topics: [
+          'When and how to use AI? (10:01)',
+          'ChatGPT – The optimal way to use it (9:09)',
+          'Github Copilot, Cursor AI & Llama coder (11:59)',
+          'Working with LLM APIs (12:34)'
+        ]
+      },
+      {
+        title: 'Hands-On Python Projects (8 lectures • 76min)',
+        description: 'Real-world projects: Calculator, Millionaire Game, PDFMerger, News App, Water Reminder, AI Virtual Assistant, File Organizer, QR Code Generator.',
+        topics: [
+          'Build a Simple Calculator (6:04)',
+          'Who wants to be a Millionaire Game (12:02)',
+          'PDFMerger: Merge PDFs using Python (7:32)',
+          'Build a News App Using APIs (12:31)',
+          'Build a Drink Water Reminder App (5:27)',
+          'Build an AI Powered Virtual Assistant (13:49)',
+          'Build a File Organizer using Python (10:51)',
+          'Build a QR Code Generator using Python (7:44)'
+        ]
+      },
+      {
+        title: 'Building Web Applications using Flask (12 lectures • 93min)',
+        description: 'Flask web app development: static sites, form handling, Jinja2 templating, template inheritance, static routing, query parameters, JSON APIs, and flashing.',
+        topics: [
+          'Introduction to Flask (3:15)',
+          'Creating our first Flask App (6:48)',
+          'Creating a Static Site (13:48)',
+          'Serving Static Files in Flask (5:01)',
+          'Handling Forms in Flask (10:05)',
+          'Jinja 2 Templating in Flask (6:06)',
+          'Conditionals, Loops & Comments in Jinja2 (6:54)',
+          'Template Inheritance (10:24)',
+          'Changing static folder & url_for function in Flask (9:19)',
+          'Query Parameters in Flask (7:08)',
+          'Creating APIs in Flask using jsonify (3:40)',
+          'Message Flashing in Flask (10:41)'
+        ]
+      },
+      {
+        title: 'Project VidSnapAI - An AI Powered TikTok/Reel Generator (7 lectures • 79min)',
+        description: 'Full-stack AI SaaS project: Flask backend logic, file uploading, AI Reel generation pipeline, ElevenLabs realistic AI audio, ffmpeg video processing, and gallery display.',
+        topics: [
+          'VidSnapAI - Setting up our AI Saas using Python & Flask (8:24)',
+          'VidSnapAI - Writing Flask Backend Logic for AI Reel Generator (9:24)',
+          'VidSnapAI - Uploading Files to our Server (10:44)',
+          'VidSnapAI - Creating AI Reel Generation Pipeline (9:54)',
+          'VidSnapAI - Using ElevenLabs to Generate realistic AI Audio (12:54)',
+          'VidSnapAI - Generating Reels with audio using ffmpeg & Python (21:48)',
+          'VidSnapAI - Displaying the Generated Reels in Gallery (6:38)'
+        ]
+      },
+      {
+        title: 'Version Control: Git for Developers (16 lectures • 147min)',
+        description: 'Comprehensive Git & GitHub: installation, workflow, cloning, gitignore, branches, merging, merge conflicts, GitHub Desktop, stashing, VS Code & GitLens.',
+        topics: [
+          'Introduction to Git and GitHub (9:28)',
+          'Installing Git (3:34)',
+          'Basic Git Workflow for Python Developers (9:26)',
+          'Writing commands for git workflow (9:30)',
+          'Cloning a repository (8:06)',
+          'Tracking and managing changes (15:14)',
+          'Creating a gitignore file (8:31)',
+          'Removing files from git repository (6:47)',
+          'Branches in Git (14:23)',
+          'Merging Branches & Merge Conflict (10:17)',
+          'Working with GitHub (9:41)',
+          'Working with Remote Repositories (9:03)',
+          'Working with Github Desktop (11:15)',
+          'Git Stash (9:49)',
+          'Using git in VS Code (9:11)',
+          'Using GitLens VS Code Extension (3:23)'
+        ]
+      },
+      {
+        title: 'Conclusion and Next Steps (2 lectures • 4min)',
+        description: 'Course summary, next steps, additional resources, and software engineering career guidance.',
+        topics: [
+          'Course Summary & What’s Next (1:59)',
+          'Resources and Career Guidance (2:46)'
         ]
       }
     ]
@@ -1225,7 +1355,7 @@ export const COURSES: CourseItem[] = [
   {
     id: 'genai-dsa-combo',
     title: 'Complete Generative AI And DSA Course',
-    tagline: 'Master Data Structures & Algorithms alongside LLMs, OpenAI/Gemini APIs, RAG & LangChain.',
+    tagline: 'Master Data Structures & Algorithms alongside LLMs, OpenAI/Gemini APIs, RAG, LangGraph & AI Agents.',
     category: 'AI & Machine Learning',
     price: 399,
     linkType: 'telegram',
@@ -1235,84 +1365,122 @@ export const COURSES: CourseItem[] = [
     badgeBg: 'bg-violet-100 text-violet-800 border-violet-200',
     icon: Brain,
     level: 'Beginner to Advanced',
-    duration: '10 Weeks Batch',
-    description: 'The ultimate modern software engineering combo course! Master Core DSA problem solving (Trees, Graphs, DP) alongside Generative AI engineering (Transformers, Vector Databases, RAG pipelines, LangChain, and AI Agent frameworks).',
+    duration: '12 Weeks Batch',
+    description: 'The ultimate modern software engineering combo course! Master Core C++ and Data Structures & Algorithms alongside Generative AI engineering, LangChain, LangGraph, RAG systems, Multi-Agent frameworks, and AWS deployment.',
     features: [
-      'Dual Mastery: Core DSA Algorithms & Generative AI Engineering',
-      'OpenAI & Gemini API Integrations with Function Calling',
-      'RAG Systems with Vector Databases (Pinecone, ChromaDB)',
-      'LangChain Framework & Autonomous AI Agents',
-      'Exclusive Telegram Group for Solution Code & Live Batch'
+      'Dual Mastery: Core C++ & DSA Algorithms with 300+ Solved Problems',
+      'Generative AI Foundations, LLM Architecture & Vector Databases',
+      'LangChain & RAG (Retrieval-Augmented Generation) Systems',
+      'Advanced LangGraph Multi-Agent Workflows & MCP Server',
+      'Production AWS Cloud Deployment & Final Capstone AI Agent'
     ],
     modules: [
       {
-        title: 'Module 1: Core DSA Algorithms & Problem-Solving Patterns',
-        description: 'Time/space complexity, Two Pointers, Sliding Window, Recursion, Trees, Graphs, and DP.',
+        title: 'Getting Started: Your Journey Overview',
+        description: 'Course structure, setting up your development environment for DSA & AI, balancing practice, and career paths.',
         topics: [
-          'Time & Space Complexity Analysis (Big-O Analysis)',
-          'Two Pointers & Sliding Window Algorithmic Patterns',
-          'Frequency Map & Subarray Lookup Patterns',
-          'Recursion, Backtracking & Subsets Generation',
-          'Binary Trees, BST Operations & Traversals',
-          'Graph Adjacency Lists, BFS & DFS Traversals',
-          'Topological Sort & Shortest Path Algorithms',
-          '1D & 2D Dynamic Programming Fundamentals'
+          'Course Structure & Learning Path',
+          'Setting up Development Environment for DSA & AI',
+          'How to Balance DSA Practice with AI Projects',
+          'Career Paths: SWE vs AI Engineer vs Full-Stack AI'
         ]
       },
       {
-        title: 'Module 2: Generative AI & Large Language Model Foundations',
-        description: 'Transformers, self-attention, tokenization, embeddings, prompt engineering, and LLM parameters.',
+        title: 'Part 1: C++ & DSA Fundamentals',
+        description: 'C++ programming foundations, time & space complexity, arrays, strings, searching, sorting, STL, and OOP concepts.',
         topics: [
-          'Transformer Architecture & Self-Attention Mechanism',
-          'Encoder-Only vs Decoder-Only Models (BERT vs GPT)',
-          'Tokenization, Context Windows & Vocabulary Encoding',
-          'Vector Embeddings & Semantic Similarity',
-          'Prompt Engineering: Zero-Shot, Few-Shot & Chain-of-Thought',
-          'System Prompts, Temperature, Top-P & Repetition Penalty',
-          'Hallucinations & Mitigation Strategies',
-          'Evaluating LLM Outputs & Benchmark Metrics'
+          'C++ Programming Foundations',
+          'Time & Space Complexity Analysis',
+          'Arrays, Strings, and Basic Algorithms',
+          'Searching & Sorting Algorithms',
+          'STL (Standard Template Library)',
+          'Object-Oriented Programming for Data Structures'
         ]
       },
       {
-        title: 'Module 3: OpenAI & Gemini API Integrations',
-        description: 'API integration, streaming responses, structured JSON outputs, function calling, and multimodal AI.',
+        title: 'Part 2: Data Structures Deep Dive',
+        description: 'Linked lists, stacks, queues, binary trees, BST, heaps, hashing, graph representation & traversals, and advanced trees.',
         topics: [
-          'API Key Setup, Environment Variables & Client Config',
-          'Generating Text, Chat Completions & Streaming Responses',
-          'Structured JSON Output Generation & Schema Validation',
-          'Function Calling & External Tool Execution',
-          'Multimodal AI: Text, Image & Audio Analysis',
-          'Rate Limiting, Retries & Exponential Backoff',
-          'Token Usage Optimization & Cost Management',
-          'Building a Full AI Assistant Interface'
+          'Linked Lists, Stacks, Queues',
+          'Trees: Binary Trees, BST, Heaps',
+          'Hashing and Hash Tables',
+          'Graphs: Representation, Traversals',
+          'Advanced Trees: AVL, B-Trees',
+          '100+ Problems Solved'
         ]
       },
       {
-        title: 'Module 4: Vector Databases & RAG Architectures',
-        description: 'Embedding generation, vector databases (ChromaDB, Pinecone, FAISS), document chunking, and RAG.',
+        title: 'Part 3: Advanced Algorithms',
+        description: 'Backtracking, greedy algorithms, dynamic programming patterns, shortest path graph algorithms, sliding window, and bit manipulation.',
         topics: [
-          'Generating Text Embeddings using OpenAI/Gemini Embeddings',
-          'Vector Similarity Metrics: Cosine Distance, Dot Product, Euclidean',
-          'Vector DBs: ChromaDB, Pinecone & FAISS Setup',
-          'Document Ingestion, Chunking Strategies & Overlaps',
-          'Building Retrieval-Augmented Generation (RAG) Pipelines',
-          'RAG Reranking & Hybrid Keyword/Vector Search',
-          'Handling Large PDF Documents & Context Windows',
-          'RAG Evaluation with Ragas Framework'
+          'Backtracking & Divide and Conquer',
+          'Greedy Algorithms',
+          'Dynamic Programming (All patterns)',
+          'Graph Algorithms: MST, Shortest Paths, Topological Sort',
+          'Sliding Window & Two Pointers',
+          'Bit Manipulation',
+          '200+ Problems Solved Total'
         ]
       },
       {
-        title: 'Module 5: LangChain, AI Agents & Autonomous Workflows',
-        description: 'LangChain core, LCEL chains, memory modules, custom tools, ReAct framework, and LangGraph.',
+        title: 'Part 4: AI Fundamentals & Theory',
+        description: 'Introduction to Generative AI, LLMs, tokens, prompts, context windows, deep learning intuition, transformers, and vector databases.',
         topics: [
-          'LangChain Core: Prompts, Models & Output Parsers',
-          'LangChain Expression Language (LCEL) Chains',
-          'Conversation Memory Modules (Buffer, Summary)',
-          'Custom Tools Binding for External API Calls',
-          'ReAct (Reasoning + Acting) Agent Framework',
-          'Multi-Agent System Orchestration',
-          'LangGraph Framework for Stateful AI Workflows',
-          'Deploying Production-Ready GenAI Applications'
+          'Introduction to Generative AI',
+          'Understanding Large Language Models',
+          'Tokens, Prompts, and Context Windows',
+          'Deep Learning Intuition',
+          'Transformer Architecture Deep Dive',
+          'Vector Embeddings & Vector Databases'
+        ]
+      },
+      {
+        title: 'Part 5: Building AI Applications',
+        description: 'LangChain framework mastery, building RAG systems, creating AI agents, tool use, function calling, agent memory, and research assistant project.',
+        topics: [
+          'LangChain Framework Mastery',
+          'Building RAG (Retrieval-Augmented Generation) Systems',
+          'Creating Your First AI Agent',
+          'Tool Use & Function Calling',
+          'Agent Memory Implementation',
+          'Project: Research Assistant Agent'
+        ]
+      },
+      {
+        title: 'Part 6: Advanced AI & Multi-Agent Systems',
+        description: 'LangGraph for complex workflows, multi-agent systems, human-in-the-loop design, graph RAG, multimodal agents, and collaborative team project.',
+        topics: [
+          'LangGraph for Complex Workflows',
+          'Building Multi-Agent Systems',
+          'Human-in-the-Loop Design',
+          'Graph RAG & Multi-Modal Agents',
+          'Advanced Data Techniques',
+          'Project: Collaborative AI Team'
+        ]
+      },
+      {
+        title: 'Part 7: Production AI & Deployment',
+        description: 'Architecting AI for scale, cloud deployment on AWS, MCP server, fine-tuning custom models, LangSmith observability, and full-stack AI agent capstone.',
+        topics: [
+          'Architecting AI for Scale',
+          'Cloud Deployment on AWS',
+          'MCP (Model Control Plane) Server',
+          'Fine-Tuning Custom Models',
+          'LangSmith for Observability',
+          'Automated Evaluation & Testing',
+          'Final Capstone: Full-Stack AI Agent'
+        ]
+      },
+      {
+        title: 'Part 8: Integration & Career Prep',
+        description: 'DSA in AI systems, building AI coding assistants, system design for AI, interview preparation, portfolio project, and career guidance.',
+        topics: [
+          'Using DSA in AI Systems (Efficient algorithms for AI)',
+          'Building AI-Powered Coding Assistants',
+          'System Design for AI Applications',
+          'Interview Preparation: DSA + AI Combined',
+          'Portfolio Project: AI System with Strong Algorithmic Foundation',
+          'Career Guidance & Job Search Strategies'
         ]
       }
     ]
@@ -1341,59 +1509,298 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: LLM Architecture & Advanced Prompt Engineering',
-        description: 'Transformers, self-attention, tokenization, advanced prompt patterns, system prompts, and security.',
+        title: 'Module 1: Tool Setup, Python Foundations & Data Types',
+        description: 'Installation of VS Code, Python environment, code organization, PEP8, data types, numbers, strings, tuples, lists, sets, dicts, and mini projects.',
         topics: [
-          'Transformer Encoder-Decoder Architecture Deep Dive',
-          'Positional Encoding, Self-Attention & Multi-Head Attention',
-          'Tokenization Engines (Tiktoken, SentencePiece)',
-          'Advanced Prompt Engineering Techniques (ReAct, Tree of Thoughts)',
-          'System Instructions, Temperature & Top-P Fine-Tuning',
-          'Handling Long Context Windows & Context Compression',
-          'Guardrails, Content Filtering & Prompt Injection Security',
-          'Model Benchmarking (MMLU, HumanEval)'
+          'Installation of Tools (VSCode and Python)',
+          'VS Code Setup (Extensions and Themes)',
+          'Get your code files here',
+          'Meet your Instructor - Hitesh',
+          'What is Programming..?',
+          'Convert that into Python Code',
+          'A Real World Python Code Intro',
+          'Why to use Python',
+          'Writing first Python code on MAC',
+          'Writing first Python code on WINDOWS',
+          'Get everything in Virtual Environment',
+          'Organize Python Code like a Pro',
+          'PEP8 and Zen of python',
+          'Objects - Mutable and Immutable in Python',
+          'Numbers, Booleans and Operators in Depth in Python',
+          'String - Index, Slice and Encoding',
+          'Tuples and Membership Testing',
+          'Basics of List in Python',
+          'Operator overloading and bytearray in python',
+          'Set and frozenset in python',
+          'Dictionary in Python',
+          'Touch on Advance Data types like Collections',
+          'Kettle Boiling Story Project',
+          'Building a Snack System',
+          'Building a Chai Price Calculator',
+          'Building Smart Thermostat System',
+          'Delivery Fees Waiver System',
+          'Build a train seat information system'
         ]
       },
       {
-        title: 'Module 2: Vector Databases, Embeddings & RAG Systems',
-        description: 'Vector spaces, ChromaDB, Pinecone, document chunking, RAG architectures, and hybrid search.',
+        title: 'Module 2: Loops, Functions, Comprehensions & OOP in Python',
+        description: 'Loops, enumerate, zip, walrus operator, functions, lambdas, comprehensions, generators, decorators, classes, inheritance, and error handling.',
         topics: [
-          'High-Dimensional Vector Spaces & Embeddings',
-          'ChromaDB Setup, Persistent Storage & Metadata Indexing',
-          'Pinecone Serverless Indexing & Vector Search',
-          'Document Processing: PyPDF, Recursive Character Splitter',
-          'RAG Architecture: Retrieval, Context Injection & Generation',
-          'Hybrid Search: Combining BM25 Keyword & Dense Vector Search',
-          'Parent-Document Retriever & Self-Querying Retrievers',
-          'Evaluating RAG Precision, Recall & Faithfulness'
+          'Introduction to Loops',
+          'Tea Token Dispenser',
+          'Batch Chai Preparation',
+          'Looping through list - Orders Name',
+          'Why to use Enumerate',
+          'Zip Can Combine Lists',
+          'Introducing While Loop in Python',
+          'Break, Continue and Loop Fallback',
+          'Walrus Operator is Interesting in Python',
+          'Dictionary in place of Match Case',
+          'Functions - Reducing Duplication and Splitting Complex Tasks',
+          'Functions - 3 More Features',
+          'Scope and Named Space in Functions',
+          'Non local vs Global scopes',
+          'Handling Arguments in Function in Python',
+          'Handle Multiple Return in Python',
+          'Lambdas, Pure vs Impure functions',
+          'Documenting your Functions and Built-in Functions',
+          'Python Imports, Modules and Init File',
+          'What are Comprehensions in Python?',
+          'List Comprehensions in Python',
+          'Set Comprehensions in Python',
+          'Dictionary Comprehensions in Python',
+          'Generator Comprehensions for Memory Optimization',
+          'Generators with Yield and Next Methods',
+          'Infinite Generators in Python',
+          'Send Value to Generators',
+          'Yield From and Close the Generators',
+          'Decorators in Python',
+          'Build a Logger with Decorator',
+          'Build an Authorization Decorator',
+          'Building your 1st Class and Object in Python',
+          'Class and Object Namespace',
+          'Attribute Shadowing in Python',
+          'Self argument in python',
+          'Constructors and Init in Python Classes',
+          'Inheritance and Composition in Python Classes',
+          '3 Ways to Access Base Class',
+          'Method Resolution Order - MRO',
+          'Static Methods in Python',
+          'Classmethod vs Staticmethod',
+          'Property decorator - Getter and Setter',
+          'What is Error handling',
+          'Try except else and finally',
+          'Catching multiple exceptions',
+          'Raise your own errors',
+          'Creating custom exceptions',
+          'Mini project with exception learning',
+          'File handling with try except and with'
         ]
       },
       {
-        title: 'Module 3: LangChain Framework & Agentic AI',
-        description: 'LangChain LCEL, memory persistence, function calling, custom tools, ReAct loops, and LangGraph.',
+        title: 'Module 3: Concurrency, Asyncio & Pydantic Data Validation',
+        description: 'Concurrency vs parallelism, GIL, threads, locks, multiprocess, asyncio event loop, coroutines, and Pydantic validation.',
         topics: [
-          'LangChain Core Architecture & Runnable Interfaces',
-          'Building Complex Chains with LCEL',
-          'Memory Persistence in Vector Stores & Databases',
-          'Function Calling with Structured Output Parsers',
-          'Building Custom Tools for Web Search, SQL & APIs',
-          'ReAct Agents & Autonomous Decision Loops',
-          'LangGraph for Graphs-based Multi-Agent Workflows',
-          'Human-in-the-Loop Approval Workflows'
+          'Code files for Thread and concurrency section',
+          'What is Concurrency and Parallelism?',
+          'What is Global Interpreter Lock - GIL',
+          'Threads and lock in depth',
+          'Multi Process with Queue and Value',
+          'Code files for asyncio section',
+          'Asyncio, Event loop, coroutines and await in python',
+          'Mixing threads with asyncio in python',
+          'Asyncio and MultiProcess in python',
+          'Understanding Daemon vs Non-Daemon Threads',
+          'Debugging and Profiling - Race condition and Deadlock in python',
+          'Why pydantic is important',
+          'The foundation of pydantic',
+          'Pydantic Default conversions',
+          'Mixing pydantic and typing in python',
+          'Adding validations with Field',
+          'Field and model validators in python',
+          'Computed property in pydantic',
+          'Advance Validation in pydantic',
+          'Nested models in pydantic',
+          'Self referencing models in pydantic',
+          'Advance nested model patterns',
+          'Best practice for pydantic model design',
+          'Model dump and model dump json in serialization of pydantic'
         ]
       },
       {
-        title: 'Module 4: Fine-Tuning Open Source Models & Production Cloud',
-        description: 'Llama 3, Mistral, LoRA/QLoRA, dataset preparation, GGUF/AWQ formats, Ollama/vLLM, and cloud deployment.',
+        title: 'Module 4: LLM Architecture, Prompting, Ollama & Hugging Face',
+        description: 'Deep dive into GPT, transformers, tokenization, embeddings, OpenAI/Gemini APIs, prompt engineering, local LLMs with Ollama, and Hugging Face deployment.',
         topics: [
-          'Open Source LLMs: Llama 3, Mistral, Qwen & Gemma',
-          'Fine-Tuning Overview: Full Fine-Tuning vs Parameter-Efficient',
-          'LoRA (Low-Rank Adaptation) & QLoRA Quantization',
-          'Dataset Preparation & Formatting (JSONL Format)',
-          'Model Quantization Formats (GGUF, AWQ, EXL2)',
-          'Ollama & vLLM High-Performance Inference Servers',
-          'Deploying Open Source LLMs on AWS EC2 / Modal / RunPod',
-          'Monitoring Production GenAI Costs & Latency'
+          'Understanding Large Language Models (LLMs)',
+          'Deep Dive into the GPT Architecture',
+          'How LLMS Work under the Hood?',
+          'Fundamentals of Tokenization in NLP',
+          'Implementing a Custom Tokenizer in Python',
+          'The Transformer Breakthrough: Google’s Paper on Attention',
+          'Deep Diving into Vector Embeddings',
+          'Role of Positional Encodings in Transformers',
+          'Understanding Multi-Head Attention for Rich Context',
+          'Configuring Your OpenAI Account',
+          'Invoking OpenAI APIs with Python',
+          'Creating and Setting Up Google Gemini Account',
+          'Using Google Gemini with OpenAI-Compatible APIs',
+          'Prompt Fundamentals: Encoding Instructions for LLMs',
+          'Prompting Types: Zero-Shot, Few-Shot, One-Shot',
+          'One-Shot Prompting for Deterministic Inference',
+          'Few-Shot Prompting for Contextual Generalization',
+          'Structured Outputs with Few-Shot Prompting',
+          'Chain-of-Thought (CoT) for Reasoning',
+          'Auto-CoT: Automated Reasoning Prompt Generation',
+          'Persona-Based Prompting',
+          'Introduction to Prompt Serialization Styles',
+          'Alpaca Prompt Template for Instruction Tuning',
+          'ChatML Schema: OpenAI’s Structured Prompt Format',
+          'INST Format: LLaMA-2 Instruction Specification',
+          'Ollama Overview: Local LLM Runtime Engine',
+          'Dockerized Environment Setup for LLMs',
+          'Running Ollama Models with Docker Runner',
+          'Configuring OpenWebUI with Ollama Backend',
+          'FastAPI Environment Setup & Dependencies',
+          'Integrating Ollama with FastAPI & Python APIs',
+          'Hugging Face Model Deployment – Section Intro',
+          'Configuring and Securing Hugging Face Account',
+          'Accessing Instruct-Tuned Models (Google Gemma)',
+          'Installing and Using Hugging Face CLI Tools',
+          'Model Downloading & Execution from HF Hub'
+        ]
+      },
+      {
+        title: 'Module 5: AI Agents, RAG, LangChain & Distributed Queues',
+        description: 'Agentic AI concepts, building CLI coding agent, RAG indexing & retrieval, vector DBs, LangChain setup, distributed queues with Redis & FastAPI.',
+        topics: [
+          'Agentic AI Fundamentals – Section Intro',
+          'What Exactly Are AI Agents? (Core Concepts)',
+          'Coding Your First AI Agent',
+          'Enforcing Structured Outputs with Pydantic',
+          'Building a CLI Coding Agent (Claude Code) from Scratch',
+          'Intro to RAG & LangChain – Section Overview',
+          'Defining the Core Problem in RAG Systems',
+          'Naive Retrieval-Based Solution Approach',
+          'RAG Pipeline – Indexing Workflow Explained',
+          'RAG Pipeline – Retrieval Mechanism in Depth',
+          'Local Vector DB Setup with Docker Compose',
+          'LangChain Installation & Setup',
+          'LangChain Document Loaders for PDF',
+          'LangChain Document Chunking & Splitting',
+          'LangChain Vector Store as Retrievers',
+          'LangChain-Powered RAG Retrieval Execution',
+          'Sync vs Async in RAG Architectures',
+          'Introduction to Queues System Design for Async Setup',
+          'Python RQ Setup Distributed Queues',
+          'Setting up Redis and Valkey with Docker',
+          'Worker Orchestration with Python RQ',
+          'FastAPI Endpoints setup for chat Queue',
+          'Asynchronous Message Enqueueing with FastAPI',
+          'FastAPI Polling & Dequeuing Messages from Async Queues',
+          'Running & Scaling Worker Nodes for Background Processing',
+          'What is Multi Modal Agent?',
+          'Sending Multimedia to LLM (Images)'
+        ]
+      },
+      {
+        title: 'Module 6: LangGraph Workflows, Agent Memory & Graph DBs',
+        description: 'LangGraph core concepts, nodes, edges, state management, MongoDB checkpointer, memory layers (short/long-term), Mem0, Neo4j & Cypher queries.',
+        topics: [
+          'Section Intro - Why LangGraph is a Game-Changer for AI Agents',
+          'Deep Dive into LangGraph – Core Concepts, Nodes and Edges',
+          'Setting Up LangGraph – Installation and Environment Configuration',
+          'Defining State in LangGraph for AI Agent Context',
+          'Defining Nodes and Functions in LangGraph',
+          'Connecting Nodes with Edges – Designing Complex AI Graph',
+          'Testing and Debugging Your LangGraph AI Workflow',
+          'Integrating AI LLMs into LangGraph',
+          'Conditional Edges & Smart Routing',
+          'What is Checkpointing? Enabling Persistence in AI Agent Workflows',
+          'Setting Up MongoDB with Docker for LangGraph Checkpoint Storage',
+          'Implementing MongoDB Checkpointer in LangGraph Workflow Graphs',
+          'Section Intro - The Memory Layer in AI Agents',
+          'What is Memory in AI and Agents',
+          'Different Types of Memory Architectures in AI and Agent',
+          'Short-Term Memory – Handling Context Windows',
+          'Long-Term Memory – Persistent Knowledge',
+          'Factual Memory for AI Agents',
+          'Episodic Memory in AI Workflows',
+          'Semantic Memory for General Knowledge',
+          'Mem0 Setup with Python for AI Memory Layer',
+          'Mem0 Configuration with Python for Agents',
+          'Vector Database Setup with Docker for Memory',
+          'Using Vector Databases for AI Agent Memory',
+          'Section Intro to the Graph Memory',
+          'What is a Graph in AI and Data Systems',
+          'Why Graph Memory is Needed in AI Agents',
+          'Introduction to Graph Databases Neo4j and Kuzu',
+          'Setting Up Neo4j Cloud Instance for Graph Memory',
+          'Basics of Cypher Query for Graph Databases',
+          'Adding Graph Database Support for Memory Agent',
+          'Testing Graph Memory Implementation in Agents'
+        ]
+      },
+      {
+        title: 'Module 7: Conversational Voice AI, MCP, Git, Docker & AWS ECS',
+        description: 'Conversational voice AI, speech-to-speech, voice Cursor IDE clone, Model Context Protocol (MCP), Git series, Docker containerization, and AWS ECS cloud deployment.',
+        topics: [
+          'Section Intro to Conversational Agentic AI',
+          'Understanding Conversational AI for Agents',
+          'The S2S and Chained Voice Agents',
+          'Speech To Speech Voice Agents',
+          'Understanding the Chained Pattern for Voice Agents',
+          'Setting Up STT for Chained Conversational Agent',
+          'Setting Up OpenAI GPT Completions for Chained Agent',
+          'Setting Up TTS for Conversational AI Agents',
+          'Building a Voice Based AI Cursor IDE Clone',
+          'Section Intro to Model Context Protocol',
+          'Understanding What Model Context Protocol (MCP) Is',
+          'Exploring the Architecture of MCP',
+          'Introduction to GIT series',
+          'Git init and hidden folder',
+          'Git commits and logs',
+          'Git internal working and configs',
+          'Git merge and git conflicts',
+          'Git Diff and stashing',
+          'Git rebase is not that scary',
+          'Insight of pushing code to github',
+          'How to make Pull Request and Open Source contribution',
+          'Introduction to Docker and the Rise of Containerization in DevOps',
+          'Real-World Problem That Docker Solves in Modern Development',
+          'Understanding the Difference Between Docker and Virtual Machines',
+          'How to Install Docker on Your System for Local Development',
+          'Docker Containers vs Docker Images: What\'s the Difference?',
+          'Introduction to Docker CLI and Commonly Used Commands',
+          'Running Docker Containers Using the CLI with Practical Examples',
+          'Working with Docker Images Through Command-Line Interface (CLI)',
+          'Exploring Docker Container Commands for Management and Debugging',
+          'Creating and Using a Dockerfile to Containerize Node.js Apps',
+          'Best Practices to Optimize Docker Images for Speed and Performance',
+          'Understanding and Implementing Port Mapping in Docker Containers',
+          'Auto Port Mapping in Docker: Dynamic Exposure of Container Ports',
+          'Publishing Docker Images to Docker Hub or Private Registries',
+          'Building Optimized Multi-Stage Docker Images for Production Use',
+          'Security Best Practices for Running Docker Containers Safely',
+          'Understanding Docker Bridge Networking for Container Communication',
+          'Creating and Using Custom Docker Bridges for Network Isolation',
+          'Docker Other Modes of Networking',
+          'Attaching Host Machine Volumes to Docker Containers for Data Sharing',
+          'Creating and Managing Custom Named Volumes in Docker for Persistence',
+          'Introduction to Docker Compose',
+          'Networking in Docker Compose',
+          'Volume in Docker Compose',
+          'Custom Docker builds',
+          'Introduction to Docker Orchestration and Why It’s Crucial for Production',
+          'Creating and Configuring a New AWS Account for ECS Deployment',
+          'Setting Up Amazon Elastic Container Registry (ECR) to Push Docker Images',
+          'Launching and Configuring ECS Clusters to Run Docker Containers',
+          'Defining ECS Tasks and Creating Task Definitions for Container Execution',
+          'Deploying ECS Services with Load Balancer for High Availability',
+          'Cleaning Up AWS ECS and ECR Resources to Avoid Unnecessary Billing',
+          'Debugging and Fixing ECS Health Check Failures During Container Deployment',
+          'Hosted Tools in Agent SDK',
+          'Function Tools in Agent SDK',
+          'Agent As a Tool'
         ]
       }
     ]
