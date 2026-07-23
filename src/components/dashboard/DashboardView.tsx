@@ -251,48 +251,49 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-                  <Calendar className="w-5 h-5" />
+                  <Clock className="w-5 h-5" />
                 </div>
-                <h2 className="text-base font-extrabold text-slate-900">Today's Schedule & Planner</h2>
+                <h2 className="text-base font-extrabold text-slate-900">Active Assignments & Deadlines</h2>
               </div>
               <button
-                onClick={() => onNavigateTab('calendar')}
+                onClick={() => onNavigateTab('assignment')}
                 className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1"
               >
-                View Full Calendar <ArrowRight className="w-3.5 h-3.5" />
+                View Solver <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {todayEvents.length > 0 ? (
+            {assignments.length > 0 ? (
               <div className="space-y-3">
-                {todayEvents.map((evt) => (
+                {assignments.slice(0, 3).map((item) => (
                   <div
-                    key={evt.id}
-                    className="p-4 rounded-2xl bg-white border border-slate-200/60 flex items-center justify-between hover:border-blue-200 transition-all"
+                    key={item.id}
+                    onClick={() => onNavigateTab('assignment')}
+                    className="p-4 rounded-2xl bg-white border border-slate-200/60 flex items-center justify-between hover:border-blue-200 transition-all cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 font-bold text-xs flex flex-col items-center justify-center border border-blue-100">
-                        <span>{evt.time}</span>
+                      <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 font-bold text-xs flex flex-col items-center justify-center border border-indigo-100">
+                        <Clock className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-900">{evt.title}</p>
-                        <p className="text-xs text-slate-500">{evt.category} • {evt.durationMinutes} mins</p>
+                        <p className="text-sm font-bold text-slate-900">{item.title}</p>
+                        <p className="text-xs text-slate-500">{item.subject} • Due: {item.dueDate}</p>
                       </div>
                     </div>
                     <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
-                      Upcoming
+                      Solve AI
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="p-8 rounded-2xl bg-slate-50/70 border border-dashed border-slate-200 text-center">
-                <p className="text-xs font-semibold text-slate-500">No classes or events scheduled for today.</p>
+                <p className="text-xs font-semibold text-slate-500">No active assignment deadlines recorded.</p>
                 <button
-                  onClick={() => onNavigateTab('calendar')}
+                  onClick={() => onNavigateTab('assignment')}
                   className="mt-2 text-xs font-bold text-blue-600 hover:underline"
                 >
-                  + Add Event to Smart Calendar
+                  + Solve Assignment with AI
                 </button>
               </div>
             )}

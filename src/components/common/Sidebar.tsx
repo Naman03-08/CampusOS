@@ -37,7 +37,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'studyhub', label: 'AI Study, Chat & Solver', icon: BookOpen, badge: 'AI Suite' },
     { id: 'resumebuilder', label: 'AI Resume Builder', icon: FileText, badge: 'ATS' },
     { id: 'attendance', label: 'Attendance', icon: CheckSquare },
-    { id: 'calendar', label: 'Smart Calendar', icon: Calendar },
     { id: 'coding', label: 'Coding Hub', icon: Code2, badge: 'DSA' },
     { id: 'courses', label: 'Coding Courses', icon: GraduationCap, badge: 'NEW' },
     { id: 'placement', label: 'Placement & Interview', icon: Briefcase, badge: 'Jobs' },

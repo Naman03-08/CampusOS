@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Code, 
   Cpu, 
@@ -18,18 +18,22 @@ import {
   CreditCard, 
   ExternalLink,
   ChevronRight,
+  ChevronDown,
   Layers,
   MessageSquare,
   Brain,
   BarChart3,
   FileCode,
   Folder,
-  Database,
   Filter,
   Shield,
   Smartphone,
-  Sparkle,
-  Server
+  Server,
+  Search,
+  CheckSquare,
+  Square,
+  RotateCcw,
+  Zap
 } from 'lucide-react';
 import { UserProfile } from '../../types';
 
@@ -40,31 +44,10 @@ interface CodingCoursesViewProps {
   onNavigateTab?: (tab: string) => void;
 }
 
-export interface CourseItem {
-  id: string;
-  title: string;
-  tagline: string;
-  category: 'Web Development' | 'Data Structures & Algorithms' | 'AI & Machine Learning' | 'Data Analytics' | 'Cyber Security' | 'App Development' | 'DevOps' | 'System Design' | 'Soft Skills & Communication';
-  price: number; // 399
-  linkType: 'telegram' | 'drive';
-  linkUrl: string;
-  bgGradient: string;
-  bgImageUrl?: string;
-  accentColor: string;
-  badgeBg: string;
-  icon: React.ElementType;
-  level: string;
-  duration: string;
-  description: string;
-  features: string[];
-  modules: {
-    title: string;
-    description: string;
-    topics: string[];
-  }[];
-}
+import { COURSES, type CourseItem } from '../../data/detailedCoursesData';
+export { COURSES, type CourseItem };
 
-export const COURSES: CourseItem[] = [
+const INLINE_COURSES = [
   {
     id: 'mern-webdev',
     title: 'Web Development: Interactive MERN Core',
@@ -89,24 +72,59 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Modern JavaScript (ES6+) & DOM Fundamentals',
+        title: 'Module 1: Modern JavaScript (ES6+), DOM & Async Mechanics',
         description: 'Master async/await, promises, closures, event loops, and modern ES6 syntax.',
-        topics: ['Arrow functions & Destructuring', 'Promises & Async/Await', 'Fetch API & JSON handling', 'DOM Manipulation & Events']
+        topics: [
+          'Arrow Functions, Destructuring & Rest/Spread Operators',
+          'Promises, Async/Await & Event Loop Mechanics',
+          'Fetch API, Axios & RESTful Data Fetching',
+          'DOM Manipulation, Event Bubbling & Delegation',
+          'ES6 Modules, Scope, Hoisting & TDZ'
+        ]
       },
       {
         title: 'Module 2: Frontend Mastery with React 18 & Tailwind CSS',
         description: 'Component architecture, state management, custom hooks, context API, and responsive UI design.',
-        topics: ['React Hooks (useState, useEffect, useMemo)', 'Custom Hooks & State Persistence', 'Tailwind CSS Utility Design', 'React Router v6 Navigation']
+        topics: [
+          'React Hooks: useState, useEffect, useMemo & useCallback',
+          'Building Reusable Custom Hooks & Local Storage Sync',
+          'Tailwind CSS Utility Layouts & Responsive Breakpoints',
+          'React Router v6 Dynamic Routing & Protected Routes',
+          'State Management with Context API & Redux Toolkit'
+        ]
       },
       {
         title: 'Module 3: Backend Microservices with Node.js & Express.js',
         description: 'Build secure, scalable RESTful APIs with input validation, error handling middleware, and logging.',
-        topics: ['Express Routing & Controllers', 'Custom Middleware & Error Handling', 'RESTful API Best Practices', 'File Uploads with Multer']
+        topics: [
+          'Node.js Runtime Engine & Event-Driven Architecture',
+          'Express.js Router, Controllers & Service Layers',
+          'Custom Middleware, CORS, Helmet & Request Rate Limiting',
+          'RESTful API Design Standards & HTTP Status Codes',
+          'File Uploads with Multer & Cloudinary Image Storage'
+        ]
       },
       {
         title: 'Module 4: Database Design with MongoDB & Mongoose ORM',
         description: 'Schema modeling, indexing, aggregation frameworks, relationships, and queries in MongoDB.',
-        topics: ['Mongoose Schemas & Models', 'CRUD Operations & Filters', 'Aggregation Pipelines', 'Data Validation & Indexing']
+        topics: [
+          'Mongoose Schemas, Models & Field Validations',
+          'CRUD Operations, Operators ($set, $push) & Filters',
+          'MongoDB Aggregation Pipelines & Data Analytics',
+          'Database Indexing & Query Performance Tuning',
+          'Relational Population ($lookup & populate)'
+        ]
+      },
+      {
+        title: 'Module 5: Authentication, Security & Cloud Deployment',
+        description: 'JWT Auth, Role-Based Access Control, environment setup, and cloud hosting.',
+        topics: [
+          'JWT (JSON Web Tokens) Authentication & Cookie Storage',
+          'Password Hashing with bcrypt & Salt Rounds',
+          'Role-Based Access Control (RBAC) Middleware',
+          'Environment Variables & Production Config',
+          'Deploying Backend on Render/Railway & Frontend on Vercel'
+        ]
       }
     ]
   },
@@ -134,19 +152,59 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: C++ STL Mastery & Time-Space Complexity',
+        title: 'Module 1: C++ STL Mastery, Memory & Complexity Analysis',
         description: 'Vectors, maps, sets, priority queues, iterators, and asymptotic notation analysis.',
-        topics: ['Vectors, Deque & Lists', 'Ordered/Unordered Maps & Sets', 'Iterators & STL Algorithms', 'Big-O Analysis']
+        topics: [
+          'Big-O Time & Space Complexity Analysis',
+          'Vectors, Deque, Lists & Capacity Allocation',
+          'Ordered Maps/Sets vs Unordered Hash Tables',
+          'Custom STL Comparators & Iterators',
+          'Pointers, References & Dynamic Memory Allocation'
+        ]
       },
       {
         title: 'Module 2: Arrays, Strings, Two-Pointer & Sliding Window',
         description: 'Master fundamental linear data structure techniques for interview problem solving.',
-        topics: ['Subarray & Substring Patterns', 'Two-Pointer Technique', 'Sliding Window (Fixed & Variable)', 'Prefix Sum']
+        topics: [
+          'Subarray & Substring Search Patterns',
+          'Two-Pointer Technique (Opposite & Same Direction)',
+          'Sliding Window (Fixed vs Variable Size)',
+          'Prefix Sum Arrays & Difference Arrays',
+          'Kadane\'s Algorithm & Matrix Traversals'
+        ]
       },
       {
-        title: 'Module 3: Trees, Graphs, Backtracking & Dynamic Programming',
-        description: 'Hierarchical traversals, shortest paths, memoization, and tabular DP.',
-        topics: ['BFS & DFS Traversal Patterns', 'Dijkstra & DSU', 'Backtracking N-Queens', '1D & 2D Dynamic Programming']
+        title: 'Module 3: Recursion, Backtracking & Linked Lists',
+        description: 'Call stack visualization, combinatorial search, and pointer manipulations.',
+        topics: [
+          'Recursion Call Stack & Base Case Design',
+          'Backtracking: N-Queens, Subsets & Sudoku Solver',
+          'Single & Doubly Linked List Operations',
+          'Fast & Slow Pointer Cycle Detection Pattern',
+          'Monotonic Stack & Queue Applications'
+        ]
+      },
+      {
+        title: 'Module 4: Binary Trees, BST & Priority Queues',
+        description: 'Hierarchical structure traversals, BST properties, and heap algorithms.',
+        topics: [
+          'Binary Tree Traversals (DFS & Level-Order BFS)',
+          'BST Search, Insertion, Deletion & Validation',
+          'Lowest Common Ancestor (LCA) in Trees',
+          'Max/Min Heap Operations & Priority Queue',
+          'Tries & Prefix Search Optimization'
+        ]
+      },
+      {
+        title: 'Module 5: Graphs & Dynamic Programming',
+        description: 'Graph traversals, shortest path algorithms, and memoization DP.',
+        topics: [
+          'Graph Adjacency List Representation & BFS/DFS',
+          'Dijkstra\'s & Bellman-Ford Shortest Path Algorithms',
+          'Disjoint Set Union (DSU) & Kruskal\'s MST',
+          '1D Dynamic Programming (Climbing Stairs, Coin Change)',
+          '2D Dynamic Programming (LCS, Knapsack & Edit Distance)'
+        ]
       }
     ]
   },
@@ -174,14 +232,57 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Java OOP Fundamentals & Collections Framework',
+        title: 'Module 1: Java OOP Mechanics & JCF Memory Architecture',
         description: 'Classes, Inheritance, Generics, ArrayList, HashMap, and TreeSet internals.',
-        topics: ['Inheritance & Abstract Classes', 'ArrayList & HashMap internals', 'Heap vs Stack Memory', 'Generics & Comparators']
+        topics: [
+          'JVM, JRE & JDK Architecture & Garbage Collection',
+          'Inheritance, Interfaces & Abstract Classes',
+          'Heap vs Stack Memory Allocation & References',
+          'Java Generics, Wildcards & Custom Comparators',
+          'StringBuilder & String Pool Optimizations'
+        ]
       },
       {
-        title: 'Module 2: Sorting, Searching, Trees & Graphs',
-        description: 'Binary search variants, tree construction, BFS/DFS graph traversals in Java.',
-        topics: ['Binary Search on Answer', 'Binary Tree Construction', 'Graph Representation in Java', 'Dynamic Programming']
+        title: 'Module 2: Java Collections Framework (JCF) Deep Dive',
+        description: 'Internal implementations of List, Set, Map, and Queue interfaces.',
+        topics: [
+          'ArrayList vs LinkedList Performance Mechanics',
+          'HashMap Internal Bucketing & Hash Collision Resolution',
+          'TreeMap & TreeSet Red-Black Tree Guarantees',
+          'PriorityQueue Heap Implementations in Java',
+          'ArrayDeque vs Stack for Queue Operations'
+        ]
+      },
+      {
+        title: 'Module 3: Sorting, Searching & Linear Problem Patterns',
+        description: 'Binary search variants, sorting algorithms, and pointer techniques.',
+        topics: [
+          'Binary Search on Answer Space Pattern',
+          'MergeSort & QuickSort In-place Algorithms',
+          'Two-Pointers & Sliding Window Patterns in Java',
+          'Prefix Sum & HashMap Subarray Lookup Tricks'
+        ]
+      },
+      {
+        title: 'Module 4: Trees, Graphs & Heaps in Java',
+        description: 'Tree traversals, graph algorithms, and heap data structures.',
+        topics: [
+          'Binary Tree Level Order BFS & Boundary Traversals',
+          'Binary Search Tree (BST) Operations & Validation',
+          'Graph Representation using Adjacency Lists',
+          'Graph BFS, DFS & Cycle Detection in Directed Graphs',
+          'Dijkstra Shortest Path with PriorityQueue'
+        ]
+      },
+      {
+        title: 'Module 5: Dynamic Programming & Placement Interview Prep',
+        description: 'Recursion, memoization, tabular DP, and system design basics.',
+        topics: [
+          'Recursion & Backtracking in Java',
+          'Top-Down Memoization Dynamic Programming',
+          'Bottom-Up Tabular Matrix DP',
+          'System Design Principles & OOP Interview Walkthroughs'
+        ]
       }
     ]
   },
@@ -209,19 +310,54 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Python & JavaScript Language Mechanisms for DSA',
+        title: 'Module 1: Python & JS Engine Mechanisms for DSA',
         description: 'Master built-in data structures, list comprehensions, slicing, Map, Set, and Object key lookups.',
-        topics: ['Python Lists, Dicts, Counter & collections.deque', 'JS Map, Set, Array methods & Object lookups', 'Big-O Complexity & Memory Overhead', 'Recursion & Call Stack in Python/JS']
+        topics: [
+          'Python Lists, Dicts, Counter & collections.deque',
+          'JS Map, Set, Array Methods & Object Key Lookups',
+          'Big-O Complexity & Memory Footprint in Py/JS',
+          'Recursion Call Stack & Tail Call Optimization'
+        ]
       },
       {
         title: 'Module 2: Arrays, Strings, HashMaps & Two-Pointers',
         description: 'Efficient string manipulation, frequency maps, two-pointers, and sliding window patterns.',
-        topics: ['Sliding Window Technique', 'Two-Pointer Traversal', 'HashMap & HashSet Lookup Patterns', 'Subarray Sum Problems']
+        topics: [
+          'Two-Pointer Traversal Technique',
+          'Sliding Window (Fixed & Variable Size)',
+          'HashMap & HashSet Lookup Strategies',
+          'Subarray Sum & Prefix Frequency Patterns'
+        ]
       },
       {
-        title: 'Module 3: Linked Lists, Trees, Graphs & Dynamic Programming',
-        description: 'Pointer/Reference nodes in JS/Python, Tree traversals, BFS/DFS, and Memoization.',
-        topics: ['Node-based Data Structures', 'Binary Tree & BST Traversals', 'Graph BFS/DFS with Recursion/Queue', 'Top-Down Memoization & Tabulation']
+        title: 'Module 3: Linked Lists, Stacks & Queues',
+        description: 'Pointer/Reference nodes in JS/Python, Stack & Queue applications.',
+        topics: [
+          'Single & Doubly Linked List Operations',
+          'Fast & Slow Pointer Cycle Detection',
+          'Stack Implementation with Lists/Arrays',
+          'Monotonic Stack & Queue Problems'
+        ]
+      },
+      {
+        title: 'Module 4: Trees, BST & Graph Traversals',
+        description: 'Binary Tree traversals, BST search, and graph algorithms.',
+        topics: [
+          'Binary Tree Traversals & Depth Calculation',
+          'BST Search, Insert & Validation',
+          'Graph Adjacency List & Matrix Representation',
+          'Graph BFS & DFS Algorithms'
+        ]
+      },
+      {
+        title: 'Module 5: Dynamic Programming & Interview Sets',
+        description: 'Top-down memoization, bottom-up DP, and interview problem sets.',
+        topics: [
+          'Top-Down Memoization Patterns',
+          'Bottom-Up Tabulation Matrices',
+          'Standard DP Problems (Knapsack, LCS, LIS)',
+          'Top 50 LeetCode Medium/Hard Walkthroughs'
+        ]
       }
     ]
   },
@@ -249,19 +385,44 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Fundamentals of Cyber Security & Networking',
+        title: 'Module 1: Networking Fundamentals, Protocols & Reconnaissance',
         description: 'OSI Model, TCP/IP Protocols, Port Scanning with Nmap, and Wireshark Packet Analysis.',
-        topics: ['TCP/IP Protocol Suite & Handshakes', 'Linux CLI for Security Tools', 'Nmap Port Scanning & Service Enumeration', 'Wireshark Packet Sniffing']
+        topics: [
+          'OSI 7-Layer Model & TCP/IP Protocol Stack',
+          'Linux CLI Utilities for Cyber Security Engineers',
+          'Nmap Port Scanning, OS Fingerprinting & Service Enum',
+          'Wireshark Packet Sniffing & Traffic Analysis'
+        ]
       },
       {
-        title: 'Module 2: Web Application Penetration Testing (OWASP Top 10)',
+        title: 'Module 2: Web Application Security & OWASP Top 10',
         description: 'Burp Suite proxy, SQL Injection, Cross-Site Scripting (XSS), CSRF, and Authentication Bypasses.',
-        topics: ['Burp Suite Setup & Interception', 'SQL Injection (SQLi) Exploitation', 'Cross-Site Scripting (XSS) Attacks', 'Session Hijacking & CSRF']
+        topics: [
+          'Burp Suite Setup & HTTP Request Interception',
+          'SQL Injection (SQLi) Exploitation & Prevention',
+          'Cross-Site Scripting (XSS) Stored/Reflected Attacks',
+          'CSRF, Session Hijacking & Broken Authentication'
+        ]
       },
       {
-        title: 'Module 3: System Hacking, Metasploit & Bug Bounty Workflows',
+        title: 'Module 3: System Penetration Testing & Metasploit',
         description: 'Vulnerability assessment, privilege escalation, Metasploit framework, and reporting.',
-        topics: ['Metasploit Exploitation Framework', 'Privilege Escalation Techniques', 'Bug Bounty Methodology & Recon', 'Ethical Hacking Report Writing']
+        topics: [
+          'Vulnerability Assessment & CVE Identification',
+          'Metasploit Framework Exploitation & Payloads',
+          'Privilege Escalation in Linux & Windows Systems',
+          'Password Cracking with John the Ripper / Hashcat'
+        ]
+      },
+      {
+        title: 'Module 4: Bug Bounty Workflows, Cryptography & Defense',
+        description: 'Recon methodology, cryptography, security headers, and penetration report writing.',
+        topics: [
+          'Recon Methodology (Subdomain Enum, Asset Mapping)',
+          'Cryptography (AES, RSA, SHA-256 Hashing)',
+          'Web Security Headers, CORS & CSP Policies',
+          'Writing Professional Penetration Testing Reports'
+        ]
       }
     ]
   },
@@ -289,19 +450,54 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Dart Fundamentals & Flutter UI Widget Tree',
+        title: 'Module 1: Dart Programming Language & Flutter Basics',
         description: 'Dart syntax, Async programming, Layout widgets, Material Design & Cupertino components.',
-        topics: ['Variables, Functions & OOP in Dart', 'Stateless vs Stateful Widgets', 'Container, Column, Row & Flex Layouts', 'Custom Buttons & Form Inputs']
+        topics: [
+          'Dart Variables, Functions, Mixins & OOP',
+          'Async Programming (Futures & Streams) in Dart',
+          'Stateless vs Stateful Widgets Lifecycle',
+          'Material Design 3 UI Components & Icons'
+        ]
       },
       {
-        title: 'Module 2: State Management & REST API Integration',
-        description: 'Managing complex application state, HTTP requests, JSON parsing, and local persistent cache.',
-        topics: ['Provider State Management', 'HTTP Package & JSON Serialization', 'Shared Preferences & Hive DB', 'BLoC Pattern Overview']
+        title: 'Module 2: Layouts, Forms & Responsive UI Design',
+        description: 'Managing layouts, forms, theme configuration, and responsive screens.',
+        topics: [
+          'Container, Row, Column & Flex Alignment',
+          'ListView, GridView & CustomScrollView Builders',
+          'Form Validation & Custom User Inputs',
+          'Dark Mode & Theme Configuration'
+        ]
       },
       {
-        title: 'Module 3: Firebase Integration & App Store Deployment',
-        description: 'Firebase Authentication, Cloud Firestore, Push Notifications, and Play Store release build generation.',
-        topics: ['Firebase Email/Google Authentication', 'Firestore Realtime Database CRUD', 'Push Notifications with FCM', 'Building APKs & App Store Guidelines']
+        title: 'Module 3: State Management with Provider & Riverpod',
+        description: 'Managing complex application state cleanly.',
+        topics: [
+          'State Management Fundamentals & Lifted State',
+          'Provider Setup & Consumer Widgets',
+          'Riverpod StateNotifier & Providers',
+          'BLoC Pattern Architecture Overview'
+        ]
+      },
+      {
+        title: 'Module 4: REST API Integration & Local Storage',
+        description: 'HTTP requests, JSON parsing, and local databases.',
+        topics: [
+          'HTTP Package & JSON Deserialization',
+          'Handling Loading States & Error Handlers',
+          'Local Storage with Shared Preferences',
+          'Hive NoSQL Local Database'
+        ]
+      },
+      {
+        title: 'Module 5: Firebase Integration & App Store Deployment',
+        description: 'Firebase Auth, Firestore, FCM Push Notifications, and Play/App Store releases.',
+        topics: [
+          'Firebase Auth (Email/Password & Google Sign-In)',
+          'Cloud Firestore Realtime Database CRUD',
+          'Firebase Cloud Messaging (FCM) Push Notifications',
+          'Building Release APKs & Play Store Guidelines'
+        ]
       }
     ]
   },
@@ -331,17 +527,52 @@ export const COURSES: CourseItem[] = [
       {
         title: 'Module 1: Python Basics & Core Language Syntax',
         description: 'Variables, data types, conditional statements, loops, functions, and list/dict manipulations.',
-        topics: ['Python Syntax & Variables', 'Control Flow & Loops', 'Functions & Lambda Expressions', 'Lists, Tuples, Dictionaries & Sets']
+        topics: [
+          'Python Setup, Variables & Primitive Data Types',
+          'Conditional Statements (if-elif-else) & Logic',
+          'Loops (for, while) & Range Functions',
+          'Functions, Lambda Expressions & Scope'
+        ]
       },
       {
-        title: 'Module 2: Object-Oriented Programming (OOP) & Exception Handling',
-        description: 'Classes, Inheritance, Polymorphism, Encapsulation, Exception Handling, and File I/O.',
-        topics: ['Classes & Constructors', 'Inheritance & Method Overriding', 'Try-Except Blocks & Custom Exceptions', 'File Read/Write & Context Managers']
+        title: 'Module 2: Data Structures & Advanced Python Concepts',
+        description: 'Lists, Tuples, Dictionaries, Sets, and Module management.',
+        topics: [
+          'Lists, Tuples, Dictionaries & Sets Manipulation',
+          'List & Dictionary Comprehensions',
+          'String Formatting & Regex Matching',
+          'Modules, Packages & Virtual Environments'
+        ]
       },
       {
-        title: 'Module 3: Python Data Science & AI Libraries',
-        description: 'NumPy vector arrays, Pandas DataFrames, Matplotlib plotting, and intro to AI workflows.',
-        topics: ['NumPy Ndarrays & Operations', 'Pandas Data Wrangling', 'Matplotlib Data Visualization', 'Building First Machine Learning Script']
+        title: 'Module 3: Object-Oriented Programming (OOP) & Exceptions',
+        description: 'Classes, Inheritance, Exception Handling, and File I/O.',
+        topics: [
+          'Classes, Objects & Constructors (__init__)',
+          'Inheritance, Method Overriding & Polymorphism',
+          'Exception Handling (try-except-finally)',
+          'File I/O & Context Managers (with statement)'
+        ]
+      },
+      {
+        title: 'Module 4: NumPy & Pandas for AI & Data Science',
+        description: 'Vector arrays, DataFrames, and data wrangling.',
+        topics: [
+          'NumPy Ndarrays, Slicing & Broadcasting',
+          'Pandas Series & DataFrames',
+          'Data Cleaning & Missing Value Handling',
+          'Merging, Grouping & Aggregating Data'
+        ]
+      },
+      {
+        title: 'Module 5: Matplotlib, Seaborn & Intro to ML',
+        description: 'Visualizations and machine learning introductory scripts.',
+        topics: [
+          'Matplotlib Line Plots, Bar Charts & Histograms',
+          'Seaborn Heatmaps & Statistical Charts',
+          'Feature Scaling & Train-Test Split',
+          'Building First Scikit-Learn Machine Learning Script'
+        ]
       }
     ]
   },
@@ -369,19 +600,55 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Data Structures & Algorithms Foundations',
-        description: 'Problem-solving patterns, Arrays, Two-Pointers, HashMaps, Trees, Graphs, and DP.',
-        topics: ['Sliding Window & Two-Pointers', 'HashMaps & HashSets', 'Binary Trees & Graph BFS/DFS', 'Dynamic Programming Fundamentals']
+        title: 'Module 1: Core DSA Algorithms & Problem-Solving',
+        description: 'Problem-solving patterns, Arrays, HashMaps, Trees, Graphs, and DP.',
+        topics: [
+          'Sliding Window & Two-Pointer Patterns',
+          'HashMaps & Frequency Counter Tricks',
+          'Binary Trees & BST Operations',
+          'Graph BFS & DFS Traversals',
+          'Dynamic Programming Fundamentals'
+        ]
       },
       {
-        title: 'Module 2: Generative AI, LLMs & Prompt Engineering',
-        description: 'Large Language Models architecture, prompt design patterns, context windows, and API calling.',
-        topics: ['LLM Foundations & Tokens', 'Zero-shot / Few-shot Prompting', 'OpenAI & Gemini API Integration', 'Structured Output Parsing']
+        title: 'Module 2: Generative AI & LLM Foundations',
+        description: 'Transformer architecture, self-attention, tokenization, and prompt engineering.',
+        topics: [
+          'Transformer Architecture & Self-Attention',
+          'Tokenization, Context Windows & Embeddings',
+          'Zero-shot, Few-shot & Chain-of-Thought Prompting',
+          'System Prompts & Temperature Tuning'
+        ]
       },
       {
-        title: 'Module 3: RAG Systems, Vector Databases & LangChain Agents',
-        description: 'Embeddings, ChromaDB, Pinecone, Retrieval-Augmented Generation pipelines, and AI Agents.',
-        topics: ['Text Embeddings & Vector Search', 'Building RAG Pipelines', 'LangChain Memory & Chains', 'Autonomous AI Agents']
+        title: 'Module 3: OpenAI & Gemini API Integrations',
+        description: 'SDK integration, text/chat generation, function calling, and streaming.',
+        topics: [
+          'SDK Setup & API Authentication',
+          'Generating Text, Chat Completion & JSON Parsing',
+          'Function Calling & Tool Execution',
+          'Streaming Responses in Real-Time'
+        ]
+      },
+      {
+        title: 'Module 4: Vector Databases & RAG Pipelines',
+        description: 'Embeddings, ChromaDB, Pinecone, and RAG retrieval.',
+        topics: [
+          'Text Embedding Generation & Similarity Metrics',
+          'Vector Databases (ChromaDB & Pinecone)',
+          'Document Chunking & Indexing Strategies',
+          'Building Retrieval-Augmented Generation (RAG) Pipelines'
+        ]
+      },
+      {
+        title: 'Module 5: LangChain, AI Agents & Autonomous Workflows',
+        description: 'Chains, memory, custom tools, and AI agents.',
+        topics: [
+          'LangChain Chains & Memory Modules',
+          'Custom Tool Creation for AI Agents',
+          'ReAct Agent Frameworks',
+          'Building Production GenAI Applications'
+        ]
       }
     ]
   },
@@ -411,17 +678,42 @@ export const COURSES: CourseItem[] = [
       {
         title: 'Module 1: LLM Architecture & Advanced Prompt Engineering',
         description: 'Understanding Transformers, self-attention, tokenization, temperature, system prompts, and chain-of-thought.',
-        topics: ['Transformers & Tokenization Mechanics', 'System Prompts & Few-Shot Examples', 'Chain-of-Thought & ReAct Prompting', 'API Rate Limits & Error Handling']
+        topics: [
+          'Transformers & Tokenization Mechanics',
+          'System Prompts & Few-Shot In-Context Learning',
+          'Chain-of-Thought & ReAct Reasoning Patterns',
+          'API Rate Limiting & Retry Strategies'
+        ]
       },
       {
         title: 'Module 2: Vector Databases, Embeddings & RAG Architectures',
         description: 'Creating document embeddings, semantic search, vector indexing in ChromaDB/Pinecone, and RAG retrieval.',
-        topics: ['Embedding Models & Cosine Similarity', 'Vector Store Indexing with ChromaDB', 'Document Chunking Strategies', 'Evaluating RAG Performance']
+        topics: [
+          'Text Embedding Models & Vector Spaces',
+          'ChromaDB & Pinecone Setup & Indexing',
+          'Document Chunking & Metadata Filtering',
+          'RAG Pipeline Construction & Evaluation'
+        ]
       },
       {
-        title: 'Module 3: LangChain Agents, Tool Calling & LLM Fine-Tuning',
-        description: 'Building multi-step AI agents with custom tools, Function Calling, and fine-tuning open-source models.',
-        topics: ['LangChain Agents & Tools', 'Function Calling & Tool Execution', 'Fine-Tuning Llama 3 / Mistral', 'Production Deployment of GenAI Apps']
+        title: 'Module 3: LangChain Framework & Custom Tools',
+        description: 'Building multi-step AI agents with custom tools, Function Calling, and memory modules.',
+        topics: [
+          'LangChain Core Abstractions & Chains',
+          'Conversation Buffer & Summary Memory',
+          'Custom Tool Binding & Function Calling',
+          'Multi-Agent Coordination Workflows'
+        ]
+      },
+      {
+        title: 'Module 4: Fine-Tuning Open Source Models & Production Deployment',
+        description: 'Fine-tuning Llama 3/Mistral, LoRA, QLoRA, and cloud hosting.',
+        topics: [
+          'Fine-Tuning Open Source LLMs (Llama 3, Mistral)',
+          'LoRA & QLoRA Quantization Techniques',
+          'GGUF & AWQ Model Formats',
+          'Deploying GenAI Apps on Cloud Infrastructure'
+        ]
       }
     ]
   },
@@ -451,17 +743,42 @@ export const COURSES: CourseItem[] = [
       {
         title: 'Module 1: Python Data Science & Statistical Analysis',
         description: 'Data wrangling with Pandas, matrix computations with NumPy, data visualization, and statistical modeling.',
-        topics: ['Pandas Data Wrangling & Cleaning', 'NumPy High-Performance Computing', 'Seaborn & Plotly Data Visualization', 'Hypothesis Testing & Statistics']
+        topics: [
+          'Pandas Data Wrangling & Cleaning',
+          'NumPy High-Performance Matrix Computations',
+          'Seaborn & Plotly Data Visualization',
+          'Descriptive & Inferential Statistics'
+        ]
       },
       {
-        title: 'Module 2: Machine Learning & Deep Learning Neural Networks',
+        title: 'Module 2: Machine Learning & Deep Neural Networks',
         description: 'Supervised/Unsupervised Machine Learning algorithms, Scikit-Learn pipelines, and PyTorch deep learning.',
-        topics: ['Regression & Classification Algorithms', 'Model Evaluation & Cross-Validation', 'Deep Neural Networks in PyTorch', 'Convolutional & Recurrent Networks']
+        topics: [
+          'Supervised Learning (Regression & Classification)',
+          'Unsupervised Learning (K-Means & PCA)',
+          'Model Evaluation, ROC-AUC & Cross-Validation',
+          'PyTorch Neural Network Architecture'
+        ]
       },
       {
-        title: 'Module 3: Generative AI, RAG Systems & LangChain Agents',
-        description: 'LLM fine-tuning, Prompt engineering, Embedding models, RAG vector pipelines, and LangChain AI Agents.',
-        topics: ['Large Language Models Architecture', 'Prompt Engineering Patterns', 'RAG Pipelines with Vector DBs', 'Building Autonomous AI Agents with LangChain']
+        title: 'Module 3: Natural Language Processing (NLP) & Transformers',
+        description: 'Text preprocessing, embeddings, and Transformer models.',
+        topics: [
+          'Text Preprocessing & TF-IDF Vectors',
+          'Word Embeddings (Word2Vec, GloVe)',
+          'Recurrent Neural Networks (RNN/LSTM)',
+          'Transformer Architecture & Hugging Face'
+        ]
+      },
+      {
+        title: 'Module 4: Generative AI, RAG Systems & LangChain Agents',
+        description: 'LLM fine-tuning, Prompt engineering, RAG vector pipelines, and LangChain AI Agents.',
+        topics: [
+          'Large Language Model Mechanics',
+          'Prompt Engineering Best Practices',
+          'RAG Architecture with Vector Databases',
+          'Building Autonomous AI Agents with LangChain'
+        ]
       }
     ]
   },
@@ -489,19 +806,54 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Python Data Science Stack (NumPy, Pandas, Scikit-Learn)',
-        description: 'Data manipulation, exploratory data analysis, matrix operations, and feature scaling.',
-        topics: ['NumPy Ndarrays & Vectorization', 'Pandas DataFrames & Data Cleaning', 'Matplotlib & Seaborn Visualization', 'Scikit-Learn Pipelines & Preprocessing']
+        title: 'Module 1: Math & Python Data Science Stack',
+        description: 'Data manipulation, linear algebra, matrix operations, and feature scaling.',
+        topics: [
+          'Linear Algebra & Calculus for ML',
+          'NumPy Ndarrays & Vectorization',
+          'Pandas DataFrames & Data Cleaning',
+          'Matplotlib & Seaborn Visualizations'
+        ]
       },
       {
-        title: 'Module 2: Classical Machine Learning Algorithms',
-        description: 'Linear Regression, Logistic Regression, Decision Trees, Random Forests, XGBoost, and Clustering.',
-        topics: ['Supervised Learning Models', 'Cross-Validation & Hyperparameter Tuning', 'Ensemble Methods (XGBoost/LightGBM)', 'K-Means & Hierarchical Clustering']
+        title: 'Module 2: Supervised Machine Learning Algorithms',
+        description: 'Linear Regression, Logistic Regression, Decision Trees, Random Forests, XGBoost.',
+        topics: [
+          'Linear & Logistic Regression Models',
+          'Decision Trees & Random Forests',
+          'Support Vector Machines (SVM)',
+          'XGBoost & Gradient Boosting Algorithms'
+        ]
       },
       {
-        title: 'Module 3: Deep Learning, PyTorch & Large Language Models (LLMs)',
-        description: 'Perceptrons, Backpropagation, Convolutional Networks, Transformers, and LLM Fine-Tuning.',
-        topics: ['Artificial Neural Networks & Loss Functions', 'PyTorch Tensors & Model Training', 'Transformer Architecture (Self-Attention)', 'Hugging Face & Fine-Tuning LLMs']
+        title: 'Module 3: Unsupervised Learning & Model Optimization',
+        description: 'Clustering, PCA, Cross-Validation, and Scikit-Learn pipelines.',
+        topics: [
+          'K-Means & Hierarchical Clustering',
+          'Principal Component Analysis (PCA)',
+          'Cross-Validation & Hyperparameter Tuning',
+          'Scikit-Learn Pipelines & Model Persistence'
+        ]
+      },
+      {
+        title: 'Module 4: Deep Learning & PyTorch Framework',
+        description: 'Perceptrons, Backpropagation, CNNs, and PyTorch tensors.',
+        topics: [
+          'Artificial Neural Networks (ANN) & Loss Functions',
+          'Backpropagation & Gradient Descent',
+          'Convolutional Neural Networks (CNN) for CV',
+          'PyTorch Tensors, Datasets & Training Loops'
+        ]
+      },
+      {
+        title: 'Module 5: Transformers, Hugging Face & Fine-Tuning LLMs',
+        description: 'Attention mechanisms, pretrained models, and LLM fine-tuning.',
+        topics: [
+          'Attention Mechanisms & Transformer Encoder/Decoder',
+          'Hugging Face Hub & Pretrained Models',
+          'Fine-Tuning Models on Custom Datasets',
+          'Evaluating Model Performance in Production'
+        ]
       }
     ]
   },
@@ -531,17 +883,43 @@ export const COURSES: CourseItem[] = [
       {
         title: 'Module 1: Advanced Excel & Power Query for Analytics',
         description: 'XLOOKUP, INDEX-MATCH, Pivot Tables, Conditional Formatting, and Power Query ETL.',
-        topics: ['Advanced Formulas (XLOOKUP, LET, FILTER)', 'Dynamic Pivot Tables & Slicers', 'Power Query Data Transformation', 'Executive Dashboard Design']
+        topics: [
+          'Advanced Formulas (XLOOKUP, INDEX-MATCH, LET, FILTER)',
+          'Dynamic Pivot Tables, Slicers & Calculated Fields',
+          'Power Query Data Transformation & Cleaning',
+          'Executive Interactive Dashboard Design'
+        ]
       },
       {
-        title: 'Module 2: SQL Data Querying & Database Management',
+        title: 'Module 2: SQL Data Querying & Database Analytics',
         description: 'SELECT queries, Filtering, JOINs, Grouping, Aggregations, Subqueries, CTEs, and Window Functions.',
-        topics: ['Multi-Table INNER/LEFT/FULL JOINs', 'GROUP BY, HAVING & Aggregations', 'Common Table Expressions (CTEs)', 'Window Functions (ROW_NUMBER, RANK, LEAD/LAG)']
+        topics: [
+          'SELECT, WHERE, ORDER BY & Aggregations',
+          'Multi-Table INNER/LEFT/FULL JOINs',
+          'GROUP BY, HAVING & Subqueries',
+          'Common Table Expressions (CTEs)',
+          'Window Functions (ROW_NUMBER, RANK, LEAD/LAG)'
+        ]
       },
       {
-        title: 'Module 3: Power BI, Tableau & Python Exploratory Analysis',
-        description: 'Data modeling, DAX measures, interactive dashboard builds, and Python EDA.',
-        topics: ['Power BI DAX Formulas & Data Modeling', 'Tableau Calculations & Visual Storytelling', 'Python Pandas Data wrangling', 'Business Case Studies & Portfolio Building']
+        title: 'Module 3: Power BI & Data Visualization',
+        description: 'Data modeling, DAX measures, interactive dashboard builds, and storytelling.',
+        topics: [
+          'Data Modeling & Star Schema Architecture',
+          'DAX Formulas (CALCULATE, SUMX, DATESYTD)',
+          'Building Interactive Dashboards in Power BI',
+          'Storytelling with Data & KPI Cards'
+        ]
+      },
+      {
+        title: 'Module 4: Python Exploratory Data Analysis (EDA)',
+        description: 'Pandas data wrangling, Seaborn charts, and business case studies.',
+        topics: [
+          'Python Pandas Data Wrangling',
+          'Cleaning Missing & Duplicate Data',
+          'Matplotlib & Seaborn Exploratory Charts',
+          'Business Case Studies & Portfolio Building'
+        ]
       }
     ]
   },
@@ -569,19 +947,45 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Linux System Administration, Shell Scripting & Git',
+        title: 'Module 1: Linux Administration, Shell Scripting & Git',
         description: 'Command line utilities, permissions, process management, bash automation scripts, and Git branching.',
-        topics: ['Linux CLI Commands & Permissions', 'Bash Shell Scripting & Automation', 'Git Branching, Merging & Rebasing', 'SSH Keys & Server Security']
+        topics: [
+          'Linux CLI Commands, Permissions & Process Management',
+          'Bash Shell Scripting & Automation',
+          'Git Branching, Merging, Rebasing & Pull Requests',
+          'SSH Keys, Firewall & Server Hardening'
+        ]
       },
       {
-        title: 'Module 2: Docker Containers & Kubernetes Cluster Orchestration',
-        description: 'Container images, Dockerfiles, Docker Compose, Kubernetes Pods, Services, Deployments, and Helm charts.',
-        topics: ['Dockerfile Optimization & Multi-stage Builds', 'Docker Compose Microservices', 'Kubernetes Architecture & Pods', 'K8s Services, Ingress & Helm Charts']
+        title: 'Module 2: Docker Containers & Multi-Container Stacks',
+        description: 'Container images, Dockerfiles, Docker Compose, and networking.',
+        topics: [
+          'Docker Architecture & Image Creation',
+          'Dockerfile Best Practices & Multi-Stage Builds',
+          'Managing Containers, Networks & Volumes',
+          'Docker Compose Multi-Container Microservices'
+        ]
       },
       {
-        title: 'Module 3: CI/CD Pipelines, Terraform IaC, Ansible & AWS Cloud',
-        description: 'Automated build/test/deploy pipelines, declarative infrastructure provisioning, and AWS cloud hosting.',
-        topics: ['GitHub Actions & Jenkins CI/CD', 'Terraform Modules & State Management', 'Ansible Playbooks & Configuration', 'AWS EC2, S3, IAM & EKS Deployments']
+        title: 'Module 3: Kubernetes Cluster Orchestration',
+        description: 'Kubernetes Pods, Services, Deployments, and Helm package manager.',
+        topics: [
+          'Kubernetes Architecture (Control Plane & Worker Nodes)',
+          'Pods, Deployments & ReplicaSets',
+          'K8s Services, NodePort, ClusterIP & Ingress Controllers',
+          'ConfigMaps, Secrets & Helm Package Manager'
+        ]
+      },
+      {
+        title: 'Module 4: CI/CD Pipelines, Infrastructure as Code & Cloud',
+        description: 'GitHub Actions, Jenkins, Terraform IaC, Ansible, and AWS Cloud hosting.',
+        topics: [
+          'GitHub Actions Workflows & Automated Testing',
+          'Jenkins Pipeline Setup & Integration',
+          'Terraform Infrastructure as Code (IaC) Provisioning',
+          'Ansible Configuration Management',
+          'AWS EC2, S3 & EKS Cluster Deployments'
+        ]
       }
     ]
   },
@@ -609,19 +1013,44 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Foundation: Modern JavaScript, TypeScript & React/Next.js',
+        title: 'Module 1: JavaScript, TypeScript & React/Next.js Architecture',
         description: 'Deep dive into JS internals, async programming, TypeScript types, React 18, and Next.js App Router.',
-        topics: ['JavaScript Callbacks, Promises & Async/Await', 'TypeScript Generics & Strict Typing', 'React Hooks & State Optimization', 'Next.js 14 App Router & Server Actions']
+        topics: [
+          'Callbacks, Promises, Event Loop & Async/Await',
+          'TypeScript Generics, Interfaces & Strict Typing',
+          'React 18 Custom Hooks & State Optimization',
+          'Next.js 14 App Router & Server Components'
+        ]
       },
       {
-        title: 'Module 2: Backend Architecture: Node.js, PostgreSQL, Prisma & Express',
+        title: 'Module 2: Backend Microservices with Node, PostgreSQL & Prisma',
         description: 'RESTful API microservices, relational database modeling, Prisma ORM, JWT auth, and middleware.',
-        topics: ['Node.js & Express API Design', 'PostgreSQL Queries & Relational Schemas', 'Prisma ORM Migrations & Indexing', 'JWT Authentication & Security Headers']
+        topics: [
+          'RESTful API Microservices with Express',
+          'PostgreSQL Relational Database Modeling',
+          'Prisma ORM Migrations, Indexing & Relations',
+          'JWT Authentication & Security Headers'
+        ]
       },
       {
-        title: 'Module 3: Advanced Systems: WebSockets, Monorepos, Docker & Open Source',
-        description: 'Real-time communication, Turborepo monorepos, containerization, and open-source contribution guidelines.',
-        topics: ['Real-time WebSockets & WebRTC', 'Turborepo & Monorepo Workflows', 'Docker Containerization & Networking', 'Open Source PRs & System Design']
+        title: 'Module 3: Real-Time WebSockets, WebRTC & Monorepos',
+        description: 'Real-time communication, Turborepo monorepos, and WebRTC streaming.',
+        topics: [
+          'Real-Time Bidirectional WebSockets',
+          'WebRTC Video/Audio P2P Streaming',
+          'Turborepo Monorepo Architecture',
+          'State Management & Recoil'
+        ]
+      },
+      {
+        title: 'Module 4: Docker, CI/CD, System Design & Open Source',
+        description: 'Containerization, automated pipelines, system design, and open source PRs.',
+        topics: [
+          'Docker Containerization & Networking',
+          'Automated CI/CD Pipelines',
+          'System Design & Rate Limiting',
+          'Open Source Contribution Guidelines & PRs'
+        ]
       }
     ]
   },
@@ -649,19 +1078,34 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Web Development & Full Stack Microservices',
+        title: 'Module 1: Web Development & Microservice Backend',
         description: 'Next.js App Router, TypeScript, PostgreSQL, Prisma, serverless functions, and state management.',
-        topics: ['Next.js App Router & Server Components', 'Relational Schemas in PostgreSQL & Prisma', 'State Management & Custom Hooks', 'Serverless Architecture & Cloudflare Workers']
+        topics: [
+          'Next.js 15 App Router & Server Actions',
+          'Relational Schemas in PostgreSQL & Prisma',
+          'Serverless Architectures & Cloudflare Workers',
+          'Custom Middleware & Security Policies'
+        ]
       },
       {
-        title: 'Module 2: DevOps, Kubernetes, Kafka, Redis & Distributed Systems',
+        title: 'Module 2: DevOps, Kubernetes, Redis, Kafka & Distributed Systems',
         description: 'Scaling backend services, caching layers with Redis, message queues with Kafka, and Kubernetes management.',
-        topics: ['Redis Caching & Pub/Sub Queues', 'Kafka Message Streams & Consumer Groups', 'Kubernetes Deployment & Auto-scaling', 'Monitoring with Prometheus & Grafana']
+        topics: [
+          'Redis Caching, Pub/Sub & Rate Limiting',
+          'Kafka Message Queues & Event Streaming',
+          'Kubernetes Deployment, Auto-Scaling & Ingress',
+          'Prometheus & Grafana Monitoring'
+        ]
       },
       {
-        title: 'Module 3: Web3, Blockchain Architecture & Rust Systems Programming',
+        title: 'Module 3: Systems Programming in Rust & Web3 Blockchain',
         description: 'Rust programming fundamentals, Solana/Ethereum smart contracts, decentralized apps (dApps), and cryptography.',
-        topics: ['Rust Ownership, Borrowing & Lifetimes', 'Smart Contract Development (Anchor/Solana)', 'Decentralized Applications (dApps)', 'Web3 Security Auditing & Cryptography']
+        topics: [
+          'Rust Ownership, Borrowing, Lifetimes & Enums',
+          'Smart Contract Development on Solana/Anchor',
+          'Building Decentralized Apps (dApps)',
+          'Web3 Security Audits & Cryptography'
+        ]
       }
     ]
   },
@@ -689,19 +1133,34 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Data Structures & Problem Solving in C++',
+        title: 'Module 1: C++ DSA & Competitive Problem Solving',
         description: 'Arrays, Strings, Linked Lists, Trees, Graphs, DP, and Competitive Programming.',
-        topics: ['Sliding Window & Two Pointers', 'Recursion & Backtracking', 'Trees, Graphs BFS/DFS', 'Dynamic Programming Patterns']
+        topics: [
+          'Two Pointers & Sliding Window Patterns',
+          'Recursion & Backtracking Algorithms',
+          'Binary Trees, BST & Graph Traversals',
+          'Dynamic Programming & Memoization'
+        ]
       },
       {
-        title: 'Module 2: Full-Stack Web Dev & Blockchain Tech',
+        title: 'Module 2: Full-Stack Web Development & Blockchain',
         description: 'React, Node.js, Express, MongoDB, Web3, Ethereum & Smart Contracts.',
-        topics: ['Full-Stack MERN Architecture', 'REST APIs & JWT Auth', 'Solidity & Ethereum Smart Contracts', 'Web3.js & dApp Frontend Integration']
+        topics: [
+          'React & Node.js Microservices',
+          'REST API & JWT Authentication',
+          'Solidity Smart Contracts & Ethereum Virtual Machine',
+          'Web3.js & dApp Frontend Integration'
+        ]
       },
       {
-        title: 'Module 3: Low-Level (LLD) & High-Level System Design (HLD)',
+        title: 'Module 3: System Design (LLD & HLD) Architecture',
         description: 'Design patterns, OOP principles, DB sharding, caching, microservices & rate limiters.',
-        topics: ['SOLID Principles & LLD Design Patterns', 'Scalable Microservices Architecture', 'Database Sharding, Replication & Caching', 'Building Rate Limiters & Distributed Systems']
+        topics: [
+          'SOLID Design Principles & Design Patterns',
+          'Scalable Microservice Architecture',
+          'Database Sharding, Replication & Caching',
+          'Building Distributed Systems & Rate Limiters'
+        ]
       }
     ]
   },
@@ -729,19 +1188,34 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: C++ Fundamentals, STL & Linear Data Structures',
+        title: 'Module 1: C++ STL & Linear Data Structures',
         description: 'Pointers, memory management, STL containers, Arrays, Strings, Searching & Sorting.',
-        topics: ['C++ STL Vectors, Maps, Sets', 'Binary Search Variants', 'Two Pointers & Sliding Window', 'Linked List Construction & Tricks']
+        topics: [
+          'C++ STL Vectors, Maps, Sets & Iterators',
+          'Binary Search Variants & Matrix Operations',
+          'Two Pointers & Sliding Window Patterns',
+          'Linked List Construction & Inversion'
+        ]
       },
       {
-        title: 'Module 2: Stacks, Queues, Trees & Heap Data Structures',
+        title: 'Module 2: Stacks, Queues, Trees & Heaps',
         description: 'Stack-Queue algorithms, Binary Trees, BST, Heaps, and Priority Queues.',
-        topics: ['Infix/Postfix Stack Evaluation', 'Tree Traversals & Views', 'Heap Sort & Priority Queue', 'Tries & Prefix Trees']
+        topics: [
+          'Stack Evaluation & Monotonic Stack',
+          'Binary Tree Traversals, Views & LCA',
+          'Max/Min Heap Construction & Priority Queues',
+          'Tries & Prefix Tree Operations'
+        ]
       },
       {
         title: 'Module 3: Graphs, Backtracking & Dynamic Programming',
         description: 'Graph algorithms, shortest path, backtracking, and 1D/2D DP optimization.',
-        topics: ['BFS, DFS & Topological Sort', 'Dijkstra & Minimum Spanning Tree', 'N-Queens & Sudoku Backtracking', 'Tabulation & Memoization DP']
+        topics: [
+          'Graph BFS, DFS & Topological Sort',
+          'Dijkstra & Minimum Spanning Trees',
+          'N-Queens & Backtracking Problems',
+          '1D & 2D Dynamic Programming Patterns'
+        ]
       }
     ]
   },
@@ -769,19 +1243,34 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Advanced C++ Concepts & Basic to Intermediate DSA',
+        title: 'Module 1: Bit Manipulation, Recursion & Linear Structures',
         description: 'Complexity analysis, Bitwise operations, Recursion, Backtracking, and Linear Structures.',
-        topics: ['Bit Manipulation Tricks', 'Recursion Tree Analysis', 'Arrays, Strings & Matrix Problems', 'Stack & Queue Applications']
+        topics: [
+          'Bitwise Tricks & XOR Operations',
+          'Recursion Tree Analysis & Backtracking',
+          'Arrays, Strings & Matrix Rotations',
+          'Stack & Queue Applications'
+        ]
       },
       {
-        title: 'Module 2: Trees, Advanced Graphs & Dynamic Programming',
+        title: 'Module 2: Trees, Graph Algorithms & Advanced DP',
         description: 'LCA in Trees, Graph Algorithms, Tarjan/Bridges, and 2D/3D DP.',
-        topics: ['Lowest Common Ancestor (LCA)', 'Bridges & Articulation Points in Graphs', 'DP on Trees & Grids', 'Digit DP & Bitmask DP']
+        topics: [
+          'Lowest Common Ancestor (LCA) in Trees',
+          'Bridges & Articulation Points in Graphs',
+          'DP on Trees & Grids',
+          'Digit DP & Bitmask Dynamic Programming'
+        ]
       },
       {
         title: 'Module 3: Advanced Data Structures (Segment/Fenwick) & LLD',
         description: 'Range queries with Segment Trees, Fenwick Trees, String Algorithms, and LLD.',
-        topics: ['Segment Tree with Lazy Propagation', 'Fenwick Tree (Binary Indexed Tree)', 'KMP & Z-Algorithm for Strings', 'Low-Level System Design Patterns']
+        topics: [
+          'Segment Trees with Lazy Propagation',
+          'Fenwick Trees (Binary Indexed Tree)',
+          'KMP & Z-Algorithm for String Pattern Matching',
+          'Low-Level System Design (LLD) Patterns'
+        ]
       }
     ]
   },
@@ -809,19 +1298,34 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Low-Level Design (LLD) & Object-Oriented Design',
-        description: 'SOLID design principles, design patterns (Factory, Singleton, Observer, Strategy), and UML class diagrams.',
-        topics: ['SOLID Principles & Clean Code', 'Creational & Structural Design Patterns', 'Behavioral Patterns & State Machines', 'LLD Case Studies: Parking Lot & Elevator System']
+        title: 'Module 1: Low-Level Design (LLD) & Design Patterns',
+        description: 'SOLID design principles, design patterns, and UML class diagrams.',
+        topics: [
+          'SOLID Principles & Clean Code Standards',
+          'Creational, Structural & Behavioral Patterns',
+          'Class Diagrams & Object-Oriented Modeling',
+          'LLD Case Studies: Parking Lot & Elevator System'
+        ]
       },
       {
         title: 'Module 2: High-Level System Design (HLD) & Distributed Systems',
-        description: 'Scalability fundamentals, Load Balancing, Horizontal vs Vertical Scaling, CAP Theorem, and Consistent Hashing.',
-        topics: ['Horizontal vs Vertical Scaling & Load Balancers', 'CAP Theorem & PACELC Theorem', 'Consistent Hashing & Partitioning', 'Database Sharding, Replication & ACID vs BASE']
+        description: 'Scalability fundamentals, Load Balancing, CAP Theorem, and Consistent Hashing.',
+        topics: [
+          'Horizontal vs Vertical Scaling & Load Balancers',
+          'CAP & PACELC Theorems',
+          'Consistent Hashing & Data Partitioning',
+          'Database Sharding, Replication & CAP'
+        ]
       },
       {
-        title: 'Module 3: Caching, Messaging Queues & Production Architectures',
-        description: 'Redis caching strategies, Kafka/RabbitMQ message brokers, API Gateway design, and microservices.',
-        topics: ['Redis Cache-Aside, Write-Through & Write-Back', 'Kafka Event Streaming & Message Queues', 'Designing Distributed Rate Limiters', 'HLD Case Studies: WhatsApp, Uber & YouTube']
+        title: 'Module 3: Caching, Message Queues & System Architectures',
+        description: 'Redis caching strategies, Kafka message queues, and case studies.',
+        topics: [
+          'Redis Cache Strategies (Cache-Aside, Write-Through)',
+          'Kafka Event Streaming & Message Queues',
+          'Designing Distributed Rate Limiters',
+          'HLD Case Studies: WhatsApp, Uber & YouTube'
+        ]
       }
     ]
   },
@@ -851,17 +1355,32 @@ export const COURSES: CourseItem[] = [
       {
         title: 'Module 1: Node.js Runtime, Event Loop & Core Modules',
         description: 'Understanding V8 Engine, Non-blocking I/O, Event Loop phases, FS module, Streams, and Buffers.',
-        topics: ['Node.js Architecture & V8 Engine', 'Asynchronous Non-blocking I/O & Event Loop', 'File System (FS) & Event Emitters', 'Streams, Buffers & Pipeline Handling']
+        topics: [
+          'Node.js Architecture & V8 Engine',
+          'Asynchronous Non-blocking I/O & Event Loop',
+          'File System (FS) & Event Emitters',
+          'Streams, Buffers & Pipeline Handling'
+        ]
       },
       {
         title: 'Module 2: Express.js Framework & MongoDB Database',
         description: 'Routing, custom middleware, error handling, MongoDB connection, Mongoose validation, and CRUD operations.',
-        topics: ['Express Routing & Middleware Architecture', 'MongoDB Setup & Mongoose Schemas', 'Database Indexing & Aggregation Pipelines', 'Centralized Error Handling & Validation']
+        topics: [
+          'Express Routing & Middleware Pipelines',
+          'MongoDB Setup & Mongoose Schemas',
+          'Database Indexing & Aggregation Pipelines',
+          'Centralized Error Handling & Validation'
+        ]
       },
       {
         title: 'Module 3: Authentication, WebSockets & Capstone Backend Project',
         description: 'JWT Auth, bcrypt password hashing, Socket.io real-time chat, file uploads (Multer/Cloudinary), and production deployment.',
-        topics: ['JWT Authentication & Cookie Sessions', 'Real-Time Communication with WebSockets', 'File Uploads with Multer & Cloudinary', 'Full Capstone E-Commerce REST API Deployment']
+        topics: [
+          'JWT Authentication & Cookie Sessions',
+          'Real-Time Communication with WebSockets',
+          'File Uploads with Multer & Cloudinary',
+          'Full Capstone E-Commerce REST API Deployment'
+        ]
       }
     ]
   },
@@ -891,17 +1410,32 @@ export const COURSES: CourseItem[] = [
       {
         title: 'Module 1: Spring Boot Microservices & REST API Fundamentals',
         description: 'Building RESTful web services with Spring Boot, Spring Data JPA, H2/PostgreSQL databases, and Bean Validation.',
-        topics: ['Spring Boot Architecture & Auto-configuration', 'Spring Data JPA & Entity Relationships', 'REST API Design & Swagger/OpenAPI Specs', 'Exception Handling & Input Validation']
+        topics: [
+          'Spring Boot Architecture & Auto-configuration',
+          'Spring Data JPA & Entity Relationships',
+          'REST API Design & Swagger/OpenAPI Specs',
+          'Exception Handling & Input Validation'
+        ]
       },
       {
         title: 'Module 2: Spring Cloud Ecosystem & Microservice Patterns',
         description: 'Service discovery with Eureka, Centralized Config Server, Spring Cloud Gateway, Resilience4j, and Kafka messaging.',
-        topics: ['Eureka Service Registry & Discovery', 'Spring Cloud Gateway Routing & Security', 'Resilience4j Circuit Breaker & Rate Limiting', 'Event-Driven Microservices with Kafka']
+        topics: [
+          'Eureka Service Registry & Discovery',
+          'Spring Cloud Gateway Routing & Security',
+          'Resilience4j Circuit Breaker & Rate Limiting',
+          'Event-Driven Microservices with Kafka'
+        ]
       },
       {
         title: 'Module 3: Docker Containerization & Kubernetes Orchestration',
         description: 'Building OCI Docker images, Docker Compose multi-container environments, Kubernetes deployment, and ConfigMaps/Secrets.',
-        topics: ['Dockerizing Spring Boot Applications', 'Docker Compose Microservice Stacks', 'Kubernetes Deployments, Pods & Services', 'K8s ConfigMaps, Secrets & Helm Charts']
+        topics: [
+          'Dockerizing Spring Boot Applications',
+          'Docker Compose Microservice Stacks',
+          'Kubernetes Deployments, Pods & Services',
+          'K8s ConfigMaps, Secrets & Helm Charts'
+        ]
       }
     ]
   },
@@ -931,17 +1465,32 @@ export const COURSES: CourseItem[] = [
       {
         title: 'Module 1: Java Basics, Control Flow & OOP Fundamentals',
         description: 'JDK setup, JVM/JRE architecture, variables, loops, methods, classes, objects, and encapsulation.',
-        topics: ['JVM, JRE & JDK Architecture', 'Data Types & Control Flow Statements', 'Classes, Objects & Constructors', 'Encapsulation & Access Modifiers']
+        topics: [
+          'JVM, JRE & JDK Architecture',
+          'Data Types & Control Flow Statements',
+          'Classes, Objects & Constructors',
+          'Encapsulation & Access Modifiers'
+        ]
       },
       {
         title: 'Module 2: Advanced OOPs, Interfaces & Exception Handling',
         description: 'Inheritance, Polymorphism, Abstraction, Interfaces, Packages, and Custom Exception Handling.',
-        topics: ['Method Overloading & Overriding', 'Abstract Classes & Interfaces', 'Exception Handling with Try-Catch-Finally', 'Custom Exceptions & Packages']
+        topics: [
+          'Method Overloading & Overriding',
+          'Abstract Classes & Interfaces',
+          'Exception Handling with Try-Catch-Finally',
+          'Custom Exceptions & Packages'
+        ]
       },
       {
         title: 'Module 3: Java Collections Framework, Streams & Multithreading',
         description: 'ArrayList, LinkedList, HashMap, HashSet, Iterators, Lambda expressions, Streams API, and Threads.',
-        topics: ['ArrayList, HashSet & HashMap Mastery', 'Generics & Iterators', 'Java 8 Lambdas & Stream API', 'Multithreading & Concurrency Basics']
+        topics: [
+          'ArrayList, HashSet & HashMap Mastery',
+          'Generics & Iterators',
+          'Java 8 Lambdas & Stream API',
+          'Multithreading & Concurrency Basics'
+        ]
       }
     ]
   },
@@ -971,17 +1520,32 @@ export const COURSES: CourseItem[] = [
       {
         title: 'Module 1: MLOps Foundations, Data Versioning & MLflow',
         description: 'MLOps lifecycle, modular coding structure, DVC data versioning, MLflow experiment tracking, and model registry.',
-        topics: ['MLOps Lifecycle & Project Architecture', 'Data Version Control (DVC) Pipelines', 'MLflow Experiment Tracking & Logging', 'Model Packaging & Registry']
+        topics: [
+          'MLOps Lifecycle & Project Architecture',
+          'Data Version Control (DVC) Pipelines',
+          'MLflow Experiment Tracking & Logging',
+          'Model Packaging & Registry'
+        ]
       },
       {
         title: 'Module 2: Model Serving, Containerization & CI/CD',
         description: 'FastAPI model endpoints, Docker containerization, BentoML serving, and GitHub Actions CI/CD workflows.',
-        topics: ['FastAPI & Flask REST Endpoints for ML Models', 'Dockerizing ML Pipelines & Containers', 'BentoML & Triton Model Server', 'GitHub Actions CI/CD Automation']
+        topics: [
+          'FastAPI & Flask REST Endpoints for ML Models',
+          'Dockerizing ML Pipelines & Containers',
+          'BentoML & Triton Model Server',
+          'GitHub Actions CI/CD Automation'
+        ]
       },
       {
         title: 'Module 3: Cloud Deployment (AWS) & Model Monitoring',
         description: 'Deploying ML pipelines on AWS EC2/ECR/S3, monitoring data drift, Evidently AI, and 10+ Capstone Projects.',
-        topics: ['AWS EC2, S3 & ECR Deployment Pipelines', 'Data & Concept Drift Monitoring with Evidently AI', 'Prometheus & Grafana ML Dashboards', '10+ Industry Capstone ML Project Walkthroughs']
+        topics: [
+          'AWS EC2, S3 & ECR Deployment Pipelines',
+          'Data & Concept Drift Monitoring with Evidently AI',
+          'Prometheus & Grafana ML Dashboards',
+          '10+ Industry Capstone ML Project Walkthroughs'
+        ]
       }
     ]
   },
@@ -1011,17 +1575,32 @@ export const COURSES: CourseItem[] = [
       {
         title: 'Module 1: Foundations of Spoken English & Grammar',
         description: 'Tenses made simple, sentence structures, common grammar mistakes, daily usage vocabulary, and pronunciation.',
-        topics: ['Tenses & Practical Grammar Rules', 'Building Everyday English Vocabulary', 'Correct Pronunciation & Phonetics', 'Eliminating Hesitation & Fear of Speaking']
+        topics: [
+          'Tenses & Practical Grammar Rules',
+          'Building Everyday English Vocabulary',
+          'Correct Pronunciation & Phonetics',
+          'Eliminating Hesitation & Fear of Speaking'
+        ]
       },
       {
         title: 'Module 2: Fluency, Conversation & Accent Building',
         description: 'Real-life conversation scenarios (shopping, traveling, office), thought framing in English, and accent neutralization.',
-        topics: ['Framing Thoughts Directly in English', 'Real-Life Conversation Roleplays', 'Accent Neutralization & Voice Modulation', 'Listening Comprehension & Expressive Speaking']
+        topics: [
+          'Framing Thoughts Directly in English',
+          'Real-Life Conversation Roleplays',
+          'Accent Neutralization & Voice Modulation',
+          'Listening Comprehension & Expressive Speaking'
+        ]
       },
       {
         title: 'Module 3: Professional English, Interviews & Public Speaking',
         description: 'Job interview preparation, corporate presentation skills, email writing etiquettes, and public speaking confidence.',
-        topics: ['Job Interview Q&A Mastery', 'Corporate Email Writing & Business Etiquettes', 'Public Speaking & Presentation Skills', 'Group Discussion (GD) Strategies']
+        topics: [
+          'Job Interview Q&A Mastery',
+          'Corporate Email Writing & Business Etiquettes',
+          'Public Speaking & Presentation Skills',
+          'Group Discussion (GD) Strategies'
+        ]
       }
     ]
   },
@@ -1051,17 +1630,32 @@ export const COURSES: CourseItem[] = [
       {
         title: 'Module 1: Engine Mechanics, Scope, Closures & ES6+',
         description: 'Execution context, hoisting, lexical scope, closures, TDZ, arrow functions, and ES6+ features.',
-        topics: ['Execution Context & Call Stack', 'Hoisting, Let, Var & Const TDZ', 'Lexical Scope & Closure Patterns', 'ES6+ Destructuring, Rest/Spread & Modules']
+        topics: [
+          'Execution Context & Call Stack',
+          'Hoisting, Let, Var & Const TDZ',
+          'Lexical Scope & Closure Patterns',
+          'ES6+ Destructuring, Rest/Spread & Modules'
+        ]
       },
       {
         title: 'Module 2: Asynchronous JS, Promises & Event Loop Deep Dive',
         description: 'Callbacks, Promises, Async/Await, Microtask vs Macrotask Queue, and Event Loop.',
-        topics: ['Event Loop & Event Queue Mechanics', 'Promises Chaining & Error Handling', 'Async/Await & Try-Catch Best Practices', 'Building Custom Polyfills (Promise.all, Race)']
+        topics: [
+          'Event Loop & Event Queue Mechanics',
+          'Promises Chaining & Error Handling',
+          'Async/Await & Try-Catch Best Practices',
+          'Building Custom Polyfills (Promise.all, Race)'
+        ]
       },
       {
         title: 'Module 3: Prototypal Inheritance, DOM & Machine Coding Interviews',
         description: 'Prototypes, class syntax, DOM event delegation, debouncing, throttling, and machine coding problems.',
-        topics: ['Prototype Chain & Object Inheritance', 'DOM Event Delegation, Bubbling & Capturing', 'Debouncing, Throttling & Currying', 'Top 50 Machine Coding & Output Interview Questions']
+        topics: [
+          'Prototype Chain & Object Inheritance',
+          'DOM Event Delegation, Bubbling & Capturing',
+          'Debouncing, Throttling & Currying',
+          'Top 50 Machine Coding & Output Interview Questions'
+        ]
       }
     ]
   },
@@ -1091,85 +1685,116 @@ export const COURSES: CourseItem[] = [
       {
         title: 'Module 1: Python Built-in Data Structures & Algorithm Foundations',
         description: 'Time/space complexity, Python list/dict internals, collections module, and string/array tricks.',
-        topics: ['Big-O Notation & Memory Footprint in Python', 'Lists, Dicts, Sets & Collections (defaultdict, Counter)', 'String Manipulation & Regex Tricks', 'Heapq & Bisect Modules for Fast Searching']
+        topics: [
+          'Big-O Notation & Memory Footprint in Python',
+          'Lists, Dicts, Sets & Collections (defaultdict, Counter)',
+          'String Manipulation & Regex Tricks',
+          'Heapq & Bisect Modules for Fast Searching'
+        ]
       },
       {
         title: 'Module 2: Core Data Structures: Linked Lists, Trees & Graphs',
         description: 'Two-Pointers, Fast & Slow pointers, Recursion, Trees, Graphs, BFS/DFS in Python.',
-        topics: ['Two Pointers & Sliding Window Patterns', 'Linked Lists & Fast/Slow Pointer Pattern', 'Binary Trees, BST & Tree Traversals', 'Graph Adjacency Lists, BFS & DFS']
+        topics: [
+          'Two Pointers & Sliding Window Patterns',
+          'Linked Lists & Fast/Slow Pointer Pattern',
+          'Binary Trees, BST & Tree Traversals',
+          'Graph Adjacency Lists, BFS & DFS'
+        ]
       },
       {
-        title: 'Module 3: Advanced Algorithms, Dynamic Programming & Mock Prep',
-        description: 'Backtracking, Memoization, Tabulation, Dynamic Programming, and top Python interview problem sets.',
-        topics: ['Recursion & Backtracking (N-Queens, Subsets)', 'Dynamic Programming (1D & 2D Memoization)', 'Top 50 Python LeetCode Interview Questions', 'Behavioral & Technical Python Interview Strategies']
-      }
-    ]
-  },
-  {
-    id: 'master-microsoft-fabric-cicd',
-    title: 'Master MicroSoft Fabric: A Complete End-To-End Project- CICD',
-    tagline: 'Build Enterprise Data Pipelines with Microsoft Fabric, OneLake, Synapse, Power BI & CI/CD.',
-    category: 'Data Analytics',
-    price: 199,
-    linkType: 'telegram',
-    linkUrl: 'https://t.me/+dxrp3E4W-3dlMGU1',
-    bgGradient: 'from-blue-700 via-teal-700 to-slate-900',
-    accentColor: 'blue',
-    badgeBg: 'bg-blue-100 text-blue-800 border-blue-200',
-    icon: Database,
-    level: 'Intermediate to Advanced',
-    duration: '8 Weeks Batch',
-    description: 'Master Microsoft Fabric for modern enterprise data engineering! Build an end-to-end data platform project using OneLake, Synapse Data Factory, Data Engineering Lakehouses, Real-Time Analytics, Power BI DirectLake mode, and automated Git/CI/CD deployment pipelines. Unlock the official Telegram channel after payment to start learning.',
-    features: [
-      'End-to-End Enterprise Data Platform Project with Microsoft Fabric',
-      'OneLake Storage, Lakehouse & Synapse Pipelines Architecture',
-      'PySpark Data Engineering, Delta Lake & Real-Time Analytics',
-      'Automated Git Integration & Deployment Pipelines (CI/CD)',
-      'Exclusive Telegram Channel for Solution Architecture & Deployment Templates'
-    ],
-    modules: [
-      {
-        title: 'Module 1: Microsoft Fabric Architecture, OneLake & Lakehouse',
-        description: 'Fabric workspace setup, OneLake architecture, Lakehouse vs Warehouse, and Delta Parquet storage.',
-        topics: ['Microsoft Fabric Platform Architecture', 'OneLake Storage & Shortcutting Concept', 'Building Lakehouses & Data Warehouses', 'Delta Table Formats & Optimization']
-      },
-      {
-        title: 'Module 2: Data Engineering with PySpark & Data Factory Pipelines',
-        description: 'Ingesting data with Data Factory, PySpark transformations, Notebooks, and Dataflows Gen2.',
-        topics: ['Data Factory Pipelines & Copy Activities', 'PySpark Transformations in Fabric Notebooks', 'Dataflows Gen2 for ETL Ingestion', 'Real-Time Analytics with KQL Database']
-      },
-      {
-        title: 'Module 3: Power BI DirectLake, Git Integration & CI/CD Pipelines',
-        description: 'DirectLake reporting in Power BI, Fabric Git integration, deployment pipelines, and ALM.',
-        topics: ['Power BI DirectLake Reporting Mode', 'Fabric Git Integration with Azure DevOps/GitHub', 'Deployment Pipelines (Dev/Test/Prod)', 'End-to-End Capstone Project & CI/CD Automation']
+        title: 'Module 3: Backtracking, Dynamic Programming & Mock Interview Sets',
+        description: 'Recursion, 1D/2D DP, and top Python technical interview problems.',
+        topics: [
+          'Recursion & Backtracking (Subsets, Permutations)',
+          '1D & 2D Dynamic Programming in Python',
+          'Top 100 LeetCode Python Interview Problems',
+          'Mock Technical Interview Strategies'
+        ]
       }
     ]
   }
 ];
+void INLINE_COURSES;
 
-export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) => {
-  // Persistence for unlocked courses in localStorage
+export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNavigateTab }) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [activeCourseId, setActiveCourseId] = useState<string | null>(null);
+  
+  // Unlocked courses persistence state
   const [unlockedCourses, setUnlockedCourses] = useState<string[]>(() => {
     try {
-      const saved = localStorage.getItem('unlocked_coding_courses');
-      return saved ? JSON.parse(saved) : [];
+      const saved = localStorage.getItem('campus_os_unlocked_courses');
+      return saved ? JSON.parse(saved) : ['mern-webdev'];
     } catch {
-      return [];
+      return ['mern-webdev'];
     }
   });
 
-  const [activeCourseId, setActiveCourseId] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [payingForCourse, setPayingForCourse] = useState<CourseItem | null>(null);
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [paymentSuccessMessage, setPaymentSuccessMessage] = useState(false);
-
-  useEffect(() => {
+  // Completed syllabus topics state map (Key: `${courseId}::${topicName}`)
+  const [completedTopics, setCompletedTopics] = useState<Record<string, boolean>>(() => {
     try {
-      localStorage.setItem('unlocked_coding_courses', JSON.stringify(unlockedCourses));
-    } catch (e) {
-      console.warn('Failed to save unlocked courses to localStorage:', e);
+      const saved = localStorage.getItem('campus_os_completed_topics');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
     }
+  });
+
+  // Search filter query inside course syllabus detail view
+  const [syllabusSearchQuery, setSyllabusSearchQuery] = useState('');
+
+  // Accordion state for modules (open/close)
+  const [expandedModules, setExpandedModules] = useState<Record<number, boolean>>({
+    0: true,
+    1: true,
+    2: true,
+    3: true,
+    4: true
+  });
+
+  // Payment Modal State
+  const [payingForCourse, setPayingForCourse] = useState<CourseItem | null>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
+  const [paymentSuccessMessage, setPaymentSuccessMessage] = useState<boolean>(false);
+
+  // Sync unlocked courses & completed topics with Firestore on mount
+  useEffect(() => {
+    if (user && user.uid) {
+      FirestoreService.getUserCourseProgress(user.uid).then((progressMap) => {
+        if (progressMap && Object.keys(progressMap).length > 0) {
+          const unlockedFromDb: string[] = [];
+          const completedFromDb: Record<string, boolean> = { ...completedTopics };
+
+          Object.values(progressMap).forEach((pData: any) => {
+            if (pData.courseId) {
+              unlockedFromDb.push(pData.courseId);
+            }
+            if (pData.completedTopicIds && Array.isArray(pData.completedTopicIds)) {
+              pData.completedTopicIds.forEach((topicKey: string) => {
+                completedFromDb[topicKey] = true;
+              });
+            }
+          });
+
+          if (unlockedFromDb.length > 0) {
+            setUnlockedCourses((prev) => {
+              const combined = [...new Set([...prev, ...unlockedFromDb])];
+              localStorage.setItem('campus_os_unlocked_courses', JSON.stringify(combined));
+              return combined;
+            });
+          }
+
+          setCompletedTopics(completedFromDb);
+          localStorage.setItem('campus_os_completed_topics', JSON.stringify(completedFromDb));
+        }
+      }).catch(err => console.warn("Failed to load user course progress from Firestore:", err));
+    }
+  }, [user]);
+
+  // Save unlocked courses to localStorage
+  useEffect(() => {
+    localStorage.setItem('campus_os_unlocked_courses', JSON.stringify(unlockedCourses));
   }, [unlockedCourses]);
 
   const handleUnlockCourseClick = (course: CourseItem) => {
@@ -1208,6 +1833,74 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
     }, 1200);
   };
 
+  // Toggle individual topic checkbox completion
+  const handleToggleTopicCheckbox = (courseId: string, topicName: string) => {
+    const topicKey = `${courseId}::${topicName}`;
+    const nextValue = !completedTopics[topicKey];
+
+    const updated = {
+      ...completedTopics,
+      [topicKey]: nextValue
+    };
+
+    setCompletedTopics(updated);
+    localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
+
+    if (user && user.uid) {
+      const courseCompletedTopicIds = Object.keys(updated).filter(
+        k => k.startsWith(`${courseId}::`) && updated[k]
+      );
+
+      FirestoreService.saveUserCourseProgress(user.uid, courseId, {
+        completedTopicIds: courseCompletedTopicIds,
+        lastTopicUpdated: topicName,
+        updatedAt: new Date().toISOString()
+      }).catch(e => console.warn("Firestore progress sync warning:", e));
+    }
+  };
+
+  // Toggle all topics in a module (check all or uncheck all)
+  const handleToggleModuleTopics = (courseId: string, moduleTopics: string[], forceCheck: boolean) => {
+    const updated = { ...completedTopics };
+    moduleTopics.forEach((t) => {
+      const topicKey = `${courseId}::${t}`;
+      updated[topicKey] = forceCheck;
+    });
+
+    setCompletedTopics(updated);
+    localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
+
+    if (user && user.uid) {
+      const courseCompletedTopicIds = Object.keys(updated).filter(
+        k => k.startsWith(`${courseId}::`) && updated[k]
+      );
+
+      FirestoreService.saveUserCourseProgress(user.uid, courseId, {
+        completedTopicIds: courseCompletedTopicIds,
+        updatedAt: new Date().toISOString()
+      }).catch(e => console.warn("Firestore progress sync warning:", e));
+    }
+  };
+
+  // Calculate stats for a given course
+  const getCourseStats = (course: CourseItem) => {
+    let totalTopics = 0;
+    let completedCount = 0;
+
+    course.modules.forEach((mod) => {
+      mod.topics.forEach((t) => {
+        totalTopics++;
+        const key = `${course.id}::${t}`;
+        if (completedTopics[key]) {
+          completedCount++;
+        }
+      });
+    });
+
+    const percentage = totalTopics > 0 ? Math.round((completedCount / totalTopics) * 100) : 0;
+    return { totalTopics, completedCount, percentage };
+  };
+
   const activeCourse = COURSES.find((c) => c.id === activeCourseId);
 
   // Filter logic
@@ -1216,21 +1909,31 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
     : COURSES.filter(c => c.category === selectedCategory);
 
   // -------------------------------------------------------------
-  // DETAIL VIEW FOR UNLOCKED / PAID COURSE
+  // DETAIL VIEW FOR UNLOCKED / ACTIVE COURSE WITH SYLLABUS CHECKBOXES
   // -------------------------------------------------------------
   if (activeCourse) {
     const isDrive = activeCourse.linkType === 'drive';
+    const stats = getCourseStats(activeCourse);
 
     return (
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-300">
         {/* Back navigation */}
-        <button
-          onClick={() => setActiveCourseId(null)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to All Courses</span>
-        </button>
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setActiveCourseId(null)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to All Courses</span>
+          </button>
+
+          <div className="text-xs font-bold text-slate-500 flex items-center gap-2">
+            <span>Syllabus Progress:</span>
+            <span className="font-black text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200">
+              {stats.completedCount} / {stats.totalTopics} Topics ({stats.percentage}%)
+            </span>
+          </div>
+        </div>
 
         {/* Hero banner for Course detail */}
         <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${activeCourse.bgGradient} p-6 sm:p-10 text-white shadow-xl`}>
@@ -1254,6 +1957,20 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
               {activeCourse.description}
             </p>
 
+            {/* Syllabus Overall Progress Bar */}
+            <div className="pt-2 max-w-xl space-y-2">
+              <div className="flex justify-between items-center text-xs text-white/90 font-extrabold">
+                <span>Course Syllabus Progress</span>
+                <span>{stats.completedCount} of {stats.totalTopics} Topics Completed ({stats.percentage}%)</span>
+              </div>
+              <div className="w-full bg-white/20 rounded-full h-3 p-0.5 overflow-hidden backdrop-blur-md">
+                <div 
+                  className="bg-gradient-to-r from-emerald-400 to-teal-300 h-full rounded-full transition-all duration-500 shadow-sm"
+                  style={{ width: `${stats.percentage}%` }}
+                />
+              </div>
+            </div>
+
             <div className="pt-2 flex flex-wrap items-center gap-6 text-xs text-white/90 font-bold">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4" />
@@ -1276,15 +1993,15 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-6">
             <div className="space-y-2 max-w-2xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-black uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Enrollment Confirmed
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Official Resource Access
               </div>
               <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-2">
-                start learning
+                Start Learning & Stream Lectures
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
                 {isDrive 
-                  ? 'You have successfully unlocked this course! Access the official Google Drive folder below to stream video lectures, download Jupyter notebooks, and access complete datasets.'
-                  : 'You have successfully unlocked this course! Join the official Telegram channel below to access live lecture streams, study materials, project code repositories, and batch announcements.'}
+                  ? 'Access the official Google Drive repository below to stream video lectures, download Jupyter notebooks, and access complete datasets.'
+                  : 'Join the official Telegram channel below to access live lecture streams, study materials, project code repositories, and batch announcements.'}
               </p>
             </div>
 
@@ -1301,7 +2018,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
                 } text-white font-black text-sm sm:text-base shadow-xl transition-all transform hover:scale-[1.03] cursor-pointer`}
               >
                 {isDrive ? <Folder className="w-5 h-5 text-white" /> : <Send className="w-5 h-5 text-white" />}
-                <span>{isDrive ? 'Open Google Drive Folder & Start Learning' : 'Join Telegram Channel & Start Learning'}</span>
+                <span>{isDrive ? 'Open Google Drive Folder' : 'Join Telegram Channel'}</span>
                 <ExternalLink className="w-4 h-4 text-white/80" />
               </a>
             </div>
@@ -1314,12 +2031,12 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
                 <span>{isDrive ? 'Google Drive Access' : 'Telegram Community'}</span>
               </div>
               <p className="text-slate-400">
-                {isDrive ? 'Instant access to all structured course folders & datasets.' : 'Direct access to mentors and doubt solving with batchmates.'}
+                {isDrive ? 'Instant access to structured video folders & datasets.' : 'Direct access to mentors and doubt solving with batchmates.'}
               </p>
             </div>
             <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
               <div className="font-extrabold text-white flex items-center gap-1.5">
-                <Video className="w-4 h-4 text-purple-400" /> Live & Video Lectures
+                <Video className="w-4 h-4 text-purple-400" /> High Quality Video Classes
               </div>
               <p className="text-slate-400">Stream high-definition class recordings and live sessions anytime.</p>
             </div>
@@ -1332,51 +2049,173 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
           </div>
         </div>
 
-        {/* Detailed Course Syllabus Roadmap */}
+        {/* DETAILED INTERACTIVE SYLLABUS & CHECKBOX ROADMAP */}
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-          <div className="border-b border-slate-100 pb-4">
-            <h3 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <Layers className="w-5 h-5 text-purple-600" /> Detailed Course Roadmap & Curriculum
-            </h3>
-            <p className="text-xs text-slate-500 font-medium mt-1">
-              Structured step-by-step breakdown of modules covered in this cohort
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {activeCourse.modules.map((mod, idx) => (
-              <div key={idx} className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-xl bg-purple-100 text-purple-700 font-black text-xs flex items-center justify-center shrink-0">
-                    0{idx + 1}
-                  </div>
-                  <div>
-                    <h4 className="font-black text-slate-900 text-sm">{mod.title}</h4>
-                    <p className="text-xs text-slate-500 font-medium mt-0.5">{mod.description}</p>
-                  </div>
-                </div>
-
-                <div className="pl-10 space-y-1.5">
-                  {mod.topics.map((t, tidx) => (
-                    <div key={tidx} className="text-xs font-semibold text-slate-700 flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                      <span>{t}</span>
-                    </div>
-                  ))}
-                </div>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-black uppercase tracking-wider mb-2">
+                <CheckSquare className="w-3.5 h-3.5" /> Interactive Syllabus Tracker
               </div>
-            ))}
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                Complete Course Syllabus & Topic Tracker
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                Mark off topics as you finish studying them. Your progress automatically syncs with Firebase!
+              </p>
+            </div>
+
+            {/* Syllabus Search Filter */}
+            <div className="relative shrink-0 max-w-xs w-full">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <input
+                type="text"
+                placeholder="Search syllabus topics..."
+                value={syllabusSearchQuery}
+                onChange={(e) => setSyllabusSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white"
+              />
+            </div>
           </div>
 
-          {/* Bottom CTA again for convenience */}
-          <div className="pt-4 flex justify-center">
+          {/* Module-by-Module Accordion with Checkboxes */}
+          <div className="space-y-6">
+            {activeCourse.modules.map((mod, mIdx) => {
+              // Filter topics by query if applicable
+              const filteredTopics = syllabusSearchQuery
+                ? mod.topics.filter(t => t.toLowerCase().includes(syllabusSearchQuery.toLowerCase()))
+                : mod.topics;
+
+              if (syllabusSearchQuery && filteredTopics.length === 0) {
+                return null;
+              }
+
+              // Count completed topics in this module
+              const completedInModule = mod.topics.filter(t => completedTopics[`${activeCourse.id}::${t}`]).length;
+              const isModuleAllCompleted = completedInModule === mod.topics.length && mod.topics.length > 0;
+              const isExpanded = expandedModules[mIdx] !== false;
+
+              return (
+                <div 
+                  key={mIdx} 
+                  className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                    isModuleAllCompleted 
+                      ? 'bg-emerald-50/40 border-emerald-200' 
+                      : 'bg-white border-slate-200 shadow-xs'
+                  }`}
+                >
+                  {/* Module Header */}
+                  <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/70">
+                    <div 
+                      onClick={() => setExpandedModules(prev => ({ ...prev, [mIdx]: !isExpanded }))}
+                      className="flex items-start gap-3 cursor-pointer select-none flex-1"
+                    >
+                      <div className={`w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center shrink-0 ${
+                        isModuleAllCompleted 
+                          ? 'bg-emerald-600 text-white' 
+                          : 'bg-purple-100 text-purple-700'
+                      }`}>
+                        {isModuleAllCompleted ? <CheckCircle2 className="w-5 h-5" /> : `0${mIdx + 1}`}
+                      </div>
+                      <div>
+                        <h4 className="font-black text-slate-900 text-base flex items-center gap-2">
+                          {mod.title}
+                        </h4>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">{mod.description}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                      <span className={`text-xs font-black px-3 py-1 rounded-full border ${
+                        isModuleAllCompleted
+                          ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                          : 'bg-purple-50 text-purple-700 border-purple-200'
+                      }`}>
+                        {completedInModule} / {mod.topics.length} Done
+                      </span>
+
+                      {/* Toggle All Topics Button */}
+                      <button
+                        onClick={() => handleToggleModuleTopics(activeCourse.id, mod.topics, !isModuleAllCompleted)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                          isModuleAllCompleted
+                            ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                            : 'bg-purple-600 hover:bg-purple-700 text-white'
+                        }`}
+                      >
+                        {isModuleAllCompleted ? 'Uncheck Module' : 'Mark Module Complete'}
+                      </button>
+
+                      <button
+                        onClick={() => setExpandedModules(prev => ({ ...prev, [mIdx]: !isExpanded }))}
+                        className="p-1 rounded-lg hover:bg-slate-200/80 text-slate-500"
+                      >
+                        {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Module Topics Checkbox List */}
+                  {isExpanded && (
+                    <div className="p-5 space-y-3 bg-white">
+                      {filteredTopics.map((topic, tIdx) => {
+                        const topicKey = `${activeCourse.id}::${topic}`;
+                        const isChecked = !!completedTopics[topicKey];
+
+                        return (
+                          <div
+                            key={tIdx}
+                            onClick={() => handleToggleTopicCheckbox(activeCourse.id, topic)}
+                            className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-4 group ${
+                              isChecked
+                                ? 'bg-emerald-50/70 border-emerald-300 text-slate-900'
+                                : 'bg-slate-50/50 hover:bg-purple-50/50 border-slate-200/80 hover:border-purple-200 text-slate-800'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3.5">
+                              <div className="shrink-0 transition-transform group-hover:scale-110">
+                                {isChecked ? (
+                                  <CheckSquare className="w-5 h-5 text-emerald-600" />
+                                ) : (
+                                  <Square className="w-5 h-5 text-slate-400 group-hover:text-purple-600" />
+                                )}
+                              </div>
+
+                              <span className={`text-xs sm:text-sm font-bold transition-all ${
+                                isChecked ? 'line-through text-slate-500 font-semibold' : 'text-slate-800'
+                              }`}>
+                                {topic}
+                              </span>
+                            </div>
+
+                            {isChecked && (
+                              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full shrink-0 flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" /> Completed
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Bottom CTA & Progress Summary */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">
+            <div className="text-xs text-slate-500 font-bold flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-purple-600" />
+              <span>Overall Course Completion: {stats.completedCount} of {stats.totalTopics} Topics ({stats.percentage}%)</span>
+            </div>
+
             <a
               href={activeCourse.linkUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl ${
+              className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl ${
                 isDrive ? 'bg-amber-600 hover:bg-amber-700' : 'bg-purple-600 hover:bg-purple-700'
-              } text-white font-extrabold text-sm shadow-md transition-colors`}
+              } text-white font-extrabold text-xs shadow-md transition-colors cursor-pointer`}
             >
               {isDrive ? <Folder className="w-4 h-4" /> : <Send className="w-4 h-4" />}
               <span>{isDrive ? 'Open Google Drive Course Folder' : 'Go to Course Telegram Channel'}</span>
@@ -1389,7 +2228,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
   }
 
   // -------------------------------------------------------------
-  // MAIN COURSES DIRECTORY LIST
+  // MAIN COURSES DIRECTORY LIST (ALL COURSES)
   // -------------------------------------------------------------
   const categories = ['All', 'Web Development', 'Data Structures & Algorithms', 'AI & Machine Learning', 'Data Analytics', 'Cyber Security', 'App Development', 'DevOps', 'System Design', 'Soft Skills & Communication'];
 
@@ -1401,13 +2240,13 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
         <div className="absolute -right-10 -bottom-10 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-black uppercase tracking-wider">
-            <Sparkles className="w-4 h-4 text-amber-300" /> Exclusive Interactive Coding Courses
+            <Sparkles className="w-4 h-4 text-amber-300" /> Interactive Coding Courses & Detailed Syllabi
           </div>
           <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Level Up Your Code & Unlock Placements
+            Level Up Your Code & Track Your Syllabus Progress
           </h1>
           <p className="text-sm sm:text-base text-slate-300 font-medium leading-relaxed">
-            Enroll in top-rated structured courses designed by industry experts. Get instant access to full syllabus materials, interactive problem sets, and our official Telegram / Google Drive resources for ₹399 each.
+            Enroll in top-rated structured courses designed by industry experts. Track your topic completion with live interactive checkboxes, access complete syllabus roadmaps, and join official Telegram / Google Drive resources for ₹399 each.
           </p>
         </div>
       </div>
@@ -1438,6 +2277,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
           const isUnlocked = unlockedCourses.includes(course.id);
           const IconComp = course.icon;
           const isDrive = course.linkType === 'drive';
+          const stats = getCourseStats(course);
 
           return (
             <div
@@ -1489,6 +2329,22 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
                     </span>
                   </div>
 
+                  {/* Syllabus Progress Bar on Card if Topics exist */}
+                  <div className="p-3 rounded-2xl bg-purple-50/60 border border-purple-100 space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px] font-black text-slate-700">
+                      <span className="flex items-center gap-1">
+                        <CheckSquare className="w-3.5 h-3.5 text-purple-600" /> Syllabus Progress
+                      </span>
+                      <span className="text-purple-700">{stats.completedCount}/{stats.totalTopics} Topics ({stats.percentage}%)</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                      <div 
+                        className="bg-purple-600 h-full rounded-full transition-all duration-300"
+                        style={{ width: `${stats.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+
                   {/* Highlights list */}
                   <div className="space-y-2">
                     <div className="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider">
@@ -1511,7 +2367,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
                       className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-colors"
                     >
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>{isDrive ? 'Access Course & Drive' : 'Access Course & Telegram'}</span>
+                      <span>{isDrive ? 'Open Syllabus & Drive' : 'Open Syllabus & Telegram'}</span>
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   ) : (
@@ -1539,11 +2395,11 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
           </div>
           <div>
             <h4 className="font-extrabold text-slate-900 text-base">Instant Course Access & Dedicated Learning Support</h4>
-            <p className="text-xs text-slate-500 font-medium">Pay once to unlock lifetime access to course content and the official Telegram / Google Drive resources.</p>
+            <p className="text-xs text-slate-500 font-medium">Pay once to unlock lifetime access to course content, interactive syllabus progress tracking, and official Telegram / Google Drive resources.</p>
           </div>
         </div>
         <div className="flex items-center gap-3 shrink-0 text-xs font-bold text-slate-500">
-          <div className="flex items-center gap-1"><BookOpen className="w-4 h-4 text-purple-600" /> Full Curriculum</div>
+          <div className="flex items-center gap-1"><BookOpen className="w-4 h-4 text-purple-600" /> Complete Syllabi</div>
           <span>•</span>
           <div className="flex items-center gap-1"><Send className="w-4 h-4 text-sky-500" /> Telegram & Drive Access</div>
         </div>
@@ -1574,7 +2430,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user }) =>
             <div className="p-4 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-between">
               <div>
                 <div className="text-xs text-purple-700 font-bold">Total Course Fee</div>
-                <div className="text-xs text-purple-500">Includes {payingForCourse.linkType === 'drive' ? 'Google Drive' : 'Telegram channel'} access & roadmap</div>
+                <div className="text-xs text-purple-500">Includes {payingForCourse.linkType === 'drive' ? 'Google Drive' : 'Telegram channel'} access & interactive syllabus</div>
               </div>
               <div className="text-2xl font-black text-purple-900">₹{payingForCourse.price}</div>
             </div>

@@ -21,7 +21,10 @@ if (typeof window !== 'undefined') {
   });
 }
 
-const db: Firestore = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
+const dbId = (firebaseConfig as any)?.firestoreDatabaseId;
+const db: Firestore = (dbId && dbId !== '(default)' && dbId !== '') 
+  ? getFirestore(app, dbId) 
+  : getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 let analytics: Analytics | null = null;

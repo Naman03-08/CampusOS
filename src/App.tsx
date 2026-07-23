@@ -22,7 +22,6 @@ import { StudyHubView } from './components/studyhub/StudyHubView';
 import { AIChatView } from './components/chat/AIChatView';
 import { AssignmentSolverView } from './components/assignment/AssignmentSolverView';
 import { AttendanceView } from './components/attendance/AttendanceView';
-import { CalendarView } from './components/calendar/CalendarView';
 import { CodingHubView } from './components/coding/CodingHubView';
 import { CodingCoursesView } from './components/courses/CodingCoursesView';
 import { PlacementHubView } from './components/placement/PlacementHubView';
@@ -56,7 +55,7 @@ export function App() {
   const [upgradeFeatureName, setUpgradeFeatureName] = useState<string>('this feature');
   const [pendingTabAfterTrial, setPendingTabAfterTrial] = useState<string | null>(null);
 
-  const gatedTabs = ['studyhub', 'resumebuilder', 'chat', 'assignment', 'attendance', 'calendar', 'coding', 'courses', 'placement'];
+  const gatedTabs = ['studyhub', 'resumebuilder', 'chat', 'assignment', 'attendance', 'coding', 'courses', 'placement'];
 
   const getTabDisplayName = (tabId: string) => {
     switch (tabId) {
@@ -65,7 +64,6 @@ export function App() {
       case 'assignment':
         return 'AI Study, Chat & Assignment Solver';
       case 'attendance': return 'Attendance Manager & Calculator';
-      case 'calendar': return 'Smart Calendar & Timetable';
       case 'coding': return 'Coding Hub & 375 DSA Roadmap Sheet';
       case 'courses': return 'Interactive Coding Courses & Academies';
       case 'placement': return 'Placement Hub & AI Mock Interviews';
@@ -502,14 +500,6 @@ export function App() {
                 <AttendanceView
                   attendance={attendance}
                   onUpdateAttendance={handleUpdateAttendance}
-                />
-              )}
-
-              {activeTab === 'calendar' && (
-                <CalendarView
-                  schedule={schedule}
-                  onAddEvent={handleAddEvent}
-                  onDeleteEvent={handleDeleteEvent}
                 />
               )}
 

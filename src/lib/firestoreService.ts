@@ -38,12 +38,52 @@ export interface UserFullData {
   schedule: ScheduleEvent[];
 }
 
+export function sanitizeForFirestore<T>(data: T): T {
+  if (data === null || data === undefined) {
+    return null as any;
+  }
+  if (typeof data === 'function' || typeof data === 'symbol') {
+    return undefined as any;
+  }
+  if (typeof data !== 'object') {
+    return data;
+  }
+  if (Array.isArray(data)) {
+    return data
+      .map(item => sanitizeForFirestore(item))
+      .filter(item => item !== undefined) as any;
+  }
+  const cleanObj: Record<string, any> = {};
+  for (const key of Object.keys(data)) {
+    const value = (data as any)[key];
+    if (
+      value === undefined ||
+      typeof value === 'function' ||
+      typeof value === 'symbol'
+    ) {
+      continue;
+    }
+    if (typeof value === 'object' && value !== null) {
+      if ((value as any).$$typeof) {
+        continue;
+      }
+      const cleaned = sanitizeForFirestore(value);
+      if (cleaned !== undefined) {
+        cleanObj[key] = cleaned;
+      }
+    } else {
+      cleanObj[key] = value;
+    }
+  }
+  return cleanObj as T;
+}
+
 export class FirestoreService {
   // User Profile
   static async saveProfile(profile: UserProfile): Promise<void> {
     if (!db || !profile.uid) return;
     try {
-      await setDoc(doc(db, 'users', profile.uid), profile, { merge: true });
+      await setDoc(doc(db, 'users', profile.uid), sanitizeForFirestore(profile), { merge: true });
     } catch (e) {
       console.warn("Firestore saveProfile error:", e);
     }
@@ -149,7 +189,7 @@ export class FirestoreService {
   static async saveStudySuite(uid: string, suite: StudySuite): Promise<void> {
     if (!db || !uid) return;
     try {
-      await setDoc(doc(db, 'studySuites', suite.id), { ...suite, userId: uid }, { merge: true });
+      await setDoc(doc(db, 'studySuites', suite.id), sanitizeForFirestore({ ...suite, userId: uid }), { merge: true });
     } catch (e) {
       console.warn("Firestore saveStudySuite error:", e);
     }
@@ -182,7 +222,7 @@ export class FirestoreService {
   static async saveAssignment(uid: string, assignment: AssignmentItem): Promise<void> {
     if (!db || !uid) return;
     try {
-      await setDoc(doc(db, 'assignments', assignment.id), { ...assignment, userId: uid }, { merge: true });
+      await setDoc(doc(db, 'assignments', assignment.id), sanitizeForFirestore({ ...assignment, userId: uid }), { merge: true });
     } catch (e) {
       console.warn("Firestore saveAssignment error:", e);
     }
@@ -207,7 +247,7 @@ export class FirestoreService {
     if (!db || !uid) return;
     try {
       for (const item of list) {
-        await setDoc(doc(db, 'attendance', item.id), { ...item, userId: uid }, { merge: true });
+        await setDoc(doc(db, 'attendance', item.id), sanitizeForFirestore({ ...item, userId: uid }), { merge: true });
       }
     } catch (e) {
       console.warn("Firestore saveAttendance error:", e);
@@ -233,7 +273,7 @@ export class FirestoreService {
     if (!db || !uid) return;
     try {
       for (const item of list) {
-        await setDoc(doc(db, 'schedules', item.id), { ...item, userId: uid }, { merge: true });
+        await setDoc(doc(db, 'schedules', item.id), sanitizeForFirestore({ ...item, userId: uid }), { merge: true });
       }
     } catch (e) {
       console.warn("Firestore saveSchedule error:", e);
@@ -259,7 +299,7 @@ export class FirestoreService {
     if (!db || !uid) return;
     try {
       for (const item of list) {
-        await setDoc(doc(db, 'dsaProblems', item.id), { ...item, userId: uid }, { merge: true });
+        await setDoc(doc(db, 'dsaProblems', item.id), sanitizeForFirestore({ ...item, userId: uid }), { merge: true });
       }
     } catch (e) {
       console.warn("Firestore saveDSA error:", e);
@@ -284,7 +324,7 @@ export class FirestoreService {
   static async saveResume(uid: string, resume: ResumeData): Promise<void> {
     if (!db || !uid) return;
     try {
-      await setDoc(doc(db, 'resumes', resume.id || 'res-' + uid), { ...resume, userId: uid }, { merge: true });
+      await setDoc(doc(db, 'resumes', resume.id || 'res-' + uid), sanitizeForFirestore({ ...resume, userId: uid }), { merge: true });
     } catch (e) {
       console.warn("Firestore saveResume error:", e);
     }
@@ -308,7 +348,7 @@ export class FirestoreService {
   static async saveMockInterview(uid: string, result: MockInterviewResult): Promise<void> {
     if (!db || !uid) return;
     try {
-      await setDoc(doc(db, 'mockInterviews', result.id), { ...result, userId: uid }, { merge: true });
+      await setDoc(doc(db, 'mockInterviews', result.id), sanitizeForFirestore({ ...result, userId: uid }), { merge: true });
     } catch (e) {
       console.warn("Firestore saveMockInterview error:", e);
     }
@@ -340,7 +380,8 @@ export class FirestoreService {
     try {
       for (const course of coursesList) {
         if (!course.id) continue;
-        await setDoc(doc(db, 'codingCourses', course.id), course, { merge: true });
+        const sanitized = sanitizeForFirestore(course);
+        await setDoc(doc(db, 'codingCourses', course.id), sanitized, { merge: true });
       }
       console.log(`Successfully synced ${coursesList.length} coding courses to Firebase Firestore.`);
     } catch (e) {
@@ -371,13 +412,13 @@ export class FirestoreService {
     if (!db || !uid || !courseId) return;
     try {
       const docId = `${uid}_${courseId}`;
-      const payload = {
+      const payload = sanitizeForFirestore({
         id: docId,
         userId: uid,
         courseId,
         ...progressData,
         updatedAt: new Date().toISOString()
-      };
+      });
       await setDoc(doc(db, 'userCourseProgress', docId), payload, { merge: true });
     } catch (e) {
       console.warn("Firestore saveUserCourseProgress error:", e);

@@ -33,10 +33,10 @@ export const FeaturesGrid: React.FC = () => {
       desc: 'Smart timetable tracking with target percentage calculator. Tells you exactly how many classes you can skip or MUST attend.',
     },
     {
-      icon: Calendar,
+      icon: Zap,
       color: 'from-amber-500 to-orange-600',
-      title: 'Smart AI Calendar',
-      desc: 'Auto-schedules your daily study sessions, assignment deadlines, and exam revision based on difficulty and time remaining.',
+      title: 'Interactive Courses & Academies',
+      desc: 'Master full-stack MERN, Java DSA, AI/ML, and System Design with guided interactive modules, live code runners, and capstones.',
     },
     {
       icon: Code2,
