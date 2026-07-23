@@ -3014,45 +3014,147 @@ export const COURSES: CourseItem[] = [
     ],
     modules: [
       {
-        title: 'Module 1: Bit Manipulation, Recursion & Linear Structures',
-        description: 'Bitwise operations, XOR tricks, recursion trees, backtracking, matrix rotations, and Monotonic Stacks.',
+        title: 'Phase 1: Programming Fundamentals',
+        description: 'Flowcharts, Pseudocode, Time & Space Complexity, C++ Basics, Variables, Operators, Input/Output, Conditionals, Loops, Functions, Arrays, Strings, Character Arrays, Vectors, Pointers, References, and Memory Management.',
         topics: [
-          'Bitwise Operations, XOR Tricks & Bit Masking',
-          'Time & Space Complexity Proofs',
-          'Recursion Tree Analysis & Call Stack Visualization',
-          'Backtracking Combinatorial Search',
-          'Array Rotations, Kadane Algorithm & Subarray Patterns',
-          'Matrix Manipulations & Spiral Search',
-          'Monotonic Stack & Monotonic Queue Applications',
-          'Hard Linked List In-Place Reversals'
+          'Flowcharts',
+          'Pseudocode',
+          'Time & Space Complexity',
+          'C++ Basics',
+          'Variables & Data Types',
+          'Operators',
+          'Input/Output',
+          'Conditional Statements',
+          'Loops',
+          'Functions',
+          'Arrays',
+          'Strings',
+          'Character Arrays',
+          'Vectors',
+          'Pointers',
+          'References',
+          'Memory Management'
         ]
       },
       {
-        title: 'Module 2: Trees, Graph Algorithms & Advanced DP',
-        description: 'LCA, BST balancing, Topological sort, Tarjan bridges, DSU, Tree DP, Digit DP, and Bitmask DP.',
+        title: 'Phase 2: Recursion & Basic Algorithms',
+        description: 'Recursion, Backtracking, Binary Search, Searching Techniques, Sorting Algorithms (Bubble, Selection, Insertion, Merge, Quick Sort), Divide & Conquer, Bit Manipulation, and Mathematics for DSA.',
         topics: [
-          'Binary Tree Diameter, LCA & Path Sum Problems',
-          'BST Balancing & Range Queries',
-          'Graph Topological Sort (Kahn Algorithm & DFS)',
-          'Bridges & Articulation Points in Graphs (Tarjan)',
-          'Disjoint Set Union (DSU) with Path Compression',
-          'DP on Trees & Re-rooting DP',
-          'Digit DP & Bitmask Dynamic Programming',
-          'Matrix Chain Multiplication & DP on Grids'
+          'Recursion',
+          'Backtracking',
+          'Binary Search',
+          'Searching Techniques',
+          'Sorting Algorithms',
+          'Bubble Sort',
+          'Selection Sort',
+          'Insertion Sort',
+          'Merge Sort',
+          'Quick Sort',
+          'Divide & Conquer',
+          'Bit Manipulation',
+          'Mathematics for DSA'
         ]
       },
       {
-        title: 'Module 3: Advanced Data Structures (Segment/Fenwick) & LLD',
-        description: 'Segment Trees, Lazy Propagation, Fenwick Trees, KMP string matching, and Low-Level Design (LLD).',
+        title: 'Phase 3: Linear Data Structures',
+        description: 'Advanced Arrays, 2D Arrays, Advanced Strings, Linked Lists (Singly, Doubly, Circular), Stack, Queue, Deque, and C++ Standard Template Library (STL).',
         topics: [
-          'Segment Tree Construction & Range Queries',
-          'Segment Tree Lazy Propagation for Range Updates',
-          'Fenwick Tree (Binary Indexed Tree) Operations',
-          'String Pattern Matching: KMP Algorithm',
-          'Z-Algorithm & Rabin-Karp Hash Matching',
-          'Object-Oriented Design Principles (SOLID)',
-          'Low-Level Design (LLD) Patterns',
-          'Top 300 LeetCode Medium/Hard Questions Solved'
+          'Arrays (Advanced)',
+          '2D Arrays',
+          'Strings (Advanced)',
+          'Linked List',
+          'Singly Linked List',
+          'Doubly Linked List',
+          'Circular Linked List',
+          'Stack',
+          'Queue',
+          'Deque',
+          'STL (Standard Template Library)'
+        ]
+      },
+      {
+        title: 'Phase 4: Trees',
+        description: 'Binary Tree, Tree Traversals, Binary Search Tree (BST), AVL Tree (Basics), Heap, Priority Queue, Trie, Segment Tree, and Fenwick Tree (BIT).',
+        topics: [
+          'Binary Tree',
+          'Tree Traversals',
+          'Binary Search Tree',
+          'AVL Tree (Basics)',
+          'Heap',
+          'Priority Queue',
+          'Trie',
+          'Segment Tree',
+          'Fenwick Tree (BIT)'
+        ]
+      },
+      {
+        title: 'Phase 5: Hashing & Graphs',
+        description: 'Hash Maps, Hash Tables, Collision Handling, Graph Representation, BFS, DFS, Topological Sort, Shortest Path Algorithms (Dijkstra, Bellman-Ford, Floyd Warshall), Minimum Spanning Tree (Prim\'s, Kruskal\'s), and Disjoint Set Union (Union Find).',
+        topics: [
+          'Hash Maps',
+          'Hash Tables',
+          'Collision Handling',
+          'Graph Representation',
+          'BFS',
+          'DFS',
+          'Topological Sort',
+          'Shortest Path',
+          'Dijkstra',
+          'Bellman-Ford',
+          'Floyd Warshall',
+          'Minimum Spanning Tree',
+          'Prim\'s Algorithm',
+          'Kruskal\'s Algorithm',
+          'Disjoint Set Union (Union Find)'
+        ]
+      },
+      {
+        title: 'Phase 6: Advanced Algorithms',
+        description: 'Greedy Algorithms, Sliding Window, Two Pointers, Prefix Sum, Binary Search on Answer, Meet in the Middle, Monotonic Stack, and Monotonic Queue.',
+        topics: [
+          'Greedy Algorithms',
+          'Sliding Window',
+          'Two Pointers',
+          'Prefix Sum',
+          'Binary Search on Answer',
+          'Meet in the Middle',
+          'Monotonic Stack',
+          'Monotonic Queue'
+        ]
+      },
+      {
+        title: 'Phase 7: Dynamic Programming',
+        description: 'DP Basics, Memoization, Tabulation, Space Optimization, 1D DP, 2D DP, Knapsack, LIS, LCS, Matrix Chain Multiplication, Partition DP, Digit DP (Basics), Tree DP, and Bitmask DP (Introduction).',
+        topics: [
+          'DP Basics',
+          'Memoization',
+          'Tabulation',
+          'Space Optimization',
+          '1D DP',
+          '2D DP',
+          'Knapsack',
+          'LIS',
+          'LCS',
+          'Matrix Chain Multiplication',
+          'Partition DP',
+          'Digit DP (Basics)',
+          'Tree DP',
+          'Bitmask DP (Introduction)'
+        ]
+      },
+      {
+        title: 'Phase 8: Interview Preparation',
+        description: 'Company-wise Questions, Pattern-based Questions, LeetCode Problems, Coding Contest Practice, Mock Coding Interviews, Resume Building, HR Interview Preparation, Systematic Problem Solving, and Placement Strategy.',
+        topics: [
+          'Company-wise Questions',
+          'Pattern-based Questions',
+          'LeetCode Problems',
+          'Coding Contest Practice',
+          'Mock Coding Interviews',
+          'Resume Building',
+          'HR Interview Preparation',
+          'Systematic Problem Solving',
+          'Placement Strategy'
         ]
       }
     ]
