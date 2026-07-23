@@ -22,6 +22,7 @@ interface CodingHubProps {
   dsa: DSAProblem[];
   onToggleSolved: (id: string) => void;
   onResetDSASheet?: (newSheet: DSAProblem[]) => void;
+  onNavigateTab?: (tab: string) => void;
 }
 
 const CATEGORIES = [
@@ -127,7 +128,7 @@ const SECTION_RESOURCES: Record<string, { gfg: string; leetcode: string; youtube
   }
 };
 
-export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, onResetDSASheet }) => {
+export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, onResetDSASheet, onNavigateTab }) => {
   const [problems, setProblems] = useState<DSAProblem[]>(dsa);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('All');
@@ -263,6 +264,15 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
 
           {/* PDF Section Links */}
           <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+            {onNavigateTab && (
+              <button
+                onClick={() => onNavigateTab('courses')}
+                className="px-3 py-1 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-[11px] font-black flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>Explore Interactive Coding Courses & Academies</span>
+              </button>
+            )}
             <a
               href="https://www.youtube.com/@ApnaCollegeOfficial"
               target="_blank"

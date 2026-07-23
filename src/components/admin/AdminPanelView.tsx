@@ -31,6 +31,7 @@ import {
 import { UserProfile } from '../../types';
 import { FirestoreService, UserFullData } from '../../lib/firestoreService';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
+import { calculatePlanDetails } from '../../lib/planUtils';
 
 interface AdminPanelViewProps {
   user?: UserProfile;
@@ -405,6 +406,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
               <thead>
                 <tr className="border-b border-slate-200 text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">
                   <th className="py-3 px-4">Student Profile</th>
+                  <th className="py-3 px-4">Active Plan & Expiry</th>
                   <th className="py-3 px-4">Attendance</th>
                   <th className="py-3 px-4">DSA Solved</th>
                   <th className="py-3 px-4">Assignments</th>
@@ -415,6 +417,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-700">
                 {filteredUsers.map((student) => {
+                  const planDetails = calculatePlanDetails(student);
                   const stats = student.stats || {
                     attendancePercentage: 0,
                     totalClassesAttended: 0,
@@ -453,6 +456,36 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
                             </p>
                             <p className="text-[11px] text-slate-400 font-mono truncate">{student.email}</p>
                           </div>
+                        </div>
+                      </td>
+
+                      {/* Plan & Remaining Days Column */}
+                      <td className="py-3.5 px-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                              planDetails.currentPlanId === 'plan_349'
+                                ? 'bg-indigo-100 text-indigo-900 border border-indigo-200'
+                                : planDetails.currentPlanId === 'plan_199'
+                                ? 'bg-blue-100 text-blue-900 border border-blue-200'
+                                : 'bg-emerald-100 text-emerald-900 border border-emerald-200'
+                            }`}>
+                              {planDetails.planName}
+                            </span>
+
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-black flex items-center gap-1 ${
+                              planDetails.isExpired 
+                                ? 'bg-red-100 text-red-800 border border-red-200' 
+                                : 'bg-slate-900 text-white'
+                            }`}>
+                              <Clock className="w-3 h-3" />
+                              {planDetails.isExpired ? 'Expired' : `${planDetails.daysRemaining} Days Left`}
+                            </span>
+                          </div>
+
+                          <p className="text-[10px] text-slate-400 font-medium">
+                            Expires: <span className="font-mono text-slate-700 font-bold">{planDetails.formattedExpiresAt}</span>
+                          </p>
                         </div>
                       </td>
 
@@ -562,6 +595,37 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
               <div className="p-8 text-center text-slate-400">Failed to load student telemetry.</div>
             ) : (
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {/* Student Plan Status Banner */}
+                {(() => {
+                  const pDetails = calculatePlanDetails(inspectData.profile);
+                  return (
+                    <div className="p-4 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-extrabold uppercase text-blue-400 tracking-wider">Subscription Plan Status</span>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                            pDetails.currentPlanId === 'plan_349' ? 'bg-indigo-500 text-white' : pDetails.currentPlanId === 'plan_199' ? 'bg-blue-500 text-white' : 'bg-emerald-500 text-white'
+                          }`}>
+                            {pDetails.planName}
+                          </span>
+                        </div>
+                        <p className="text-xs font-semibold text-slate-300 mt-0.5">
+                          Started: <strong className="text-white">{pDetails.formattedStartedAt}</strong> • Valid Until: <strong className="text-white">{pDetails.formattedExpiresAt}</strong>
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className={`px-3 py-1 rounded-full text-xs font-extrabold flex items-center gap-1.5 ${
+                          pDetails.isExpired ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'
+                        }`}>
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>{pDetails.isExpired ? 'Plan Expired' : `${pDetails.daysRemaining} Days Remaining`}</span>
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Navigation Tabs */}
                 <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                   <button

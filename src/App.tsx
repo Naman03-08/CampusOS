@@ -24,16 +24,20 @@ import { AssignmentSolverView } from './components/assignment/AssignmentSolverVi
 import { AttendanceView } from './components/attendance/AttendanceView';
 import { CalendarView } from './components/calendar/CalendarView';
 import { CodingHubView } from './components/coding/CodingHubView';
+import { CodingCoursesView } from './components/courses/CodingCoursesView';
 import { PlacementHubView } from './components/placement/PlacementHubView';
-import { NotificationsDrawer } from './components/notifications/NotificationsDrawer';
+import { AIResumeBuilderView } from './components/resume/AIResumeBuilderView';
 import { SettingsView } from './components/settings/SettingsView';
 import { AdminPanelView } from './components/admin/AdminPanelView';
+import { UpgradePlansView } from './components/pricing/UpgradePlansView';
+import { UpgradePromptModal } from './components/common/UpgradePromptModal';
 
 import { StorageService, getZeroAttendance, getZeroDSA, getZeroResume } from './lib/storage';
 import { FirestoreService } from './lib/firestoreService';
 import { auth } from './lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { UserProfile, StudySuite, AssignmentItem, AttendanceSubject, ScheduleEvent, DSAProblem, ResumeData, AppNotification } from './types';
+import { calculatePlanDetails } from './lib/planUtils';
 
 export function App() {
   const [user, setUser] = useState<UserProfile>(StorageService.getProfile());
@@ -42,6 +46,55 @@ export function App() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [showUpgradeModal, setShowUpgradeModal] = useState<boolean>(false);
+  const [upgradeFeatureName, setUpgradeFeatureName] = useState<string>('this feature');
+  const [pendingTabAfterTrial, setPendingTabAfterTrial] = useState<string | null>(null);
+
+  const gatedTabs = ['studyhub', 'resumebuilder', 'chat', 'assignment', 'attendance', 'calendar', 'coding', 'courses', 'placement'];
+
+  const getTabDisplayName = (tabId: string) => {
+    switch (tabId) {
+      case 'studyhub':
+      case 'chat': 
+      case 'assignment':
+        return 'AI Study, Chat & Assignment Solver';
+      case 'attendance': return 'Attendance Manager & Calculator';
+      case 'calendar': return 'Smart Calendar & Timetable';
+      case 'coding': return 'Coding Hub & 375 DSA Roadmap Sheet';
+      case 'courses': return 'Interactive Coding Courses & Academies';
+      case 'placement': return 'Placement Hub & AI Mock Interviews';
+      default: return 'this AI feature';
+    }
+  };
+
+  const handleNavigateTabWithGuard = (tabId: string, customFeatureName?: string) => {
+    const planDetails = calculatePlanDetails(user);
+    if (gatedTabs.includes(tabId) && !planDetails.hasActiveAccess) {
+      setUpgradeFeatureName(customFeatureName || getTabDisplayName(tabId));
+      setPendingTabAfterTrial(tabId);
+      setShowUpgradeModal(true);
+      return;
+    }
+    setActiveTab(tabId);
+  };
+
+  const handleStartFreeTrial = () => {
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000); // 4 Days
+    const updated: UserProfile = {
+      ...user,
+      plan: 'free_trial',
+      freeTrialUsed: true,
+      freeTrialStartedAt: now.toISOString(),
+      planStartedAt: now.toISOString(),
+      planExpiresAt: expiresAt.toISOString()
+    };
+    handleUpdateProfile(updated);
+    if (pendingTabAfterTrial) {
+      setActiveTab(pendingTabAfterTrial);
+      setPendingTabAfterTrial(null);
+    }
+  };
 
   // Core Data State
   const [studySuites, setStudySuites] = useState<StudySuite[]>(StorageService.getStudySuites());
@@ -270,8 +323,23 @@ export function App() {
     }
   };
 
+  const handleUpdateProfile = (updatedFields: Partial<UserProfile>) => {
+    const updated = { ...user, ...updatedFields };
+    setUser(updated);
+    StorageService.saveProfile(updated);
+    if (user.uid) {
+      FirestoreService.saveProfile(updated);
+    }
+  };
+
   const handleMarkReadNotification = (id: string) => {
     const updated = notifications.map((n) => (n.id === id ? { ...n, read: true } : n));
+    setNotifications(updated);
+    StorageService.saveNotifications(updated);
+  };
+
+  const handleDeleteNotification = (id: string) => {
+    const updated = notifications.filter((n) => n.id !== id);
     setNotifications(updated);
     StorageService.saveNotifications(updated);
   };
@@ -321,28 +389,30 @@ export function App() {
         </div>
       ) : (
         /* VIEWMODE 2: APP WORKSPACE PORTAL (If logged in) */
-        <div className="relative z-10 min-h-screen flex flex-col">
+        <div className="relative z-10 h-screen w-screen overflow-hidden flex flex-col">
           <Header
             user={user}
             notifications={notifications}
-            onOpenNotifications={() => setActiveTab('notifications')}
+            onMarkReadNotification={handleMarkReadNotification}
+            onDeleteNotification={handleDeleteNotification}
+            onClearNotifications={handleClearNotifications}
             onOpenSettings={() => setActiveTab('settings')}
-            onToggleAIChat={() => setActiveTab('chat')}
+            onToggleAIChat={() => handleNavigateTabWithGuard('chat', 'AI Chat Assistant')}
             onLogout={handleLogout}
-            onNavigateTab={setActiveTab}
+            onNavigateTab={handleNavigateTabWithGuard}
           />
 
-          <div className="flex-1 flex max-w-[1600px] w-full mx-auto">
+          <div className="flex-1 flex w-full max-w-[1600px] mx-auto overflow-hidden">
             {/* Sidebar */}
             <Sidebar
               activeTab={activeTab}
-              onSelectTab={setActiveTab}
+              onSelectTab={handleNavigateTabWithGuard}
               unreadNotificationsCount={notifications.filter((n) => !n.read).length}
               user={user}
             />
 
             {/* Main Stage View Area */}
-            <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-full">
+            <main className="flex-1 h-full overflow-y-auto p-4 sm:p-6 lg:p-8 min-w-0 max-w-full scrollbar-thin">
               {activeTab === 'dashboard' && (
                 <DashboardView
                   user={user}
@@ -351,8 +421,9 @@ export function App() {
                   dsa={dsa}
                   studySuites={studySuites}
                   assignments={assignments}
-                  onNavigateTab={setActiveTab}
-                  onOpenStudyHubUpload={() => setActiveTab('studyhub')}
+                  onNavigateTab={handleNavigateTabWithGuard}
+                  onOpenStudyHubUpload={() => handleNavigateTabWithGuard('studyhub', 'AI Study Hub Upload')}
+                  onStartTrial={handleStartFreeTrial}
                 />
               )}
 
@@ -361,15 +432,30 @@ export function App() {
                   studySuites={studySuites}
                   onSaveSuite={handleSaveSuite}
                   onDeleteSuite={handleDeleteSuite}
+                  assignments={assignments}
+                  onAddAssignment={handleAddAssignment}
                 />
               )}
 
-              {activeTab === 'chat' && <AIChatView />}
-
-              {activeTab === 'assignment' && (
-                <AssignmentSolverView
+              {activeTab === 'chat' && (
+                <StudyHubView
+                  studySuites={studySuites}
+                  onSaveSuite={handleSaveSuite}
+                  onDeleteSuite={handleDeleteSuite}
                   assignments={assignments}
                   onAddAssignment={handleAddAssignment}
+                  initialMode="chat"
+                />
+              )}
+
+              {activeTab === 'assignment' && (
+                <StudyHubView
+                  studySuites={studySuites}
+                  onSaveSuite={handleSaveSuite}
+                  onDeleteSuite={handleDeleteSuite}
+                  assignments={assignments}
+                  onAddAssignment={handleAddAssignment}
+                  initialMode="assignment"
                 />
               )}
 
@@ -393,6 +479,23 @@ export function App() {
                   dsa={dsa}
                   onToggleSolved={handleToggleDSA}
                   onResetDSASheet={handleResetDSASheet}
+                  onNavigateTab={handleNavigateTabWithGuard}
+                />
+              )}
+
+              {activeTab === 'courses' && (
+                <CodingCoursesView
+                  user={user}
+                  onNavigateTab={handleNavigateTabWithGuard}
+                />
+              )}
+
+              {activeTab === 'resumebuilder' && (
+                <AIResumeBuilderView
+                  user={user}
+                  resumeData={resumeData}
+                  onUpdateResume={handleUpdateResume}
+                  onNavigateTab={handleNavigateTabWithGuard}
                 />
               )}
 
@@ -404,16 +507,19 @@ export function App() {
                 />
               )}
 
-              {activeTab === 'notifications' && (
-                <NotificationsDrawer
-                  notifications={notifications}
-                  onMarkRead={handleMarkReadNotification}
-                  onClearAll={handleClearNotifications}
+              {activeTab === 'pricing' && (
+                <UpgradePlansView
+                  user={user}
+                  onUpdateProfile={handleUpdateProfile}
                 />
               )}
 
               {activeTab === 'settings' && (
-                <SettingsView user={user} onSaveProfile={setUser} />
+                <SettingsView 
+                  user={user} 
+                  onSaveProfile={handleUpdateProfile}
+                  onNavigateTab={setActiveTab}
+                />
               )}
 
               {activeTab === 'admin' && (
@@ -430,6 +536,16 @@ export function App() {
         initialMode={authMode}
         onClose={() => setShowAuthModal(false)}
         onSuccess={handleAuthSuccess}
+      />
+
+      {/* Feature Upgrade & Free Trial Prompt Modal */}
+      <UpgradePromptModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        user={user}
+        onStartTrial={handleStartFreeTrial}
+        onNavigateToPricing={() => setActiveTab('pricing')}
+        featureName={upgradeFeatureName}
       />
     </div>
   );

@@ -12,10 +12,14 @@ import {
   Plus, 
   Award, 
   TrendingUp, 
-  CheckCircle2 
+  CheckCircle2,
+  Sparkles,
+  Zap,
+  ShieldAlert
 } from 'lucide-react';
 import { UserProfile, AttendanceSubject, ScheduleEvent, DSAProblem, StudySuite, AssignmentItem } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
+import { calculatePlanDetails } from '../../lib/planUtils';
 
 interface DashboardViewProps {
   user: UserProfile;
@@ -26,6 +30,7 @@ interface DashboardViewProps {
   assignments: AssignmentItem[];
   onNavigateTab: (tab: string) => void;
   onOpenStudyHubUpload: () => void;
+  onStartTrial?: () => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -37,7 +42,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   assignments,
   onNavigateTab,
   onOpenStudyHubUpload,
+  onStartTrial
 }) => {
+  const planDetails = calculatePlanDetails(user);
+
   // Calculate statistics
   const totalClasses = attendance.reduce((acc, a) => acc + a.totalClasses, 0);
   const totalAttended = attendance.reduce((acc, a) => acc + a.attendedClasses, 0);
@@ -68,33 +76,78 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         badge="Main Dashboard Overview"
       />
 
+      {/* Trial Inactive Banner */}
+      {!planDetails.hasActiveAccess && (
+        <div className="p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 border border-blue-500/40 card-3d">
+          <div className="flex items-start gap-3.5">
+            <div className="p-3 rounded-2xl bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0 mt-0.5 shadow-3d-sm">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-400 text-slate-950 shadow-2xs">
+                  {planDetails.isExpired ? 'Plan Expired' : 'Free Trial Ready'}
+                </span>
+              </div>
+              <h3 className="text-base font-black text-white mt-1">
+                {planDetails.isExpired ? 'Your Subscription Plan Has Expired' : 'Start Your 4-Day Free Trial (₹0) to Unlock All Features'}
+              </h3>
+              <p className="text-xs text-slate-300 mt-0.5 max-w-xl">
+                {planDetails.isExpired 
+                  ? 'Please upgrade to Pro Scholar (₹199) or Campus Pro Ultimate (₹349) to continue using AI tools.'
+                  : 'You are currently browsing in website preview mode. Activate your 4-day free trial whenever you are ready!'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0">
+            {!planDetails.freeTrialUsed && onStartTrial && (
+              <button
+                onClick={onStartTrial}
+                className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs shadow-md btn-3d-emerald flex items-center gap-1.5 cursor-pointer transition-all"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                <span>Start 4-Day Free Trial</span>
+              </button>
+            )}
+            <button
+              onClick={() => onNavigateTab('pricing')}
+              className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md btn-3d-blue flex items-center gap-1.5 cursor-pointer transition-all"
+            >
+              <Zap className="w-3.5 h-3.5 text-amber-300" />
+              <span>Upgrade to Pro Plan</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Personalized Welcome Banner */}
-      <div className="p-6 sm:p-8 rounded-[28px] bg-gradient-to-br from-[#2563EB] via-blue-600 to-indigo-600 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden">
+      <div className="p-6 sm:p-8 rounded-[28px] bg-gradient-to-br from-[#2563EB] via-blue-600 to-indigo-600 text-white shadow-2xl relative overflow-hidden card-3d">
         <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div>
             <div className="flex items-center gap-2 mb-2.5">
-              <span className="px-3 py-1 rounded-full bg-white/20 text-white font-bold text-xs backdrop-blur-md border border-white/30 flex items-center gap-1.5 shadow-2xs">
-                <Flame className="w-3.5 h-3.5 text-orange-300 fill-orange-300" /> 14 Day Study Streak
+              <span className="px-3 py-1 rounded-full bg-white/20 text-white font-extrabold text-xs backdrop-blur-md border border-white/30 flex items-center gap-1.5 shadow-2xs">
+                <Flame className="w-3.5 h-3.5 text-orange-300 fill-orange-300 animate-pulse" /> 14 Day Study Streak
               </span>
-              <span className="text-xs text-blue-100 font-semibold">{user.university || 'Stanford University'}</span>
+              <span className="text-xs text-blue-100 font-bold">{user.university || 'Stanford University'}</span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+            <h1 className="text-2xl sm:text-4xl font-black tracking-tight drop-shadow-xs">
               Welcome back, {user.displayName || 'Alex'}! 👋
             </h1>
-            <p className="text-xs sm:text-sm text-blue-100 mt-1.5 max-w-xl leading-relaxed">
-              Target Role: <strong className="text-white font-bold">{user.targetRole || 'Software Engineer'}</strong> | Major: <strong className="text-white font-bold">{user.major || 'Computer Science'}</strong>
+            <p className="text-xs sm:text-sm text-blue-100 mt-1.5 max-w-xl leading-relaxed font-medium">
+              Target Role: <strong className="text-white font-extrabold">{user.targetRole || 'Software Engineer'}</strong> | Major: <strong className="text-white font-extrabold">{user.major || 'Computer Science'}</strong>
             </p>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={onOpenStudyHubUpload}
-              className="px-6 py-3 rounded-full bg-white text-blue-700 font-bold text-xs sm:text-sm shadow-lg shadow-black/10 hover:bg-blue-50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
+              className="px-6 py-3 rounded-2xl bg-white text-blue-700 font-extrabold text-xs sm:text-sm shadow-xl btn-3d-blue hover:bg-blue-50 cursor-pointer transition-all flex items-center gap-2"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-blue-600" />
               Upload Study Notes
             </button>
           </div>
@@ -106,86 +159,86 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         {/* Attendance Widget */}
         <div 
           onClick={() => onNavigateTab('attendance')}
-          className="bg-white/45 backdrop-blur-xl p-5 rounded-2xl border border-white/80 shadow-2xs hover:bg-white/70 hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white/80 backdrop-blur-xl p-5 rounded-2xl border border-white/90 shadow-3d-sm hover:shadow-xl card-3d transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Attendance</span>
-            <div className="w-9 h-9 rounded-xl bg-blue-50/80 text-blue-600 flex items-center justify-center font-bold">
+            <span className="text-xs font-black text-slate-500 uppercase tracking-wider">Attendance</span>
+            <div className="w-9 h-9 rounded-xl bg-blue-50/90 text-blue-600 flex items-center justify-center font-black shadow-2xs">
               <CheckSquare className="w-4.5 h-4.5" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">{overallAttendance}%</span>
-            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100/80 backdrop-blur-md px-2 py-0.5 rounded-md border border-emerald-200">
+            <span className="text-2xl sm:text-3xl font-black text-slate-900">{overallAttendance}%</span>
+            <span className="text-[11px] font-black text-emerald-700 bg-emerald-100/90 backdrop-blur-md px-2 py-0.5 rounded-md border border-emerald-200">
               Safe & Above 75%
             </span>
           </div>
-          <div className="h-1.5 w-full bg-slate-200/60 rounded-full mt-3 overflow-hidden">
+          <div className="h-2 w-full bg-slate-200/80 rounded-full mt-3 overflow-hidden shadow-inner">
             <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${overallAttendance}%` }}></div>
           </div>
-          <p className="text-[11px] text-slate-500 mt-2">Target goal: 80% across all subjects</p>
+          <p className="text-[11px] text-slate-500 mt-2 font-medium">Target goal: 80% across all subjects</p>
         </div>
 
         {/* Upcoming Assignments */}
         <div 
           onClick={() => onNavigateTab('assignment')}
-          className="bg-white/45 backdrop-blur-xl p-5 rounded-2xl border border-white/80 shadow-2xs hover:bg-white/70 hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white/80 backdrop-blur-xl p-5 rounded-2xl border border-white/90 shadow-3d-sm hover:shadow-xl card-3d transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Assignments</span>
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+            <span className="text-xs font-black text-slate-500 uppercase tracking-wider">Assignments</span>
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black shadow-2xs">
               <Clock className="w-4.5 h-4.5" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">{assignments.length}</span>
-            <span className="text-[11px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100">
+            <span className="text-2xl sm:text-3xl font-black text-slate-900">{assignments.length}</span>
+            <span className="text-[11px] font-black text-amber-700 bg-amber-100/90 px-2 py-0.5 rounded-md border border-amber-200">
               Due This Week
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2">AI Step-by-Step Solver Ready</p>
+          <p className="text-[11px] text-slate-500 mt-2 font-medium">AI Step-by-Step Solver Ready</p>
         </div>
 
         {/* DSA Coding Progress */}
         <div 
           onClick={() => onNavigateTab('coding')}
-          className="bg-white/45 backdrop-blur-xl p-5 rounded-2xl border border-white/80 shadow-2xs hover:bg-white/70 hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white/80 backdrop-blur-xl p-5 rounded-2xl border border-white/90 shadow-3d-sm hover:shadow-xl card-3d transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">DSA Solved</span>
-            <div className="w-9 h-9 rounded-xl bg-cyan-50/80 text-cyan-600 flex items-center justify-center font-bold">
+            <span className="text-xs font-black text-slate-500 uppercase tracking-wider">DSA Solved</span>
+            <div className="w-9 h-9 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-black shadow-2xs">
               <Code2 className="w-4.5 h-4.5" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">{solvedDSA} / {totalDSA}</span>
-            <span className="text-[11px] font-bold text-cyan-700 bg-cyan-100/80 backdrop-blur-md px-2 py-0.5 rounded-md border border-cyan-200">
+            <span className="text-2xl sm:text-3xl font-black text-slate-900">{solvedDSA} / {totalDSA}</span>
+            <span className="text-[11px] font-black text-cyan-800 bg-cyan-100/90 backdrop-blur-md px-2 py-0.5 rounded-md border border-cyan-200">
               {dsaProgressPct}%
             </span>
           </div>
-          <div className="h-1.5 w-full bg-slate-200/60 rounded-full mt-3 overflow-hidden">
+          <div className="h-2 w-full bg-slate-200/80 rounded-full mt-3 overflow-hidden shadow-inner">
             <div className="h-full bg-cyan-600 rounded-full" style={{ width: `${dsaProgressPct}%` }}></div>
           </div>
         </div>
 
         {/* ATS Resume Score */}
         <div 
-          onClick={() => onNavigateTab('placement')}
-          className="bg-white/45 backdrop-blur-xl p-5 rounded-2xl border border-white/80 shadow-2xs hover:bg-white/70 hover:shadow-md transition-all cursor-pointer group"
+          onClick={() => onNavigateTab('resumebuilder')}
+          className="bg-white/80 backdrop-blur-xl p-5 rounded-2xl border border-white/90 shadow-3d-sm hover:shadow-xl card-3d transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">ATS Resume</span>
-            <div className="w-9 h-9 rounded-xl bg-purple-50/80 text-purple-600 flex items-center justify-center font-bold">
+            <span className="text-xs font-black text-slate-500 uppercase tracking-wider">ATS Resume</span>
+            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black shadow-2xs">
               <Award className="w-4.5 h-4.5" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">88 / 100</span>
-            <span className="text-[11px] font-bold text-purple-700 bg-purple-100/80 backdrop-blur-md px-2 py-0.5 rounded-md border border-purple-200">
+            <span className="text-2xl sm:text-3xl font-black text-slate-900">88 / 100</span>
+            <span className="text-[11px] font-black text-purple-800 bg-purple-100/90 backdrop-blur-md px-2 py-0.5 rounded-md border border-purple-200">
               Top 5%
             </span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-2">Matched against {user.targetRole || 'SWE'}</p>
+          <p className="text-[11px] text-slate-500 mt-2 font-medium">Matched against {user.targetRole || 'SWE'}</p>
         </div>
       </div>
 

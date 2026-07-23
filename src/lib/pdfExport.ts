@@ -1,4 +1,44 @@
 import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+export async function exportCanvasToPDF(elementId: string, filename: string = 'Resume.pdf'): Promise<void> {
+  const elem = document.getElementById(elementId);
+  if (!elem) {
+    throw new Error(`Element with id #${elementId} not found`);
+  }
+
+  // Generate crisp canvas rendering
+  const canvas = await html2canvas(elem, {
+    scale: 2, // 2x scale for high DPI crisp text
+    useCORS: true,
+    logging: false,
+    backgroundColor: '#ffffff',
+    onclone: (clonedDoc) => {
+      const clonedElem = clonedDoc.getElementById(elementId);
+      if (clonedElem) {
+        clonedElem.style.transform = 'none';
+        clonedElem.style.boxShadow = 'none';
+        clonedElem.style.margin = '0';
+        clonedElem.style.width = '100%';
+        clonedElem.style.maxWidth = '100%';
+        clonedElem.style.borderRadius = '0';
+      }
+    }
+  });
+
+  const imgData = canvas.toDataURL('image/png', 1.0);
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4'
+  });
+
+  const pdfWidth = pdf.internal.pageSize.getWidth(); // 210 mm
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+  pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+  pdf.save(filename);
+}
 
 export function exportTextToPDF(title: string, content: string, filename: string = 'document.pdf') {
   const doc = new jsPDF();

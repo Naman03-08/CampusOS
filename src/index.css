@@ -27,35 +27,149 @@
   background: #94a3b8;
 }
 
-/* Glassmorphism helpers for semi-transparent moving background view */
+/* Glassmorphism & Depth helpers */
 .glass-card {
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
 }
 
 .glass-card-strong {
-  background: rgba(255, 255, 255, 0.80);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.08);
 }
 
 .glass-panel {
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* 3D Visual Dimension & Elevate Effects */
+.perspective-container {
+  perspective: 1200px;
+}
+
+.card-3d {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+}
+
+.card-3d:hover {
+  transform: translateY(-5px) rotateX(1.5deg) rotateY(-1.5deg) scale(1.008);
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.12), 0 0 15px rgba(59, 130, 246, 0.15);
+}
+
+.shadow-3d-sm {
+  box-shadow: 0 4px 0 0 rgba(203, 213, 225, 0.8), 0 10px 20px -5px rgba(15, 23, 42, 0.06);
+}
+
+.shadow-3d {
+  box-shadow: 0 6px 0 0 rgba(203, 213, 225, 0.9), 0 15px 30px -10px rgba(15, 23, 42, 0.08);
+}
+
+.shadow-3d-blue {
+  box-shadow: 0 6px 0 0 #1d4ed8, 0 15px 30px -5px rgba(37, 99, 235, 0.3);
+}
+
+.shadow-3d-emerald {
+  box-shadow: 0 6px 0 0 #047857, 0 15px 30px -5px rgba(16, 185, 129, 0.3);
+}
+
+.shadow-3d-indigo {
+  box-shadow: 0 6px 0 0 #4338ca, 0 15px 30px -5px rgba(99, 102, 241, 0.3);
 }
 
 .glow-amber {
-  box-shadow: 0 10px 30px -10px rgba(217, 119, 6, 0.25);
+  box-shadow: 0 10px 30px -10px rgba(217, 119, 6, 0.3);
 }
 
 .glow-blue {
   box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.35);
 }
+
+.glow-indigo {
+  box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.35);
+}
+
+/* Tactile 3D Button Push Effect */
+.btn-3d-blue {
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 0 0 #1e40af, 0 8px 16px -4px rgba(37, 99, 235, 0.3);
+}
+
+.btn-3d-blue:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 #1e40af, 0 3px 8px -2px rgba(37, 99, 235, 0.3);
+}
+
+.btn-3d-emerald {
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 0 0 #065f46, 0 8px 16px -4px rgba(16, 185, 129, 0.3);
+}
+
+.btn-3d-emerald:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 #065f46, 0 3px 8px -2px rgba(16, 185, 129, 0.3);
+}
+
+/* Print Styles for AI Resume Canvas */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+  
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide app navigation, forms, controls, sidebars, buttons */
+  header, nav, sidebar, button, input, select, textarea, .no-print,
+  .lg\:col-span-5 {
+    display: none !important;
+  }
+
+  /* Show paper canvas wrapper properly */
+  .lg\:col-span-7 {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+  }
+
+  #resume-paper-canvas {
+    transform: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 16px !important;
+    background-color: #ffffff !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+
+  #resume-paper-canvas * {
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+
 

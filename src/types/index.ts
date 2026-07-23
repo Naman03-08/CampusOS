@@ -22,6 +22,11 @@ export interface UserProfile {
   displayName: string;
   photoURL?: string;
   role: Role;
+  plan?: string; // 'free_trial' | 'plan_199' | 'plan_349'
+  freeTrialUsed?: boolean;
+  freeTrialStartedAt?: string;
+  planStartedAt?: string;
+  planExpiresAt?: string;
   university?: string;
   major?: string;
   year?: string;
@@ -199,4 +204,61 @@ export interface AppNotification {
   type: 'attendance' | 'assignment' | 'exam' | 'placement' | 'system';
   read: boolean;
   createdAt: string;
+}
+
+export interface CourseLesson {
+  id: string;
+  title: string;
+  duration: string;
+  summary: string;
+  codeSnippet?: {
+    language: string;
+    starterCode: string;
+    solutionCode: string;
+    instructions: string;
+  };
+  quiz?: QuizQuestion[];
+}
+
+export interface CourseModule {
+  id: string;
+  title: string;
+  description: string;
+  lessons: CourseLesson[];
+}
+
+export interface CodingCourse {
+  id: string;
+  title: string;
+  slug: string;
+  category: 'Web Dev' | 'DSA & C++' | 'AI & ML' | 'Backend & Cloud' | 'Mobile Dev' | 'Cybersecurity';
+  badge: string;
+  description: string;
+  instructor: {
+    name: string;
+    role: string;
+    avatar: string;
+  };
+  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'All Levels';
+  durationHours: number;
+  totalModules: number;
+  rating: number;
+  enrolledStudentsCount: number;
+  tags: string[];
+  gradientBg: string;
+  modules: CourseModule[];
+  capstoneProject?: {
+    title: string;
+    description: string;
+    deliverables: string[];
+  };
+}
+
+export interface UserCourseProgress {
+  courseId: string;
+  enrolledAt: string;
+  completedLessonIds: string[];
+  quizScores: Record<string, number>;
+  certificateIssued?: boolean;
+  certificateIssuedAt?: string;
 }

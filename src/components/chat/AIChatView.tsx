@@ -82,22 +82,22 @@ export const AIChatView: React.FC = () => {
   ];
 
   return (
-    <div className="h-[calc(100vh-6rem)] flex flex-col bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden animate-in fade-in duration-300">
+    <div className="h-[calc(100vh-8rem)] min-h-[550px] flex flex-col bg-white/90 backdrop-blur-xl rounded-3xl border border-white/90 shadow-3d card-3d overflow-hidden animate-in fade-in duration-300">
       {/* Header */}
-      <div className="p-4 px-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs">
-            <Bot className="w-5 h-5 text-blue-200" />
+      <div className="p-4 px-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white flex items-center justify-between border-b border-blue-500/20">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-indigo-700 flex items-center justify-center text-white font-black shadow-3d-indigo shrink-0">
+            <Bot className="w-5 h-5 text-amber-300" />
           </div>
           <div>
-            <h2 className="font-extrabold text-sm text-slate-900">CampusOS AI Assistant</h2>
-            <p className="text-[10px] text-blue-600 font-semibold">Autonomous AI Reasoning Engine</p>
+            <h2 className="font-black text-sm sm:text-base text-white tracking-tight">CampusOS AI Academic Tutor & Assistant</h2>
+            <p className="text-[11px] text-blue-300 font-bold">Autonomous AI Reasoning & Step-by-Step Problem Solver</p>
           </div>
         </div>
 
         <button
           onClick={() => setMessages([messages[0]])}
-          className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-slate-200/60 transition-colors"
+          className="p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-white/10 transition-colors"
           title="Clear Conversation"
         >
           <Trash2 className="w-4 h-4" />
@@ -105,7 +105,7 @@ export const AIChatView: React.FC = () => {
       </div>
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-slate-50/40">
+      <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-slate-50/60">
         {messages.map((m) => (
           <div
             key={m.id}
@@ -114,31 +114,31 @@ export const AIChatView: React.FC = () => {
             }`}
           >
             <div
-              className={`w-8 h-8 rounded-xl font-bold text-xs flex items-center justify-center shrink-0 shadow-xs ${
+              className={`w-9 h-9 rounded-2xl font-black text-xs flex items-center justify-center shrink-0 shadow-3d-sm ${
                 m.sender === 'user'
                   ? 'bg-blue-600 text-white'
                   : 'bg-indigo-600 text-white'
               }`}
             >
-              {m.sender === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+              {m.sender === 'user' ? <User className="w-4.5 h-4.5" /> : <Bot className="w-4.5 h-4.5 text-amber-300" />}
             </div>
 
             <div
-              className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed space-y-1 shadow-2xs relative group ${
+              className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed space-y-1.5 shadow-3d-sm relative group ${
                 m.sender === 'user'
-                  ? 'bg-blue-600 text-white font-medium rounded-tr-none'
-                  : 'bg-white text-slate-800 border border-slate-200/80 rounded-tl-none'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-tr-none'
+                  : 'bg-white text-slate-800 border border-slate-200/90 rounded-tl-none'
               }`}
             >
               <div className="whitespace-pre-wrap font-sans">{m.text}</div>
-              <div className="flex items-center justify-between pt-2 border-t border-slate-200/30 text-[10px] opacity-70">
+              <div className="flex items-center justify-between pt-2 border-t border-slate-200/30 text-[10px] opacity-80 font-bold">
                 <span>{m.timestamp}</span>
                 {m.sender === 'ai' && (
                   <button
                     onClick={() => handleCopy(m.id, m.text)}
                     className="p-1 hover:text-blue-600 transition-colors flex items-center gap-1"
                   >
-                    {copiedId === m.id ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                    {copiedId === m.id ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                   </button>
                 )}
               </div>
@@ -148,12 +148,12 @@ export const AIChatView: React.FC = () => {
 
         {loading && (
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
-              <Bot className="w-4 h-4 animate-bounce" />
+            <div className="w-9 h-9 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-3d-sm">
+              <Bot className="w-4.5 h-4.5 text-amber-300 animate-bounce" />
             </div>
-            <div className="p-3 rounded-2xl bg-white border border-slate-200 text-xs font-semibold text-slate-500 flex items-center gap-2">
-              <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-600" />
-              <span>CampusOS AI is thinking and formulating explanation...</span>
+            <div className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-3d-sm text-xs font-bold text-slate-600 flex items-center gap-2">
+              <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />
+              <span>CampusOS AI is thinking and formulating step-by-step solution...</span>
             </div>
           </div>
         )}
@@ -162,15 +162,15 @@ export const AIChatView: React.FC = () => {
       </div>
 
       {/* Quick Prompt Chips */}
-      <div className="p-2 px-6 bg-white border-t border-slate-200 flex items-center gap-2 overflow-x-auto text-[11px] font-semibold text-slate-600">
-        <span className="text-slate-400 shrink-0 font-bold">Quick Prompts:</span>
+      <div className="p-3 px-6 bg-slate-100/90 border-t border-slate-200/80 flex items-center gap-2 overflow-x-auto text-[11px] font-extrabold text-slate-600">
+        <span className="text-slate-400 shrink-0 uppercase tracking-wider font-black">Quick Prompts:</span>
         {quickPrompts.map((qp, i) => (
           <button
             key={i}
             onClick={() => {
               setInputText(qp);
             }}
-            className="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-600 border border-slate-200/80 shrink-0 transition-colors"
+            className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-blue-600 hover:text-white border border-slate-200/90 shadow-2xs shrink-0 transition-all cursor-pointer font-bold"
           >
             {qp}
           </button>
@@ -178,18 +178,18 @@ export const AIChatView: React.FC = () => {
       </div>
 
       {/* Input Bar */}
-      <form onSubmit={handleSend} className="p-4 bg-white border-t border-slate-200 flex items-center gap-3">
+      <form onSubmit={handleSend} className="p-4 bg-white border-t border-slate-200/80 flex items-center gap-3">
         <input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           placeholder="Ask any question, derive proofs, debug code, or request exam strategies..."
-          className="flex-1 px-4 py-3 text-xs sm:text-sm rounded-2xl bg-slate-100/80 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all"
+          className="flex-1 px-4 py-3.5 text-xs sm:text-sm font-semibold rounded-2xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white shadow-inner transition-all"
         />
         <button
           type="submit"
           disabled={loading || !inputText.trim()}
-          className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/20 disabled:opacity-50 transition-all flex items-center gap-2"
+          className="px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs sm:text-sm shadow-md btn-3d-blue disabled:opacity-50 transition-all flex items-center gap-2 cursor-pointer"
         >
           <span>Send</span>
           <Send className="w-4 h-4" />

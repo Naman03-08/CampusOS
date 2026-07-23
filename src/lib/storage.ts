@@ -23,6 +23,7 @@ const STORAGE_KEYS = {
   MOCK_INTERVIEWS: 'campusos_mock_interviews',
   NOTIFICATIONS: 'campusos_notifications',
   CHAT_MESSAGES: 'campusos_chat_messages',
+  COURSE_PROGRESS: 'campusos_course_progress',
 };
 
 // ZERO BASELINE GENERATORS FOR NEW REGISTERED USERS
@@ -299,4 +300,20 @@ export class StorageService {
     list.unshift(notif);
     this.set(STORAGE_KEYS.NOTIFICATIONS, list);
   }
+
+  // Course Progress
+  static getCourseProgress(): Record<string, any> {
+    return this.get<Record<string, any>>(STORAGE_KEYS.COURSE_PROGRESS, {});
+  }
+
+  static saveCourseProgress(progressMap: Record<string, any>): void {
+    this.set(STORAGE_KEYS.COURSE_PROGRESS, progressMap);
+  }
+
+  static updateSingleCourseProgress(courseId: string, progressData: any): void {
+    const progressMap = this.getCourseProgress();
+    progressMap[courseId] = progressData;
+    this.saveCourseProgress(progressMap);
+  }
 }
+

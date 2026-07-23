@@ -14,23 +14,36 @@ import {
   Trash2, 
   ChevronRight, 
   Zap, 
-  FileCheck 
+  FileCheck,
+  MessageSquareText,
+  Bot,
+  Sparkles
 } from 'lucide-react';
-import { StudySuite, Flashcard, QuizQuestion } from '../../types';
+import { StudySuite, Flashcard, QuizQuestion, AssignmentItem } from '../../types';
 import { exportTextToPDF } from '../../lib/pdfExport';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
+import { AIChatView } from '../chat/AIChatView';
+import { AssignmentSolverView } from '../assignment/AssignmentSolverView';
 
 interface StudyHubViewProps {
   studySuites: StudySuite[];
   onSaveSuite: (suite: StudySuite) => void;
   onDeleteSuite: (id: string) => void;
+  assignments?: AssignmentItem[];
+  onAddAssignment?: (assignment: AssignmentItem) => void;
+  initialMode?: 'synthesizer' | 'chat' | 'assignment';
 }
 
 export const StudyHubView: React.FC<StudyHubViewProps> = ({
   studySuites,
   onSaveSuite,
   onDeleteSuite,
+  assignments = [],
+  onAddAssignment = () => {},
+  initialMode = 'synthesizer',
 }) => {
+  const [mainMode, setMainMode] = useState<'synthesizer' | 'chat' | 'assignment'>(initialMode);
+
   const [selectedSuite, setSelectedSuite] = useState<StudySuite | null>(
     studySuites.length > 0 ? studySuites[0] : null
   );
@@ -110,41 +123,99 @@ export const StudyHubView: React.FC<StudyHubViewProps> = ({
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Section Usage Banner */}
       <SectionUsageBanner
-        title="AI Study Hub & Document Synthesizer"
-        subtitle="Automated study suites, flashcards, interactive quizzes & revision roadmaps"
-        purpose="This section is used to convert raw textbook chapters, lecture notes, and syllabus topics into comprehensive study suites. The AI automatically generates full notes, active recall flashcards, practice quizzes, formula cheat sheets, viva voice Q&A, and a 7-day exam revision roadmap."
+        title="AI Study Hub, Chat Assistant & Assignment Solver"
+        subtitle="Unified Workspace: Note Synthesizer, Flashcards, 24/7 AI Tutor & Step-by-Step Problem Solver"
+        purpose="This single unified workspace combines automated lecture synthesis, an autonomous AI Academic Tutor, and an AI Assignment Solver. Convert raw textbooks & syllabus notes into flashcards and quizzes, chat with the AI Tutor for step-by-step proofs & code debugging, or solve complex homework problem sets with textbook references."
         keyFeatures={[
-          'AI Note & Summary Synthesis',
-          'Interactive Active Recall Flashcards',
-          'Self-Scoring Exam Quizzes',
-          'Formula & Mindmap Breakdown',
-          'Viva Q&A & 7-Day Revision Planner',
-          'Export Notes & Quizzes to PDF'
+          '24/7 AI Academic Chat Assistant & Reasoning Engine',
+          'Automated Lecture Note & Summary Synthesis',
+          'AI Step-by-Step Assignment & Proof Solver',
+          'Active Recall Flashcards & Practice Quizzes',
+          'Formula Cheat Sheets & Mindmap Breakdown',
+          'Export Complete Study Suites & Solutions to PDF'
         ]}
         icon={<BookOpen className="w-6 h-6 text-white" />}
-        badge="Study Hub Purpose"
+        badge="Unified Study, Chat & Solver OS"
       />
 
-      {/* Top Action Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-blue-600" />
-            <h1 className="text-2xl font-black text-slate-900">AI Study Hub & Document Synthesizer</h1>
-          </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Turn raw lectures, PDFs & syllabus notes into complete flashcards, quizzes & 7-day revision plans.
-          </p>
-        </div>
+      {/* Top Mode Selector Bar (Unified Section) */}
+      <div className="flex items-center gap-2 bg-slate-100/90 p-2 rounded-2xl border border-slate-200/80 shadow-3d-sm w-fit flex-wrap">
+        <button
+          onClick={() => setMainMode('synthesizer')}
+          className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+            mainMode === 'synthesizer'
+              ? 'bg-blue-600 text-white shadow-3d-blue scale-[1.02]'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+          }`}
+        >
+          <BookOpen className="w-4 h-4" />
+          <span>AI Study Suites & Synthesizer</span>
+        </button>
 
         <button
-          onClick={() => setShowUploader(!showUploader)}
-          className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/20 flex items-center gap-2 transition-all"
+          onClick={() => setMainMode('chat')}
+          className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+            mainMode === 'chat'
+              ? 'bg-blue-600 text-white shadow-3d-blue scale-[1.02]'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+          }`}
         >
-          <Upload className="w-4 h-4" />
-          {showUploader ? 'Close Uploader' : '+ New Study Suite'}
+          <Bot className="w-4 h-4 text-amber-300" />
+          <span>AI Chat Tutor & Assistant</span>
+          <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase bg-amber-400 text-slate-950">
+            24/7 Live
+          </span>
+        </button>
+
+        <button
+          onClick={() => setMainMode('assignment')}
+          className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+            mainMode === 'assignment'
+              ? 'bg-blue-600 text-white shadow-3d-blue scale-[1.02]'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+          }`}
+        >
+          <FileCheck className="w-4 h-4 text-emerald-400" />
+          <span>AI Assignment Solver</span>
         </button>
       </div>
+
+      {/* MODE 1: AI Chat Assistant & Tutor */}
+      {mainMode === 'chat' && (
+        <AIChatView />
+      )}
+
+      {/* MODE 2: AI Assignment Solver */}
+      {mainMode === 'assignment' && (
+        <AssignmentSolverView
+          assignments={assignments}
+          onAddAssignment={onAddAssignment}
+        />
+      )}
+
+      {/* MODE 3: Study Suites & Synthesizer */}
+      {mainMode === 'synthesizer' && (
+        <>
+          {/* Top Action Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-white/90 backdrop-blur-xl border border-white/90 shadow-3d-sm card-3d">
+            <div>
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-6 h-6 text-blue-600" />
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">AI Study Hub & Document Synthesizer</h1>
+              </div>
+              <p className="text-xs text-slate-500 mt-1 font-medium">
+                Turn raw lectures, PDFs & syllabus notes into complete flashcards, quizzes & 7-day revision plans.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowUploader(!showUploader)}
+              className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs sm:text-sm shadow-md btn-3d-blue flex items-center gap-2 transition-all cursor-pointer"
+            >
+              <Upload className="w-4 h-4" />
+              {showUploader ? 'Close Uploader' : '+ New Study Suite'}
+            </button>
+          </div>
 
       {/* Uploader Box Modal/Expandable */}
       {showUploader && (
@@ -277,13 +348,23 @@ export const StudyHubView: React.FC<StudyHubViewProps> = ({
                 <h2 className="text-xl font-extrabold text-slate-900 mt-1">{selectedSuite.title}</h2>
               </div>
 
-              <button
-                onClick={handleExportPDF}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-2 transition-colors w-fit"
-              >
-                <Download className="w-4 h-4 text-blue-600" />
-                Export as PDF
-              </button>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  onClick={() => setMainMode('chat')}
+                  className="px-4 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 font-black text-xs flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
+                >
+                  <Bot className="w-4 h-4 text-indigo-600" />
+                  Ask AI Tutor About This
+                </button>
+
+                <button
+                  onClick={handleExportPDF}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-2 transition-colors w-fit cursor-pointer"
+                >
+                  <Download className="w-4 h-4 text-blue-600" />
+                  Export as PDF
+                </button>
+              </div>
             </div>
 
             {/* Sub-Tab Navigation Bar */}
@@ -551,6 +632,8 @@ export const StudyHubView: React.FC<StudyHubViewProps> = ({
           </div>
         </div>
       ) : null}
+        </>
+      )}
     </div>
   );
 };
