@@ -3,6 +3,7 @@ import { FileCheck, Zap, Download, CheckCircle2, RefreshCw, Upload, FileText } f
 import { AssignmentItem } from '../../types';
 import { exportTextToPDF } from '../../lib/pdfExport';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
+import { StreakService } from '../../lib/streakService';
 
 interface AssignmentSolverProps {
   assignments: AssignmentItem[];
@@ -50,6 +51,7 @@ export const AssignmentSolverView: React.FC<AssignmentSolverProps> = ({
         createdAt: new Date().toISOString(),
       };
 
+      StreakService.recordActivity();
       onAddAssignment(newItem);
       setSelectedAssignment(newItem);
       setTitle('');

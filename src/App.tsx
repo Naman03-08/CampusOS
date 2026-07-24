@@ -33,6 +33,7 @@ import { UpgradePromptModal } from './components/common/UpgradePromptModal';
 import { CertificateVerificationModal } from './components/courses/CertificateVerificationModal';
 
 import { StorageService, getZeroAttendance, getZeroDSA, getZeroResume } from './lib/storage';
+import { StreakService } from './lib/streakService';
 import { FirestoreService } from './lib/firestoreService';
 import { auth } from './lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -156,7 +157,21 @@ export function App() {
       courseTopicsCompleted = 0;
     }
 
-    const currentStreak = dsaSolved + assignmentsSolved + courseTopicsCompleted;
+    const totalActivityCount = dsaSolved + assignmentsSolved + courseTopicsCompleted;
+
+    const prevActivityCount = parseInt(localStorage.getItem('campus_os_prev_activity_count') || '0', 10);
+    
+    let streakInfo = StreakService.evaluateStreak();
+
+    if (totalActivityCount > prevActivityCount && totalActivityCount > 0) {
+      streakInfo = StreakService.recordActivity();
+      localStorage.setItem('campus_os_prev_activity_count', totalActivityCount.toString());
+    } else if (totalActivityCount > 0 && !streakInfo.completedToday) {
+      streakInfo = StreakService.recordActivity();
+      localStorage.setItem('campus_os_prev_activity_count', totalActivityCount.toString());
+    } else if (totalActivityCount === 0) {
+      localStorage.setItem('campus_os_prev_activity_count', '0');
+    }
 
     const updatedProfile: UserProfile = {
       ...currentProfile,
@@ -166,7 +181,9 @@ export function App() {
         totalClassesHeld: totalClasses,
         dsaSolvedCount: dsaSolved,
         dsaTotalCount: currentDSA.length,
-        dsaStreak: currentStreak,
+        dsaStreak: streakInfo.streak,
+        streakAtRisk: streakInfo.isAtRisk,
+        streakCompletedToday: streakInfo.completedToday,
         assignmentsSolvedCount: assignmentsSolved,
         assignmentsTotalCount: currentAssignments.length,
         studySuitesCount: currentSuites.length,

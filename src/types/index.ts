@@ -7,6 +7,9 @@ export interface UserStats {
   dsaSolvedCount: number;
   dsaTotalCount: number;
   dsaStreak: number;
+  streakAtRisk?: boolean;
+  streakCompletedToday?: boolean;
+  lastActivityDate?: string;
   assignmentsSolvedCount: number;
   assignmentsTotalCount: number;
   studySuitesCount: number;

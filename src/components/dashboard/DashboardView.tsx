@@ -15,11 +15,13 @@ import {
   CheckCircle2,
   Sparkles,
   Zap,
-  ShieldAlert
+  ShieldAlert,
+  AlertTriangle
 } from 'lucide-react';
 import { UserProfile, AttendanceSubject, ScheduleEvent, DSAProblem, StudySuite, AssignmentItem } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { calculatePlanDetails } from '../../lib/planUtils';
+import { StreakService } from '../../lib/streakService';
 
 interface DashboardViewProps {
   user: UserProfile;
@@ -121,6 +123,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       )}
 
+      {/* Red Streak Risk Warning Banner */}
+      {user.stats?.streakAtRisk && (
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-pulse border-2 border-red-300">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-white/20 shrink-0">
+              <Flame className="w-6 h-6 text-yellow-300 fill-yellow-300 animate-bounce" />
+            </div>
+            <div>
+              <h3 className="text-sm font-black tracking-wide text-white flex items-center gap-2">
+                ⚠️ STREAK AT RISK! ({user.stats?.dsaStreak || 1} Day Streak)
+              </h3>
+              <p className="text-xs text-red-100 font-medium mt-0.5">
+                You haven't completed any activity today. Complete at least 1 coding question, assignment, or course topic today or your streak will break tomorrow!
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => onNavigateTab('coding')}
+            className="px-4 py-2 rounded-xl bg-white text-red-700 font-black text-xs shrink-0 hover:bg-red-50 shadow-md transition-all cursor-pointer"
+          >
+            Solve a Problem Now →
+          </button>
+        </div>
+      )}
+
       {/* Personalized Welcome Banner */}
       <div className="p-6 sm:p-8 rounded-[28px] bg-gradient-to-br from-[#2563EB] via-blue-600 to-indigo-600 text-white shadow-2xl relative overflow-hidden card-3d">
         <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -129,7 +156,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div>
             <div className="flex items-center gap-2 mb-2.5">
               {(() => {
-                const streak = user.stats?.dsaStreak || 0;
+                const { streak, isAtRisk } = StreakService.getStreakInfo();
+                if (isAtRisk) {
+                  return (
+                    <span className="px-3 py-1 rounded-full font-extrabold text-xs bg-red-600 text-white border border-red-400 flex items-center gap-1.5 shadow-md animate-pulse">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-300 fill-amber-300 animate-bounce" />
+                      {streak} Day{streak === 1 ? '' : 's'} Study Streak (At Risk! ⚠️)
+                    </span>
+                  );
+                }
                 return (
                   <span className={`px-3 py-1 rounded-full font-extrabold text-xs backdrop-blur-md border flex items-center gap-1.5 shadow-2xs ${
                     streak > 0 ? 'bg-white/20 border-white/30 text-white' : 'bg-black/20 border-white/20 text-blue-100'

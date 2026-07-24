@@ -12,11 +12,13 @@ import {
   RotateCcw,
   BookOpenCheck,
   Trophy,
-  Sparkles
+  Sparkles,
+  AlertTriangle
 } from 'lucide-react';
 import { DSAProblem } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { getCampusOSDSASheet } from '../../data/dsaSheet375';
+import { StreakService } from '../../lib/streakService';
 
 interface CodingHubProps {
   dsa: DSAProblem[];
@@ -187,8 +189,12 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
   const progressPct = totalCount > 0 ? Math.round((solvedCount / totalCount) * 100) : 0;
 
   const handleToggle = (id: string) => {
+    const target = problems.find((p) => p.id === id);
     const updated = problems.map((p) => (p.id === id ? { ...p, solved: !p.solved } : p));
     setProblems(updated);
+    if (target && !target.solved) {
+      StreakService.recordActivity();
+    }
     onToggleSolved(id);
   };
 
@@ -306,10 +312,23 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          <div className="px-3.5 py-2 rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-800 font-bold text-xs flex items-center gap-2">
-            <Flame className={`w-4 h-4 ${solvedCount > 0 ? 'text-orange-500 fill-orange-500' : 'text-slate-400'}`} />
-            <span>Streak: {solvedCount > 0 ? `${solvedCount} Day${solvedCount === 1 ? '' : 's'}` : '0 Days'}</span>
-          </div>
+          {(() => {
+            const { streak, isAtRisk } = StreakService.getStreakInfo();
+            if (isAtRisk) {
+              return (
+                <div className="px-3.5 py-2 rounded-2xl bg-red-600 border border-red-400 text-white font-extrabold text-xs flex items-center gap-2 animate-pulse shadow-md">
+                  <AlertTriangle className="w-4 h-4 text-amber-300 fill-amber-300 animate-bounce shrink-0" />
+                  <span>Streak: {streak} Day{streak === 1 ? '' : 's'} (At Risk! ⚠️)</span>
+                </div>
+              );
+            }
+            return (
+              <div className="px-3.5 py-2 rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-800 font-bold text-xs flex items-center gap-2">
+                <Flame className={`w-4 h-4 ${streak > 0 ? 'text-orange-500 fill-orange-500 animate-bounce' : 'text-slate-400'}`} />
+                <span>Streak: {streak} Day{streak === 1 ? '' : 's'}</span>
+              </div>
+            );
+          })()}
 
           <div className="px-3.5 py-2 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs flex items-center gap-2">
             <BookOpenCheck className="w-4 h-4 text-emerald-600" />

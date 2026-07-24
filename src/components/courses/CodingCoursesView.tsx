@@ -40,6 +40,7 @@ import confetti from 'canvas-confetti';
 import { CertificateCard } from './CertificateCard';
 import { CertificateVerificationModal } from './CertificateVerificationModal';
 import { FirestoreService } from '../../lib/firestoreService';
+import { StreakService } from '../../lib/streakService';
 
 interface CodingCoursesViewProps {
   user: UserProfile;
@@ -4310,6 +4311,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
     if (!isCurrentlyChecked) {
       updated[topicKey] = true;
       setLockWarningMessage(null);
+      StreakService.recordActivity();
     } else {
       // Unchecking this topic -> also uncheck all subsequent topics in this course to maintain sequence
       activeCourseTopics.forEach((item) => {

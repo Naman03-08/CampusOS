@@ -13,9 +13,11 @@ import {
   CheckCheck,
   AlertCircle,
   Calendar,
-  X
+  X,
+  AlertTriangle
 } from 'lucide-react';
 import { UserProfile, AppNotification } from '../../types';
+import { StreakService } from '../../lib/streakService';
 
 interface HeaderProps {
   user: UserProfile;
@@ -51,8 +53,28 @@ export const Header: React.FC<HeaderProps> = ({
     });
   };
 
+  const streakInfo = StreakService.getStreakInfo();
+
   return (
-    <header className="sticky top-0 z-30 w-full h-16 bg-white/50 backdrop-blur-2xl border-b border-white/80 px-4 sm:px-6 py-3 flex items-center justify-between shadow-md">
+    <>
+      {streakInfo.isAtRisk && (
+        <div className="w-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white px-4 py-2 text-xs font-bold flex items-center justify-between gap-3 shadow-md animate-pulse z-40 sticky top-0">
+          <div className="flex items-center gap-2 max-w-5xl mx-auto">
+            <AlertTriangle className="w-4 h-4 text-amber-300 shrink-0" />
+            <span>
+              <strong>STREAK AT RISK! ⚠️</strong> You haven't done any activity today. Complete 1 coding question, course topic, or assignment today to save your <strong>{streakInfo.streak}-day streak</strong>, or it will reset to 0 tomorrow!
+            </span>
+          </div>
+          <button 
+            onClick={() => onNavigateTab('coding')}
+            className="px-3 py-1 bg-white text-red-600 font-extrabold rounded-lg text-[11px] shrink-0 hover:bg-red-50 cursor-pointer shadow-xs"
+          >
+            Solve Task Now &rarr;
+          </button>
+        </div>
+      )}
+
+      <header className="sticky top-0 z-30 w-full h-16 bg-white/50 backdrop-blur-2xl border-b border-white/80 px-4 sm:px-6 py-3 flex items-center justify-between shadow-md">
       {/* Search Command Input */}
       <div className="flex items-center gap-3 flex-1 max-w-md">
         <div className="relative w-full group">
@@ -77,7 +99,19 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center gap-3">
         {/* Study Streak Badge */}
         {(() => {
-          const streak = user.stats?.dsaStreak || 0;
+          const { streak, isAtRisk } = streakInfo;
+          if (isAtRisk) {
+            return (
+              <div 
+                title="Streak at Risk! Complete 1 task today or your streak breaks tomorrow!"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-red-600 to-rose-600 border border-red-400 text-white text-xs font-black shadow-md shadow-red-500/20 cursor-pointer hover:scale-105 transition-all animate-pulse"
+                onClick={() => onNavigateTab('coding')}
+              >
+                <AlertTriangle className="w-4 h-4 text-amber-300 fill-amber-300 animate-bounce shrink-0" />
+                <span>{streak} Day{streak === 1 ? '' : 's'} Streak (At Risk! ⚠️)</span>
+              </div>
+            );
+          }
           return (
             <div 
               title="Daily Study Streak"
@@ -336,6 +370,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
     </header>
-  );
+  </>
+);
 };
 
