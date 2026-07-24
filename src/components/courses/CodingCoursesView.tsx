@@ -4245,6 +4245,16 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
             courseTitle: payingForCourse.title,
             courseCategory: payingForCourse.category
           });
+
+          FirestoreService.recordFinancialTransaction({
+            userId: user.uid,
+            userName: user.displayName || user.email?.split('@')[0] || 'Student',
+            userEmail: user.email || '',
+            itemType: 'course',
+            itemId: payingForCourse.id,
+            itemTitle: payingForCourse.title,
+            amount: payingForCourse.price
+          }).catch(e => console.warn("Failed to record course purchase transaction in Firestore:", e));
         }
 
         setPayingForCourse(null);

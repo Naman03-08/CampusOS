@@ -1,10 +1,17 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { getFirestore, Firestore, setLogLevel } from 'firebase/firestore';
 import { getAnalytics, Analytics, isSupported } from 'firebase/analytics';
 import rawFirebaseConfig from '../../firebase-applet-config.json';
 
 export const firebaseConfig = rawFirebaseConfig;
+
+// Silence non-fatal internal debug warnings (e.g. BloomFilterError) from Firestore SDK
+try {
+  setLogLevel('error');
+} catch {
+  // Ignore if unsupported
+}
 
 let app: FirebaseApp;
 if (!getApps().length) {

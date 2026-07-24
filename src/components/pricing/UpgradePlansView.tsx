@@ -22,6 +22,7 @@ import {
 import { UserProfile } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { calculatePlanDetails, PLAN_DEFINITIONS } from '../../lib/planUtils';
+import { FirestoreService } from '../../lib/firestoreService';
 
 interface UpgradePlansProps {
   user: UserProfile;
@@ -100,6 +101,18 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
           planStartedAt: now.toISOString(),
           planExpiresAt: expiresAt.toISOString()
         });
+      }
+
+      if (user && user.uid) {
+        FirestoreService.recordFinancialTransaction({
+          userId: user.uid,
+          userName: user.displayName || user.email?.split('@')[0] || 'Student',
+          userEmail: user.email || '',
+          itemType: 'subscription',
+          itemId: selectedPlanForCheckout.id,
+          itemTitle: `Subscription Plan: ${selectedPlanForCheckout.name}`,
+          amount: selectedPlanForCheckout.rawPrice
+        }).catch(e => console.warn("Failed to record subscription transaction in Firestore:", e));
       }
 
       setSelectedPlanForCheckout(null);

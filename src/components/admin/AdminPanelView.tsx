@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   ShieldAlert, 
   Cpu, 
@@ -38,7 +38,11 @@ import {
   HelpCircle,
   Layers,
   ChevronRight,
-  Plus
+  Plus,
+  Trash2,
+  UserX,
+  AlertTriangle,
+  RotateCcw
 } from 'lucide-react';
 import { UserProfile, MonthlyProfitRecord, StudentCoursePurchase } from '../../types';
 import { FirestoreService, UserFullData } from '../../lib/firestoreService';
@@ -80,17 +84,31 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
   // -------------------------------------------------------------
   const [monthlyProfits, setMonthlyProfits] = useState<MonthlyProfitRecord[]>([]);
   const [loadingProfits, setLoadingProfits] = useState<boolean>(false);
-  const [selectedMonthKey, setSelectedMonthKey] = useState<string>('2026-07');
+  const [selectedMonthKey, setSelectedMonthKey] = useState<string>(() => new Date().toISOString().slice(0, 7));
 
   const [coursePurchases, setCoursePurchases] = useState<StudentCoursePurchase[]>([]);
   const [loadingPurchases, setLoadingPurchases] = useState<boolean>(false);
 
   // New Monthly Record Modal Form
   const [showAddMonthModal, setShowAddMonthModal] = useState<boolean>(false);
-  const [newMonthKey, setNewMonthKey] = useState('2026-08');
-  const [newMonthName, setNewMonthName] = useState('August 2026');
-  const [newSubRevenue, setNewSubRevenue] = useState('18500');
-  const [newCourseRevenue, setNewCourseRevenue] = useState('14200');
+  const [newMonthKey, setNewMonthKey] = useState(() => {
+    const nextMonth = new Date();
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    return nextMonth.toISOString().slice(0, 7);
+  });
+  const [newMonthName, setNewMonthName] = useState(() => {
+    const nextMonth = new Date();
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    return nextMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  });
+  const [newSubRevenue, setNewSubRevenue] = useState('0');
+  const [newCourseRevenue, setNewCourseRevenue] = useState('0');
+
+  // Admin Payment Deletion & Subscription Cancellation States
+  const [paymentToDelete, setPaymentToDelete] = useState<StudentCoursePurchase | null>(null);
+  const [isDeletingPayment, setIsDeletingPayment] = useState(false);
+  const [userToCancelSub, setUserToCancelSub] = useState<UserProfile | null>(null);
+  const [isCancellingSub, setIsCancellingSub] = useState(false);
 
   // -------------------------------------------------------------
   // SECTION 2 STATE: Real Email Broadcast & AI Email Draft Helper
@@ -168,130 +186,14 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       setSelectedRecipientEmails(finalUsers.map(u => u.email).filter(Boolean));
 
       // 2. Fetch Monthly Profits from Firestore
-      let profitRecords = await FirestoreService.getMonthlyProfits();
-      if (profitRecords.length === 0) {
-        // Seed default initial monthly records into Firestore
-        const defaultRecords: MonthlyProfitRecord[] = [
-          {
-            id: '2026-07',
-            monthKey: '2026-07',
-            monthName: 'July 2026',
-            subscriptionRevenue: 16450,
-            courseRevenue: 12800,
-            grossProfit: 29250,
-            subscriptionCount: 38,
-            coursePurchaseCount: 22,
-            updatedAt: new Date().toISOString()
-          },
-          {
-            id: '2026-06',
-            monthKey: '2026-06',
-            monthName: 'June 2026',
-            subscriptionRevenue: 14200,
-            courseRevenue: 10500,
-            grossProfit: 24700,
-            subscriptionCount: 32,
-            coursePurchaseCount: 18,
-            updatedAt: new Date().toISOString()
-          },
-          {
-            id: '2026-05',
-            monthKey: '2026-05',
-            monthName: 'May 2026',
-            subscriptionRevenue: 11800,
-            courseRevenue: 8900,
-            grossProfit: 20700,
-            subscriptionCount: 26,
-            coursePurchaseCount: 14,
-            updatedAt: new Date().toISOString()
-          },
-          {
-            id: '2026-04',
-            monthKey: '2026-04',
-            monthName: 'April 2026',
-            subscriptionRevenue: 9500,
-            courseRevenue: 6400,
-            grossProfit: 15900,
-            subscriptionCount: 20,
-            coursePurchaseCount: 10,
-            updatedAt: new Date().toISOString()
-          }
-        ];
-
-        for (const rec of defaultRecords) {
-          await FirestoreService.saveMonthlyProfit(rec);
-        }
-        profitRecords = defaultRecords;
-      }
+      const profitRecords = await FirestoreService.getMonthlyProfits();
       setMonthlyProfits(profitRecords);
-
-      // 3. Fetch Course Purchases
-      let purchases = await FirestoreService.getAllCoursePurchases();
-      if (purchases.length === 0) {
-        // Seed default initial purchases for demonstration
-        const defaultPurchases: StudentCoursePurchase[] = [
-          {
-            id: 'cp_101',
-            userId: user?.uid || 'naman_7845',
-            userName: user?.displayName || 'Naman Pandey',
-            userEmail: user?.email || 'naman03mgs@gmail.com',
-            courseId: 'cpp-dsa',
-            courseTitle: 'C++ Mastery & Data Structures Engine',
-            pricePaid: 699,
-            purchaseDate: '2026-07-20T10:30:00.000Z',
-            paymentStatus: 'Completed'
-          },
-          {
-            id: 'cp_102',
-            userId: user?.uid || 'naman_7845',
-            userName: user?.displayName || 'Naman Pandey',
-            userEmail: user?.email || 'naman03mgs@gmail.com',
-            courseId: 'system-design',
-            courseTitle: 'System Design Architecture & Distributed Systems',
-            pricePaid: 899,
-            purchaseDate: '2026-07-18T14:15:00.000Z',
-            paymentStatus: 'Completed'
-          },
-          {
-            id: 'cp_103',
-            userId: 'student_priya',
-            userName: 'Priya Sharma',
-            userEmail: 'priya.sharma@iitd.ac.in',
-            courseId: 'mern-webdev',
-            courseTitle: 'Web Development: Interactive MERN Core',
-            pricePaid: 599,
-            purchaseDate: '2026-07-15T09:00:00.000Z',
-            paymentStatus: 'Completed'
-          },
-          {
-            id: 'cp_104',
-            userId: 'student_rohit',
-            userName: 'Rohit Verma',
-            userEmail: 'rohit.v@bits.edu',
-            courseId: 'java-dsa',
-            courseTitle: 'Java Core & Enterprise Systems',
-            pricePaid: 499,
-            purchaseDate: '2026-07-12T16:45:00.000Z',
-            paymentStatus: 'Completed'
-          },
-          {
-            id: 'cp_105',
-            userId: 'student_ananya',
-            userName: 'Ananya Gupta',
-            userEmail: 'ananya.g@vit.ac.in',
-            courseId: '375-dsa-roadmap',
-            courseTitle: '375 DSA Roadmap Sheet & Interview Mastery',
-            pricePaid: 399,
-            purchaseDate: '2026-07-08T11:20:00.000Z',
-            paymentStatus: 'Completed'
-          }
-        ];
-
-        for (const p of defaultPurchases) {
-          await FirestoreService.saveCoursePurchase(p);
-        }
-        purchases = defaultPurchases;
+      if (profitRecords.length > 0) {
+        setSelectedMonthKey(profitRecords[0].monthKey);
       }
+
+      // 3. Fetch Course Purchases from Firestore
+      const purchases = await FirestoreService.getAllCoursePurchases();
       setCoursePurchases(purchases);
 
     } catch (e) {
@@ -344,6 +246,34 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       console.warn("Error fetching student full data:", e);
     } finally {
       setLoadingInspect(false);
+    }
+  };
+
+  // Manual Reset Handler: Reset all revenue numbers to ₹0 baseline starting fresh from today
+  const handleResetFinancialsToZero = async () => {
+    if (!window.confirm("Are you sure you want to reset all financial numbers, revenue, and monthly profit records in Firestore to ₹0 baseline starting fresh from today?")) {
+      return;
+    }
+    setLoadingProfits(true);
+    try {
+      const zeroRecords = await FirestoreService.resetFinancialsToZeroBaseline();
+      setMonthlyProfits(zeroRecords);
+      setCoursePurchases([]);
+      if (zeroRecords.length > 0) {
+        setSelectedMonthKey(zeroRecords[0].monthKey);
+      }
+      setEmailStatusMessage({
+        type: 'success',
+        text: 'All revenue metrics and monthly profits have been reset to ₹0 baseline starting fresh from today!'
+      });
+    } catch (e: any) {
+      console.error("Failed to reset financials:", e);
+      setEmailStatusMessage({
+        type: 'error',
+        text: `Failed to reset financials: ${e.message || e}`
+      });
+    } finally {
+      setLoadingProfits(false);
     }
   };
 
@@ -569,28 +499,100 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
     }
   };
 
-  // Helper calculation for Subscription Expiration Days Remaining
-  const getSubscriptionInfo = (u: UserProfile) => {
-    const planName = u.plan ? (u.plan === 'free_trial' ? '4-Day Free Trial' : u.plan) : 'Ultra AI Plan';
-    const isFree = u.plan === 'free_trial';
-    
-    // Price estimation
-    let price = 349;
-    if (planName.includes('Ultra')) price = 599;
-    if (planName.includes('Pro') || planName.includes('199')) price = 299;
-    if (isFree) price = 0;
+  // Admin Handlers: Delete Payment Transaction & Cancel Subscription
+  const handleDeletePayment = async () => {
+    if (!paymentToDelete) return;
+    setIsDeletingPayment(true);
+    try {
+      await FirestoreService.deleteTransactionAndAdjustMonthlyProfit(paymentToDelete);
+      // Refresh local state
+      const updatedPurchases = coursePurchases.filter(p => p.id !== paymentToDelete.id);
+      setCoursePurchases(updatedPurchases);
 
-    // Remaining days calculation
-    let daysRemaining = 24; // default
-    if (u.planExpiresAt) {
-      const exp = new Date(u.planExpiresAt).getTime();
-      const diff = exp - Date.now();
-      daysRemaining = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+      const updatedProfits = await FirestoreService.getMonthlyProfits();
+      setMonthlyProfits(updatedProfits);
+
+      setPaymentToDelete(null);
+      setEmailStatusMessage({
+        type: 'success',
+        text: `Payment of ₹${paymentToDelete.pricePaid} for '${paymentToDelete.courseTitle}' was permanently deleted and monthly profit adjusted in Firestore!`
+      });
+    } catch (e: any) {
+      console.error("Failed to delete payment:", e);
+      setEmailStatusMessage({
+        type: 'error',
+        text: `Failed to delete payment transaction: ${e.message || e}`
+      });
+    } finally {
+      setIsDeletingPayment(false);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!userToCancelSub) return;
+    setIsCancellingSub(true);
+    try {
+      await FirestoreService.cancelUserSubscription(userToCancelSub.uid);
+      // Update local allUsers state
+      setAllUsers(prev => prev.map(u => u.uid === userToCancelSub.uid ? { ...u, plan: 'Free Tier', planExpiresAt: undefined } : u));
+      setUserToCancelSub(null);
+      setEmailStatusMessage({
+        type: 'success',
+        text: `Subscription cancelled successfully for ${userToCancelSub.displayName || userToCancelSub.email}. User set to Free Tier in Firestore.`
+      });
+    } catch (e: any) {
+      console.error("Failed to cancel subscription:", e);
+      setEmailStatusMessage({
+        type: 'error',
+        text: `Failed to cancel user subscription: ${e.message || e}`
+      });
+    } finally {
+      setIsCancellingSub(false);
+    }
+  };
+
+  // Helper calculation for Subscription Expiration Days Remaining & Real Paid Amount
+  const getSubscriptionInfo = (u: UserProfile) => {
+    const rawPlan = u.plan ? u.plan.trim() : '';
+    const isFree = !rawPlan || rawPlan === 'free_trial' || rawPlan === 'Free Tier' || rawPlan === 'Free' || rawPlan.toLowerCase().includes('starter') || rawPlan.toLowerCase().includes('free');
+    
+    const planName = isFree 
+      ? 'Free Tier / Starter' 
+      : (rawPlan === 'free_trial' ? '4-Day Free Trial' : rawPlan);
+
+    // Exact paid price mapping for active plan
+    let price = 0;
+    if (!isFree) {
+      if (rawPlan === 'plan_199' || planName.toLowerCase().includes('pro scholar') || rawPlan.includes('199')) {
+        price = 199;
+      } else if (rawPlan === 'plan_349' || planName.toLowerCase().includes('ultimate') || planName.toLowerCase().includes('pro') || rawPlan.includes('349')) {
+        price = 349;
+      } else if (planName.toLowerCase().includes('ultra') || rawPlan.includes('599')) {
+        price = 599;
+      } else if (planName.toLowerCase().includes('year') || rawPlan.includes('1999')) {
+        price = 1999;
+      } else {
+        price = 349; // Default paid plan rate
+      }
     }
 
-    let statusLabel = `${daysRemaining} Days Remaining`;
-    if (daysRemaining === 0) statusLabel = 'Expired';
-    if (daysRemaining <= 5 && daysRemaining > 0) statusLabel = `Expiring Soon (${daysRemaining}d left)`;
+    // Remaining days calculation
+    let daysRemaining = 0;
+    let statusLabel = 'Free Access';
+
+    if (!isFree) {
+      if (u.planExpiresAt) {
+        const exp = new Date(u.planExpiresAt).getTime();
+        const diff = exp - Date.now();
+        daysRemaining = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+      } else {
+        daysRemaining = 30; // Default active 30 days
+      }
+
+      statusLabel = `${daysRemaining} Days Remaining`;
+      if (daysRemaining === 0) statusLabel = 'Expired';
+      if (daysRemaining <= 5 && daysRemaining > 0) statusLabel = `Expiring Soon (${daysRemaining}d left)`;
+    }
 
     return {
       planName,
@@ -601,12 +603,127 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
     };
   };
 
-  // Financial Summaries Calculation
-  const totalSubRevenueAllTime = monthlyProfits.reduce((sum, p) => sum + (p.subscriptionRevenue || 0), 0);
-  const totalCourseRevenueAllTime = monthlyProfits.reduce((sum, p) => sum + (p.courseRevenue || 0), 0);
+  // Real Financial Calculations connected to all registered users (allUsers) and purchase logs (coursePurchases)
+  const liveFinancials = useMemo(() => {
+    // 1. Subscription Revenue from purchases logged in coursePurchases
+    const subPurchasesFromLogs = coursePurchases.filter(
+      p => p.id.startsWith('sub_') || p.courseTitle.toLowerCase().includes('subscription')
+    );
+    const subRevFromLogs = subPurchasesFromLogs.reduce((sum, p) => sum + (p.pricePaid || 0), 0);
+
+    // 2. Set of emails already in subPurchasesFromLogs to prevent double-counting
+    const loggedUserEmailsForSub = new Set(
+      subPurchasesFromLogs.map(p => (p.userEmail || '').toLowerCase().trim())
+    );
+
+    // 3. Subscription Revenue from registered users in allUsers holding active paid plans
+    const activePaidUsers = allUsers.filter(u => {
+      const sub = getSubscriptionInfo(u);
+      return !sub.isFree && sub.price > 0;
+    });
+
+    const subRevFromActiveUsers = activePaidUsers
+      .filter(u => !loggedUserEmailsForSub.has((u.email || '').toLowerCase().trim()))
+      .reduce((sum, u) => sum + getSubscriptionInfo(u).price, 0);
+
+    const totalSubRevenue = subRevFromLogs + subRevFromActiveUsers;
+    const totalSubCount = subPurchasesFromLogs.length + activePaidUsers.filter(u => !loggedUserEmailsForSub.has((u.email || '').toLowerCase().trim())).length;
+
+    // 4. Course Sales Revenue from coursePurchases
+    const coursePurchasesOnly = coursePurchases.filter(
+      p => !p.id.startsWith('sub_') && !p.courseTitle.toLowerCase().includes('subscription')
+    );
+    const totalCourseRevenue = coursePurchasesOnly.reduce((sum, p) => sum + (p.pricePaid || 0), 0);
+    const totalCourseCount = coursePurchasesOnly.length;
+
+    const totalGrossProfit = totalSubRevenue + totalCourseRevenue;
+
+    return {
+      totalSubRevenue,
+      totalSubCount,
+      totalCourseRevenue,
+      totalCourseCount,
+      totalGrossProfit
+    };
+  }, [allUsers, coursePurchases]);
+
+  const currentMonthKey = useMemo(() => new Date().toISOString().slice(0, 7), []);
+  const currentMonthName = useMemo(() => new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), []);
+
+  // Effective Monthly Profits records for UI display
+  const effectiveMonthlyProfits = useMemo(() => {
+    let list = monthlyProfits.length > 0 ? [...monthlyProfits] : [{
+      id: currentMonthKey,
+      monthKey: currentMonthKey,
+      monthName: currentMonthName,
+      subscriptionRevenue: liveFinancials.totalSubRevenue,
+      courseRevenue: liveFinancials.totalCourseRevenue,
+      grossProfit: liveFinancials.totalGrossProfit,
+      subscriptionCount: liveFinancials.totalSubCount,
+      coursePurchaseCount: liveFinancials.totalCourseCount,
+      updatedAt: new Date().toISOString()
+    }];
+
+    // Ensure current month record reflects actual live financials
+    let hasCurrentMonth = false;
+    list = list.map(m => {
+      if (m.monthKey === currentMonthKey) {
+        hasCurrentMonth = true;
+        const subRev = Math.max(m.subscriptionRevenue || 0, liveFinancials.totalSubRevenue);
+        const crsRev = Math.max(m.courseRevenue || 0, liveFinancials.totalCourseRevenue);
+        return {
+          ...m,
+          subscriptionRevenue: subRev,
+          courseRevenue: crsRev,
+          grossProfit: subRev + crsRev,
+          subscriptionCount: Math.max(m.subscriptionCount || 0, liveFinancials.totalSubCount),
+          coursePurchaseCount: Math.max(m.coursePurchaseCount || 0, liveFinancials.totalCourseCount)
+        };
+      }
+      return m;
+    });
+
+    if (!hasCurrentMonth) {
+      list.unshift({
+        id: currentMonthKey,
+        monthKey: currentMonthKey,
+        monthName: currentMonthName,
+        subscriptionRevenue: liveFinancials.totalSubRevenue,
+        courseRevenue: liveFinancials.totalCourseRevenue,
+        grossProfit: liveFinancials.totalGrossProfit,
+        subscriptionCount: liveFinancials.totalSubCount,
+        coursePurchaseCount: liveFinancials.totalCourseCount,
+        updatedAt: new Date().toISOString()
+      });
+    }
+
+    return list;
+  }, [monthlyProfits, liveFinancials, currentMonthKey, currentMonthName]);
+
+  // Sync live financials to Firestore whenever live totals are available
+  useEffect(() => {
+    if (isUnlocked && isAuthorizedEmail && (liveFinancials.totalSubRevenue > 0 || liveFinancials.totalCourseRevenue > 0)) {
+      const recordToSync: MonthlyProfitRecord = {
+        id: currentMonthKey,
+        monthKey: currentMonthKey,
+        monthName: currentMonthName,
+        subscriptionRevenue: liveFinancials.totalSubRevenue,
+        courseRevenue: liveFinancials.totalCourseRevenue,
+        grossProfit: liveFinancials.totalGrossProfit,
+        subscriptionCount: liveFinancials.totalSubCount,
+        coursePurchaseCount: liveFinancials.totalCourseCount,
+        updatedAt: new Date().toISOString()
+      };
+      FirestoreService.saveMonthlyProfit(recordToSync).catch(e => console.warn("Failed syncing live financials to Firestore:", e));
+    }
+  }, [isUnlocked, isAuthorizedEmail, liveFinancials, currentMonthKey, currentMonthName]);
+
+  // Overall Financial Totals across all months/live
+  const totalSubRevenueAllTime = Math.max(liveFinancials.totalSubRevenue, effectiveMonthlyProfits.reduce((sum, p) => sum + (p.subscriptionRevenue || 0), 0));
+  const totalCourseRevenueAllTime = Math.max(liveFinancials.totalCourseRevenue, effectiveMonthlyProfits.reduce((sum, p) => sum + (p.courseRevenue || 0), 0));
   const totalGrossProfitAllTime = totalSubRevenueAllTime + totalCourseRevenueAllTime;
 
-  const currentMonthRecord = monthlyProfits.find((p) => p.monthKey === selectedMonthKey) || monthlyProfits[0];
+  const currentMonthRecord = effectiveMonthlyProfits.find((p) => p.monthKey === selectedMonthKey) || effectiveMonthlyProfits[0];
 
   // Case 1: Unauthorized Email Access
   if (!isAuthorizedEmail) {
@@ -877,18 +994,28 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <select
                   value={selectedMonthKey}
                   onChange={(e) => setSelectedMonthKey(e.target.value)}
                   className="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 >
-                  {monthlyProfits.map((mp) => (
+                  {effectiveMonthlyProfits.map((mp) => (
                     <option key={mp.monthKey} value={mp.monthKey}>
                       {mp.monthName} — Gross: ₹{mp.grossProfit.toLocaleString()}
                     </option>
                   ))}
                 </select>
+
+                <button
+                  onClick={handleResetFinancialsToZero}
+                  disabled={loadingProfits}
+                  title="Reset all revenue and profit metrics to ₹0 starting fresh from today"
+                  className="px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs border border-red-200 flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-red-600" />
+                  <span>Reset to ₹0 Baseline</span>
+                </button>
 
                 <button
                   onClick={() => setShowAddMonthModal(true)}
@@ -902,29 +1029,36 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
 
             {/* Monthly Profit Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {monthlyProfits.map((mp) => (
-                <div
-                  key={mp.monthKey}
-                  onClick={() => setSelectedMonthKey(mp.monthKey)}
-                  className={`p-4 rounded-2xl border transition-all cursor-pointer ${
-                    selectedMonthKey === mp.monthKey
-                      ? 'bg-blue-50/80 border-blue-500 ring-2 ring-blue-500/20'
-                      : 'bg-slate-50 border-slate-200/80 hover:bg-white hover:border-slate-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-extrabold text-slate-900">{mp.monthName}</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                      Firebase Saved
-                    </span>
-                  </div>
-                  <p className="text-xl font-black text-slate-900">₹ {mp.grossProfit.toLocaleString()}</p>
-                  <div className="mt-2 pt-2 border-t border-slate-200/60 text-[10px] text-slate-500 font-medium flex items-center justify-between">
-                    <span>Subs: ₹{mp.subscriptionRevenue.toLocaleString()}</span>
-                    <span>Courses: ₹{mp.courseRevenue.toLocaleString()}</span>
-                  </div>
+              {effectiveMonthlyProfits.length === 0 ? (
+                <div className="col-span-full p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                  <p className="text-xs font-bold text-slate-500">No monthly gross profit records in Firebase Firestore yet.</p>
+                  <p className="text-[11px] text-slate-400 font-medium mt-0.5">When users upgrade plans or purchase courses, real monthly profits will automatically record here.</p>
                 </div>
-              ))}
+              ) : (
+                effectiveMonthlyProfits.map((mp) => (
+                  <div
+                    key={mp.monthKey}
+                    onClick={() => setSelectedMonthKey(mp.monthKey)}
+                    className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                      selectedMonthKey === mp.monthKey
+                        ? 'bg-blue-50/80 border-blue-500 ring-2 ring-blue-500/20'
+                        : 'bg-slate-50 border-slate-200/80 hover:bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-extrabold text-slate-900">{mp.monthName}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                        Firebase Saved
+                      </span>
+                    </div>
+                    <p className="text-xl font-black text-slate-900">₹ {mp.grossProfit.toLocaleString()}</p>
+                    <div className="mt-2 pt-2 border-t border-slate-200/60 text-[10px] text-slate-500 font-medium flex items-center justify-between">
+                      <span>Subs: ₹{mp.subscriptionRevenue.toLocaleString()}</span>
+                      <span>Courses: ₹{mp.courseRevenue.toLocaleString()}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -967,15 +1101,28 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
                         <p className="text-[11px] text-slate-500 font-medium font-mono truncate">{u.email}</p>
                       </div>
 
-                      <div className="text-right shrink-0">
-                        <p className={`font-black text-xs ${
-                          sub.daysRemaining <= 5 ? 'text-red-600' : 'text-emerald-600'
-                        }`}>
-                          {sub.statusLabel}
-                        </p>
-                        <p className="text-[10px] text-slate-400 font-bold">
-                          {sub.price > 0 ? `Paid: ₹${sub.price}` : 'Free Access'}
-                        </p>
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <div className="text-right">
+                          <p className={`font-black text-xs ${
+                            sub.daysRemaining <= 5 && !sub.isFree ? 'text-red-600' : 'text-emerald-600'
+                          }`}>
+                            {sub.statusLabel}
+                          </p>
+                          <p className="text-[10px] text-slate-400 font-bold">
+                            {sub.price > 0 ? `Paid: ₹${sub.price}` : 'Free Access'}
+                          </p>
+                        </div>
+
+                        {!sub.isFree && (
+                          <button
+                            onClick={() => setUserToCancelSub(u)}
+                            title="Cancel user subscription"
+                            className="p-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[10px] border border-red-200 transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <UserX className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Cancel</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
@@ -1001,25 +1148,42 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
               </div>
 
               <div className="overflow-x-auto space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
-                {coursePurchases.map((cp) => (
-                  <div
-                    key={cp.id}
-                    className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 flex items-center justify-between text-xs hover:bg-white transition-colors"
-                  >
-                    <div className="pr-2 min-w-0">
-                      <p className="font-extrabold text-slate-900 truncate">{cp.userName}</p>
-                      <p className="text-[11px] text-indigo-600 font-bold truncate">{cp.courseTitle}</p>
-                      <p className="text-[10px] text-slate-400 font-mono truncate">{cp.userEmail}</p>
-                    </div>
-
-                    <div className="text-right shrink-0">
-                      <p className="font-black text-slate-900 text-xs">₹ {cp.pricePaid}</p>
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
-                        {cp.paymentStatus}
-                      </span>
-                    </div>
+                {coursePurchases.length === 0 ? (
+                  <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                    <p className="text-xs font-bold text-slate-500">No course purchase records in Firebase Firestore yet.</p>
+                    <p className="text-[11px] text-slate-400 font-medium mt-0.5">When students buy coding courses, real transaction data will appear here automatically.</p>
                   </div>
-                ))}
+                ) : (
+                  coursePurchases.map((cp) => (
+                    <div
+                      key={cp.id}
+                      className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 flex items-center justify-between text-xs hover:bg-white transition-colors"
+                    >
+                      <div className="pr-2 min-w-0">
+                        <p className="font-extrabold text-slate-900 truncate">{cp.userName}</p>
+                        <p className="text-[11px] text-indigo-600 font-bold truncate">{cp.courseTitle}</p>
+                        <p className="text-[10px] text-slate-400 font-mono truncate">{cp.userEmail}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <div className="text-right">
+                          <p className="font-black text-slate-900 text-xs">₹ {cp.pricePaid}</p>
+                          <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
+                            {cp.paymentStatus}
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={() => setPaymentToDelete(cp)}
+                          title="Delete payment record from Firestore"
+                          className="p-1.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-600 border border-slate-200 hover:border-red-200 transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -1644,6 +1808,116 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
                 )}
               </div>
             ) : null}
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 4: DELETE PAYMENT TRANSACTION CONFIRMATION */}
+      {paymentToDelete && (
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div className="flex items-center gap-2 text-red-600 font-extrabold text-base">
+                <Trash2 className="w-5 h-5" />
+                <span>Delete Payment Transaction</span>
+              </div>
+              <button
+                onClick={() => setPaymentToDelete(null)}
+                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Are you sure you want to permanently delete this payment transaction record from Firebase Firestore?
+            </p>
+
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1 font-medium">
+              <p className="text-slate-900 font-extrabold">{paymentToDelete.courseTitle}</p>
+              <p className="text-slate-600">Student: <strong>{paymentToDelete.userName}</strong> ({paymentToDelete.userEmail})</p>
+              <p className="text-emerald-700 font-black text-sm pt-1">Amount Paid: ₹{paymentToDelete.pricePaid}</p>
+            </div>
+
+            <p className="text-[11px] text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200 font-semibold leading-normal">
+              ⚠️ Deleting this transaction will remove it from student purchases and automatically deduct ₹{paymentToDelete.pricePaid} from monthly gross profits in Firestore.
+            </p>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                onClick={() => setPaymentToDelete(null)}
+                className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 font-bold text-xs text-slate-700 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeletePayment}
+                disabled={isDeletingPayment}
+                className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+              >
+                {isDeletingPayment ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+                <span>{isDeletingPayment ? 'Deleting...' : 'Delete Payment'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 5: CANCEL USER SUBSCRIPTION CONFIRMATION */}
+      {userToCancelSub && (
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div className="flex items-center gap-2 text-amber-600 font-extrabold text-base">
+                <UserX className="w-5 h-5" />
+                <span>Cancel User Subscription</span>
+              </div>
+              <button
+                onClick={() => setUserToCancelSub(null)}
+                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Are you sure you want to cancel the active subscription for this student?
+            </p>
+
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1 font-medium">
+              <p className="text-slate-900 font-extrabold">{userToCancelSub.displayName}</p>
+              <p className="text-slate-600 font-mono">{userToCancelSub.email}</p>
+              <p className="text-blue-700 font-bold pt-1">Current Plan: {userToCancelSub.plan || 'Active Subscription'}</p>
+            </div>
+
+            <p className="text-[11px] text-slate-600 bg-slate-100 p-3 rounded-xl border border-slate-200 font-medium leading-normal">
+              This student's plan status will be updated to <strong>Free Tier</strong> in Firebase Firestore and active plan perks will be revoked immediately.
+            </p>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                onClick={() => setUserToCancelSub(null)}
+                className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 font-bold text-xs text-slate-700 transition-colors cursor-pointer"
+              >
+                Keep Active
+              </button>
+              <button
+                onClick={handleCancelSubscription}
+                disabled={isCancellingSub}
+                className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+              >
+                {isCancellingSub ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <UserX className="w-4 h-4" />
+                )}
+                <span>{isCancellingSub ? 'Cancelling...' : 'Cancel Subscription'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

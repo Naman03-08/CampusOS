@@ -658,7 +658,24 @@ export class FirestoreService {
 
   // Admin Monthly Financials & Gross Profits
   static async getMonthlyProfits(): Promise<MonthlyProfitRecord[]> {
-    if (!db) return [];
+    const now = new Date();
+    const currentMonthKey = now.toISOString().slice(0, 7);
+    const currentMonthName = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    if (!db) {
+      return [{
+        id: currentMonthKey,
+        monthKey: currentMonthKey,
+        monthName: currentMonthName,
+        subscriptionRevenue: 0,
+        courseRevenue: 0,
+        grossProfit: 0,
+        subscriptionCount: 0,
+        coursePurchaseCount: 0,
+        updatedAt: now.toISOString()
+      }];
+    }
+
     try {
       const snap = await getDocs(collection(db, 'monthly_profits'));
       const list: MonthlyProfitRecord[] = [];
@@ -668,12 +685,91 @@ export class FirestoreService {
           list.push(data);
         }
       });
+
+      // Filter out old historical months prior to current month if user requested starting fresh from today
+      const currentAndFutureList = list.filter(m => m.monthKey >= currentMonthKey);
+
+      if (currentAndFutureList.length === 0) {
+        const zeroRecord: MonthlyProfitRecord = {
+          id: currentMonthKey,
+          monthKey: currentMonthKey,
+          monthName: currentMonthName,
+          subscriptionRevenue: 0,
+          courseRevenue: 0,
+          grossProfit: 0,
+          subscriptionCount: 0,
+          coursePurchaseCount: 0,
+          updatedAt: now.toISOString()
+        };
+        await setDoc(doc(db, 'monthly_profits', currentMonthKey), sanitizeForFirestore(zeroRecord), { merge: true });
+        return [zeroRecord];
+      }
+
       // Sort by month descending
-      return list.sort((a, b) => b.monthKey.localeCompare(a.monthKey));
+      return currentAndFutureList.sort((a, b) => b.monthKey.localeCompare(a.monthKey));
     } catch (e) {
       console.warn("Firestore getMonthlyProfits error:", e);
-      return [];
+      return [{
+        id: currentMonthKey,
+        monthKey: currentMonthKey,
+        monthName: currentMonthName,
+        subscriptionRevenue: 0,
+        courseRevenue: 0,
+        grossProfit: 0,
+        subscriptionCount: 0,
+        coursePurchaseCount: 0,
+        updatedAt: now.toISOString()
+      }];
     }
+  }
+
+  /**
+   * Admin helper: Reset all revenue metrics and transaction records in Firestore to ₹0 baseline starting from today.
+   */
+  static async resetFinancialsToZeroBaseline(): Promise<MonthlyProfitRecord[]> {
+    const now = new Date();
+    const currentMonthKey = now.toISOString().slice(0, 7);
+    const currentMonthName = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    if (db) {
+      try {
+        // 1. Delete all existing docs in monthly_profits
+        const profitsSnap = await getDocs(collection(db, 'monthly_profits'));
+        for (const docSnap of profitsSnap.docs) {
+          await deleteDoc(docSnap.ref);
+        }
+
+        // 2. Delete all existing docs in course_purchases
+        const purchasesSnap = await getDocs(collection(db, 'course_purchases'));
+        for (const docSnap of purchasesSnap.docs) {
+          await deleteDoc(docSnap.ref);
+        }
+      } catch (e) {
+        console.warn("Error deleting old financial records from Firestore:", e);
+      }
+    }
+
+    const currentZeroRecord: MonthlyProfitRecord = {
+      id: currentMonthKey,
+      monthKey: currentMonthKey,
+      monthName: currentMonthName,
+      subscriptionRevenue: 0,
+      courseRevenue: 0,
+      grossProfit: 0,
+      subscriptionCount: 0,
+      coursePurchaseCount: 0,
+      updatedAt: now.toISOString()
+    };
+
+    if (db) {
+      try {
+        await setDoc(doc(db, 'monthly_profits', currentMonthKey), sanitizeForFirestore(currentZeroRecord));
+      } catch (e) {
+        console.warn("Error saving zero baseline month record to Firestore:", e);
+      }
+    }
+
+    return [currentZeroRecord];
   }
 
   static async saveMonthlyProfit(record: MonthlyProfitRecord): Promise<void> {
@@ -708,6 +804,139 @@ export class FirestoreService {
       await setDoc(doc(db, 'course_purchases', purchase.id), sanitizeForFirestore(purchase), { merge: true });
     } catch (e) {
       console.warn("Firestore saveCoursePurchase error:", e);
+    }
+  }
+
+  /**
+   * Helper to record real financial transactions (both Subscription Plans and Course Purchases)
+   * in Firestore collections `course_purchases` and `monthly_profits`.
+   */
+  static async recordFinancialTransaction(data: {
+    userId: string;
+    userName: string;
+    userEmail: string;
+    itemType: 'subscription' | 'course';
+    itemId: string;
+    itemTitle: string;
+    amount: number;
+  }): Promise<void> {
+    if (!db) return;
+    try {
+      const now = new Date();
+      const monthKey = now.toISOString().slice(0, 7); // e.g. "2026-03"
+      const monthName = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      // 1. Save individual transaction record to course_purchases collection
+      const purchaseId = `${data.itemType === 'subscription' ? 'sub' : 'cp'}_${Date.now()}_${data.userId.slice(0, 6)}`;
+      const purchaseRecord: StudentCoursePurchase = {
+        id: purchaseId,
+        userId: data.userId,
+        userName: data.userName || 'Student',
+        userEmail: data.userEmail || '',
+        courseId: data.itemId,
+        courseTitle: data.itemTitle,
+        pricePaid: data.amount,
+        purchaseDate: now.toISOString(),
+        paymentStatus: 'Completed'
+      };
+
+      await this.saveCoursePurchase(purchaseRecord);
+
+      // 2. Fetch existing monthly profit records
+      const allProfits = await this.getMonthlyProfits();
+      const existingMonth = allProfits.find(m => m.monthKey === monthKey);
+
+      const subRev = (existingMonth?.subscriptionRevenue || 0) + (data.itemType === 'subscription' ? data.amount : 0);
+      const crsRev = (existingMonth?.courseRevenue || 0) + (data.itemType === 'course' ? data.amount : 0);
+      const subCount = (existingMonth?.subscriptionCount || 0) + (data.itemType === 'subscription' ? 1 : 0);
+      const crsCount = (existingMonth?.coursePurchaseCount || 0) + (data.itemType === 'course' ? 1 : 0);
+
+      const updatedMonthRecord: MonthlyProfitRecord = {
+        id: monthKey,
+        monthKey,
+        monthName: existingMonth?.monthName || monthName,
+        subscriptionRevenue: subRev,
+        courseRevenue: crsRev,
+        grossProfit: subRev + crsRev,
+        subscriptionCount: subCount,
+        coursePurchaseCount: crsCount,
+        updatedAt: now.toISOString()
+      };
+
+      await this.saveMonthlyProfit(updatedMonthRecord);
+    } catch (e) {
+      console.warn("Error recording financial transaction to Firestore:", e);
+    }
+  }
+
+  /**
+   * Admin helper: Delete a payment transaction from Firestore `course_purchases` collection.
+   */
+  static async deleteCoursePurchase(purchaseId: string): Promise<void> {
+    if (!db || !purchaseId) return;
+    try {
+      await deleteDoc(doc(db, 'course_purchases', purchaseId));
+    } catch (e) {
+      console.warn("Firestore deleteCoursePurchase error:", e);
+    }
+  }
+
+  /**
+   * Admin helper: Delete a transaction and automatically deduct its revenue from `monthly_profits` in Firestore.
+   */
+  static async deleteTransactionAndAdjustMonthlyProfit(purchaseRecord: StudentCoursePurchase): Promise<void> {
+    if (!db || !purchaseRecord || !purchaseRecord.id) return;
+    try {
+      // 1. Delete purchase record document
+      await this.deleteCoursePurchase(purchaseRecord.id);
+
+      // 2. Derive monthKey from purchaseDate
+      const pDate = new Date(purchaseRecord.purchaseDate);
+      const monthKey = !isNaN(pDate.getTime()) ? pDate.toISOString().slice(0, 7) : new Date().toISOString().slice(0, 7);
+
+      // 3. Fetch monthly profit records and adjust
+      const allProfits = await this.getMonthlyProfits();
+      const existingMonth = allProfits.find(m => m.monthKey === monthKey);
+
+      if (existingMonth) {
+        const isSubscription = purchaseRecord.id.startsWith('sub_') || purchaseRecord.courseTitle.toLowerCase().includes('subscription');
+        
+        const subRev = Math.max(0, (existingMonth.subscriptionRevenue || 0) - (isSubscription ? purchaseRecord.pricePaid : 0));
+        const crsRev = Math.max(0, (existingMonth.courseRevenue || 0) - (isSubscription ? 0 : purchaseRecord.pricePaid));
+        const subCount = Math.max(0, (existingMonth.subscriptionCount || 0) - (isSubscription ? 1 : 0));
+        const crsCount = Math.max(0, (existingMonth.coursePurchaseCount || 0) - (isSubscription ? 1 : 0));
+
+        const updatedMonthRecord: MonthlyProfitRecord = {
+          ...existingMonth,
+          subscriptionRevenue: subRev,
+          courseRevenue: crsRev,
+          grossProfit: subRev + crsRev,
+          subscriptionCount: subCount,
+          coursePurchaseCount: crsCount,
+          updatedAt: new Date().toISOString()
+        };
+
+        await this.saveMonthlyProfit(updatedMonthRecord);
+      }
+    } catch (e) {
+      console.warn("Error deleting transaction and adjusting monthly profit:", e);
+    }
+  }
+
+  /**
+   * Admin helper: Cancel a user's paid subscription and downgrade profile to Free Tier in Firestore.
+   */
+  static async cancelUserSubscription(uid: string): Promise<void> {
+    if (!db || !uid) return;
+    try {
+      const userRef = doc(db, 'users', uid);
+      await setDoc(userRef, {
+        plan: 'Free Tier',
+        planExpiresAt: null,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+    } catch (e) {
+      console.warn("Error cancelling user subscription in Firestore:", e);
     }
   }
 }
