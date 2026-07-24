@@ -307,8 +307,8 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
 
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="px-3.5 py-2 rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-800 font-bold text-xs flex items-center gap-2">
-            <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
-            <span>Streak: {solvedCount > 0 ? 'Active' : '0 Days'}</span>
+            <Flame className={`w-4 h-4 ${solvedCount > 0 ? 'text-orange-500 fill-orange-500' : 'text-slate-400'}`} />
+            <span>Streak: {solvedCount > 0 ? `${solvedCount} Day${solvedCount === 1 ? '' : 's'}` : '0 Days'}</span>
           </div>
 
           <div className="px-3.5 py-2 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs flex items-center gap-2">

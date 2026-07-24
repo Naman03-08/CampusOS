@@ -76,13 +76,22 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Right Controls */}
       <div className="flex items-center gap-3">
         {/* Study Streak Badge */}
-        <div 
-          title="Daily Study Streak"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 text-orange-600 text-xs font-black shadow-3d-sm cursor-pointer hover:scale-105 transition-transform"
-        >
-          <Flame className="w-4 h-4 text-orange-500 fill-orange-500 animate-bounce" />
-          <span>14 Day Streak</span>
-        </div>
+        {(() => {
+          const streak = user.stats?.dsaStreak || 0;
+          return (
+            <div 
+              title="Daily Study Streak"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-black shadow-3d-sm cursor-pointer hover:scale-105 transition-all ${
+                streak > 0 
+                  ? 'bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200 text-orange-600' 
+                  : 'bg-slate-100 border-slate-200 text-slate-500'
+              }`}
+            >
+              <Flame className={`w-4 h-4 ${streak > 0 ? 'text-orange-500 fill-orange-500 animate-bounce' : 'text-slate-400'}`} />
+              <span>{streak} Day{streak === 1 ? '' : 's'} Streak</span>
+            </div>
+          );
+        })()}
 
         {/* Quick AI Trigger */}
         <button

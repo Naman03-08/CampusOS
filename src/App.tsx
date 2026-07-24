@@ -139,11 +139,24 @@ export function App() {
     const attPct = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 0;
 
     const dsaSolved = currentDSA.filter((p) => p.solved).length;
-    const assignmentsSolved = currentAssignments.filter((a) => a.status === 'solved').length;
+    const assignmentsSolved = currentAssignments.filter((a) => a.status === 'solved' || a.status === 'submitted').length;
     const mockList = StorageService.getMockInterviews();
     const avgMockScore = mockList.length > 0
       ? Math.round(mockList.reduce((acc, i) => acc + i.overallScore, 0) / mockList.length)
       : 0;
+
+    let courseTopicsCompleted = 0;
+    try {
+      const savedTopics = localStorage.getItem('campus_os_completed_topics');
+      if (savedTopics) {
+        const parsed = JSON.parse(savedTopics);
+        courseTopicsCompleted = Object.values(parsed).filter(Boolean).length;
+      }
+    } catch {
+      courseTopicsCompleted = 0;
+    }
+
+    const currentStreak = dsaSolved + assignmentsSolved + courseTopicsCompleted;
 
     const updatedProfile: UserProfile = {
       ...currentProfile,
@@ -153,7 +166,7 @@ export function App() {
         totalClassesHeld: totalClasses,
         dsaSolvedCount: dsaSolved,
         dsaTotalCount: currentDSA.length,
-        dsaStreak: dsaSolved > 0 ? 1 : 0,
+        dsaStreak: currentStreak,
         assignmentsSolvedCount: assignmentsSolved,
         assignmentsTotalCount: currentAssignments.length,
         studySuitesCount: currentSuites.length,
@@ -168,25 +181,6 @@ export function App() {
     StorageService.saveProfile(updatedProfile);
     await FirestoreService.saveProfile(updatedProfile);
   };
-
-  const hasSeededRef = React.useRef<boolean>(false);
-
-  // Automatically seed coding courses catalog & student certificate registry to Firebase Firestore database ONCE
-  useEffect(() => {
-    if (hasSeededRef.current) return;
-    hasSeededRef.current = true;
-
-    const seedAllCoursesAndCertificates = async () => {
-      try {
-        const combined = [...CODING_COURSES, ...COURSES];
-        await FirestoreService.seedCodingCourses(combined);
-        await FirestoreService.seedAllStudentCertificates(user, combined);
-      } catch (e) {
-        console.warn("Course & Certificate seeding notice:", e);
-      }
-    };
-    seedAllCoursesAndCertificates();
-  }, []);
 
   // Ensure current active user profile is saved/connected in Firestore database
   useEffect(() => {
@@ -536,6 +530,7 @@ export function App() {
                 <CodingCoursesView
                   user={user}
                   onNavigateTab={handleNavigateTabWithGuard}
+                  onUpdateCourseTopics={() => syncUserStats(user, attendance, dsa, assignments, studySuites, resumeData)}
                 />
               )}
 

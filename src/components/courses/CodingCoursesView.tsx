@@ -44,6 +44,7 @@ import { FirestoreService } from '../../lib/firestoreService';
 interface CodingCoursesViewProps {
   user: UserProfile;
   onNavigateTab?: (tab: string) => void;
+  onUpdateCourseTopics?: () => void;
 }
 
 import { COURSES, type CourseItem } from '../../data/detailedCoursesData';
@@ -4128,7 +4129,7 @@ const INLINE_COURSES = [
 ];
 void INLINE_COURSES;
 
-export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNavigateTab }) => {
+export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNavigateTab, onUpdateCourseTopics }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeCourseId, setActiveCourseId] = useState<string | null>(null);
   
@@ -4320,6 +4321,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
 
     setCompletedTopics(updated);
     localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
+    onUpdateCourseTopics?.();
 
     if (user && user.uid) {
       const courseCompletedTopicIds = Object.keys(updated).filter(
@@ -4366,6 +4368,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
 
     setCompletedTopics(updated);
     localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
+    onUpdateCourseTopics?.();
 
     if (user && user.uid) {
       const courseCompletedTopicIds = Object.keys(updated).filter(

@@ -103,101 +103,28 @@ export const AIResumeBuilderView: React.FC<AIResumeBuilderViewProps> = ({
   const [resume, setResume] = useState<ResumeData>({
     id: resumeData.id || 'default_resume',
     userId: resumeData.userId || user.uid,
-    fullName: resumeData.fullName || user.displayName || 'Alex Rivera',
-    email: resumeData.email || user.email || 'alex.rivera@example.com',
-    phone: resumeData.phone || '+91 9876543210',
-    location: resumeData.location || 'San Francisco, CA',
-    github: resumeData.github || 'github.com/alexrivera',
-    linkedin: resumeData.linkedin || 'linkedin.com/in/alexrivera',
-    summary: resumeData.summary || 'Experienced software engineer with a passion for developing innovative scalable software solutions. Skilled in full-stack architecture, microservices, cloud deployments, and AI integration.',
-    education: resumeData.education?.length ? resumeData.education : [
-      {
-        institution: user.university || 'Stanford University',
-        degree: user.major || 'B.S. in Computer Science',
-        year: user.year || '2022 - 2026',
-        gpa: '3.9 / 4.0'
-      }
-    ],
-    experience: resumeData.experience?.length ? resumeData.experience : [
-      {
-        company: 'TechNova Solutions',
-        role: 'Senior Software Engineering Intern',
-        duration: 'May 2024 - Present',
-        bulletPoints: [
-          'Spearheaded the development of a microservices architecture that reduced page load latency by 42% across 100k daily active users.',
-          'Architected auto-scaling CI/CD pipelines using GitHub Actions and Docker containers, accelerating deployment velocity by 3x.',
-          'Collaborated with a cross-functional team of 6 engineers to build real-time collaborative editing features using WebSockets.'
-        ]
-      },
-      {
-        company: 'InnovaSoft Systems',
-        role: 'Software Engineer Intern',
-        duration: 'June 2023 - Aug 2023',
-        bulletPoints: [
-          'Developed and deployed multi-tenant web applications using React, Node.js, and PostgreSQL.',
-          'Refactored legacy REST APIs into GraphQL endpoints, improving data retrieval efficiency by 35%.'
-        ]
-      }
-    ],
-    projects: resumeData.projects?.length ? resumeData.projects : [
-      {
-        name: 'CloudSync Orchestrator',
-        description: 'Designed and deployed a highly-available distributed sync engine supporting real-time multi-device document synchronization with end-to-end encryption.',
-        techStack: ['React', 'TypeScript', 'Node.js', 'AWS S3', 'Docker', 'Redis'],
-        link: 'github.com/alexrivera/cloudsync'
-      },
-      {
-        name: 'SmartNotes AI Platform',
-        description: 'Developed an AI-powered study assistant utilizing vector semantic search (Pinecone) and LLM summarization engines for dynamic Flashcard generation.',
-        techStack: ['Next.js', 'Python', 'FastAPI', 'Pinecone', 'Tailwind CSS'],
-        link: 'smartnotes-demo.dev'
-      }
-    ],
-    skills: resumeData.skills?.length ? resumeData.skills : [
-      { category: 'Languages', list: ['TypeScript', 'JavaScript', 'Python', 'C++', 'Java', 'SQL', 'HTML/CSS'] },
-      { category: 'Frameworks & Libs', list: ['React', 'Next.js', 'Node.js', 'Express', 'Tailwind CSS', 'FastAPI', 'Redux'] },
-      { category: 'Cloud & Tools', list: ['Git', 'Docker', 'AWS', 'Firebase', 'PostgreSQL', 'Redis', 'Linux'] }
-    ],
+    fullName: resumeData.fullName || user.displayName || '',
+    email: resumeData.email || user.email || '',
+    phone: resumeData.phone || '',
+    location: resumeData.location || '',
+    github: resumeData.github || '',
+    linkedin: resumeData.linkedin || '',
+    summary: resumeData.summary || '',
+    education: resumeData.education?.length ? resumeData.education : [],
+    experience: resumeData.experience?.length ? resumeData.experience : [],
+    projects: resumeData.projects?.length ? resumeData.projects : [],
+    skills: resumeData.skills?.length ? resumeData.skills : [],
     updatedAt: new Date().toISOString()
   });
 
   // Additional Extended Sections State
-  const [leadership, setLeadership] = useState<Array<{ role: string; organization: string; duration: string; description: string }>>([
-    {
-      role: 'President & Tech Lead',
-      organization: 'Google Developer Student Club (GDSC)',
-      duration: '2023 - 2024',
-      description: 'Organized 12+ campus hackathons, hosted hands-on Web3 & AI workshops, and mentored 350+ student developers.'
-    }
-  ]);
-
-  const [certifications, setCertifications] = useState<CertificationItem[]>([
-    { name: 'AWS Certified Solutions Architect – Associate', issuer: 'Amazon Web Services', date: '2024', credentialId: 'AWS-9871234' },
-    { name: 'Meta Full-Stack Engineer Professional Certificate', issuer: 'Coursera / Meta', date: '2023' }
-  ]);
-
-  const [awards, setAwards] = useState<AwardItem[]>([
-    { title: '1st Place Winner - National AI Hackathon 2024', organization: 'TechCrunch Student Hack', year: '2024', description: 'Built an AI-driven accessibility tool for vision-impaired students in 36 hours.' },
-    { title: 'Dean’s Honor Roll', organization: 'Stanford University', year: '2022 - 2024', description: 'Awarded for maintaining a GPA above 3.8/4.0 for consecutive semesters.' }
-  ]);
-
-  const [research, setResearch] = useState<ResearchItem[]>([
-    { title: 'Optimizing Latency in Distributed Vector Databases', publisher: 'IEEE Student Symposium', year: '2024', summary: 'Published research on index optimization algorithms for nearest-neighbor vector search in low-resource environments.' }
-  ]);
-
-  const [languages, setLanguages] = useState<LanguageItem[]>([
-    { name: 'English', proficiency: 'Native' },
-    { name: 'Spanish', proficiency: 'Fluent' },
-    { name: 'Hindi', proficiency: 'Professional' }
-  ]);
-
-  const [volunteer, setVolunteer] = useState<VolunteerItem[]>([
-    { organization: 'Code for Good Foundation', role: 'Volunteer Web Mentor', duration: '2023 - Present', description: 'Taught foundational Python and JavaScript coding classes to underprivileged high school students.' }
-  ]);
-
-  const [customSections, setCustomSections] = useState<CustomSectionItem[]>([
-    { heading: 'Open Source Contributions', content: 'Active contributor to popular open-source repositories including React ecosystem tooling and documentation.' }
-  ]);
+  const [leadership, setLeadership] = useState<Array<{ role: string; organization: string; duration: string; description: string }>>([]);
+  const [certifications, setCertifications] = useState<CertificationItem[]>([]);
+  const [awards, setAwards] = useState<AwardItem[]>([]);
+  const [research, setResearch] = useState<ResearchItem[]>([]);
+  const [languages, setLanguages] = useState<LanguageItem[]>([]);
+  const [volunteer, setVolunteer] = useState<VolunteerItem[]>([]);
+  const [customSections, setCustomSections] = useState<CustomSectionItem[]>([]);
 
   // Section Visibility State
   const [sectionVisibility, setSectionVisibility] = useState({

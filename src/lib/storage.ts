@@ -50,22 +50,20 @@ export const getZeroNotifications = (userId: string = 'new_user'): AppNotificati
   }
 ];
 
-export const getZeroResume = (userId: string = 'new_user', fullName: string = 'Student', email: string = ''): ResumeData => ({
+export const getZeroResume = (userId: string = 'new_user', fullName: string = '', email: string = ''): ResumeData => ({
   id: `res-${userId}`,
   userId,
-  fullName: fullName || 'New Student',
+  fullName: fullName || '',
   email: email || '',
   phone: '',
   location: '',
   github: '',
   linkedin: '',
-  summary: 'Aspiring software engineer eager to solve computer science problems and build real-world applications.',
+  summary: '',
   education: [],
   experience: [],
   projects: [],
-  skills: [
-    { category: 'Programming Languages', list: ['Python', 'Java', 'C++', 'TypeScript'] }
-  ],
+  skills: [],
   atsScore: 0,
   updatedAt: new Date().toISOString()
 });

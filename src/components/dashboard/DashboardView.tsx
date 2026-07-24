@@ -128,9 +128,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div>
             <div className="flex items-center gap-2 mb-2.5">
-              <span className="px-3 py-1 rounded-full bg-white/20 text-white font-extrabold text-xs backdrop-blur-md border border-white/30 flex items-center gap-1.5 shadow-2xs">
-                <Flame className="w-3.5 h-3.5 text-orange-300 fill-orange-300 animate-pulse" /> 14 Day Study Streak
-              </span>
+              {(() => {
+                const streak = user.stats?.dsaStreak || 0;
+                return (
+                  <span className={`px-3 py-1 rounded-full font-extrabold text-xs backdrop-blur-md border flex items-center gap-1.5 shadow-2xs ${
+                    streak > 0 ? 'bg-white/20 border-white/30 text-white' : 'bg-black/20 border-white/20 text-blue-100'
+                  }`}>
+                    <Flame className={`w-3.5 h-3.5 ${streak > 0 ? 'text-orange-300 fill-orange-300 animate-pulse' : 'text-slate-300'}`} />
+                    {streak} Day{streak === 1 ? '' : 's'} Study Streak
+                  </span>
+                );
+              })()}
               <span className="text-xs text-blue-100 font-bold">{user.university || 'Stanford University'}</span>
             </div>
 
