@@ -4398,6 +4398,48 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
     return { totalTopics, completedCount, percentage };
   };
 
+  // Calculate active course stats at top level for certificate handling
+  const activeCourseStats = activeCourse ? getCourseStats(activeCourse) : null;
+
+  // Auto-save certificate to Firestore & trigger celebration confetti when 100% completed
+  useEffect(() => {
+    if (activeCourse && activeCourseStats && activeCourseStats.percentage === 100) {
+      const courseCodeClean = activeCourse.id.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+      const userCodeClean = user?.uid ? user.uid.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase() : '7845';
+      const activeCourseCertCode = `COS-2026-${courseCodeClean}-${userCodeClean}`;
+      const certificateIssuedDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+      const studentDisplayName = user?.displayName && user.displayName.trim() !== 'Guest Student' ? user.displayName : 'Naman Pandey';
+
+      const certRecord: CertificateRecord = {
+        certificateId: activeCourseCertCode,
+        userId: user?.uid || 'guest_user',
+        userName: studentDisplayName,
+        userEmail: user?.email || '',
+        joinedAt: user?.createdAt ? user.createdAt.split('T')[0] : '2026-01-15',
+        userPlan: user?.plan ? (user.plan === 'free_trial' ? '4-Day Free Trial' : user.plan) : 'Pro Student Access',
+        courseId: activeCourse.id,
+        courseTitle: activeCourse.title,
+        issuedAt: certificateIssuedDate,
+        attendancePercentage: user?.stats?.attendancePercentage ?? 92,
+        totalClassesAttended: user?.stats?.totalClassesAttended ?? 46,
+        totalClassesHeld: user?.stats?.totalClassesHeld ?? 50,
+        dsaSolvedCount: user?.stats?.dsaSolvedCount ?? 120
+      };
+
+      FirestoreService.saveCertificate(certRecord).catch(e => console.warn("Error auto-saving certificate:", e));
+
+      try {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [activeCourse, activeCourseStats?.percentage, user]);
+
   // Filter logic
   const filteredCourses = selectedCategory === 'All' 
     ? COURSES 
@@ -4408,7 +4450,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
   // -------------------------------------------------------------
   if (activeCourse) {
     const isDrive = activeCourse.linkType === 'drive';
-    const stats = getCourseStats(activeCourse);
+    const stats = activeCourseStats || getCourseStats(activeCourse);
 
     // Generate unique Certificate Code for this course and user
     const courseCodeClean = activeCourse.id.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
@@ -4416,39 +4458,6 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
     const activeCourseCertCode = `COS-2026-${courseCodeClean}-${userCodeClean}`;
     const certificateIssuedDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
     const studentDisplayName = user?.displayName && user.displayName.trim() !== 'Guest Student' ? user.displayName : 'Naman Pandey';
-
-    // Auto-save certificate to Firestore & trigger celebration confetti when 100% completed
-    useEffect(() => {
-      if (stats.percentage === 100 && activeCourse) {
-        const certRecord: CertificateRecord = {
-          certificateId: activeCourseCertCode,
-          userId: user.uid || 'guest_user',
-          userName: studentDisplayName,
-          userEmail: user.email || '',
-          joinedAt: user.createdAt ? user.createdAt.split('T')[0] : '2026-01-15',
-          userPlan: user.plan ? (user.plan === 'free_trial' ? '4-Day Free Trial' : user.plan) : 'Pro Student Access',
-          courseId: activeCourse.id,
-          courseTitle: activeCourse.title,
-          issuedAt: certificateIssuedDate,
-          attendancePercentage: user.stats?.attendancePercentage ?? 92,
-          totalClassesAttended: user.stats?.totalClassesAttended ?? 46,
-          totalClassesHeld: user.stats?.totalClassesHeld ?? 50,
-          dsaSolvedCount: user.stats?.dsaSolvedCount ?? 120
-        };
-
-        FirestoreService.saveCertificate(certRecord).catch(e => console.warn("Error auto-saving certificate:", e));
-
-        try {
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 }
-          });
-        } catch (e) {
-          // ignore
-        }
-      }
-    }, [stats.percentage, activeCourse.id]);
 
     return (
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-300">

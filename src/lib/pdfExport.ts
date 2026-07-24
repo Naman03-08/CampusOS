@@ -1,5 +1,102 @@
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
+
+export function sanitizeCssString(cssText: string): string {
+  if (!cssText) return cssText;
+  let cleaned = cssText;
+
+  // 1. Remove color-mix with nested parentheses support
+  cleaned = cleaned.replace(/color-mix\((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*\)/gi, (match) => {
+    if (match.toLowerCase().includes('transparent')) {
+      return 'rgba(0, 0, 0, 0)';
+    }
+    return 'rgb(30, 41, 59)';
+  });
+
+  // 2. Remove oklch / oklab / lab / lch functions
+  cleaned = cleaned.replace(/\b(?:oklch|oklab|lab|lch)\((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*\)/gi, 'rgb(30, 41, 59)');
+
+  // 3. Remove keywords in color-space declarations
+  cleaned = cleaned.replace(/in\s+oklab/gi, 'in srgb');
+  cleaned = cleaned.replace(/in\s+oklch/gi, 'in srgb');
+
+  // 4. Fallback cleanup for lone oklab/oklch occurrences
+  cleaned = cleaned.replace(/\boklab\b/gi, 'srgb');
+  cleaned = cleaned.replace(/\boklch\b/gi, 'srgb');
+
+  return cleaned;
+}
+
+export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElementId?: string): void {
+  // Re-create <style> elements with sanitized CSS so the cloned iframe re-parses stylesheets cleanly
+  const styleTags = Array.from(clonedDoc.querySelectorAll('style'));
+  styleTags.forEach((styleTag) => {
+    if (styleTag.textContent) {
+      const sanitized = sanitizeCssString(styleTag.textContent);
+      const newStyle = clonedDoc.createElement('style');
+      newStyle.textContent = sanitized;
+      if (styleTag.parentNode) {
+        styleTag.parentNode.replaceChild(newStyle, styleTag);
+      }
+    }
+  });
+
+  // Sanitize inline styles on all elements
+  const allElements = clonedDoc.querySelectorAll('*');
+  allElements.forEach((el) => {
+    const styleAttr = el.getAttribute('style');
+    if (styleAttr) {
+      el.setAttribute('style', sanitizeCssString(styleAttr));
+    }
+  });
+
+  // Reset positioning / margins on cloned target element if provided
+  if (targetElementId) {
+    const clonedElem = clonedDoc.getElementById(targetElementId);
+    if (clonedElem) {
+      clonedElem.style.transform = 'none';
+      clonedElem.style.boxShadow = 'none';
+      clonedElem.style.margin = '0 auto';
+      
+      const isCert = targetElementId.includes('cert');
+      if (isCert) {
+        if (clonedDoc.body) {
+          clonedDoc.body.style.width = '1040px';
+          clonedDoc.body.style.margin = '0';
+          clonedDoc.body.style.padding = '0';
+          clonedDoc.body.style.overflow = 'hidden';
+          clonedDoc.body.style.backgroundColor = '#0B1220';
+        }
+
+        let parent = clonedElem.parentElement;
+        while (parent && parent !== clonedDoc.body) {
+          parent.style.maxWidth = 'none';
+          parent.style.width = '1040px';
+          parent.style.overflow = 'hidden';
+          parent.style.maxHeight = 'none';
+          parent.style.height = 'auto';
+          parent.style.padding = '0';
+          parent.style.margin = '0 auto';
+          parent = parent.parentElement;
+        }
+
+        clonedElem.style.width = '1000px';
+        clonedElem.style.minWidth = '1000px';
+        clonedElem.style.maxWidth = '1000px';
+        clonedElem.style.height = '680px';
+        clonedElem.style.minHeight = '680px';
+        clonedElem.style.maxHeight = '680px';
+        clonedElem.style.boxSizing = 'border-box';
+        clonedElem.style.borderRadius = '16px';
+        clonedElem.style.overflow = 'hidden';
+      } else {
+        clonedElem.style.width = '100%';
+        clonedElem.style.maxWidth = '100%';
+        clonedElem.style.borderRadius = '0';
+      }
+    }
+  }
+}
 
 export async function exportCanvasToPDF(elementId: string, filename: string = 'Resume.pdf'): Promise<void> {
   const elem = document.getElementById(elementId);
@@ -7,36 +104,50 @@ export async function exportCanvasToPDF(elementId: string, filename: string = 'R
     throw new Error(`Element with id #${elementId} not found`);
   }
 
-  // Generate crisp canvas rendering
+  const isCert = filename.toLowerCase().includes('certificate') || elementId.includes('cert');
+
+  // Generate crisp canvas rendering with desktop layout width
   const canvas = await html2canvas(elem, {
     scale: 2, // 2x scale for high DPI crisp text
     useCORS: true,
+    allowTaint: true,
     logging: false,
-    backgroundColor: '#ffffff',
+    windowWidth: 1200,
+    backgroundColor: isCert ? '#0B1220' : '#ffffff',
     onclone: (clonedDoc) => {
-      const clonedElem = clonedDoc.getElementById(elementId);
-      if (clonedElem) {
-        clonedElem.style.transform = 'none';
-        clonedElem.style.boxShadow = 'none';
-        clonedElem.style.margin = '0';
-        clonedElem.style.width = '100%';
-        clonedElem.style.maxWidth = '100%';
-        clonedElem.style.borderRadius = '0';
-      }
+      sanitizeDocumentForHtml2Canvas(clonedDoc, elementId);
     }
   });
 
   const imgData = canvas.toDataURL('image/png', 1.0);
   const pdf = new jsPDF({
-    orientation: 'portrait',
+    orientation: isCert ? 'landscape' : 'portrait',
     unit: 'mm',
     format: 'a4'
   });
 
-  const pdfWidth = pdf.internal.pageSize.getWidth(); // 210 mm
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = pdf.internal.pageSize.getHeight();
 
-  pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+  if (isCert) {
+    const margin = 4; // 4mm margin for pristine full certificate fitting
+    const availWidth = pdfWidth - margin * 2;
+    const availHeight = pdfHeight - margin * 2;
+
+    const ratio = Math.min(availWidth / canvas.width, availHeight / canvas.height);
+    const renderWidth = canvas.width * ratio;
+    const renderHeight = canvas.height * ratio;
+
+    const xOffset = (pdfWidth - renderWidth) / 2;
+    const yOffset = (pdfHeight - renderHeight) / 2;
+
+    pdf.addImage(imgData, 'PNG', xOffset, yOffset, renderWidth, renderHeight, undefined, 'FAST');
+  } else {
+    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+    const yOffset = imgHeight < pdfHeight ? (pdfHeight - imgHeight) / 2 : 0;
+    pdf.addImage(imgData, 'PNG', 0, yOffset, pdfWidth, imgHeight, undefined, 'FAST');
+  }
+
   pdf.save(filename);
 }
 

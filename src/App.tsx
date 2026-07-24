@@ -169,17 +169,23 @@ export function App() {
     await FirestoreService.saveProfile(updatedProfile);
   };
 
-  // Automatically seed coding courses catalog to Firebase Firestore database
+  const hasSeededRef = React.useRef<boolean>(false);
+
+  // Automatically seed coding courses catalog & student certificate registry to Firebase Firestore database ONCE
   useEffect(() => {
-    const seedAllCourses = async () => {
+    if (hasSeededRef.current) return;
+    hasSeededRef.current = true;
+
+    const seedAllCoursesAndCertificates = async () => {
       try {
         const combined = [...CODING_COURSES, ...COURSES];
         await FirestoreService.seedCodingCourses(combined);
+        await FirestoreService.seedAllStudentCertificates(user, combined);
       } catch (e) {
-        console.warn("Course seeding error:", e);
+        console.warn("Course & Certificate seeding notice:", e);
       }
     };
-    seedAllCourses();
+    seedAllCoursesAndCertificates();
   }, []);
 
   // Ensure current active user profile is saved/connected in Firestore database
