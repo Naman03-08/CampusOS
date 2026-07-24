@@ -185,12 +185,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-3 shrink-0 flex-wrap">
+            <button
+              onClick={() => onNavigateTab('notes')}
+              className="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm shadow-xl hover:scale-105 cursor-pointer transition-all flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4 fill-slate-950 text-slate-950" />
+              AI Notes Summarizer
+            </button>
             <button
               onClick={onOpenStudyHubUpload}
-              className="px-6 py-3 rounded-2xl bg-white text-blue-700 font-extrabold text-xs sm:text-sm shadow-xl btn-3d-blue hover:bg-blue-50 cursor-pointer transition-all flex items-center gap-2"
+              className="px-5 py-3 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-extrabold text-xs sm:text-sm border border-white/40 cursor-pointer transition-all flex items-center gap-2"
             >
-              <Plus className="w-4 h-4 text-blue-600" />
+              <Plus className="w-4 h-4 text-white" />
               Upload Study Notes
             </button>
           </div>

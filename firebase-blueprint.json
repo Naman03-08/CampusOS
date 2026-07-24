@@ -145,6 +145,37 @@
         "dsaSolvedCount": { "type": "number" }
       },
       "required": ["certificateId", "userId", "courseId", "courseTitle", "userName"]
+    },
+    "monthly_profits": {
+      "title": "Monthly Profits Records",
+      "description": "Financial profit tracking per month.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "monthKey": { "type": "string" },
+        "monthName": { "type": "string" },
+        "subscriptionRevenue": { "type": "number" },
+        "courseRevenue": { "type": "number" },
+        "grossProfit": { "type": "number" }
+      },
+      "required": ["id", "monthKey", "grossProfit"]
+    },
+    "course_purchases": {
+      "title": "Student Course Purchases",
+      "description": "Purchases of individual courses made by students.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "courseId": { "type": "string" },
+        "courseTitle": { "type": "string" },
+        "pricePaid": { "type": "number" },
+        "purchaseDate": { "type": "string" },
+        "paymentStatus": { "type": "string" }
+      },
+      "required": ["id", "userId", "courseId", "pricePaid"]
     }
   },
   "securityRules": {
@@ -161,6 +192,14 @@
       "write": "true"
     },
     "certificates": {
+      "read": "true",
+      "write": "true"
+    },
+    "monthly_profits": {
+      "read": "true",
+      "write": "true"
+    },
+    "course_purchases": {
       "read": "true",
       "write": "true"
     },

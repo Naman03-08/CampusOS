@@ -19,6 +19,7 @@ import { FooterLanding } from './components/landing/FooterLanding';
 
 // App Portal Views
 import { DashboardView } from './components/dashboard/DashboardView';
+import { AINotesSummarizerView } from './components/notes/AINotesSummarizerView';
 import { StudyHubView } from './components/studyhub/StudyHubView';
 import { AIChatView } from './components/chat/AIChatView';
 import { AssignmentSolverView } from './components/assignment/AssignmentSolverView';
@@ -71,10 +72,11 @@ export function App() {
     }
   }, []);
 
-  const gatedTabs = ['studyhub', 'resumebuilder', 'chat', 'assignment', 'attendance', 'coding', 'courses', 'placement'];
+  const gatedTabs = ['notes', 'studyhub', 'resumebuilder', 'chat', 'assignment', 'attendance', 'coding', 'courses', 'placement'];
 
   const getTabDisplayName = (tabId: string) => {
     switch (tabId) {
+      case 'notes': return 'AI Smart Notes Summarizer';
       case 'studyhub':
       case 'chat': 
       case 'assignment':
@@ -494,6 +496,14 @@ export function App() {
                   onNavigateTab={handleNavigateTabWithGuard}
                   onOpenStudyHubUpload={() => handleNavigateTabWithGuard('studyhub', 'AI Study Hub Upload')}
                   onStartTrial={handleStartFreeTrial}
+                />
+              )}
+
+              {activeTab === 'notes' && (
+                <AINotesSummarizerView
+                  user={user}
+                  onSaveSuite={handleSaveSuite}
+                  onNavigateTab={handleNavigateTabWithGuard}
                 />
               )}
 

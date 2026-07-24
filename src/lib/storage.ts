@@ -143,7 +143,12 @@ export class StorageService {
   }
 
   // Clear or initialize zero state for a new registered user
-  static initializeZeroUserStorage(userId: string, email: string, displayName: string): {
+  static initializeZeroUserStorage(
+    userId: string, 
+    email: string, 
+    displayName: string, 
+    extraProfileDetails?: { university?: string; stream?: string; contactDetails?: string }
+  ): {
     profile: UserProfile;
     attendance: AttendanceSubject[];
     dsa: DSAProblem[];
@@ -154,13 +159,17 @@ export class StorageService {
     schedule: ScheduleEvent[];
     notifications: AppNotification[];
   } {
+    const streamName = extraProfileDetails?.stream || 'Computer Science';
     const profile: UserProfile = {
       uid: userId,
       email: email || 'student@campus.edu',
       displayName: displayName || email.split('@')[0] || 'New Student',
       role: email.trim().toLowerCase() === 'naman03mgs@gmail.com' ? 'admin' : 'student',
-      university: 'Campus University',
-      major: 'Computer Science',
+      university: extraProfileDetails?.university || 'Campus University',
+      major: streamName,
+      stream: streamName,
+      contactDetails: extraProfileDetails?.contactDetails || '',
+      phone: extraProfileDetails?.contactDetails || '',
       year: '1st Year',
       gpaGoal: 4.0,
       targetRole: 'Software Engineer',

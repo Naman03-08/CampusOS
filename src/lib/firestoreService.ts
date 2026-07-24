@@ -18,7 +18,9 @@ import {
   DSAProblem, 
   ResumeData, 
   MockInterviewResult,
-  CertificateRecord
+  CertificateRecord,
+  MonthlyProfitRecord,
+  StudentCoursePurchase
 } from '../types';
 import { 
   getZeroAttendance, 
@@ -156,15 +158,24 @@ export class FirestoreService {
   }
 
   // Helper: Initialize zero data across all collections in Firestore for a new registered user
-  static async initializeNewUserWithZeroData(uid: string, email: string, displayName: string): Promise<UserProfile> {
+  static async initializeNewUserWithZeroData(
+    uid: string, 
+    email: string, 
+    displayName: string,
+    extraProfileDetails?: { university?: string; stream?: string; contactDetails?: string }
+  ): Promise<UserProfile> {
     const isAdmin = email.trim().toLowerCase() === 'naman03mgs@gmail.com';
+    const streamName = extraProfileDetails?.stream || 'Computer Science';
     const profile: UserProfile = {
       uid,
       email: email || 'student@campus.edu',
       displayName: displayName || email.split('@')[0] || 'New Student',
       role: isAdmin ? 'admin' : 'student',
-      university: 'Campus University',
-      major: 'Computer Science',
+      university: extraProfileDetails?.university || 'Campus University',
+      major: streamName,
+      stream: streamName,
+      contactDetails: extraProfileDetails?.contactDetails || '',
+      phone: extraProfileDetails?.contactDetails || '',
       year: '1st Year',
       gpaGoal: 4.0,
       targetRole: 'Software Engineer',
@@ -644,6 +655,62 @@ export class FirestoreService {
       return [];
     }
   }
+
+  // Admin Monthly Financials & Gross Profits
+  static async getMonthlyProfits(): Promise<MonthlyProfitRecord[]> {
+    if (!db) return [];
+    try {
+      const snap = await getDocs(collection(db, 'monthly_profits'));
+      const list: MonthlyProfitRecord[] = [];
+      snap.forEach(d => {
+        const data = d.data() as MonthlyProfitRecord;
+        if (data && data.monthKey) {
+          list.push(data);
+        }
+      });
+      // Sort by month descending
+      return list.sort((a, b) => b.monthKey.localeCompare(a.monthKey));
+    } catch (e) {
+      console.warn("Firestore getMonthlyProfits error:", e);
+      return [];
+    }
+  }
+
+  static async saveMonthlyProfit(record: MonthlyProfitRecord): Promise<void> {
+    if (!db || !record.monthKey) return;
+    try {
+      await setDoc(doc(db, 'monthly_profits', record.monthKey), sanitizeForFirestore(record), { merge: true });
+    } catch (e) {
+      console.warn("Firestore saveMonthlyProfit error:", e);
+    }
+  }
+
+  // Course Purchases
+  static async getAllCoursePurchases(): Promise<StudentCoursePurchase[]> {
+    if (!db) return [];
+    try {
+      const snap = await getDocs(collection(db, 'course_purchases'));
+      const list: StudentCoursePurchase[] = [];
+      snap.forEach(d => {
+        const data = d.data() as StudentCoursePurchase;
+        if (data) list.push(data);
+      });
+      return list.sort((a, b) => new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime());
+    } catch (e) {
+      console.warn("Firestore getAllCoursePurchases error:", e);
+      return [];
+    }
+  }
+
+  static async saveCoursePurchase(purchase: StudentCoursePurchase): Promise<void> {
+    if (!db || !purchase.id) return;
+    try {
+      await setDoc(doc(db, 'course_purchases', purchase.id), sanitizeForFirestore(purchase), { merge: true });
+    } catch (e) {
+      console.warn("Firestore saveCoursePurchase error:", e);
+    }
+  }
 }
+
 
 

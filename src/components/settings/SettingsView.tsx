@@ -185,11 +185,22 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Major / Branch</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Stream / Major</label>
               <input
                 type="text"
-                value={profile.major}
-                onChange={(e) => setProfile({ ...profile, major: e.target.value })}
+                value={profile.stream || profile.major || ''}
+                onChange={(e) => setProfile({ ...profile, major: e.target.value, stream: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Contact Details / Phone</label>
+              <input
+                type="tel"
+                value={profile.contactDetails || profile.phone || ''}
+                onChange={(e) => setProfile({ ...profile, contactDetails: e.target.value, phone: e.target.value })}
+                placeholder="+91 9876543210"
                 className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none"
               />
             </div>

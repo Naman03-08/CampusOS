@@ -32,6 +32,9 @@ export interface UserProfile {
   planExpiresAt?: string;
   university?: string;
   major?: string;
+  stream?: string;
+  contactDetails?: string;
+  phone?: string;
   year?: string;
   gpaGoal?: number;
   targetRole?: string;
@@ -284,3 +287,43 @@ export interface CertificateRecord {
   dsaSolvedCount: number;
   dsaTotalCount?: number;
 }
+
+export interface MonthlyProfitRecord {
+  id: string; // e.g. "2026-07"
+  monthKey: string; // "2026-07"
+  monthName: string; // "July 2026"
+  subscriptionRevenue: number;
+  courseRevenue: number;
+  grossProfit: number;
+  subscriptionCount: number;
+  coursePurchaseCount: number;
+  updatedAt: string;
+}
+
+export interface StudentCoursePurchase {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  courseId: string;
+  courseTitle: string;
+  pricePaid: number;
+  purchaseDate: string;
+  paymentStatus: 'Completed' | 'Pending';
+}
+
+export interface AdminEmailPayload {
+  recipientEmails: string[];
+  subject: string;
+  bodyHtml: string;
+  smtpConfig?: {
+    host: string;
+    port: number;
+    secure: boolean;
+    user: string;
+    pass: string;
+    fromEmail: string;
+    fromName: string;
+  };
+}
+

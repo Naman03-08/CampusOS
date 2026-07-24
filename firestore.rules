@@ -60,5 +60,15 @@ service cloud.firestore {
     match /certificates/{docId} {
       allow read, write: if true;
     }
+
+    // Monthly Profits
+    match /monthly_profits/{docId} {
+      allow read, write: if true;
+    }
+
+    // Course Purchases
+    match /course_purchases/{docId} {
+      allow read, write: if true;
+    }
   }
 }

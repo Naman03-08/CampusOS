@@ -66,11 +66,11 @@ export const CanvasBackground: React.FC = () => {
 
     window.addEventListener('resize', handleResize, { passive: true });
 
-    // 1. Particle Constellation Network (130 nodes forming full-screen triangular web evenly across screen)
-    const particleCount = 130;
+    // 1. Particle Constellation Network (180 nodes forming edge-to-edge full-screen triangular web)
+    const particleCount = 180;
     const particles: Point3D[] = Array.from({ length: particleCount }, () => ({
-      x: (Math.random() - 0.5) * width * 1.8,
-      y: (Math.random() - 0.5) * height * 1.8,
+      x: (Math.random() - 0.5) * width * 2.8,
+      y: (Math.random() - 0.5) * height * 2.8,
       z: Math.random() * 800 - 400,
       vx: (Math.random() - 0.5) * 0.45,
       vy: (Math.random() - 0.5) * 0.45,
@@ -231,62 +231,53 @@ export const CanvasBackground: React.FC = () => {
     const hexBipyramidGeom = createHexagonalBipyramid(80, 100);
     const octaGeom = createOctahedron(95);
 
-    // Array of moving 3D polyhedra shapes distributed evenly across the entire screen
+    // Array of moving 3D polyhedra shapes distributed equally across every corner and center with slow, elegant movement
     const wireframeMeshes: WireframeMesh[] = [
-      // 1. Top Left - Nested Tesseract Cube
+      // 1. TOP-LEFT CORNER - Nested Tesseract Cube
       {
         ...nestedCubeGeom,
-        x: -width * 0.35, y: -height * 0.3, z: 90,
-        vx: 0.08, vy: 0.05, vz: -0.03,
+        x: -width * 0.38, y: -height * 0.32, z: 60,
+        vx: 0.015, vy: 0.01, vz: -0.005,
         rotX: 0.35, rotY: 0.55, rotZ: 0.1,
-        rotSpeedX: 0.003, rotSpeedY: 0.004, rotSpeedZ: 0.002,
+        rotSpeedX: 0.0012, rotSpeedY: 0.0015, rotSpeedZ: 0.0008,
         color: 'rgba(139, 92, 246, 0.45)', // Purple wireframe
       },
-      // 2. Top Right - Geodesic Sphere
+      // 2. TOP-RIGHT CORNER - Geodesic Sphere
       {
         ...sphereGeom,
-        x: width * 0.35, y: -height * 0.28, z: 70,
-        vx: -0.07, vy: 0.04, vz: 0.03,
+        x: width * 0.38, y: -height * 0.32, z: 50,
+        vx: -0.012, vy: 0.015, vz: 0.005,
         rotX: 0.2, rotY: 0.6, rotZ: 0.3,
-        rotSpeedX: 0.002, rotSpeedY: 0.005, rotSpeedZ: -0.003,
-        color: 'rgba(147, 51, 234, 0.42)', // Purple wireframe
+        rotSpeedX: 0.001, rotSpeedY: 0.0018, rotSpeedZ: -0.001,
+        color: 'rgba(147, 51, 234, 0.42)', // Violet wireframe
       },
-      // 3. Center Left - Hexagonal Bipyramid
+      // 3. CENTER - Hexagonal Bipyramid Diamond
       {
         ...hexBipyramidGeom,
-        x: -width * 0.3, y: height * 0.08, z: 110,
-        vx: 0.06, vy: -0.05, vz: -0.02,
+        x: 0, y: -height * 0.02, z: 80,
+        vx: 0.01, vy: -0.012, vz: -0.005,
         rotX: 0.5, rotY: 0.2, rotZ: 0.4,
-        rotSpeedX: 0.004, rotSpeedY: 0.003, rotSpeedZ: 0.002,
-        color: 'rgba(217, 119, 6, 0.45)', // Amber/Gold wireframe
+        rotSpeedX: 0.0015, rotSpeedY: 0.0012, rotSpeedZ: 0.001,
+        color: 'rgba(217, 119, 6, 0.45)', // Amber/Gold accent wireframe
       },
-      // 4. Center Right - 3D Cube
-      {
-        ...cubeGeom,
-        x: width * 0.3, y: height * 0.05, z: 85,
-        vx: -0.05, vy: -0.06, vz: 0.04,
-        rotX: 0.4, rotY: 0.4, rotZ: 0.2,
-        rotSpeedX: 0.003, rotSpeedY: 0.004, rotSpeedZ: -0.002,
-        color: 'rgba(124, 58, 237, 0.45)', // Violet wireframe
-      },
-      // 5. Bottom Left - Octahedron
+      // 4. BOTTOM-LEFT CORNER - Octahedron
       {
         ...octaGeom,
-        x: -width * 0.33, y: height * 0.35, z: 95,
-        vx: 0.05, vy: -0.04, vz: 0.02,
+        x: -width * 0.38, y: height * 0.32, z: 70,
+        vx: 0.012, vy: -0.01, vz: 0.005,
         rotX: 0.3, rotY: 0.7, rotZ: 0.1,
-        rotSpeedX: 0.002, rotSpeedY: 0.003, rotSpeedZ: 0.004,
+        rotSpeedX: 0.001, rotSpeedY: 0.0014, rotSpeedZ: 0.0012,
         color: 'rgba(147, 51, 234, 0.42)', // Purple wireframe
       },
-      // 6. Bottom Right - Hexagonal Prism
+      // 5. BOTTOM-RIGHT CORNER - 3D Cube
       {
-        ...hexPrismGeom,
-        x: width * 0.33, y: height * 0.34, z: 100,
-        vx: -0.06, vy: 0.05, vz: -0.03,
-        rotX: 0.6, rotY: 0.3, rotZ: 0.5,
-        rotSpeedX: 0.003, rotSpeedY: 0.002, rotSpeedZ: 0.003,
-        color: 'rgba(217, 119, 6, 0.42)', // Amber/Gold wireframe
-      }
+        ...cubeGeom,
+        x: width * 0.38, y: height * 0.32, z: 65,
+        vx: -0.015, vy: 0.01, vz: -0.005,
+        rotX: 0.4, rotY: 0.4, rotZ: 0.2,
+        rotSpeedX: 0.0012, rotSpeedY: 0.0015, rotSpeedZ: -0.001,
+        color: 'rgba(124, 58, 237, 0.42)', // Indigo/Violet wireframe
+      },
     ];
 
     const FOV = 480;
@@ -320,9 +311,9 @@ export const CanvasBackground: React.FC = () => {
         mesh.y += mesh.vy;
         mesh.z += mesh.vz;
 
-        // Viewport wrapping
-        const wrapX = width * 0.52;
-        const wrapY = height * 0.52;
+        // Viewport wrapping across balanced viewport bounds
+        const wrapX = width * 0.55;
+        const wrapY = height * 0.55;
         if (mesh.x < -wrapX) mesh.x = wrapX;
         if (mesh.x > wrapX) mesh.x = -wrapX;
         if (mesh.y < -wrapY) mesh.y = wrapY;
@@ -395,10 +386,10 @@ export const CanvasBackground: React.FC = () => {
         p.y += p.vy;
         p.z += p.vz;
 
-        if (p.x < -width * 0.8) p.x = width * 0.8;
-        if (p.x > width * 0.8) p.x = -width * 0.8;
-        if (p.y < -height * 0.8) p.y = height * 0.8;
-        if (p.y > height * 0.8) p.y = -height * 0.8;
+        if (p.x < -width * 1.4) p.x = width * 1.4;
+        if (p.x > width * 1.4) p.x = -width * 1.4;
+        if (p.y < -height * 1.4) p.y = height * 1.4;
+        if (p.y > height * 1.4) p.y = -height * 1.4;
         if (p.z < -300) p.z = 450;
         if (p.z > 450) p.z = -300;
 
@@ -423,8 +414,8 @@ export const CanvasBackground: React.FC = () => {
           const dy = p1.projY - p2.projY;
           const distSq = dx * dx + dy * dy;
 
-          if (distSq < 14000) {
-            const alpha = (1 - distSq / 14000) * 0.28;
+          if (distSq < 18000) {
+            const alpha = (1 - distSq / 18000) * 0.28;
             ctx.strokeStyle = `rgba(147, 51, 234, ${alpha})`;
             ctx.lineWidth = 0.8;
             ctx.beginPath();

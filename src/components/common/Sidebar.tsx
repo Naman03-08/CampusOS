@@ -13,7 +13,8 @@ import {
   Settings, 
   ShieldAlert, 
   Zap, 
-  GraduationCap 
+  GraduationCap,
+  Sparkles
 } from 'lucide-react';
 import { UserProfile } from '../../types';
 
@@ -34,6 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'notes', label: 'AI Notes Summarizer', icon: Sparkles, badge: 'AI' },
     { id: 'studyhub', label: 'AI Study, Chat & Solver', icon: BookOpen, badge: 'AI Suite' },
     { id: 'resumebuilder', label: 'AI Resume Builder', icon: FileText, badge: 'ATS' },
     { id: 'attendance', label: 'Attendance', icon: CheckSquare },
