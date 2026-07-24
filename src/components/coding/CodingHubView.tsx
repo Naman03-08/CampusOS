@@ -19,6 +19,7 @@ import { DSAProblem } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { getCampusOSDSASheet } from '../../data/dsaSheet375';
 import { StreakService } from '../../lib/streakService';
+import { getGfgUrl, getLeetcodeUrl, getPracticeUrl } from '../../lib/dsaProblemLinks';
 
 interface CodingHubProps {
   dsa: DSAProblem[];
@@ -51,82 +52,82 @@ const SECTION_RESOURCES: Record<string, { gfg: string; leetcode: string; youtube
   'Arrays': {
     gfg: 'https://www.geeksforgeeks.org/array-data-structure/',
     leetcode: 'https://leetcode.com/tag/array/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Arrays+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Arrays+DSA'
   },
   'Strings': {
     gfg: 'https://www.geeksforgeeks.org/string-data-structure/',
     leetcode: 'https://leetcode.com/tag/string/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Strings+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Strings+DSA'
   },
   '2D Arrays': {
     gfg: 'https://www.geeksforgeeks.org/matrix/',
     leetcode: 'https://leetcode.com/tag/matrix/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+2D+Arrays+Matrix+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+2D+Arrays+Matrix+DSA'
   },
   'Searching & Sorting': {
     gfg: 'https://www.geeksforgeeks.org/sorting-algorithms/',
     leetcode: 'https://leetcode.com/tag/sorting/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Searching+and+Sorting+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Searching+and+Sorting+DSA'
   },
   'Backtracking': {
     gfg: 'https://www.geeksforgeeks.org/backtracking-algorithms/',
     leetcode: 'https://leetcode.com/tag/backtracking/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Backtracking+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Backtracking+DSA'
   },
   'Linked List': {
     gfg: 'https://www.geeksforgeeks.org/data-structures/linked-list/',
     leetcode: 'https://leetcode.com/tag/linked-list/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Linked+List+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Linked+List+DSA'
   },
   'Stacks & Queues': {
     gfg: 'https://www.geeksforgeeks.org/stack-data-structure/',
     leetcode: 'https://leetcode.com/tag/stack/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Stacks+Queues+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Stacks+Queues+DSA'
   },
   'Greedy': {
     gfg: 'https://www.geeksforgeeks.org/greedy-algorithms/',
     leetcode: 'https://leetcode.com/tag/greedy/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Greedy+Algorithms+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Greedy+Algorithms+DSA'
   },
   'Binary Trees': {
     gfg: 'https://www.geeksforgeeks.org/binary-tree-data-structure/',
     leetcode: 'https://leetcode.com/tag/tree/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Binary+Trees+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Binary+Trees+DSA'
   },
   'Binary Search Trees': {
     gfg: 'https://www.geeksforgeeks.org/binary-search-tree-data-structure/',
     leetcode: 'https://leetcode.com/tag/binary-search-tree/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Binary+Search+Trees+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Binary+Search+Trees+DSA'
   },
   'Heaps & Hashing': {
     gfg: 'https://www.geeksforgeeks.org/heap-data-structure/',
     leetcode: 'https://leetcode.com/tag/heap-priority-queue/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Heaps+Hashing+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Heaps+Hashing+DSA'
   },
   'Graphs': {
     gfg: 'https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/',
     leetcode: 'https://leetcode.com/tag/graph/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Graphs+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Graphs+DSA'
   },
   'Tries': {
     gfg: 'https://www.geeksforgeeks.org/trie-insert-and-search/',
     leetcode: 'https://leetcode.com/tag/trie/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Trie+Data+Structure+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Trie+Data+Structure+DSA'
   },
   'Dynamic Programming': {
     gfg: 'https://www.geeksforgeeks.org/dynamic-programming/',
     leetcode: 'https://leetcode.com/tag/dynamic-programming/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Dynamic+Programming+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Dynamic+Programming+DSA'
   },
   'Bit Manipulation': {
     gfg: 'https://www.geeksforgeeks.org/bit-manipulation-data-structure/',
     leetcode: 'https://leetcode.com/tag/bit-manipulation/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Bit+Manipulation+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Bit+Manipulation+DSA'
   },
   'Segment Trees': {
     gfg: 'https://www.geeksforgeeks.org/segment-tree-data-structure/',
     leetcode: 'https://leetcode.com/tag/segment-tree/',
-    youtube: 'https://www.youtube.com/results?search_query=Apna+College+Segment+Trees+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Segment+Trees+DSA'
   }
 };
 
@@ -263,51 +264,32 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
             <div>
               <h1 className="text-2xl font-black text-slate-900">CampusOS 375 DSA Roadmap Sheet</h1>
               <p className="text-xs text-slate-500 mt-0.5 font-medium">
-                Comprehensive 375 DSA Question Bank (By Apna College) • Solved {solvedCount} of {totalCount} Questions
+                Comprehensive 375 DSA Question Bank (By CampusOS) • Solved {solvedCount} of {totalCount} Questions
               </p>
             </div>
           </div>
 
-          {/* PDF Section Links */}
+          {/* Section Links */}
           <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-100">
             {onNavigateTab && (
               <button
                 onClick={() => onNavigateTab('courses')}
-                className="px-3 py-1 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-[11px] font-black flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>Explore Interactive Coding Courses & Academies</span>
+                <span>Learn from CampusOS courses</span>
               </button>
             )}
-            <a
-              href="https://www.youtube.com/@ApnaCollegeOfficial"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-[11px] font-bold flex items-center gap-1.5 transition-colors"
-            >
-              <ExternalLink className="w-3 h-3 text-red-600" />
-              <span>Meet us on YouTube (Apna College)</span>
-            </a>
 
-            <a
-              href="https://www.youtube.com/watch?v=rZ41y93P2Qo"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-bold flex items-center gap-1.5 transition-colors"
-            >
-              <ExternalLink className="w-3 h-3 text-amber-600" />
-              <span>How to solve this sheet? (Video Guide)</span>
-            </a>
-
-            <a
-              href="https://www.apnacollege.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-2.5 py-1 rounded-lg bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-cyan-800 text-[11px] font-bold flex items-center gap-1.5 transition-colors"
-            >
-              <ExternalLink className="w-3 h-3 text-cyan-600" />
-              <span>Apna College Official Site</span>
-            </a>
+            {onNavigateTab && (
+              <button
+                onClick={() => onNavigateTab('dashboard')}
+                className="px-2.5 py-1.5 rounded-xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-cyan-800 text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <ExternalLink className="w-3 h-3 text-cyan-600" />
+                <span>CampusOS Portal</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -522,10 +504,10 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
             ) : (
               paginatedProblems.map((prob, idx) => {
                 const globalIndex = (currentPage - 1) * pageSize + idx + 1;
-                const linkUrl = prob.platformUrl || `https://www.google.com/search?q=${encodeURIComponent(prob.title + ' problem')}`;
-                const gfgUrl = `https://www.geeksforgeeks.org/search/?q=${encodeURIComponent(prob.title)}`;
-                const leetcodeUrl = `https://leetcode.com/problemset/all/?search=${encodeURIComponent(prob.title)}`;
-                const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent('Apna College ' + prob.title)}`;
+                const gfgUrl = getGfgUrl(prob);
+                const leetcodeUrl = getLeetcodeUrl(prob);
+                const linkUrl = getPracticeUrl(prob);
+                const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent('CampusOS ' + prob.title + ' solution')}`;
 
                 return (
                   <div
@@ -576,49 +558,57 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
 
                     {/* Question Links */}
                     <div className="flex items-center gap-1.5 flex-wrap shrink-0">
-                      <a
-                        href={linkUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs transition-colors flex items-center gap-1.5 shadow-2xs"
-                        title="Practice primary problem link"
-                      >
-                        <span>Practice</span>
-                        <ExternalLink className="w-3.5 h-3.5 text-white/80" />
-                      </a>
+                      {linkUrl && (
+                        <a
+                          href={linkUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs transition-colors flex items-center gap-1.5 shadow-2xs"
+                          title="Practice primary problem link"
+                        >
+                          <span>Practice</span>
+                          <ExternalLink className="w-3.5 h-3.5 text-white/80" />
+                        </a>
+                      )}
 
-                      <a
-                        href={gfgUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-[11px] transition-colors flex items-center gap-1"
-                        title="Search on GeeksforGeeks"
-                      >
-                        <span>GFG</span>
-                        <ExternalLink className="w-3 h-3 text-emerald-600" />
-                      </a>
+                      {gfgUrl && (
+                        <a
+                          href={gfgUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-[11px] transition-colors flex items-center gap-1"
+                          title="Open GeeksforGeeks Problem"
+                        >
+                          <span>GFG</span>
+                          <ExternalLink className="w-3 h-3 text-emerald-600" />
+                        </a>
+                      )}
 
-                      <a
-                        href={leetcodeUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-bold text-[11px] transition-colors flex items-center gap-1"
-                        title="Search on LeetCode"
-                      >
-                        <span>LeetCode</span>
-                        <ExternalLink className="w-3 h-3 text-amber-600" />
-                      </a>
+                      {leetcodeUrl && (
+                        <a
+                          href={leetcodeUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-bold text-[11px] transition-colors flex items-center gap-1"
+                          title="Open LeetCode Problem"
+                        >
+                          <span>LeetCode</span>
+                          <ExternalLink className="w-3 h-3 text-amber-600" />
+                        </a>
+                      )}
 
-                      <a
-                        href={ytUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-2.5 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold text-[11px] transition-colors flex items-center gap-1"
-                        title="Search Apna College Video Solution"
-                      >
-                        <span>Video Solution</span>
-                        <ExternalLink className="w-3 h-3 text-red-500" />
-                      </a>
+                      {ytUrl && (
+                        <a
+                          href={ytUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold text-[11px] transition-colors flex items-center gap-1"
+                          title="Search CampusOS Video Solution"
+                        >
+                          <span>Video Solution</span>
+                          <ExternalLink className="w-3 h-3 text-red-500" />
+                        </a>
+                      )}
                     </div>
                   </div>
                 );

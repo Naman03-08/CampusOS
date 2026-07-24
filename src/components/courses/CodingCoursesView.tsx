@@ -4465,7 +4465,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
     const studentDisplayName = user?.displayName && user.displayName.trim() !== 'Guest Student' ? user.displayName : 'Naman Pandey';
 
     return (
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-300">
+      <div className="w-full max-w-full px-2 sm:px-4 py-4 space-y-6 animate-in fade-in duration-300">
         {/* Back navigation */}
         <div className="flex items-center justify-between">
           <button
@@ -4949,7 +4949,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
   const categories = ['All', 'Web Development', 'Data Structures & Algorithms', 'AI & Machine Learning', 'Data Analytics', 'Cyber Security', 'App Development', 'DevOps', 'System Design', 'Soft Skills & Communication'];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-10 animate-in fade-in duration-300">
+    <div className="w-full max-w-full px-2 sm:px-4 py-4 space-y-8 animate-in fade-in duration-300">
       
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 border border-purple-200/80 p-8 sm:p-12 text-slate-900 shadow-sm">

@@ -1,4 +1,5 @@
 import { DSAProblem } from '../types';
+import { getGfgUrl, getLeetcodeUrl, getPracticeUrl } from '../lib/dsaProblemLinks';
 
 export const CAMPUS_OS_375_DSA_PROBLEMS: Omit<DSAProblem, 'id' | 'userId'>[] = [
   // ==================== ARRAYS (26) ====================
@@ -409,9 +410,18 @@ export const CAMPUS_OS_375_DSA_PROBLEMS: Omit<DSAProblem, 'id' | 'userId'>[] = [
 ];
 
 export const getCampusOSDSASheet = (userId: string = 'user'): DSAProblem[] => {
-  return CAMPUS_OS_375_DSA_PROBLEMS.map((prob, index) => ({
-    ...prob,
-    id: `campusos-dsa-${index + 1}-${userId}`,
-    userId,
-  }));
+  return CAMPUS_OS_375_DSA_PROBLEMS.map((prob, index) => {
+    const gfgUrl = getGfgUrl(prob);
+    const leetcodeUrl = getLeetcodeUrl(prob);
+    const platformUrl = getPracticeUrl(prob);
+
+    return {
+      ...prob,
+      platformUrl,
+      gfgUrl,
+      leetcodeUrl,
+      id: `campusos-dsa-${index + 1}-${userId}`,
+      userId,
+    };
+  });
 };

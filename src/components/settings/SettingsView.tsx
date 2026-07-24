@@ -27,7 +27,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in duration-300">
+    <div className="space-y-6 w-full animate-in fade-in duration-300">
       {/* Section Usage Banner */}
       <SectionUsageBanner
         title="Student Account & Profile Settings"

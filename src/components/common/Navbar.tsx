@@ -1,5 +1,5 @@
 import React from 'react';
-import { GraduationCap, Zap, ArrowRight, BookOpen, Code, Award, Calendar, CheckSquare } from 'lucide-react';
+import { GraduationCap, Zap, ArrowRight, BookOpen, Code, Award, Calendar, CheckSquare, Sparkles } from 'lucide-react';
 
 interface NavbarProps {
   onNavigateLandingSection: (sectionId: string) => void;
@@ -36,11 +36,14 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Nav Links */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-500">
           <button onClick={() => onNavigateLandingSection('features')} className="hover:text-blue-600 transition-colors">Features</button>
+          <button onClick={() => onNavigateLandingSection('sandboxes')} className="hover:text-blue-600 transition-colors flex items-center gap-1.5 text-indigo-600 font-bold">
+            <Sparkles className="w-4 h-4 text-indigo-600" /> AI Sandboxes
+          </button>
           <button onClick={() => onNavigateLandingSection('demo')} className="hover:text-blue-600 transition-colors flex items-center gap-1.5 text-blue-600 font-bold">
             <Zap className="w-4 h-4 text-blue-600" /> Interactive AI Demo
           </button>
           <button onClick={() => onNavigateLandingSection('placement')} className="hover:text-blue-600 transition-colors">Placement</button>
-          <button onClick={() => onNavigateLandingSection('pricing')} className="hover:text-blue-600 transition-colors">Pricing</button>
+          <button onClick={() => onNavigateLandingSection('why-us')} className="hover:text-blue-600 transition-colors">Why CampusOS</button>
           <button onClick={() => onNavigateLandingSection('faq')} className="hover:text-blue-600 transition-colors">FAQ</button>
         </nav>
 

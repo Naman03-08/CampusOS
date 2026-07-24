@@ -202,7 +202,7 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
   };
 
   return (
-    <div className="space-y-4 max-w-6xl mx-auto">
+    <div className="space-y-4 w-full">
       {/* Action bar if enabled */}
       {showActions && (
         <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900 text-white p-3.5 rounded-2xl shadow-md border border-slate-800">

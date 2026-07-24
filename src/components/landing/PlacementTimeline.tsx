@@ -1,5 +1,5 @@
 import React from 'react';
-import { GraduationCap, Code2, Briefcase, Award, CheckCircle } from 'lucide-react';
+import { GraduationCap, Code2, Briefcase, Award, CheckCircle, MessageSquarePlus, Star } from 'lucide-react';
 
 export const PlacementTimeline: React.FC = () => {
   const years = [
@@ -69,6 +69,26 @@ export const PlacementTimeline: React.FC = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* Section Review Callout */}
+        <div className="mt-12 p-6 rounded-3xl bg-white/60 backdrop-blur-xl border border-white/80 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+              <MessageSquarePlus className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-sm font-extrabold text-slate-900">Preparing for placements with CampusOS?</p>
+              <p className="text-xs text-slate-500 font-medium">Leave a review about your interview prep and placement journey!</p>
+            </div>
+          </div>
+          <a
+            href="#reviews"
+            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 shrink-0"
+          >
+            <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+            <span>Write a Placement Review</span>
+          </a>
         </div>
       </div>
     </section>

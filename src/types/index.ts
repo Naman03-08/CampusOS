@@ -153,6 +153,8 @@ export interface DSAProblem {
     | string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   platformUrl?: string;
+  gfgUrl?: string;
+  leetcodeUrl?: string;
   solved: boolean;
   notes?: string;
   bookmarked?: boolean;

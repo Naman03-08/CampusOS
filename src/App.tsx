@@ -9,10 +9,11 @@ import { AuthModal } from './components/auth/AuthModal';
 import { Hero } from './components/landing/Hero';
 import { TrustedBy } from './components/landing/TrustedBy';
 import { FeaturesGrid } from './components/landing/FeaturesGrid';
+import { AgentSandboxesCarousel } from './components/landing/AgentSandboxesCarousel';
 import { InteractiveDemo } from './components/landing/InteractiveDemo';
 import { PlacementTimeline } from './components/landing/PlacementTimeline';
 import { Testimonials } from './components/landing/Testimonials';
-import { Pricing } from './components/landing/Pricing';
+import { WhyChooseUs } from './components/landing/WhyChooseUs';
 import { FAQ } from './components/landing/FAQ';
 import { FooterLanding } from './components/landing/FooterLanding';
 
@@ -446,10 +447,11 @@ export function App() {
             />
             <TrustedBy />
             <FeaturesGrid />
+            <AgentSandboxesCarousel onOpenAuth={() => handleOpenAuth('register')} />
             <InteractiveDemo />
             <PlacementTimeline />
             <Testimonials />
-            <Pricing onOpenAuth={() => handleOpenAuth('register')} />
+            <WhyChooseUs onOpenAuth={() => handleOpenAuth('register')} />
             <FAQ />
           </main>
 
@@ -470,7 +472,7 @@ export function App() {
             onNavigateTab={handleNavigateTabWithGuard}
           />
 
-          <div className="flex-1 flex w-full max-w-[1600px] mx-auto overflow-hidden">
+          <div className="flex-1 flex w-full overflow-hidden">
             {/* Sidebar */}
             <Sidebar
               activeTab={activeTab}
@@ -480,7 +482,7 @@ export function App() {
             />
 
             {/* Main Stage View Area */}
-            <main className="flex-1 h-full overflow-y-auto p-4 sm:p-6 lg:p-8 min-w-0 max-w-full scrollbar-thin">
+            <main className="flex-1 h-full overflow-y-auto p-3 sm:p-5 lg:p-6 min-w-0 max-w-full scrollbar-thin">
               {activeTab === 'dashboard' && (
                 <DashboardView
                   user={user}

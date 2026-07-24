@@ -66,14 +66,14 @@ export const CanvasBackground: React.FC = () => {
 
     window.addEventListener('resize', handleResize, { passive: true });
 
-    // 1. Particle Constellation Network (75 nodes forming full-screen triangular web like in screenshot)
-    const particleCount = 75;
+    // 1. Particle Constellation Network (130 nodes forming full-screen triangular web evenly across screen)
+    const particleCount = 130;
     const particles: Point3D[] = Array.from({ length: particleCount }, () => ({
-      x: (Math.random() - 0.5) * width * 1.6,
-      y: (Math.random() - 0.5) * height * 1.6,
+      x: (Math.random() - 0.5) * width * 1.8,
+      y: (Math.random() - 0.5) * height * 1.8,
       z: Math.random() * 800 - 400,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
+      vx: (Math.random() - 0.5) * 0.45,
+      vy: (Math.random() - 0.5) * 0.45,
       vz: (Math.random() - 0.5) * 0.3,
       radius: Math.random() * 2 + 1,
       color: Math.random() > 0.35 
@@ -231,25 +231,61 @@ export const CanvasBackground: React.FC = () => {
     const hexBipyramidGeom = createHexagonalBipyramid(80, 100);
     const octaGeom = createOctahedron(95);
 
-    // Array of strictly 2 moving 3D shapes matching the image provided by the user
+    // Array of moving 3D polyhedra shapes distributed evenly across the entire screen
     const wireframeMeshes: WireframeMesh[] = [
-      // 1. Nested Tesseract Cube on Left Side
+      // 1. Top Left - Nested Tesseract Cube
       {
         ...nestedCubeGeom,
-        x: -width * 0.32, y: height * 0.15, z: 100,
-        vx: 0.12, vy: -0.08, vz: -0.04,
+        x: -width * 0.35, y: -height * 0.3, z: 90,
+        vx: 0.08, vy: 0.05, vz: -0.03,
         rotX: 0.35, rotY: 0.55, rotZ: 0.1,
         rotSpeedX: 0.003, rotSpeedY: 0.004, rotSpeedZ: 0.002,
         color: 'rgba(139, 92, 246, 0.45)', // Purple wireframe
       },
-      // 2. Geodesic Sphere on Right Side
+      // 2. Top Right - Geodesic Sphere
       {
         ...sphereGeom,
-        x: width * 0.34, y: -height * 0.02, z: 80,
-        vx: -0.1, vy: 0.07, vz: 0.04,
+        x: width * 0.35, y: -height * 0.28, z: 70,
+        vx: -0.07, vy: 0.04, vz: 0.03,
         rotX: 0.2, rotY: 0.6, rotZ: 0.3,
         rotSpeedX: 0.002, rotSpeedY: 0.005, rotSpeedZ: -0.003,
         color: 'rgba(147, 51, 234, 0.42)', // Purple wireframe
+      },
+      // 3. Center Left - Hexagonal Bipyramid
+      {
+        ...hexBipyramidGeom,
+        x: -width * 0.3, y: height * 0.08, z: 110,
+        vx: 0.06, vy: -0.05, vz: -0.02,
+        rotX: 0.5, rotY: 0.2, rotZ: 0.4,
+        rotSpeedX: 0.004, rotSpeedY: 0.003, rotSpeedZ: 0.002,
+        color: 'rgba(217, 119, 6, 0.45)', // Amber/Gold wireframe
+      },
+      // 4. Center Right - 3D Cube
+      {
+        ...cubeGeom,
+        x: width * 0.3, y: height * 0.05, z: 85,
+        vx: -0.05, vy: -0.06, vz: 0.04,
+        rotX: 0.4, rotY: 0.4, rotZ: 0.2,
+        rotSpeedX: 0.003, rotSpeedY: 0.004, rotSpeedZ: -0.002,
+        color: 'rgba(124, 58, 237, 0.45)', // Violet wireframe
+      },
+      // 5. Bottom Left - Octahedron
+      {
+        ...octaGeom,
+        x: -width * 0.33, y: height * 0.35, z: 95,
+        vx: 0.05, vy: -0.04, vz: 0.02,
+        rotX: 0.3, rotY: 0.7, rotZ: 0.1,
+        rotSpeedX: 0.002, rotSpeedY: 0.003, rotSpeedZ: 0.004,
+        color: 'rgba(147, 51, 234, 0.42)', // Purple wireframe
+      },
+      // 6. Bottom Right - Hexagonal Prism
+      {
+        ...hexPrismGeom,
+        x: width * 0.33, y: height * 0.34, z: 100,
+        vx: -0.06, vy: 0.05, vz: -0.03,
+        rotX: 0.6, rotY: 0.3, rotZ: 0.5,
+        rotSpeedX: 0.003, rotSpeedY: 0.002, rotSpeedZ: 0.003,
+        color: 'rgba(217, 119, 6, 0.42)', // Amber/Gold wireframe
       }
     ];
 
@@ -427,16 +463,24 @@ export const CanvasBackground: React.FC = () => {
         style={{ animationDuration: '7s' }}
       />
       <div 
-        className="absolute top-1/4 -right-32 w-[44rem] h-[44rem] rounded-full bg-amber-200/45 blur-[130px] animate-pulse"
+        className="absolute -top-32 -right-32 w-[42rem] h-[42rem] rounded-full bg-indigo-200/40 blur-[120px] animate-pulse"
+        style={{ animationDuration: '8s' }}
+      />
+      <div 
+        className="absolute top-1/3 -right-32 w-[44rem] h-[44rem] rounded-full bg-amber-200/45 blur-[130px] animate-pulse"
         style={{ animationDuration: '9s' }}
       />
       <div 
-        className="absolute -bottom-32 left-1/3 w-[42rem] h-[42rem] rounded-full bg-fuchsia-200/40 blur-[120px] animate-pulse"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[48rem] h-[48rem] rounded-full bg-violet-200/25 blur-[140px] animate-pulse"
+        style={{ animationDuration: '10s' }}
+      />
+      <div 
+        className="absolute -bottom-32 left-10 w-[42rem] h-[42rem] rounded-full bg-fuchsia-200/40 blur-[120px] animate-pulse"
         style={{ animationDuration: '11s' }}
       />
       <div 
-        className="absolute top-2/3 left-10 w-96 h-96 rounded-full bg-amber-300/30 blur-[100px] animate-pulse"
-        style={{ animationDuration: '8s' }}
+        className="absolute -bottom-32 right-10 w-[42rem] h-[42rem] rounded-full bg-amber-300/30 blur-[120px] animate-pulse"
+        style={{ animationDuration: '8.5s' }}
       />
 
       {/* Subtle Dot Matrix Wallpaper Accent */}

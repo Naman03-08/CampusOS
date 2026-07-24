@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Zap, BookOpen, FileCheck, Bot, CheckCircle2, ArrowRight, RefreshCw } from 'lucide-react';
+import { Zap, BookOpen, FileCheck, Bot, CheckCircle2, ArrowRight, RefreshCw, MessageSquarePlus, Star } from 'lucide-react';
 
 export const InteractiveDemo: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'flashcard' | 'assignment' | 'interview'>('flashcard');
@@ -134,6 +134,26 @@ export const InteractiveDemo: React.FC = () => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Section Review Callout */}
+        <div className="mt-10 max-w-3xl mx-auto p-5 rounded-2xl bg-white/60 backdrop-blur-xl border border-white/80 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
+              <MessageSquarePlus className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm font-extrabold text-slate-900">Tried our AI Playground?</p>
+              <p className="text-[11px] text-slate-500 font-medium">Rate the interactive flashcards, assignment solver, or mock interviews!</p>
+            </div>
+          </div>
+          <a
+            href="#reviews"
+            className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 shrink-0"
+          >
+            <Star className="w-3 h-3 fill-amber-300 text-amber-300" />
+            <span>Write Playground Review</span>
+          </a>
         </div>
       </div>
     </section>

@@ -9,7 +9,9 @@ import {
   Bot, 
   Zap, 
   Layers, 
-  Cpu 
+  Cpu,
+  MessageSquarePlus,
+  Star
 } from 'lucide-react';
 
 export const FeaturesGrid: React.FC = () => {
@@ -101,6 +103,26 @@ export const FeaturesGrid: React.FC = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* Section Review Callout */}
+        <div className="mt-12 p-6 rounded-3xl bg-white/60 backdrop-blur-xl border border-white/80 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+              <MessageSquarePlus className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-sm font-extrabold text-slate-900">Loved these CampusOS features?</p>
+              <p className="text-xs text-slate-500 font-medium">Write a quick review about your favorite module to help fellow students.</p>
+            </div>
+          </div>
+          <a
+            href="#reviews"
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 shrink-0"
+          >
+            <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+            <span>Write a Feature Review</span>
+          </a>
         </div>
       </div>
     </section>
