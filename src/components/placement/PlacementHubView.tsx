@@ -23,7 +23,7 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
   const [evaluationResult, setEvaluationResult] = useState<any>(null);
   const [loadingEval, setLoadingEval] = useState(false);
 
-  // Mock Interview state
+  // Interview Practice state
   const [interviewRole, setInterviewRole] = useState('Software Engineer (Google / Meta)');
   const [interviewQuestion, setInterviewQuestion] = useState('How do you design a LRU Cache with O(1) time complexity?');
   const [userAnswer, setUserAnswer] = useState('');
@@ -108,12 +108,12 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Section Usage Banner */}
       <SectionUsageBanner
-        title="Placement Hub & AI Mock Interview Suite"
-        subtitle="ATS Resume Scoring, AI Voice/Text Mock Interviews & Targeted Cover Letter Builder"
-        purpose="This section is used to prepare for campus hiring, software engineering roles, and corporate internships. It includes AI ATS Resume Audit tools, simulated technical mock interviews with instant feedback scores, and personalized cover letter generators."
+        title="Placement Hub & AI Interview Practice Suite"
+        subtitle="ATS Resume Scoring, AI Technical & Behavioral Interview Practice & Targeted Cover Letter Builder"
+        purpose="This section is used to prepare for campus hiring, software engineering roles, and corporate internships. It includes AI ATS Resume Audit tools, simulated technical interview practice with instant feedback scores, and personalized cover letter generators."
         keyFeatures={[
           'AI ATS Resume Score & Keyword Optimizer',
-          'Simulated AI Technical & Behavioral Mock Interviews',
+          'Simulated AI Technical & Behavioral Interview Practice',
           'Instant Scoring & Answer Refinement Critique',
           'Custom Cover Letter Generator for Target Companies',
           'Export Professional Resume to PDF'
@@ -127,10 +127,10 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <Briefcase className="w-6 h-6 text-rose-600" />
-            <h1 className="text-2xl font-black text-slate-900">Placement Hub & AI Mock Interview Suite</h1>
+            <h1 className="text-2xl font-black text-slate-900">Placement Hub & Technical Interview Suite</h1>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            ATS Resume optimization, custom cover letters & live voice/video mock interview evaluations.
+            ATS Resume optimization, custom cover letters & technical interview evaluations.
           </p>
         </div>
 
@@ -159,7 +159,7 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
             activeTab === 'mock_interview' ? 'bg-white text-rose-600 shadow-xs' : 'text-slate-600'
           }`}
         >
-          AI Mock Interview Simulator
+          Technical Interview Simulator
         </button>
         <button
           onClick={() => setActiveTab('cover_letter')}
@@ -286,7 +286,7 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
         </div>
       )}
 
-      {/* TAB 2: AI Mock Interview Simulator */}
+      {/* TAB 2: Technical Interview Simulator */}
       {activeTab === 'mock_interview' && (
         <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">

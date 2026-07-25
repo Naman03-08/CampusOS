@@ -72,7 +72,7 @@ export const InteractiveDemo: React.FC = () => {
                 : 'bg-white/50 backdrop-blur-md text-slate-700 hover:bg-white/70 border border-white/60'
             }`}
           >
-            <Bot className="w-4 h-4" /> Mock Interview Evaluator
+            <Bot className="w-4 h-4" /> Technical Interview Evaluator
           </button>
         </div>
 
@@ -144,7 +144,7 @@ export const InteractiveDemo: React.FC = () => {
             </div>
             <div>
               <p className="text-xs sm:text-sm font-extrabold text-slate-900">Tried our AI Playground?</p>
-              <p className="text-[11px] text-slate-500 font-medium">Rate the interactive flashcards, assignment solver, or mock interviews!</p>
+              <p className="text-[11px] text-slate-500 font-medium">Rate the interactive flashcards, assignment solver, or interview practice!</p>
             </div>
           </div>
           <a

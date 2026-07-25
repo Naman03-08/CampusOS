@@ -32,7 +32,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
       <SectionUsageBanner
         title="Student Account & Profile Settings"
         subtitle="Configure university background, target GPA, dream career role, subscription plan & cloud synchronization"
-        purpose="This section is used to customize your student profile settings and review your active subscription plan status. Your target GPA and career goals customize the AI models across the study hub, assignment solver, and placement mock interviews."
+        purpose="This section is used to customize your student profile settings and review your active subscription plan status. Your target GPA and career goals customize the AI models across the study hub, assignment solver, and placement interview prep."
         keyFeatures={[
           'University & Major Profile Management',
           'Active Subscription Plan Status & Expiration Countdown',

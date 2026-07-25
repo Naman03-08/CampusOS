@@ -356,7 +356,7 @@ export class FirestoreService {
     return null;
   }
 
-  // Mock Interviews
+  // Interview Practice
   static async saveMockInterview(uid: string, result: MockInterviewResult): Promise<void> {
     if (!db || !uid) return;
     try {

@@ -68,7 +68,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       {
         id: 'ai_evt_3',
         userId: 'default',
-        title: 'Mock Interview Voice Drills',
+        title: 'Technical Interview Drills',
         time: '19:00',
         date: todayStr,
         category: 'Study',

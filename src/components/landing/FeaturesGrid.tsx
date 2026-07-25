@@ -55,8 +55,8 @@ export const FeaturesGrid: React.FC = () => {
     {
       icon: Bot,
       color: 'from-purple-500 to-indigo-600',
-      title: 'AI Mock Interviews',
-      desc: 'Camera and microphone ready! Practice technical and behavioral questions with immediate AI scoring on confidence & depth.',
+      title: 'AI Technical Interview Prep',
+      desc: 'Practice technical and behavioral questions across 256 subjects with immediate AI scoring on accuracy & depth.',
     },
     {
       icon: Cpu,

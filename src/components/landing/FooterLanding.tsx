@@ -37,7 +37,7 @@ export const FooterLanding: React.FC = () => {
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">Career & Placements</h4>
             <ul className="space-y-2.5 text-xs font-semibold">
               <li><a href="#placement" className="hover:text-purple-600 transition-colors">ATS Resume Builder</a></li>
-              <li><a href="#placement" className="hover:text-purple-600 transition-colors">AI Mock Interviews</a></li>
+              <li><a href="#placement" className="hover:text-purple-600 transition-colors">Technical Interview Prep</a></li>
               <li><a href="#placement" className="hover:text-purple-600 transition-colors">LinkedIn Optimizer</a></li>
               <li><a href="#placement" className="hover:text-purple-600 transition-colors">Company Roadmaps</a></li>
             </ul>

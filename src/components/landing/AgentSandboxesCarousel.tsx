@@ -162,7 +162,7 @@ const SANDBOX_MODULES: SandboxModule[] = [
   },
   {
     id: 'interview',
-    title: 'AI Mock Interview Evaluator',
+    title: 'AI Technical Interview Evaluator',
     badge: 'SPEECH & TECH TELEMETRY',
     badgeBg: 'bg-teal-100/80 border-teal-200/80',
     badgeText: 'text-teal-800',
@@ -171,7 +171,7 @@ const SANDBOX_MODULES: SandboxModule[] = [
     iconBg: 'bg-teal-100/90 border-teal-200',
     iconColor: 'text-teal-600',
     bulletColor: 'bg-teal-600',
-    metricLabel: 'MOCK SIMULATION',
+    metricLabel: 'INTERVIEW SIMULATION',
     metricValue: 'Full AI Voice HR',
     description: 'Engage with adaptive AI agents that analyze speech parameters, technical correctness, and vocal poise.',
     bullets: [

@@ -412,13 +412,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <h3 className="text-base font-extrabold">Placement AI Ready</h3>
             </div>
             <p className="text-xs text-blue-100 leading-relaxed mb-4">
-              Practice 1-on-1 AI voice/video mock interviews for <strong>{user.targetRole || 'Software Engineer'}</strong>.
+              Practice technical interview questions & coding drills for <strong>{user.targetRole || 'Software Engineer'}</strong>.
             </p>
             <button
               onClick={() => onNavigateTab('interviewprep')}
               className="w-full py-2.5 rounded-xl bg-white text-blue-700 font-bold text-xs hover:bg-blue-50 transition-all shadow-sm"
             >
-              Start AI Mock Interview
+              Practice Technical Interviews
             </button>
           </div>
 

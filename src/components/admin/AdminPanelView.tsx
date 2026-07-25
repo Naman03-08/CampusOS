@@ -1409,7 +1409,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
                   Registered Student Directory & Progress Tracker
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Inspect student attendance, DSA coding solves, AI study suites, and mock interview performance.
+                  Inspect student attendance, DSA coding solves, AI study suites, and interview prep performance.
                 </p>
               </div>
 

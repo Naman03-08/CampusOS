@@ -17,7 +17,7 @@ export interface PlanInfo {
     dsaSolutions: string;
     assignmentSolver: string;
     resumeScans: string;
-    mockInterviews: string;
+    interviewPrep: string;
     aiChatTutor: string;
   };
   notIncluded?: string[];
@@ -40,7 +40,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
       dsaSolutions: '3 Solutions / day',
       assignmentSolver: '5 Problems total',
       resumeScans: '2 ATS Resume Audits total',
-      mockInterviews: '1 Practice Session total',
+      interviewPrep: '1 Practice Session total',
       aiChatTutor: '20 Messages total'
     },
     features: [
@@ -61,7 +61,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
   {
     id: 'plan_199',
     name: 'Pro Scholar Pass',
-    tagline: 'Perfect for active college students aiming for top GPAs',
+    tagline: 'Perfect for active college students aiming for top GPAs & Placements',
     priceMonthly: '₹199',
     priceYearly: '₹1,899',
     period: 'per month (30 Days)',
@@ -74,7 +74,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
       dsaSolutions: 'Unlimited 375 DSA Sheet',
       assignmentSolver: 'Unlimited Problems',
       resumeScans: '15 ATS Scans / month',
-      mockInterviews: '5 Sessions / month',
+      interviewPrep: '5 Sessions / month',
       aiChatTutor: 'Unlimited 24/7 Chat'
     },
     features: [
@@ -108,7 +108,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
       dsaSolutions: 'UNLIMITED Code Coach',
       assignmentSolver: 'UNLIMITED Solves',
       resumeScans: 'UNLIMITED Scans & PDF Exports',
-      mockInterviews: 'UNLIMITED Question Bank Access',
+      interviewPrep: 'UNLIMITED Question Bank Access',
       aiChatTutor: 'UNLIMITED Priority Chat'
     },
     features: [
@@ -117,7 +117,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
       'UNLIMITED High-Score ATS Resume Builder & Job Matcher',
       'UNLIMITED Instant CampusOS 375 DSA Code Coach (C++, Java, Python, TS)',
       'UNLIMITED AI Cover Letter Generators for Target Companies',
-      '1-on-1 AI Placement Mentor & Company Interview Prep',
+      '1-on-1 AI Placement Mentor & Company Technical Interview Prep',
       'Priority Ultra-Fast AI Reasoning Engine',
       'Verified CampusOS Completion Certificate'
     ],

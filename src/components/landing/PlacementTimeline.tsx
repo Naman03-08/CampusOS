@@ -28,8 +28,8 @@ export const PlacementTimeline: React.FC = () => {
       year: 'Year 4: Placements',
       icon: Briefcase,
       color: 'bg-emerald-600',
-      title: 'AI Mock Interviews & Top Offers',
-      items: ['Practice AI voice/video mock interviews', 'Company-specific interview roadmaps', 'Land high-paying campus placements'],
+      title: 'AI Technical Interview Prep & Top Offers',
+      items: ['Practice technical & behavioral interview questions', 'Company-specific interview roadmaps', 'Land high-paying campus placements'],
     },
   ];
 

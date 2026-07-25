@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="text-xs font-black tracking-wide uppercase text-blue-100">Campus Pro</span>
         </div>
         <p className="text-[11px] text-blue-100 leading-snug mb-3.5 font-medium">
-          Unlimited AI Chat Tutor, ATS resume checks & live mock interviews!
+          Unlimited AI Chat Tutor, ATS resume checks & technical interview prep!
         </p>
         <button
           onClick={() => onSelectTab('pricing')}

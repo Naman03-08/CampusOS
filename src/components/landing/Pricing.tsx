@@ -44,10 +44,10 @@ export const Pricing: React.FC<PricingProps> = ({ onOpenAuth }) => {
       name: 'Campus Pro Ultimate',
       price: isAnnual ? '₹279' : '₹349',
       period: 'per month',
-      desc: 'Complete placement & interview preparation pass with 1-on-1 AI voice mock interviews.',
+      desc: 'Complete placement & technical interview preparation pass with 1-on-1 AI placement coaching.',
       features: [
         'Everything in ₹199 Plan PLUS:',
-        'Unlimited 1-on-1 AI Voice & Video Mock Interviews',
+        'Unlimited 1-on-1 Technical Interview Question Bank Access (256 Subjects)',
         'Unlimited High-Score ATS Resume Builder & Job Matcher',
         'Instant 375 DSA Code Coach (C++, Java, Python, TS)',
         '1-on-1 AI Placement Mentor & Company Interview Insights',

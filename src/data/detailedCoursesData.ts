@@ -2819,7 +2819,7 @@ export const COURSES: CourseItem[] = [
       'Complete C++ Language & STL Basics to Advanced',
       '250+ Solved Top Product Company Interview Questions',
       'Step-by-step Dry-Run Visualization & Code Templates',
-      'Mock Interview Tips & Placement Guidance',
+      'Technical Interview Tips & Placement Guidance',
       'Exclusive Telegram Channel for Course Updates & Solution Notes'
     ],
     modules: [

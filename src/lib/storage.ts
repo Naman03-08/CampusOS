@@ -296,7 +296,7 @@ export class StorageService {
     this.set(STORAGE_KEYS.RESUME, resume);
   }
 
-  // Mock Interviews
+  // Interview Practice
   static getMockInterviews(): MockInterviewResult[] {
     return this.get<MockInterviewResult[]>(STORAGE_KEYS.MOCK_INTERVIEWS, []);
   }

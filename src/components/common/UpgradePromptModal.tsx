@@ -135,7 +135,7 @@ export const UpgradePromptModal: React.FC<UpgradePromptModalProps> = ({
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>1-on-1 AI Mock Interviews</span>
+                <span>Technical Interview Prep Bank</span>
               </div>
             </div>
           </div>

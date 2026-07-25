@@ -139,7 +139,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
               <h3 className="font-extrabold text-sm text-slate-900 mb-1">ATS Resume Score: 92/100</h3>
               <p className="text-xs text-slate-500 mb-3">Matched for Google & Meta SWE Roles.</p>
               <span className="text-[11px] font-bold text-purple-600 bg-purple-50/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-purple-100 inline-block">
-                Mock Interview Ready
+                Placement Interview Ready
               </span>
             </div>
           </div>

@@ -158,7 +158,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
       <SectionUsageBanner
         title="CampusOS Upgrade & Subscription Plans"
         subtitle="Choose the ideal plan to accelerate your academic grades, DSA mastery, and placement success"
-        purpose="Upgrade to unlock unlimited AI Assignment Solving, full CampusOS 375 DSA Roadmap Code Coach, unlimited ATS Resume Scans, and AI Mock Interviews."
+        purpose="Upgrade to unlock unlimited AI Assignment Solving, full CampusOS 375 DSA Roadmap Code Coach, unlimited ATS Resume Scans, and Technical Interview Prep."
         keyFeatures={[
           '3 Plans: 4-Day Free Trial (1x Lifetime, Choose When to Start), ₹199 & ₹349 Plans',
           '30-Day Auto Renewal Cycles for Pro Scholar & Ultimate Plans',
@@ -364,8 +364,8 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                       <span className="text-slate-900 font-extrabold">{plan.usageLimits.dsaSolutions}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-500">AI Mock Interviews:</span>
-                      <span className="text-slate-900 font-extrabold">{plan.usageLimits.mockInterviews}</span>
+                      <span className="text-slate-500">Interview Prep & Qs:</span>
+                      <span className="text-slate-900 font-extrabold">{plan.usageLimits.interviewPrep}</span>
                     </div>
                   </div>
                 </div>
@@ -472,7 +472,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
               </tr>
               <tr>
                 <td className="py-3.5 px-4 font-bold flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-purple-600" /> AI Voice & Video Mock Interviews
+                  <Zap className="w-4 h-4 text-purple-600" /> Technical Interview Prep Suite
                 </td>
                 <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">1 Practice Session</td>
                 <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">5 Sessions / Month</td>
