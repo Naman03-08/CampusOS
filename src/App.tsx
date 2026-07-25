@@ -37,8 +37,8 @@ import { UpgradePromptModal } from './components/common/UpgradePromptModal';
 import { CertificateVerificationModal } from './components/courses/CertificateVerificationModal';
 
 import { StorageService, getZeroAttendance, getZeroDSA, getZeroResume } from './lib/storage';
-import { StreakService } from './lib/streakService';
 import { FirestoreService } from './lib/firestoreService';
+import { StreakService } from './lib/streakService';
 import { auth } from './lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { UserProfile, StudySuite, AssignmentItem, AttendanceSubject, ScheduleEvent, DSAProblem, ResumeData, AppNotification } from './types';
@@ -60,6 +60,70 @@ export function App() {
   const [showUpgradeModal, setShowUpgradeModal] = useState<boolean>(false);
   const [upgradeFeatureName, setUpgradeFeatureName] = useState<string>('this feature');
   const [pendingTabAfterTrial, setPendingTabAfterTrial] = useState<string | null>(null);
+
+  // Global Focus Timer State for Navbar Watch & Habiturex
+  const [focusTimerSeconds, setFocusTimerSeconds] = useState<number>(25 * 60);
+  const [focusTimerInitialMinutes, setFocusTimerInitialMinutes] = useState<number>(25);
+  const [isFocusTimerRunning, setIsFocusTimerRunning] = useState<boolean>(false);
+  const [focusTimerMode, setFocusTimerMode] = useState<'focus' | 'shortBreak' | 'longBreak'>('focus');
+
+  // Focus Timer Tick Interval in App.tsx (never unmounts during tab switches)
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (isFocusTimerRunning) {
+      interval = setInterval(() => {
+        setFocusTimerSeconds((prevSeconds) => {
+          if (prevSeconds > 1) {
+            return prevSeconds - 1;
+          }
+          // Timer completed!
+          setIsFocusTimerRunning(false);
+          if (user?.uid) {
+            const today = new Date().toISOString().split('T')[0];
+            FirestoreService.getHabiturexData(user.uid).then(data => {
+              const currentLog = data?.studyHoursLog || {};
+              const currentStats = data?.stats || { credits: 0, flameStreak: 0, xp: 0, perfectDays: 0 };
+              const newLog = {
+                ...currentLog,
+                [today]: (currentLog[today] || 0) + 0.5
+              };
+              FirestoreService.saveHabiturexData(user.uid, {
+                tasks: data?.tasks || [],
+                missions: data?.missions || [],
+                events: data?.events || [],
+                studyHoursLog: newLog,
+                stats: {
+                  ...currentStats,
+                  credits: (currentStats.credits || 0) + 50
+                }
+              }).catch(err => console.warn('Focus timer save error:', err));
+            });
+          }
+          alert('🎉 Focus Session Completed! +50 Gold Credits Earned.');
+          return 0;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isFocusTimerRunning, user?.uid]);
+
+  const displayFocusMinutes = Math.floor(focusTimerSeconds / 60);
+  const displayFocusSeconds = focusTimerSeconds % 60;
+
+  const focusTimerInfo = {
+    active: isFocusTimerRunning || focusTimerSeconds < focusTimerInitialMinutes * 60,
+    isRunning: isFocusTimerRunning,
+    minutes: displayFocusMinutes,
+    seconds: displayFocusSeconds,
+    mode: focusTimerMode,
+    onTogglePlay: () => setIsFocusTimerRunning(prev => !prev),
+    onReset: () => {
+      setIsFocusTimerRunning(false);
+      setFocusTimerSeconds(focusTimerInitialMinutes * 60);
+    }
+  };
 
   // Global Certificate QR code verification listener
   const [globalVerifyCertId, setGlobalVerifyCertId] = useState<string | null>(null);
@@ -469,6 +533,7 @@ export function App() {
           <Header
             user={user}
             notifications={notifications}
+            focusTimer={focusTimerInfo}
             onMarkReadNotification={handleMarkReadNotification}
             onDeleteNotification={handleDeleteNotification}
             onClearNotifications={handleClearNotifications}
@@ -548,7 +613,20 @@ export function App() {
                   user={user}
                   attendance={attendance}
                   onUpdateAttendance={handleUpdateAttendance}
-                  onNavigateTab={handleNavigateTabWithGuard}
+                  focusTimerSeconds={focusTimerSeconds}
+                  focusTimerInitialMinutes={focusTimerInitialMinutes}
+                  isFocusTimerRunning={isFocusTimerRunning}
+                  focusTimerMode={focusTimerMode}
+                  onToggleFocusTimer={() => setIsFocusTimerRunning(prev => !prev)}
+                  onResetFocusTimer={() => {
+                    setIsFocusTimerRunning(false);
+                    setFocusTimerSeconds(focusTimerInitialMinutes * 60);
+                  }}
+                  onSetFocusTimerDuration={(mins: number) => {
+                    setIsFocusTimerRunning(false);
+                    setFocusTimerInitialMinutes(mins);
+                    setFocusTimerSeconds(mins * 60);
+                  }}
                   initialInnerTab={activeTab === 'attendance' ? 'attendance' : undefined}
                 />
               )}

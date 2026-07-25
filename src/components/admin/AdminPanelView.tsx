@@ -1140,22 +1140,34 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 border-b pb-2 text-xs font-bold">
+                <div className="flex items-center gap-2 border-b pb-2 text-xs font-bold overflow-x-auto">
                   <button
                     onClick={() => setInspectTab('attendance')}
-                    className={`px-3 py-1.5 rounded-lg ${inspectTab === 'attendance' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+                    className={`px-3 py-1.5 rounded-lg shrink-0 ${inspectTab === 'attendance' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}
                   >
                     Attendance ({inspectData.attendance.length})
                   </button>
                   <button
+                    onClick={() => setInspectTab('habiturex' as any)}
+                    className={`px-3 py-1.5 rounded-lg shrink-0 ${inspectTab === ('habiturex' as any) ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+                  >
+                    Habiturex & Tasks ({(inspectData.habiturex?.tasks || []).length})
+                  </button>
+                  <button
+                    onClick={() => setInspectTab('marks' as any)}
+                    className={`px-3 py-1.5 rounded-lg shrink-0 ${inspectTab === ('marks' as any) ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+                  >
+                    Exam Marks ({(inspectData.marks || []).length})
+                  </button>
+                  <button
                     onClick={() => setInspectTab('dsa')}
-                    className={`px-3 py-1.5 rounded-lg ${inspectTab === 'dsa' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+                    className={`px-3 py-1.5 rounded-lg shrink-0 ${inspectTab === 'dsa' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}
                   >
                     DSA Solves ({inspectData.dsa.filter(d => d.solved).length})
                   </button>
                   <button
                     onClick={() => setInspectTab('suites')}
-                    className={`px-3 py-1.5 rounded-lg ${inspectTab === 'suites' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+                    className={`px-3 py-1.5 rounded-lg shrink-0 ${inspectTab === 'suites' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'}`}
                   >
                     Study Suites ({inspectData.studySuites.length})
                   </button>
@@ -1169,6 +1181,76 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
                         <span className="font-mono text-emerald-600 font-bold">{a.attendedClasses}/{a.totalClasses} Attended</span>
                       </div>
                     ))}
+                  </div>
+                )}
+
+                {inspectTab === ('habiturex' as any) && (
+                  <div className="space-y-3 text-xs">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-center">
+                        <p className="text-[10px] text-blue-700 font-extrabold uppercase">Streak</p>
+                        <p className="text-base font-black text-blue-900">{inspectData.habiturex?.stats?.flameStreak || 0} Days</p>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-center">
+                        <p className="text-[10px] text-amber-700 font-extrabold uppercase">Gold Credits</p>
+                        <p className="text-base font-black text-amber-900">{inspectData.habiturex?.stats?.credits || 0} Gold</p>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-purple-50 border border-purple-200 text-center">
+                        <p className="text-[10px] text-purple-700 font-extrabold uppercase">Focus Hours</p>
+                        <p className="text-base font-black text-purple-900">
+                          {Object.values(inspectData.habiturex?.studyHoursLog || {}).reduce<number>((a, b) => a + Number(b), 0).toFixed(1)}h
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <p className="font-black text-slate-800 text-[11px] uppercase">Tasks & Habits:</p>
+                      {(inspectData.habiturex?.tasks || []).length === 0 ? (
+                        <p className="text-slate-400 italic">No Habiturex tasks created yet.</p>
+                      ) : (
+                        (inspectData.habiturex?.tasks || []).map((t: any) => (
+                          <div key={t.id} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                            <div>
+                              <span className="font-black text-slate-900">{t.name}</span>
+                              <span className="text-[10px] text-slate-500 ml-2">({t.subject})</span>
+                            </div>
+                            <span className={`px-2 py-0.5 rounded font-black text-[10px] ${
+                              t.status === 'Completed' || t.completedToday ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
+                            }`}>
+                              {t.status || 'Pending'}
+                            </span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {inspectTab === ('marks' as any) && (
+                  <div className="space-y-2 text-xs">
+                    {(inspectData.marks || []).length === 0 ? (
+                      <p className="text-slate-400 italic py-4 text-center">No exam marks entered by student yet.</p>
+                    ) : (
+                      (inspectData.marks || []).map((m) => {
+                        const pct = m.maxMarks > 0 ? Math.round((m.scoredMarks / m.maxMarks) * 100) : 0;
+                        return (
+                          <div key={m.id} className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                            <div>
+                              <p className="font-black text-slate-900">{m.subject} - {m.examTitle}</p>
+                              <p className="text-[10px] text-slate-500">{m.semester || 'Semester N/A'} • {m.examDate}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-mono font-bold text-slate-800">{m.scoredMarks} / {m.maxMarks}</p>
+                              <span className={`px-2 py-0.2 rounded font-black text-[9px] ${
+                                pct >= 75 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                              }`}>
+                                {pct}%
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 )}
 

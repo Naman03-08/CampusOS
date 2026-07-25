@@ -70,5 +70,15 @@ service cloud.firestore {
     match /course_purchases/{docId} {
       allow read, write: if true;
     }
+
+    // Habiturex Data
+    match /habiturex/{docId} {
+      allow read, write: if true;
+    }
+
+    // Exam Marks
+    match /marks/{docId} {
+      allow read, write: if true;
+    }
   }
 }

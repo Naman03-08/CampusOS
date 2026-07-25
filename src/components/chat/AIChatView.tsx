@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Trash2, Copy, Check, BookOpen, RefreshCw } from 'lucide-react';
 import { ChatMessage } from '../../types';
+import { StructuredResponseFormatter } from './StructuredResponseFormatter';
 
 export const AIChatView: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -130,7 +131,11 @@ export const AIChatView: React.FC = () => {
                   : 'bg-white text-slate-800 border border-slate-200/90 rounded-tl-none'
               }`}
             >
-              <div className="whitespace-pre-wrap font-sans">{m.text}</div>
+              {m.sender === 'user' ? (
+                <div className="whitespace-pre-wrap font-sans">{m.text}</div>
+              ) : (
+                <StructuredResponseFormatter content={m.text} />
+              )}
               <div className="flex items-center justify-between pt-2 border-t border-slate-200/30 text-[10px] opacity-80 font-bold">
                 <span>{m.timestamp}</span>
                 {m.sender === 'ai' && (

@@ -66,98 +66,96 @@ function generateComprehensiveChatFallback(query: string): string {
   const qLower = query.toLowerCase();
 
   if (qLower.includes("dijkstra")) {
-    return `### Dijkstra's Shortest Path Algorithm (Step-by-Step)
+    return `### Executive Overview: Dijkstra's Shortest Path Algorithm
 
 Dijkstra's algorithm finds the shortest path from a single source node to all other nodes in a weighted graph with **non-negative edge weights**.
 
-#### 1. Core Data Structures
-- **Distance Array \`dist[]\`**: Initialized to \`infinity\` for all nodes, and \`0\` for the source node.
-- **Priority Queue (Min-Heap)**: Stores pairs \`(distance, node)\` to extract the unvisited node with the smallest distance in $O(\\log V)$ time.
-- **Visited Set \`visited[]\`**: Tracks nodes whose minimum distance is finalized.
+#### Step 1: Core Data Structures
+- **Distance Array "dist[]"**: Initialized to "infinity" for all nodes, and "0" for the source node.
+- **Priority Queue (Min-Heap)**: Stores pairs (distance, node) to extract the unvisited node with the smallest distance in O(log V) time.
+- **Visited Set "visited[]"**: Tracks nodes whose minimum distance is finalized.
 
-#### 2. Step-by-Step Execution Algorithm
-1. **Initialization**: Set \`dist[source] = 0\`. Push \`(0, source)\` into the Min-Heap.
-2. **Pop Minimum**: Extract the pair \`(d, u)\` with the smallest distance $d$ from the Heap.
-3. **Skip if Settled**: If $u$ is already visited, continue. Otherwise, mark $u$ as visited.
-4. **Relax Neighbors**: For each edge $(u, v)$ with weight $w$:
-   $$\\text{If } dist[u] + w < dist[v] \\implies dist[v] = dist[u] + w$$
-   Push \`(dist[v], v)\` into the Heap.
+#### Step 2: Execution Steps
+1. **Initialization**: Set dist[source] = 0. Push (0, source) into the Min-Heap.
+2. **Pop Minimum**: Extract pair (d, u) with the smallest distance d from the Heap.
+3. **Skip if Settled**: If u is already visited, continue. Otherwise, mark u as visited.
+4. **Relax Neighbors**: For each edge (u, v) with weight w:
+   dist[u] + w < dist[v] => dist[v] = dist[u] + w
+   Push (dist[v], v) into the Heap.
 5. **Repeat**: Repeat until the Heap is empty.
 
-#### 3. Complexity Analysis
-- **Time Complexity**: **$O((V + E) \\log V)$** when implemented with a Min-Heap / Fibonacci Heap.
-- **Space Complexity**: **$O(V)$** to store distances and priority queue entries.
+#### Step 3: Complexity Bounds
+- **Time Complexity**: O((V + E) log V) with a Min-Heap / Fibonacci Heap.
+- **Space Complexity**: O(V) to store distances and priority queue entries.
 
-#### 4. Key Limitations
+#### Step 4: Key Viva Exam Tip
 - Cannot handle **negative edge weights** (use Bellman-Ford algorithm instead).`;
   }
 
   if (qLower.includes("quicksort") || qLower.includes("quick sort")) {
-    return `### Derivation of QuickSort Time Complexity
+    return `### Executive Overview: QuickSort Time Complexity Derivation
 
 QuickSort is a Divide-and-Conquer sorting algorithm based on partitioning an array around a chosen **pivot element**.
 
-#### 1. Recurrence Relation
-$$\\text{T}(n) = \\text{T}(k) + \\text{T}(n - k - 1) + O(n)$$
-Where $k$ is the number of elements smaller than the pivot.
+#### Step 1: Recurrence Relation Formula
+T(n) = T(k) + T(n - k - 1) + O(n)
+Where k is the number of elements smaller than the pivot.
 
-#### 2. Best-Case Analysis ($O(n \\log n)$)
-Occurs when the pivot splits the array into two equal halves ($k = n/2$):
-$$\\text{T}(n) = 2 \\text{T}(n/2) + O(n)$$
-By Master Theorem (Case 2), where $a=2, b=2, d=1$:
-$$\\text{T}(n) = O(n \\log n)$$
+#### Step 2: Best-Case Analysis - O(n log n)
+Occurs when the pivot splits the array into two equal halves (k = n/2):
+T(n) = 2 T(n/2) + O(n)
+By Master Theorem (Case 2, where a=2, b=2, d=1):
+T(n) = O(n log n)
 
-#### 3. Worst-Case Analysis ($O(n^2)$)
-Occurs when the array is already sorted or reverse sorted, and the pivot is always the minimum or maximum element ($k = 0$):
-$$\\text{T}(n) = \\text{T}(n - 1) + O(n) = O(n) + O(n-1) + \\dots + O(1) = O(n^2)$$
+#### Step 3: Worst-Case Analysis - O(n²)
+Occurs when the array is already sorted or reverse sorted, and the pivot is always the min or max element (k = 0):
+T(n) = T(n - 1) + O(n) = O(n) + O(n-1) + ... + O(1) = O(n²)
 
-#### 4. Average-Case Analysis ($O(n \\log n)$)
-Expected time complexity over all uniform random permutations of inputs evaluates to $2n \\ln n \\approx 1.39 n \\log_2 n = O(n \\log n)$.
+#### Step 4: Average-Case Analysis - O(n log n)
+Expected time complexity over all uniform random permutations evaluates to 2n ln(n) ≈ 1.39 n log₂ n = O(n log n).
 
-#### 5. Auxiliary Space
-- **Best/Avg Space**: $O(\\log n)$ recursive call stack.
-- **Worst Space**: $O(n)$ stack depth.`;
+#### Step 5: Auxiliary Space
+- **Best/Avg Space**: O(log n) recursive stack depth.
+- **Worst Space**: O(n) stack depth.`;
   }
 
   if (qLower.includes("page fault") || qLower.includes("fifo") || qLower.includes("lru")) {
-    return `### Page Replacement Algorithms: FIFO vs LRU
+    return `### Executive Overview: Page Replacement Algorithms (FIFO vs LRU)
 
-When physical memory (RAM) frames are full, operating systems invoke page replacement algorithms to swap out page frames.
+When physical RAM frames are full, operating systems invoke page replacement algorithms to swap out page frames.
 
-#### 1. FIFO (First-In, First-Out)
+#### Step 1: FIFO (First-In, First-Out)
 - **Mechanism**: Replaces the page that was brought into memory earliest.
 - **Implementation**: Queue (FIFO structure).
 - **Belady's Anomaly**: Increasing the number of page frames can counter-intuitively *increase* the number of page faults.
 
-#### 2. LRU (Least Recently Used)
+#### Step 2: LRU (Least Recently Used)
 - **Mechanism**: Replaces the page that has not been accessed for the longest period of time.
 - **Implementation**: Doubly Linked List + Hash Map (or hardware access matrix/counter).
 - **Property**: Stack algorithm — immune to Belady's Anomaly.
 
-#### 3. Numerical Example
-Reference String: \`[7, 0, 1, 2, 0, 3, 0, 4]\` with **3 Frames**:
+#### Step 3: Numerical Example & Comparison
+Reference String: [7, 0, 1, 2, 0, 3, 0, 4] with 3 Frames:
 - **FIFO Page Faults**: 6 Faults
-- **LRU Page Faults**: 5 Faults (LRU retains page \`0\` because it was accessed recently).`;
+- **LRU Page Faults**: 5 Faults (LRU retains page 0 because it was accessed recently).`;
   }
 
-  return `### Comprehensive AI Analysis & Explanation
+  return `### Executive Overview & Analysis
 
-Thank you for your question regarding **"${query}"**. Here is a detailed breakdown:
+Thank you for your academic query regarding **"${query}"**. Here is a structured step-by-step breakdown:
 
-#### 1. Fundamental Principles
+#### Step 1: Fundamental Principles
 - **Core Concept**: Break down the problem domain into discrete, verifiable components.
 - **Theoretical Basis**: Analyze input constraints, algorithmic bounds, and system preconditions.
 
-#### 2. Key Mathematical & Logical Steps
+#### Step 2: Key Mathematical & Logical Proof
 1. Establish initial conditions and boundary variables.
 2. Execute state transitions according to invariant rules.
 3. Validate output integrity against edge cases and memory constraints.
 
-#### 3. Practical Applications & Best Practices
+#### Step 3: Practical Applications & Viva Tip
 - Ensure code modularity and clean architectural abstraction.
-- Optimize time-space tradeoffs for production scalability.
-
-*Feel free to ask follow-up questions, request pseudo-code, or ask for practice viva exam questions on this topic!*`;
+- Optimize time-space tradeoffs for production scalability.`;
 }
 
 // 1. Study Hub Generation Route
@@ -365,7 +363,17 @@ app.post("/api/ai/chat", async (req, res) => {
     }
 
     const systemPrompt = `You are CampusOS AI Assistant, an elite academic and career tutor for college students.
-Provide thorough, accurate, step-by-step, and deeply helpful answers using clear Markdown formatting, bold headings, equations/proofs, and code blocks where appropriate.
+Provide thorough, accurate, step-by-step, and deeply helpful answers using clear, clean Markdown formatting.
+
+CRITICAL FORMATTING INSTRUCTIONS:
+1. DO NOT output raw LaTeX markup syntax like \\frac{a}{b}, \\left(, \\right), \\sum_{...}^{...}, or raw $...$ or $$...$$ dollar sign wrappers.
+2. Format all mathematical equations using clean, human-readable math symbols (e.g., T(n) = T(n-1) + O(1/n), (1/k) - (1/(k+1)), log(n), O(n log n), ∑, √, ≤, ≥, ⇒).
+3. Structure your response into clear, distinct sections:
+   - ### Executive Overview
+   - ### Step-by-Step Proof / Explanation (use numbered steps like Step 1:, Step 2:)
+   - ### Key Formulas & Complexity Bounds
+   - ### Code / Pseudocode (use markdown code fences with language tags like \`\`\`cpp)
+   - ### Viva Exam Tip
 ${documentContext ? `Document Context:\n"""${documentContext}"""` : ""}`;
 
     if (process.env.GEMINI_API_KEY) {

@@ -1,74 +1,70 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  Sparkles, 
-  Flame, 
-  Zap, 
-  Coins, 
-  Sliders, 
-  RotateCcw, 
+  Trophy, 
+  Award, 
+  BarChart3, 
+  Plus, 
+  Trash2, 
+  Check, 
+  CheckCircle2, 
+  X, 
+  Clock, 
+  Play, 
+  Pause, 
+  RefreshCw, 
   Search, 
-  Bell, 
+  Calendar, 
+  CalendarDays, 
+  CheckSquare, 
+  FileText, 
   LayoutDashboard, 
   Table, 
-  Target, 
   LineChart, 
-  Calendar, 
-  CheckSquare, 
-  Plus, 
+  Target, 
+  GraduationCap, 
+  Zap, 
+  AlertCircle, 
+  Bookmark, 
   ChevronLeft, 
   ChevronRight, 
-  Award, 
-  Check, 
-  X, 
-  Trash2, 
-  Edit2, 
-  Activity, 
-  ShieldCheck, 
-  BarChart3, 
-  Clock, 
-  CalendarCheck,
-  UserCheck,
-  Percent,
-  Calculator,
-  PlusCircle,
-  Filter
+  Flame, 
+  Sparkles,
+  Medal,
+  Edit2
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
-  LineChart as ReLineChart, 
-  Line, 
   BarChart as ReBarChart, 
   Bar, 
   XAxis, 
   YAxis, 
   Tooltip, 
+  AreaChart, 
+  Area, 
   RadarChart, 
   PolarGrid, 
   PolarAngleAxis, 
   PolarRadiusAxis, 
   Radar 
 } from 'recharts';
-import { AttendanceSubject, UserProfile } from '../../types';
+import { UserProfile, AttendanceSubject, StudentMarkRecord, HabiturexData } from '../../types';
 import { AttendanceView } from '../attendance/AttendanceView';
+import { FirestoreService } from '../../lib/firestoreService';
+import { StreakService } from '../../lib/streakService';
 
-interface HabiturexViewProps {
-  user?: UserProfile;
-  attendance: AttendanceSubject[];
-  onUpdateAttendance: (updated: AttendanceSubject[]) => void;
-  onNavigateTab?: (tab: string) => void;
-  initialInnerTab?: 'dashboard' | 'table' | 'missions' | 'analytics' | 'matrix' | 'attendance';
-}
-
-export interface HabitItem {
+export interface TaskItem {
   id: string;
   name: string;
-  timeframe: 'Morning' | 'Afternoon' | 'Evening' | 'Anytime';
-  category: 'Coding' | 'Fitness' | 'Mind' | 'Growth' | 'Career' | 'Health' | 'Social' | 'Finance' | 'Studies';
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  xpValue: number;
-  streakDays: number;
+  subject: string;
+  priority: 'Low' | 'Medium' | 'High' | 'Critical';
+  status: 'Pending' | 'In Progress' | 'Completed';
+  progress: number;
+  dueDate: string;
+  timeLeft?: string;
+  assignedBy?: string;
+  category?: string;
   completedToday: boolean;
-  historyDates: string[]; // ISO date strings
+  streakDays: number;
 }
 
 export interface DailyMission {
@@ -77,36 +73,61 @@ export interface DailyMission {
   description: string;
   targetCount: number;
   currentCount: number;
-  xpReward: number;
   creditReward: number;
   completed: boolean;
   claimed: boolean;
 }
 
-const DEFAULT_CATEGORIES = ['Coding', 'Fitness', 'Mind', 'Growth', 'Career', 'Health', 'Social', 'Finance', 'Studies'];
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  type: 'Exam' | 'Assignment' | 'Lecture' | 'Study';
+  subject: string;
+  color: string;
+}
 
-const BASELINE_HABITS: Omit<HabitItem, 'id' | 'completedToday' | 'historyDates'>[] = [
-  { name: 'Solve 1 CampusOS DSA Problem', timeframe: 'Morning', category: 'Coding', difficulty: 'Medium', xpValue: 50, streakDays: 0 },
-  { name: 'Review Core CS Concept (OS/DBMS)', timeframe: 'Afternoon', category: 'Studies', difficulty: 'Easy', xpValue: 30, streakDays: 0 },
-  { name: 'Gym / 30-min Physical Fitness', timeframe: 'Evening', category: 'Fitness', difficulty: 'Medium', xpValue: 40, streakDays: 0 },
-  { name: 'Update AI Resume / Portfolio Project', timeframe: 'Anytime', category: 'Career', difficulty: 'Hard', xpValue: 60, streakDays: 0 },
-  { name: '30-min Mindful Reading or System Design', timeframe: 'Evening', category: 'Mind', difficulty: 'Medium', xpValue: 40, streakDays: 0 }
-];
+interface LeaderboardEntry {
+  uid: string;
+  displayName: string;
+  university: string;
+  marksAvg: number;
+  tasksCompleted: number;
+  streak: number;
+  studyHours: number;
+}
 
-const STARTER_MISSIONS: Omit<DailyMission, 'id' | 'completed' | 'claimed'>[] = [
-  { title: 'Placement Starter', description: 'Log at least 2 habits in Habiturex today', targetCount: 2, currentCount: 0, xpReward: 100, creditReward: 20 },
-  { title: 'Consistency Flame', description: 'Maintain active Flame for 3 consecutive days', targetCount: 3, currentCount: 0, xpReward: 150, creditReward: 35 },
-  { title: 'Perfect Score', description: 'Complete 100% of your configured habits', targetCount: 1, currentCount: 0, xpReward: 200, creditReward: 50 }
-];
+interface HabiturexViewProps {
+  user: UserProfile;
+  attendance: AttendanceSubject[];
+  onUpdateAttendance: (subjects: AttendanceSubject[]) => void;
+  initialInnerTab?: 'dashboard' | 'table' | 'attendance' | 'analytics' | 'missions' | 'calendar' | 'leaderboard';
+  focusTimerSeconds?: number;
+  focusTimerInitialMinutes?: number;
+  isFocusTimerRunning?: boolean;
+  focusTimerMode?: 'focus' | 'shortBreak' | 'longBreak';
+  onToggleFocusTimer?: () => void;
+  onResetFocusTimer?: () => void;
+  onSetFocusTimerDuration?: (mins: number) => void;
+}
 
 export const HabiturexView: React.FC<HabiturexViewProps> = ({
   user,
   attendance,
   onUpdateAttendance,
-  initialInnerTab
+  initialInnerTab,
+  focusTimerSeconds = 25 * 60,
+  focusTimerInitialMinutes = 25,
+  isFocusTimerRunning = false,
+  focusTimerMode = 'focus',
+  onToggleFocusTimer,
+  onResetFocusTimer,
+  onSetFocusTimerDuration
 }) => {
-  // Inner Tab State
-  const [activeInnerTab, setActiveInnerTab] = useState<'dashboard' | 'table' | 'missions' | 'analytics' | 'matrix' | 'attendance'>(initialInnerTab || 'dashboard');
+  // Navigation Tab State
+  const [activeInnerTab, setActiveInnerTab] = useState<'dashboard' | 'table' | 'attendance' | 'analytics' | 'missions' | 'calendar' | 'leaderboard'>(
+    initialInnerTab || 'dashboard'
+  );
   const [innerSidebarCollapsed, setInnerSidebarCollapsed] = useState(false);
 
   useEffect(() => {
@@ -115,55 +136,51 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
     }
   }, [initialInnerTab]);
 
-  // Stats State (Set to ZERO initially)
-  const [xp, setXp] = useState<number>(() => {
-    return Number(localStorage.getItem('habiturex_xp')) || 0;
-  });
-  const [credits, setCredits] = useState<number>(() => {
-    return Number(localStorage.getItem('habiturex_credits')) || 0;
-  });
-  const [flameStreak, setFlameStreak] = useState<number>(() => {
-    return Number(localStorage.getItem('habiturex_flame')) || 0;
-  });
-  const [xpMultiplier, setXpMultiplier] = useState<number>(1);
-  const [perfectDaysCount, setPerfectDaysCount] = useState<number>(() => {
-    return Number(localStorage.getItem('habiturex_perfect_days')) || 0;
-  });
+  // User Stats State
+  const [credits, setCredits] = useState<number>(0);
+  const [flameStreak, setFlameStreak] = useState<number>(0);
+  const [perfectDays, setPerfectDays] = useState<number>(0);
 
-  // Habits State
-  const [habits, setHabits] = useState<HabitItem[]>(() => {
-    try {
-      const stored = localStorage.getItem('habiturex_habits');
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  // Core Data Lists
+  const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [missions, setMissions] = useState<DailyMission[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [marks, setMarks] = useState<StudentMarkRecord[]>([]);
+  const [studyHoursLog, setStudyHoursLog] = useState<Record<string, number>>({});
 
-  // Missions State
-  const [missions, setMissions] = useState<DailyMission[]>(() => {
-    try {
-      const stored = localStorage.getItem('habiturex_missions');
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  // Quick Notes State
+  const [quickNotes, setQuickNotes] = useState<string>('');
 
-  // Filters & Search
+  // Derived Focus Timer Values from Parent State (Top-Level App.tsx)
+  const timerMinutes = Math.floor(focusTimerSeconds / 60);
+  const timerSeconds = focusTimerSeconds % 60;
+  const isTimerRunning = isFocusTimerRunning;
+
+  const [customMinutesInput, setCustomMinutesInput] = useState<string>((focusTimerInitialMinutes || 25).toString());
+
+  useEffect(() => {
+    setCustomMinutesInput((focusTimerInitialMinutes || 25).toString());
+  }, [focusTimerInitialMinutes]);
+
+  // Leaderboard Data
+  const [leaderboardList, setLeaderboardList] = useState<LeaderboardEntry[]>([]);
+  const [loadingLeaderboard, setLoadingLeaderboard] = useState<boolean>(false);
+
+  // Search & Filters
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('All');
+  const [priorityFilter, setPriorityFilter] = useState<string>('All');
+  const [statusFilter, setStatusFilter] = useState<string>('All');
 
-  // Modals
-  const [showHabitModal, setShowHabitModal] = useState(false);
-  const [editingHabit, setEditingHabit] = useState<HabitItem | null>(null);
-  const [habitForm, setHabitForm] = useState({
+  // Modals State
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [editingTask, setEditingTask] = useState<TaskItem | null>(null);
+  const [taskForm, setTaskForm] = useState({
     name: '',
-    timeframe: 'Morning' as HabitItem['timeframe'],
-    category: 'Coding' as HabitItem['category'],
-    difficulty: 'Medium' as HabitItem['difficulty'],
-    xpValue: 50
+    subject: 'DBMS',
+    priority: 'Medium' as TaskItem['priority'],
+    status: 'Pending' as TaskItem['status'],
+    dueDate: new Date().toISOString().split('T')[0],
+    category: 'Studies'
   });
 
   const [showMissionModal, setShowMissionModal] = useState(false);
@@ -171,367 +188,421 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
     title: '',
     description: '',
     targetCount: 1,
-    xpReward: 100,
-    creditReward: 20
+    creditReward: 100
   });
 
-  const [showTunerModal, setShowTunerModal] = useState(false);
-  const [showNotificationsPopover, setShowNotificationsPopover] = useState(false);
+  const [showMarkModal, setShowMarkModal] = useState(false);
+  const [editingMark, setEditingMark] = useState<StudentMarkRecord | null>(null);
+  const [markForm, setMarkForm] = useState({
+    subject: 'DBMS',
+    examTitle: 'Mid-Term Exam',
+    scoredMarks: 85,
+    maxMarks: 100,
+    examDate: new Date().toISOString().split('T')[0],
+    semester: 'Semester 4'
+  });
 
-  // Attendance Sub-view State
-  const [showAddSubjectModal, setShowAddSubjectModal] = useState(false);
-  const [newSubject, setNewSubject] = useState({ code: '', name: '', totalClasses: 0, attendedClasses: 0, targetPercentage: 75 });
-  const [calcTargetPercent, setCalcTargetPercent] = useState<number>(75);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [eventForm, setEventForm] = useState({
+    title: '',
+    date: new Date().toISOString().split('T')[0],
+    type: 'Exam' as CalendarEvent['type'],
+    subject: 'DBMS'
+  });
 
-  // Level Calculation: 500 XP per level
-  const currentLevel = Math.floor(xp / 500) + 1;
-  const currentLevelXp = xp % 500;
-
-  // Save to LocalStorage
+  // Fetch Firestore Data on Mount & Sync
   useEffect(() => {
-    localStorage.setItem('habiturex_xp', xp.toString());
-    localStorage.setItem('habiturex_credits', credits.toString());
-    localStorage.setItem('habiturex_flame', flameStreak.toString());
-    localStorage.setItem('habiturex_perfect_days', perfectDaysCount.toString());
-    localStorage.setItem('habiturex_habits', JSON.stringify(habits));
-    localStorage.setItem('habiturex_missions', JSON.stringify(missions));
-  }, [xp, credits, flameStreak, perfectDaysCount, habits, missions]);
+    let isMounted = true;
+    async function loadHabiturexData() {
+      if (!user?.uid) return;
+      try {
+        const habData = await FirestoreService.getHabiturexData(user.uid);
+        const userMarks = await FirestoreService.getStudentMarks(user.uid);
 
-  // Handle Habit Toggle
-  const toggleHabitCompletion = (habitId: string) => {
-    const todayStr = new Date().toISOString().split('T')[0];
+        if (isMounted) {
+          if (habData) {
+            setTasks(habData.tasks || []);
+            setMissions(habData.missions || []);
+            setEvents(habData.events || []);
+            setStudyHoursLog(habData.studyHoursLog || {});
+            setCredits(habData.stats?.credits || 0);
+            setFlameStreak(habData.stats?.flameStreak || 0);
+            setPerfectDays(habData.stats?.perfectDays || 0);
+          }
+          if (userMarks) {
+            setMarks(userMarks);
+          }
+        }
+      } catch (err) {
+        console.warn("Failed loading Habiturex Firestore data:", err);
+      }
+    }
 
-    setHabits(prev => prev.map(h => {
-      if (h.id !== habitId) return h;
+    loadHabiturexData();
+    return () => { isMounted = false; };
+  }, [user?.uid]);
 
-      const isCompleting = !h.completedToday;
-      const gainedXp = isCompleting ? h.xpValue * xpMultiplier : -(h.xpValue * xpMultiplier);
+  // Auto Save to Firestore
+  const saveAllToFirestore = async (
+    updatedTasks = tasks,
+    updatedMissions = missions,
+    updatedEvents = events,
+    updatedLog = studyHoursLog,
+    updatedCredits = credits,
+    updatedStreak = flameStreak
+  ) => {
+    if (!user?.uid) return;
+    try {
+      await FirestoreService.saveHabiturexData(user.uid, {
+        tasks: updatedTasks,
+        missions: updatedMissions,
+        events: updatedEvents,
+        studyHoursLog: updatedLog,
+        stats: {
+          xp: 0,
+          credits: updatedCredits,
+          flameStreak: updatedStreak,
+          perfectDays
+        }
+      });
+    } catch (e) {
+      console.warn("Error saving Habiturex data:", e);
+    }
+  };
 
-      setXp(currentXp => Math.max(0, currentXp + gainedXp));
-
-      let newStreak = h.streakDays;
-      let newHistory = [...h.historyDates];
-
+  // Toggle Task Status & Record Streak
+  const handleToggleTask = async (taskId: string) => {
+    const updated = tasks.map(t => {
+      if (t.id !== taskId) return t;
+      const isCompleting = !t.completedToday;
+      
       if (isCompleting) {
-        newStreak += 1;
-        if (!newHistory.includes(todayStr)) newHistory.push(todayStr);
-      } else {
-        newStreak = Math.max(0, newStreak - 1);
-        newHistory = newHistory.filter(d => d !== todayStr);
+        // Record active activity for streak
+        StreakService.recordActivity();
       }
 
       return {
-        ...h,
+        ...t,
         completedToday: isCompleting,
-        streakDays: newStreak,
-        historyDates: newHistory
+        status: (isCompleting ? 'Completed' : 'In Progress') as TaskItem['status'],
+        progress: isCompleting ? 100 : 50,
+        streakDays: isCompleting ? t.streakDays + 1 : Math.max(0, t.streakDays - 1)
       };
-    }));
+    });
 
-    // Update Missions
-    setMissions(prevMissions => prevMissions.map(m => {
-      const updatedCount = Math.min(m.targetCount, m.currentCount + 1);
-      return {
-        ...m,
-        currentCount: updatedCount,
-        completed: updatedCount >= m.targetCount
-      };
-    }));
-  };
-
-  // Seed Baseline Habits
-  const handleSeedBaseline = () => {
-    const seeded: HabitItem[] = BASELINE_HABITS.map((b, i) => ({
-      ...b,
-      id: `hb_seed_${Date.now()}_${i}`,
-      completedToday: false,
-      historyDates: []
-    }));
-    setHabits(prev => [...prev, ...seeded]);
-  };
-
-  // Seed Starter Missions
-  const handleSeedMissions = () => {
-    const seeded: DailyMission[] = STARTER_MISSIONS.map((m, i) => ({
-      ...m,
-      id: `ms_seed_${Date.now()}_${i}`,
-      completed: false,
-      claimed: false
-    }));
-    setMissions(prev => [...prev, ...seeded]);
-  };
-
-  // Save Custom / Edited Habit
-  const handleSaveHabit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!habitForm.name.trim()) return;
-
-    if (editingHabit) {
-      setHabits(prev => prev.map(h => h.id === editingHabit.id ? { ...h, ...habitForm } : h));
-    } else {
-      const newH: HabitItem = {
-        id: 'hb_' + Date.now(),
-        name: habitForm.name.trim(),
-        timeframe: habitForm.timeframe,
-        category: habitForm.category,
-        difficulty: habitForm.difficulty,
-        xpValue: habitForm.xpValue,
-        streakDays: 0,
-        completedToday: false,
-        historyDates: []
-      };
-      setHabits(prev => [newH, ...prev]);
+    const completedCount = updated.filter(t => t.completedToday).length;
+    let newStreak = flameStreak;
+    if (completedCount > 0) {
+      newStreak = Math.max(flameStreak, 1);
+      setFlameStreak(newStreak);
     }
 
-    setHabitForm({ name: '', timeframe: 'Morning', category: 'Coding', difficulty: 'Medium', xpValue: 50 });
-    setEditingHabit(null);
-    setShowHabitModal(false);
+    setTasks(updated);
+    saveAllToFirestore(updated, missions, events, studyHoursLog, credits, newStreak);
   };
 
-  const handleDeleteHabit = (id: string) => {
-    setHabits(prev => prev.filter(h => h.id !== id));
+  // Add or Edit Task
+  const handleSaveTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!taskForm.name.trim()) return;
+
+    let updated: TaskItem[];
+    if (editingTask) {
+      updated = tasks.map(t => t.id === editingTask.id ? { ...t, ...taskForm } : t);
+    } else {
+      const newTask: TaskItem = {
+        id: 'tsk_' + Date.now(),
+        name: taskForm.name.trim(),
+        subject: taskForm.subject,
+        priority: taskForm.priority,
+        status: taskForm.status,
+        progress: taskForm.status === 'Completed' ? 100 : 25,
+        dueDate: taskForm.dueDate,
+        timeLeft: '3 Days Left',
+        assignedBy: 'Self-Target',
+        category: taskForm.category,
+        completedToday: taskForm.status === 'Completed',
+        streakDays: 0
+      };
+      updated = [newTask, ...tasks];
+    }
+
+    setTasks(updated);
+    setShowTaskModal(false);
+    setEditingTask(null);
+    setTaskForm({ name: '', subject: 'DBMS', priority: 'Medium', status: 'Pending', dueDate: new Date().toISOString().split('T')[0], category: 'Studies' });
+    saveAllToFirestore(updated);
   };
 
-  // Save Custom Mission
+  // Delete Task
+  const handleDeleteTask = (id: string) => {
+    const updated = tasks.filter(t => t.id !== id);
+    setTasks(updated);
+    saveAllToFirestore(updated);
+  };
+
+  // Add Custom Mission
   const handleSaveMission = (e: React.FormEvent) => {
     e.preventDefault();
     if (!missionForm.title.trim()) return;
 
-    const newM: DailyMission = {
-      id: 'ms_' + Date.now(),
+    const newMission: DailyMission = {
+      id: 'msn_' + Date.now(),
       title: missionForm.title.trim(),
-      description: missionForm.description.trim(),
+      description: missionForm.description || 'Custom daily study goal',
       targetCount: missionForm.targetCount,
       currentCount: 0,
-      xpReward: missionForm.xpReward,
       creditReward: missionForm.creditReward,
       completed: false,
       claimed: false
     };
 
-    setMissions(prev => [newM, ...prev]);
-    setMissionForm({ title: '', description: '', targetCount: 1, xpReward: 100, creditReward: 20 });
+    const updated = [newMission, ...missions];
+    setMissions(updated);
     setShowMissionModal(false);
+    setMissionForm({ title: '', description: '', targetCount: 1, creditReward: 100 });
+    saveAllToFirestore(tasks, updated);
   };
 
+  // Claim Mission Reward
   const handleClaimMission = (missionId: string) => {
-    setMissions(prev => prev.map(m => {
-      if (m.id === missionId && !m.claimed && m.completed) {
-        setXp(x => x + m.xpReward);
-        setCredits(c => c + m.creditReward);
-        return { ...m, claimed: true };
-      }
-      return m;
-    }));
-  };
-
-  // Wipe All Data
-  const handleWipeAll = () => {
-    if (window.confirm('⚠️ Are you sure you want to reset ALL Habiturex metrics, habits, and streak data back to ZERO?')) {
-      setXp(0);
-      setCredits(0);
-      setFlameStreak(0);
-      setPerfectDaysCount(0);
-      setHabits([]);
-      setMissions([]);
-      localStorage.removeItem('habiturex_xp');
-      localStorage.removeItem('habiturex_credits');
-      localStorage.removeItem('habiturex_flame');
-      localStorage.removeItem('habiturex_perfect_days');
-      localStorage.removeItem('habiturex_habits');
-      localStorage.removeItem('habiturex_missions');
-      alert('Reset completed. All Habiturex metrics are set back to 0.');
-    }
-  };
-
-  // Attendance Handler Helpers
-  const handleAttendanceChange = (id: string, deltaAttended: number, deltaTotal: number) => {
-    const updated = attendance.map(item => {
-      if (item.id === id) {
-        const newTotal = Math.max(0, item.totalClasses + deltaTotal);
-        const newAttended = Math.max(0, Math.min(newTotal, item.attendedClasses + deltaAttended));
-        return { ...item, totalClasses: newTotal, attendedClasses: newAttended };
-      }
-      return item;
+    let rewardGranted = 0;
+    const updated = missions.map(m => {
+      if (m.id !== missionId) return m;
+      rewardGranted = m.creditReward;
+      return { ...m, claimed: true };
     });
-    onUpdateAttendance(updated);
+
+    const newCredits = credits + rewardGranted;
+    setCredits(newCredits);
+    setMissions(updated);
+    saveAllToFirestore(tasks, updated, events, studyHoursLog, newCredits);
+    alert(`🎉 Reward Claimed! +${rewardGranted} Gold Credits added to your account.`);
   };
 
-  const handleAddSubject = (e: React.FormEvent) => {
+  // Save Exam Mark
+  const handleSaveMark = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newSubject.name.trim()) return;
+    if (!markForm.subject.trim() || !user?.uid) return;
 
-    const sub: AttendanceSubject = {
-      id: 'att_' + Date.now(),
-      userId: user?.uid || 'guest',
-      code: newSubject.code.toUpperCase() || 'CS101',
-      name: newSubject.name.trim(),
-      totalClasses: newSubject.totalClasses,
-      attendedClasses: newSubject.attendedClasses,
-      targetPercentage: newSubject.targetPercentage || 75,
-      scheduleDays: ['Mon', 'Wed', 'Fri']
+    let updated: StudentMarkRecord[];
+    if (editingMark) {
+      updated = marks.map(m => m.id === editingMark.id ? { ...m, ...markForm } : m);
+    } else {
+      const newMark: StudentMarkRecord = {
+        id: 'mrk_' + Date.now(),
+        userId: user.uid,
+        subject: markForm.subject,
+        examTitle: markForm.examTitle,
+        scoredMarks: Number(markForm.scoredMarks),
+        maxMarks: Number(markForm.maxMarks),
+        examDate: markForm.examDate,
+        semester: markForm.semester,
+        createdAt: new Date().toISOString()
+      };
+      updated = [newMark, ...marks];
+    }
+
+    setMarks(updated);
+    setShowMarkModal(false);
+    setEditingMark(null);
+    await FirestoreService.saveStudentMarks(user.uid, updated);
+  };
+
+  // Delete Exam Mark
+  const handleDeleteMark = async (id: string) => {
+    const updated = marks.filter(m => m.id !== id);
+    setMarks(updated);
+    await FirestoreService.deleteStudentMark(id);
+  };
+
+  // Save Calendar Event
+  const handleSaveEvent = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!eventForm.title.trim()) return;
+
+    const colors = {
+      Exam: 'bg-rose-100 text-rose-800 border-rose-200',
+      Assignment: 'bg-blue-100 text-blue-800 border-blue-200',
+      Lecture: 'bg-purple-100 text-purple-800 border-purple-200',
+      Study: 'bg-emerald-100 text-emerald-800 border-emerald-200'
     };
 
-    onUpdateAttendance([...attendance, sub]);
-    setNewSubject({ code: '', name: '', totalClasses: 0, attendedClasses: 0, targetPercentage: 75 });
-    setShowAddSubjectModal(false);
+    const newEv: CalendarEvent = {
+      id: 'evt_' + Date.now(),
+      title: eventForm.title,
+      date: eventForm.date,
+      type: eventForm.type,
+      subject: eventForm.subject,
+      color: colors[eventForm.type] || 'bg-slate-100 text-slate-800 border-slate-200'
+    };
+
+    const updated = [newEv, ...events];
+    setEvents(updated);
+    setShowEventModal(false);
+    setEventForm({ title: '', date: new Date().toISOString().split('T')[0], type: 'Exam', subject: 'DBMS' });
+    saveAllToFirestore(tasks, missions, updated);
   };
 
-  // Filtered Habits
-  const filteredHabits = habits.filter(h => {
-    const matchesSearch = h.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || h.category === selectedCategory;
-    const matchesDifficulty = selectedDifficulty === 'All' || h.difficulty === selectedDifficulty;
-    return matchesSearch && matchesCategory && matchesDifficulty;
+  // Load Campus Leaderboard Data from Firestore
+  useEffect(() => {
+    if (activeInnerTab === 'leaderboard') {
+      setLoadingLeaderboard(true);
+      async function fetchLeaderboard() {
+        try {
+          const users = await FirestoreService.getAllUsers();
+          const entries: LeaderboardEntry[] = [];
+
+          for (const u of users) {
+            const [uMarks, uHab] = await Promise.all([
+              FirestoreService.getStudentMarks(u.uid),
+              FirestoreService.getHabiturexData(u.uid)
+            ]);
+
+            const totalScored = uMarks.reduce((acc, m) => acc + m.scoredMarks, 0);
+            const totalMax = uMarks.reduce((acc, m) => acc + m.maxMarks, 0);
+            const marksAvg = totalMax > 0 ? Math.round((totalScored / totalMax) * 100) : 0;
+
+            const tasksCompleted = (uHab?.tasks || []).filter((t: any) => t.completedToday || t.status === 'Completed').length;
+            const streak = uHab?.stats?.flameStreak || 0;
+            const studyHours = Object.values(uHab?.studyHoursLog || {}).reduce((a, b) => a + Number(b), 0);
+
+            entries.push({
+              uid: u.uid,
+              displayName: u.displayName || 'Campus Student',
+              university: u.university || 'Engineering Cohort',
+              marksAvg,
+              tasksCompleted,
+              streak,
+              studyHours
+            });
+          }
+
+          // Sort by highest marks avg, then completed tasks, then streak
+          entries.sort((a, b) => b.marksAvg - a.marksAvg || b.tasksCompleted - a.tasksCompleted || b.streak - a.streak);
+          setLeaderboardList(entries);
+        } catch (e) {
+          console.warn("Failed fetching leaderboard:", e);
+        } finally {
+          setLoadingLeaderboard(false);
+        }
+      }
+
+      fetchLeaderboard();
+    }
+  }, [activeInnerTab]);
+
+  // Overall Attendance Percentage
+  const totalHeldClasses = attendance.reduce((acc, curr) => acc + curr.totalClasses, 0);
+  const totalAttendedClasses = attendance.reduce((acc, curr) => acc + curr.attendedClasses, 0);
+  const overallAttendancePct = totalHeldClasses > 0 ? Math.round((totalAttendedClasses / totalHeldClasses) * 1000) / 10 : 0;
+
+  // Filtered Tasks
+  const filteredTasks = tasks.filter(t => {
+    const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) || t.subject.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesPriority = priorityFilter === 'All' || t.priority === priorityFilter;
+    const matchesStatus = statusFilter === 'All' || t.status === statusFilter;
+    return matchesSearch && matchesPriority && matchesStatus;
   });
 
-  const completedHabitsCount = habits.filter(h => h.completedToday).length;
-  const completionPercentage = habits.length > 0 ? Math.round((completedHabitsCount / habits.length) * 100) : 0;
+  // Dynamic Weekly Study Hours Data (Starting from User Sign-In Date)
+  const studyHoursData = useMemo(() => {
+    const userCreatedDate = user?.createdAt ? new Date(user.createdAt) : new Date();
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const now = new Date();
+    
+    // Map current week days
+    return days.map((dayName, idx) => {
+      const d = new Date();
+      const currentDayIdx = (d.getDay() + 6) % 7; // Monday = 0
+      const diff = idx - currentDayIdx;
+      d.setDate(d.getDate() + diff);
+      const dateStr = d.toISOString().split('T')[0];
 
-  // Radar Data for Performance Analytics
-  const radarData = DEFAULT_CATEGORIES.map(cat => {
-    const catHabits = habits.filter(h => h.category === cat);
-    const catCompleted = catHabits.filter(h => h.completedToday).length;
-    const score = catHabits.length > 0 ? Math.round((catCompleted / catHabits.length) * 100) : 0;
-    return { category: cat, score };
-  });
+      // Check if date is before user creation date
+      const isBeforeSignIn = d.getTime() < userCreatedDate.setHours(0,0,0,0);
+      const hours = isBeforeSignIn ? 0 : (studyHoursLog[dateStr] || 0);
 
-  // Recharts Mock Weekly XP
-  const weeklyData = [
-    { day: 'Mon', xp: Math.round(xp * 0.1) },
-    { day: 'Tue', xp: Math.round(xp * 0.25) },
-    { day: 'Wed', xp: Math.round(xp * 0.4) },
-    { day: 'Thu', xp: Math.round(xp * 0.6) },
-    { day: 'Fri', xp: Math.round(xp * 0.75) },
-    { day: 'Sat', xp: Math.round(xp * 0.9) },
-    { day: 'Sun', xp: xp }
+      return {
+        day: dayName,
+        hours: hours,
+        goal: 6
+      };
+    });
+  }, [user?.createdAt, studyHoursLog]);
+
+  // Attendance Trend (Fresh Start = 0 unless logged)
+  const attendanceTrendData = [
+    { week: 'W1', rate: 0 },
+    { week: 'W2', rate: 0 },
+    { week: 'W3', rate: 0 },
+    { week: 'W4', rate: 0 },
+    { week: 'W5', rate: 0 },
+    { week: 'W6', rate: overallAttendancePct }
   ];
 
+  // Radar Mastery (Fresh Start = 0 unless subjects completed)
+  const radarData = useMemo(() => {
+    const subjects = ['DBMS', 'OS', 'DSA', 'CN', 'System Design'];
+    return subjects.map(sub => {
+      const subMarks = marks.filter(m => m.subject.toLowerCase() === sub.toLowerCase());
+      const subScored = subMarks.reduce((a, m) => a + m.scoredMarks, 0);
+      const subMax = subMarks.reduce((a, m) => a + m.maxMarks, 0);
+      const score = subMax > 0 ? Math.round((subScored / subMax) * 100) : 0;
+      return { subject: sub, score };
+    });
+  }, [marks]);
+
+  // Exam Marks Analytics Calculations
+  const totalScoredMarks = marks.reduce((a, m) => a + m.scoredMarks, 0);
+  const totalMaxMarks = marks.reduce((a, m) => a + m.maxMarks, 0);
+  const overallMarksPct = totalMaxMarks > 0 ? Math.round((totalScoredMarks / totalMaxMarks) * 1000) / 10 : 0;
+  const estimatedCGPA = overallMarksPct > 0 ? Math.min(10, Math.round((overallMarksPct / 9.5) * 100) / 100) : 0;
+
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
+    <div className="space-y-6 pb-12">
       
-      {/* ============================================================================ */}
-      {/* HABITUREX TOP HEADER BAR */}
-      {/* ============================================================================ */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-slate-900 text-white shadow-xl space-y-4 border border-slate-800 card-3d">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          
-          {/* Logo & Title */}
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20 font-black">
-              <Sparkles className="w-6 h-6 text-amber-300 animate-pulse" />
-            </div>
+      {/* Top Banner Header */}
+      <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 font-extrabold text-[10px] tracking-wide uppercase">
+              STUDENT PERFORMANCE & HABIT ENGINE
+            </span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            Habiturex Workspace & Academic Suite
+          </h1>
+          <p className="text-xs text-slate-500 font-medium">
+            Personalized dashboard, active study tracking, exam marks analysis, and live campus leaderboard.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="px-4 py-2 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-center gap-2">
+            <Award className="w-5 h-5 text-amber-600 shrink-0" />
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-black tracking-tight text-white">Habiturex</h1>
-                <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-black text-[10px] tracking-wider uppercase border border-blue-500/30">
-                  V3.5 PREMIUM
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 font-medium">Daily Consistency Operating System</p>
+              <p className="text-[10px] uppercase font-black text-amber-700">Gold Credits</p>
+              <p className="text-sm font-black text-amber-900">{credits} Gold</p>
             </div>
           </div>
 
-          {/* Top Bar Stats Pills */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            {/* Level & XP */}
-            <div className="p-2.5 rounded-2xl bg-slate-800/80 border border-slate-700/60 space-y-1">
-              <div className="flex items-center justify-between text-[10px] font-black">
-                <span className="text-blue-400">LVL {currentLevel}</span>
-                <span className="text-slate-400 uppercase tracking-widest text-[9px]">RECRUIT EXPERTISE</span>
-              </div>
-              <p className="text-xs font-black text-white">{xp} XP</p>
-              <div className="w-full h-1.5 rounded-full bg-slate-700 overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500" 
-                  style={{ width: `${(currentLevelXp / 500) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-
-            {/* Store Credits */}
-            <div className="p-2.5 rounded-2xl bg-slate-800/80 border border-slate-700/60 flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-                <Coins className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-xs font-black text-white">{credits} Gold</p>
-                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Store Credits</p>
-              </div>
-            </div>
-
-            {/* Active Flame Streak */}
-            <div className="p-2.5 rounded-2xl bg-slate-800/80 border border-slate-700/60 flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">
-                <Flame className="w-4 h-4 animate-bounce" />
-              </div>
-              <div>
-                <p className="text-xs font-black text-white">{flameStreak} Days</p>
-                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Active Flame</p>
-              </div>
-            </div>
-
-            {/* XP Boost */}
-            <div className="p-2.5 rounded-2xl bg-slate-800/80 border border-slate-700/60 flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
-                <Zap className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-xs font-black text-white">x{xpMultiplier} XP</p>
-                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Multiplier</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowTunerModal(true)}
-              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <Sliders className="w-3.5 h-3.5 text-blue-400" />
-              <span>TUNER</span>
-            </button>
-
-            <button
-              onClick={handleWipeAll}
-              className="px-3.5 py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 text-red-300 font-bold text-xs border border-red-800/40 flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-red-400" />
-              <span>WIPE ALL</span>
-            </button>
-
-            <div className="relative">
-              <button
-                onClick={() => setShowNotificationsPopover(!showNotificationsPopover)}
-                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer relative"
-              >
-                <Bell className="w-4 h-4" />
-                <span className="w-2 h-2 rounded-full bg-blue-500 absolute top-1 right-1"></span>
-              </button>
-
-              {showNotificationsPopover && (
-                <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl p-4 z-50 space-y-2 animate-in zoom-in-95">
-                  <h4 className="text-xs font-black text-white border-b border-slate-800 pb-2">Habiturex System Activity</h4>
-                  <div className="space-y-2 text-[11px] text-slate-300 font-medium">
-                    <p className="p-2 rounded-xl bg-slate-800/60">🔥 Habiturex Daily Engine Active. Log routine habits to earn XP.</p>
-                    <p className="p-2 rounded-xl bg-slate-800/60">🎯 Level 1 Recruit initialized. Complete daily missions to unlock store credits.</p>
-                  </div>
-                </div>
-              )}
+          <div className="px-4 py-2 rounded-2xl bg-orange-50 border border-orange-200 text-orange-900 flex items-center gap-2">
+            <Flame className="w-5 h-5 text-orange-500 fill-orange-500 animate-bounce shrink-0" />
+            <div>
+              <p className="text-[10px] uppercase font-black text-orange-700">Active Streak</p>
+              <p className="text-sm font-black text-orange-900">{flameStreak} Days</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ============================================================================ */}
-      {/* MAIN HABITUREX CONTENT AREA WITH INNER SIDEBAR */}
-      {/* ============================================================================ */}
+      {/* Main Grid Wrapper */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         
-        {/* Inner Navigation Sidebar (3 cols on desktop) */}
+        {/* Left Sub-Sidebar Navigation */}
         <div className={`${innerSidebarCollapsed ? 'lg:col-span-1' : 'lg:col-span-3'} space-y-3 transition-all duration-300`}>
-          <div className="p-3.5 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-2 card-3d">
+          <div className="p-3.5 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-2">
             
             <div className="flex items-center justify-between px-2 py-1">
               {!innerSidebarCollapsed && (
@@ -560,7 +631,6 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                   <LayoutDashboard className="w-4 h-4" />
                   {!innerSidebarCollapsed && <span>Dashboard Hub</span>}
                 </div>
-                {!innerSidebarCollapsed && <span className="w-2 h-2 rounded-full bg-blue-300"></span>}
               </button>
 
               <button
@@ -573,56 +643,11 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
               >
                 <div className="flex items-center gap-2.5">
                   <Table className="w-4 h-4" />
-                  {!innerSidebarCollapsed && <span>Habits Table</span>}
+                  {!innerSidebarCollapsed && <span>Tasks & Targets</span>}
                 </div>
                 {!innerSidebarCollapsed && (
-                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px]">{habits.length}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px]">{tasks.length}</span>
                 )}
-              </button>
-
-              <button
-                onClick={() => setActiveInnerTab('missions')}
-                className={`w-full p-2.5 rounded-2xl text-xs font-black flex items-center justify-between transition-all cursor-pointer ${
-                  activeInnerTab === 'missions'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Target className="w-4 h-4" />
-                  {!innerSidebarCollapsed && <span>Daily Missions</span>}
-                </div>
-                {!innerSidebarCollapsed && (
-                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px]">{missions.length}</span>
-                )}
-              </button>
-
-              <button
-                onClick={() => setActiveInnerTab('analytics')}
-                className={`w-full p-2.5 rounded-2xl text-xs font-black flex items-center justify-between transition-all cursor-pointer ${
-                  activeInnerTab === 'analytics'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <LineChart className="w-4 h-4" />
-                  {!innerSidebarCollapsed && <span>Performance Analytics</span>}
-                </div>
-              </button>
-
-              <button
-                onClick={() => setActiveInnerTab('matrix')}
-                className={`w-full p-2.5 rounded-2xl text-xs font-black flex items-center justify-between transition-all cursor-pointer ${
-                  activeInnerTab === 'matrix'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Calendar className="w-4 h-4" />
-                  {!innerSidebarCollapsed && <span>Consistency Matrix</span>}
-                </div>
               </button>
 
               <button
@@ -638,31 +663,88 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                   {!innerSidebarCollapsed && <span>Attendance Manager</span>}
                 </div>
                 {!innerSidebarCollapsed && (
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">Active</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">{overallAttendancePct}%</span>
                 )}
+              </button>
+
+              <button
+                onClick={() => setActiveInnerTab('analytics')}
+                className={`w-full p-2.5 rounded-2xl text-xs font-black flex items-center justify-between transition-all cursor-pointer ${
+                  activeInnerTab === 'analytics'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <LineChart className="w-4 h-4" />
+                  {!innerSidebarCollapsed && <span>Analytics & Performance</span>}
+                </div>
+              </button>
+
+              <button
+                onClick={() => setActiveInnerTab('missions')}
+                className={`w-full p-2.5 rounded-2xl text-xs font-black flex items-center justify-between transition-all cursor-pointer ${
+                  activeInnerTab === 'missions'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Target className="w-4 h-4" />
+                  {!innerSidebarCollapsed && <span>Daily Missions</span>}
+                </div>
+              </button>
+
+              <button
+                onClick={() => setActiveInnerTab('calendar')}
+                className={`w-full p-2.5 rounded-2xl text-xs font-black flex items-center justify-between transition-all cursor-pointer ${
+                  activeInnerTab === 'calendar'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Calendar className="w-4 h-4" />
+                  {!innerSidebarCollapsed && <span>Marks & Academic Schedule</span>}
+                </div>
+              </button>
+
+              <button
+                onClick={() => setActiveInnerTab('leaderboard')}
+                className={`w-full p-2.5 rounded-2xl text-xs font-black flex items-center justify-between transition-all cursor-pointer ${
+                  activeInnerTab === 'leaderboard'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Trophy className="w-4 h-4 text-amber-500" />
+                  {!innerSidebarCollapsed && <span>Campus Leaderboard</span>}
+                </div>
               </button>
             </nav>
 
-            {/* Profile Footer Box */}
+            {/* Profile Footer */}
             {!innerSidebarCollapsed && (
               <div className="pt-3 border-t border-slate-100">
                 <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/60 flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-black flex items-center justify-center text-sm shadow-sm">
-                    {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'N'}
+                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-black flex items-center justify-center text-sm shadow-xs">
+                    {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'S'}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-black text-slate-900 truncate">{user?.displayName || 'Naman pandey'}</p>
-                    <span className="px-1.5 py-0.2 rounded bg-blue-100 text-blue-700 font-extrabold text-[9px]">
-                      PLACEMENT READY
+                    <p className="text-xs font-black text-slate-900 truncate">{user?.displayName || 'Student'}</p>
+                    <span className="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 font-extrabold text-[9px]">
+                      {overallMarksPct > 0 ? `${overallMarksPct}% MARKS AVG` : 'FRESH START'}
                     </span>
                   </div>
                 </div>
               </div>
             )}
+
           </div>
         </div>
 
-        {/* Main Workspace (9 cols or 11 cols when inner sidebar collapsed) */}
+        {/* Right Main Content Pane */}
         <div className={`${innerSidebarCollapsed ? 'lg:col-span-11' : 'lg:col-span-9'} space-y-5`}>
           
           {/* ============================================================================ */}
@@ -671,446 +753,581 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
           {activeInnerTab === 'dashboard' && (
             <div className="space-y-5 animate-in fade-in duration-300">
               
-              {/* Consistency Blueprint Banner */}
-              <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-xl space-y-4 border border-blue-800/40 relative overflow-hidden card-3d">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+              {/* Hero Greeting Banner */}
+              <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-lg space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full bg-blue-400/20 text-blue-300 font-black text-[10px] uppercase tracking-wider border border-blue-400/30">
-                        AI CO-PILOT ADVISOR
+                      <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-black text-[10px] tracking-wider uppercase backdrop-blur-md">
+                        STUDENT HABITUREX CONSOLE
                       </span>
                     </div>
-                    <h2 className="text-xl font-black text-white">Consistency Blueprint</h2>
-                    <p className="text-xs text-indigo-200 font-medium italic max-w-xl">
-                      "Excellence is an art won by training and habituation. We are what we repeatedly do." — Aristotle
+                    <h2 className="text-2xl font-black tracking-tight text-white">
+                      Welcome, {user?.displayName || 'Student'} 👋
+                    </h2>
+                    <p className="text-xs text-blue-100 font-medium max-w-xl">
+                      "Consistency turns effort into excellence. Set your custom daily missions, complete active tasks to keep your streak alive, and track your performance."
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => {
-                        setEditingHabit(null);
-                        setHabitForm({ name: '', timeframe: 'Morning', category: 'Coding', difficulty: 'Medium', xpValue: 50 });
-                        setShowHabitModal(true);
-                      }}
-                      className="px-4 py-2.5 rounded-2xl bg-white hover:bg-blue-50 text-slate-950 font-black text-xs shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
-                    >
-                      <Plus className="w-4 h-4 text-blue-600" />
-                      <span>New Habit Target</span>
-                    </button>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-right">
+                      <p className="text-[10px] uppercase font-bold text-blue-200">Today's Date</p>
+                      <p className="text-xs font-black text-white">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Progress Summary Pill */}
-                <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-slate-300">
-                  <span>COMPLETED TODAY: {completedHabitsCount} of {habits.length} Habits</span>
-                  <span className="text-amber-300 font-black">{completionPercentage}% Completed</span>
                 </div>
               </div>
 
-              {/* Today's Performance Target Box */}
-              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4 card-3d">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <div className="flex items-center gap-2">
-                    <Target className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <h3 className="text-base font-black text-slate-900">Today's Performance Routine</h3>
-                      <p className="text-xs text-slate-500">Tap completion circle to log habit and claim score</p>
-                    </div>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-extrabold text-xs">
-                    ACTIVE LOGS
-                  </span>
-                </div>
-
-                {habits.length === 0 ? (
-                  <div className="p-10 text-center space-y-3">
-                    <Target className="w-10 h-10 text-slate-300 mx-auto" />
-                    <p className="text-sm font-black text-slate-800">No Routine Logs Registered</p>
-                    <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                      Build an outstanding high-performance routine by registering your first habit target or seeding our baseline habits.
-                    </p>
-                    <div className="flex items-center justify-center gap-3 pt-2">
-                      <button
-                        onClick={() => setShowHabitModal(true)}
-                        className="px-4 py-2 rounded-xl bg-blue-600 text-white font-black text-xs hover:bg-blue-700 transition-colors cursor-pointer shadow-sm"
-                      >
-                        + Add Habit Target
-                      </button>
-                      <button
-                        onClick={handleSeedBaseline}
-                        className="px-4 py-2 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 font-black text-xs transition-colors cursor-pointer border border-purple-200"
-                      >
-                        ⚡ Seed Baseline
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-2.5">
-                    {habits.map((h) => (
-                      <div
-                        key={h.id}
-                        onClick={() => toggleHabitCompletion(h.id)}
-                        className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
-                          h.completedToday
-                            ? 'bg-emerald-50/70 border-emerald-300 text-slate-900'
-                            : 'bg-slate-50/60 border-slate-200/80 hover:bg-white text-slate-800'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                            h.completedToday ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 bg-white'
-                          }`}>
-                            {h.completedToday && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                          </div>
-
-                          <div className="min-w-0">
-                            <p className={`text-xs font-black truncate ${h.completedToday ? 'line-through text-slate-500' : 'text-slate-900'}`}>
-                              {h.name}
-                            </p>
-                            <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium mt-0.5">
-                              <span className="px-1.5 py-0.2 rounded bg-slate-200 text-slate-700 font-bold">{h.timeframe}</span>
-                              <span className="px-1.5 py-0.2 rounded bg-blue-100 text-blue-700 font-bold">{h.category}</span>
-                              <span className="text-orange-600 font-bold">🔥 {h.streakDays}d Streak</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <span className="px-2.5 py-1 rounded-xl bg-blue-100 text-blue-800 font-black text-xs shrink-0">
-                          +{h.xpValue} XP
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Metrics & Radar Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* 8 Stat KPI Cards Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
                 
-                {/* Performance Metrics Breakdown */}
-                <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4 card-3d">
-                  <h3 className="text-sm font-black text-slate-900 border-b border-slate-100 pb-2">
-                    Performance Stats Summary
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3.5 rounded-2xl bg-blue-50 border border-blue-100 space-y-1">
-                      <p className="text-[10px] uppercase font-bold text-blue-600">Total Habits Logged</p>
-                      <p className="text-lg font-black text-slate-900">{completedHabitsCount}</p>
-                    </div>
-
-                    <div className="p-3.5 rounded-2xl bg-orange-50 border border-orange-100 space-y-1">
-                      <p className="text-[10px] uppercase font-bold text-orange-600">Combo Streak</p>
-                      <p className="text-lg font-black text-slate-900">{flameStreak}d</p>
-                    </div>
-
-                    <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-100 space-y-1">
-                      <p className="text-[10px] uppercase font-bold text-emerald-600">Perfect Days</p>
-                      <p className="text-lg font-black text-slate-900">{perfectDaysCount}</p>
-                    </div>
-
-                    <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-100 space-y-1">
-                      <p className="text-[10px] uppercase font-bold text-amber-600">Store Gold</p>
-                      <p className="text-lg font-black text-slate-900">{credits}g</p>
+                {/* 1. Attendance Rate */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-black text-slate-400">Attendance Rate</span>
+                    <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                      <CheckSquare className="w-3.5 h-3.5" />
                     </div>
                   </div>
-                </div>
-
-                {/* Radar Chart: Category Mastery */}
-                <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-2 card-3d">
-                  <h3 className="text-sm font-black text-slate-900 border-b border-slate-100 pb-2">
-                    Balanced Category Mastery
-                  </h3>
-                  <div className="h-48 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                        <PolarGrid stroke="#e2e8f0" />
-                        <PolarAngleAxis dataKey="category" tick={{ fill: '#64748b', fontSize: 9, fontWeight: 700 }} />
-                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} />
-                        <Radar name="Completion %" dataKey="score" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.4} />
-                      </RadarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ============================================================================ */}
-          {/* TAB 2: HABITS TABLE */}
-          {/* ============================================================================ */}
-          {activeInnerTab === 'table' && (
-            <div className="space-y-4 animate-in fade-in duration-300">
-              
-              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4 card-3d">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                   <div>
-                    <h2 className="text-base font-black text-slate-900">Active Habits Console</h2>
-                    <p className="text-xs text-slate-500">Configure, customize, and log your placement routine targets.</p>
+                    <p className="text-xl font-black text-slate-900">{overallAttendancePct}%</p>
+                    <p className="text-[10px] font-bold text-emerald-600 mt-0.5">Target ≥75%</p>
                   </div>
+                </div>
+
+                {/* 2. Active Tasks */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-black text-slate-400">Active Tasks</span>
+                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                      <FileText className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-slate-900">{tasks.length} Total</p>
+                    <p className="text-[10px] font-bold text-blue-600 mt-0.5">{tasks.filter(t => t.status !== 'Completed').length} Pending</p>
+                  </div>
+                </div>
+
+                {/* 3. Completed Tasks */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-black text-slate-400">Completed Tasks</span>
+                    <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-slate-900">{tasks.filter(t => t.status === 'Completed' || t.completedToday).length} Done</p>
+                    <p className="text-[10px] font-bold text-indigo-600 mt-0.5">Streak Active</p>
+                  </div>
+                </div>
+
+                {/* 4. Total Focus Hours */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-black text-slate-400">Focus Hours</span>
+                    <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                      <Clock className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-slate-900">
+                      {Object.values(studyHoursLog).reduce<number>((a, b) => a + Number(b), 0).toFixed(1)} hrs
+                    </p>
+                    <p className="text-[10px] font-bold text-purple-600 mt-0.5">Logged Total</p>
+                  </div>
+                </div>
+
+                {/* 5. Exam Marks Avg */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-black text-slate-400">Exam Marks Avg</span>
+                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                      <GraduationCap className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-slate-900">{overallMarksPct}%</p>
+                    <p className="text-[10px] font-bold text-amber-600 mt-0.5">EST. CGPA: {estimatedCGPA}</p>
+                  </div>
+                </div>
+
+                {/* 6. Gold Credits */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-black text-slate-400">Gold Credits</span>
+                    <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+                      <Award className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-amber-900">{credits}</p>
+                    <p className="text-[10px] font-bold text-amber-600 mt-0.5">Redeem Rewards</p>
+                  </div>
+                </div>
+
+                {/* 7. Upcoming Exams */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-black text-slate-400">Upcoming Exams</span>
+                    <div className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-slate-900">
+                      {events.filter(e => e.type === 'Exam').length} Scheduled
+                    </p>
+                    <p className="text-[10px] font-bold text-rose-600 mt-0.5">Calendar Active</p>
+                  </div>
+                </div>
+
+                {/* 8. Flame Streak */}
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-black text-slate-400">Daily Streak</span>
+                    <div className="w-7 h-7 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+                      <Flame className="w-3.5 h-3.5 fill-orange-500" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-slate-900">{flameStreak} Days</p>
+                    <p className="text-[10px] font-bold text-orange-600 mt-0.5">Task Streak</p>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* USER DAILY MISSIONS ON DASHBOARD */}
+              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                  <div>
+                    <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                      <Target className="w-4 h-4 text-blue-600" />
+                      <span>Daily Missions & Targets</span>
+                    </h3>
+                    <p className="text-xs text-slate-500">Set your custom targets and claim Gold credits upon completion</p>
+                  </div>
+
                   <button
-                    onClick={() => {
-                      setEditingHabit(null);
-                      setHabitForm({ name: '', timeframe: 'Morning', category: 'Coding', difficulty: 'Medium', xpValue: 50 });
-                      setShowHabitModal(true);
-                    }}
-                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0"
+                    onClick={() => setShowMissionModal(true)}
+                    className="px-3.5 py-1.5 rounded-xl bg-blue-600 text-white font-black text-xs hover:bg-blue-700 transition-colors shadow-sm cursor-pointer flex items-center gap-1 shrink-0"
                   >
-                    <Plus className="w-4 h-4" />
-                    <span>Configure Habit</span>
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Set Custom Mission</span>
                   </button>
                 </div>
 
-                {/* Filter & Search Controls */}
-                <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-                  <div className="relative w-full sm:w-64">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search habits..."
-                      className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    />
-                  </div>
-
-                  {/* Category Pills */}
-                  <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto pb-1">
-                    {['All', ...DEFAULT_CATEGORIES].map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer shrink-0 ${
-                          selectedCategory === cat 
-                            ? 'bg-blue-600 text-white' 
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Table */}
-                {filteredHabits.length === 0 ? (
-                  <div className="p-10 text-center space-y-3 border border-dashed border-slate-200 rounded-2xl">
-                    <Table className="w-8 h-8 text-slate-300 mx-auto" />
-                    <p className="text-xs font-black text-slate-800">No Active Habits Found</p>
-                    <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
-                      Your habits console is empty. Configure a custom habit target or seed baseline placement habits.
-                    </p>
-                    <button
-                      onClick={handleSeedBaseline}
-                      className="px-4 py-2 rounded-xl bg-purple-600 text-white font-black text-xs hover:bg-purple-700 transition-colors shadow-sm cursor-pointer"
-                    >
-                      ⚡ Seed Baseline
-                    </button>
+                {missions.length === 0 ? (
+                  <div className="text-center py-6 text-slate-400 text-xs font-semibold">
+                    No custom daily missions set yet. Click "Set Custom Mission" above!
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead>
-                        <tr className="border-b border-slate-200 text-[10px] uppercase font-black text-slate-400 tracking-wider">
-                          <th className="py-3 px-2">Done Today</th>
-                          <th className="py-3 px-2">Habit Target</th>
-                          <th className="py-3 px-2">Time Frame</th>
-                          <th className="py-3 px-2">Category</th>
-                          <th className="py-3 px-2">Difficulty</th>
-                          <th className="py-3 px-2">Streak</th>
-                          <th className="py-3 px-2">XP</th>
-                          <th className="py-3 px-2 text-right">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {filteredHabits.map((h) => (
-                          <tr key={h.id} className="hover:bg-slate-50/80 transition-colors">
-                            <td className="py-3 px-2">
-                              <button
-                                onClick={() => toggleHabitCompletion(h.id)}
-                                className={`w-5 h-5 rounded-md border flex items-center justify-center cursor-pointer transition-colors ${
-                                  h.completedToday ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 bg-white'
-                                }`}
-                              >
-                                {h.completedToday && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                              </button>
-                            </td>
-                            <td className="py-3 px-2 font-black text-slate-900">{h.name}</td>
-                            <td className="py-3 px-2 font-semibold text-slate-600">{h.timeframe}</td>
-                            <td className="py-3 px-2">
-                              <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-bold text-[10px]">
-                                {h.category}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {missions.map(m => {
+                      const isCompleted = m.currentCount >= m.targetCount || m.completed;
+                      return (
+                        <div key={m.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-2 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <h4 className="text-xs font-black text-slate-900">{m.title}</h4>
+                              <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-extrabold text-[10px]">
+                                +{m.creditReward} Gold
                               </span>
-                            </td>
-                            <td className="py-3 px-2 font-semibold text-slate-600">{h.difficulty}</td>
-                            <td className="py-3 px-2 font-bold text-orange-600">🔥 {h.streakDays}d</td>
-                            <td className="py-3 px-2 font-black text-blue-600">+{h.xpValue} XP</td>
-                            <td className="py-3 px-2 text-right">
+                            </div>
+                            <p className="text-[11px] text-slate-500">{m.description}</p>
+                          </div>
+
+                          <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between">
+                            <span className="text-[10px] font-bold text-slate-600">
+                              Target: {m.currentCount} / {m.targetCount}
+                            </span>
+
+                            {m.claimed ? (
+                              <span className="px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-800 font-black text-[10px]">
+                                Claimed ✅
+                              </span>
+                            ) : isCompleted ? (
                               <button
-                                onClick={() => handleDeleteHabit(h.id)}
-                                className="p-1 rounded text-slate-400 hover:text-red-600 cursor-pointer"
+                                onClick={() => handleClaimMission(m.id)}
+                                className="px-3 py-1 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-xs hover:scale-105 transition-all shadow-md cursor-pointer animate-pulse"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                Claim Reward 🎁
                               </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  const updatedMissions = missions.map(ms => ms.id === m.id ? { ...ms, currentCount: ms.currentCount + 1, completed: ms.currentCount + 1 >= ms.targetCount } : ms);
+                                  setMissions(updatedMissions);
+                                  saveAllToFirestore(tasks, updatedMissions);
+                                }}
+                                className="px-2.5 py-1 rounded-xl bg-blue-100 text-blue-700 hover:bg-blue-200 font-extrabold text-[10px] cursor-pointer"
+                              >
+                                + Progress
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
-            </div>
-          )}
 
-          {/* ============================================================================ */}
-          {/* TAB 3: DAILY MISSIONS */}
-          {/* ============================================================================ */}
-          {activeInnerTab === 'missions' && (
-            <div className="space-y-4 animate-in fade-in duration-300">
-              
-              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4 card-3d">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-                  <div>
-                    <h2 className="text-base font-black text-slate-900">Daily Missions Console</h2>
-                    <p className="text-xs text-slate-500">Challenge yourself with daily targets and claim XP boosts to accelerate placement readiness.</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={handleSeedMissions}
-                      className="px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 cursor-pointer"
-                    >
-                      ⚡ Seed Missions
-                    </button>
-                    <button
-                      onClick={() => setShowMissionModal(true)}
-                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Define Mission</span>
-                    </button>
+              {/* Main Workspace Split: Task Console + Right Panel Widgets */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                
+                {/* Left Active Tasks Console (8 cols) */}
+                <div className="lg:col-span-8 space-y-5">
+                  <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                      <div>
+                        <h3 className="text-base font-black text-slate-900">Active Tasks & Assignments</h3>
+                        <p className="text-xs text-slate-500">Completing tasks automatically maintains your daily streak</p>
+                      </div>
+
+                      <button
+                        onClick={() => setShowTaskModal(true)}
+                        className="px-3.5 py-1.5 rounded-xl bg-blue-600 text-white font-black text-xs hover:bg-blue-700 transition-colors shadow-sm cursor-pointer flex items-center gap-1 shrink-0"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add Task</span>
+                      </button>
+                    </div>
+
+                    {/* Filter & Search Toolbar */}
+                    <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+                      <div className="relative w-full sm:w-64">
+                        <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                        <input
+                          type="text"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          placeholder="Search tasks or subjects..."
+                          className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1">
+                        {['All', 'Pending', 'In Progress', 'Completed'].map(st => (
+                          <button
+                            key={st}
+                            onClick={() => setStatusFilter(st)}
+                            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                              statusFilter === st 
+                                ? 'bg-blue-600 text-white' 
+                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            }`}
+                          >
+                            {st}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Tasks Table */}
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="border-b border-slate-100 text-[10px] uppercase font-black text-slate-400 tracking-wider">
+                            <th className="py-2.5 px-2">Done</th>
+                            <th className="py-2.5 px-2">Task / Goal</th>
+                            <th className="py-2.5 px-2">Subject</th>
+                            <th className="py-2.5 px-2">Priority</th>
+                            <th className="py-2.5 px-2">Status</th>
+                            <th className="py-2.5 px-2">Progress</th>
+                            <th className="py-2.5 px-2">Due Date</th>
+                            <th className="py-2.5 px-2 text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {filteredTasks.length === 0 ? (
+                            <tr>
+                              <td colSpan={8} className="py-6 text-center text-slate-400 text-xs font-semibold">
+                                No tasks found. Click "Add Task" to create one!
+                              </td>
+                            </tr>
+                          ) : (
+                            filteredTasks.map(t => (
+                              <tr key={t.id} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="py-3 px-2">
+                                  <button
+                                    onClick={() => handleToggleTask(t.id)}
+                                    className={`w-5 h-5 rounded-md border flex items-center justify-center cursor-pointer transition-colors ${
+                                      t.completedToday ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 bg-white'
+                                    }`}
+                                  >
+                                    {t.completedToday && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                                  </button>
+                                </td>
+                                <td className="py-3 px-2 font-black text-slate-900 min-w-[180px]">
+                                  <span className={t.completedToday ? 'line-through text-slate-400' : 'text-slate-900'}>
+                                    {t.name}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-2">
+                                  <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-extrabold text-[10px]">
+                                    {t.subject}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-2">
+                                  <span className={`px-2 py-0.5 rounded font-black text-[10px] ${
+                                    t.priority === 'Critical' ? 'bg-rose-100 text-rose-800' :
+                                    t.priority === 'High' ? 'bg-amber-100 text-amber-800' :
+                                    t.priority === 'Medium' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-slate-100 text-slate-700'
+                                  }`}>
+                                    {t.priority}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-2 font-semibold text-slate-700">
+                                  {t.status}
+                                </td>
+                                <td className="py-3 px-2 w-24">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                                      <div 
+                                        className="h-full bg-blue-600 rounded-full"
+                                        style={{ width: `${t.progress}%` }}
+                                      ></div>
+                                    </div>
+                                    <span className="text-[10px] font-bold text-slate-500">{t.progress}%</span>
+                                  </div>
+                                </td>
+                                <td className="py-3 px-2 font-semibold text-slate-500">{t.dueDate}</td>
+                                <td className="py-3 px-2 text-right">
+                                  <button
+                                    onClick={() => handleDeleteTask(t.id)}
+                                    className="p-1 rounded text-slate-400 hover:text-rose-600 cursor-pointer"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
                   </div>
                 </div>
 
-                {missions.length === 0 ? (
-                  <div className="p-10 text-center space-y-3 border border-dashed border-slate-200 rounded-2xl">
-                    <Target className="w-8 h-8 text-slate-300 mx-auto" />
-                    <p className="text-xs font-black text-slate-800">No Active Missions</p>
-                    <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
-                      Your daily missions console is empty. Click "Define Mission" above or seed starter missions.
-                    </p>
-                    <button
-                      onClick={handleSeedMissions}
-                      className="px-4 py-2 rounded-xl bg-purple-600 text-white font-black text-xs hover:bg-purple-700 transition-colors shadow-sm cursor-pointer"
-                    >
-                      ⚡ Seed Starter Missions
-                    </button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {missions.map((m) => (
-                      <div key={m.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h4 className="text-xs font-black text-slate-900">{m.title}</h4>
-                            <p className="text-[11px] text-slate-500 font-medium mt-0.5">{m.description}</p>
-                          </div>
-                          <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-black text-[10px] shrink-0">
-                            +{m.xpReward} XP / +{m.creditReward}g
-                          </span>
-                        </div>
+                {/* Right Widget Column (4 cols) */}
+                <div className="lg:col-span-4 space-y-5">
+                  
+                  {/* 1. Custom Focus Timer */}
+                  <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-blue-600" />
+                        <h4 className="text-xs font-black text-slate-900">Focus Timer Watch</h4>
+                      </div>
+                      <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-extrabold text-[10px]">
+                        +50 Gold / Session
+                      </span>
+                    </div>
 
-                        {/* Progress Bar */}
-                        <div className="space-y-1">
-                          <div className="flex justify-between text-[10px] font-bold text-slate-500">
-                            <span>Progress</span>
-                            <span>{m.currentCount} / {m.targetCount}</span>
-                          </div>
-                          <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
-                            <div 
-                              className="h-full bg-blue-600 transition-all duration-300"
-                              style={{ width: `${Math.min(100, (m.currentCount / m.targetCount) * 100)}%` }}
-                            ></div>
-                          </div>
-                        </div>
-
+                    {/* Presets */}
+                    <div className="flex items-center justify-between gap-1 bg-slate-100 p-1 rounded-xl text-[10px] font-bold overflow-x-auto">
+                      {[15, 25, 45, 60, 90, 120].map(m => (
                         <button
-                          onClick={() => handleClaimMission(m.id)}
-                          disabled={!m.completed || m.claimed}
-                          className={`w-full py-2 rounded-xl font-black text-xs transition-colors cursor-pointer ${
-                            m.claimed
-                              ? 'bg-emerald-100 text-emerald-800 cursor-not-allowed'
-                              : m.completed
-                              ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
-                              : 'bg-slate-200 text-slate-500 cursor-not-allowed'
+                          key={m}
+                          onClick={() => {
+                            onSetFocusTimerDuration?.(m);
+                            setCustomMinutesInput(m.toString());
+                          }}
+                          className={`flex-1 py-1 px-1.5 rounded-lg transition-all cursor-pointer text-center ${
+                            focusTimerInitialMinutes === m ? 'bg-blue-600 text-white font-black shadow-xs' : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
-                          {m.claimed ? 'Reward Claimed ✓' : m.completed ? 'Claim Reward 🎉' : 'In Progress'}
+                          {m}m
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Custom Minute Input & Adjuster */}
+                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-2">
+                      <label className="block text-[10px] font-black uppercase text-slate-500">
+                        Custom Duration (Minutes)
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newMins = Math.max(1, focusTimerInitialMinutes - 5);
+                            onSetFocusTimerDuration?.(newMins);
+                            setCustomMinutesInput(newMins.toString());
+                          }}
+                          className="px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-black text-xs hover:bg-slate-100 cursor-pointer"
+                        >
+                          -5m
+                        </button>
+                        <input
+                          type="number"
+                          min="1"
+                          max="600"
+                          value={customMinutesInput}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setCustomMinutesInput(val);
+                            const parsed = parseInt(val, 10);
+                            if (!isNaN(parsed) && parsed > 0) {
+                              onSetFocusTimerDuration?.(parsed);
+                            }
+                          }}
+                          className="w-full text-center py-1.5 px-2 bg-white rounded-xl border border-slate-200 font-mono font-black text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newMins = focusTimerInitialMinutes + 5;
+                            onSetFocusTimerDuration?.(newMins);
+                            setCustomMinutesInput(newMins.toString());
+                          }}
+                          className="px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-black text-xs hover:bg-slate-100 cursor-pointer"
+                        >
+                          +5m
                         </button>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* ============================================================================ */}
-          {/* TAB 4: PERFORMANCE ANALYTICS */}
-          {/* ============================================================================ */}
-          {activeInnerTab === 'analytics' && (
-            <div className="space-y-5 animate-in fade-in duration-300">
-              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4 card-3d">
-                <h2 className="text-base font-black text-slate-900 border-b border-slate-100 pb-2">
-                  Weekly XP Compound Curve
-                </h2>
-                <div className="h-64 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ReLineChart data={weeklyData}>
-                      <XAxis dataKey="day" stroke="#64748b" fontSize={11} />
-                      <YAxis stroke="#64748b" fontSize={11} />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="xp" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} />
-                    </ReLineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ============================================================================ */}
-          {/* TAB 5: CONSISTENCY MATRIX */}
-          {/* ============================================================================ */}
-          {activeInnerTab === 'matrix' && (
-            <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4 card-3d animate-in fade-in duration-300">
-              <h2 className="text-base font-black text-slate-900 border-b border-slate-100 pb-2">
-                Consistency Heatmap Matrix
-              </h2>
-              <p className="text-xs text-slate-500 font-medium">30-day visual activity distribution based on habit check-ins.</p>
-
-              <div className="grid grid-cols-7 sm:grid-cols-10 gap-2 pt-2">
-                {Array.from({ length: 30 }).map((_, i) => {
-                  const dayNum = i + 1;
-                  const isActive = habits.some(h => h.historyDates.length > 0 && i % 3 === 0);
-                  return (
-                    <div
-                      key={i}
-                      className={`p-3 rounded-xl border text-center font-extrabold text-xs transition-all ${
-                        isActive
-                          ? 'bg-blue-600 border-blue-600 text-white shadow-xs'
-                          : 'bg-slate-50 border-slate-200 text-slate-400'
-                      }`}
-                    >
-                      Day {dayNum}
                     </div>
-                  );
-                })}
+
+                    {/* Timer Clock Display */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 text-white text-center space-y-2">
+                      <p className="text-3xl font-black font-mono tracking-wider">
+                        {String(timerMinutes).padStart(2, '0')}:{String(timerSeconds).padStart(2, '0')}
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest">
+                        {isTimerRunning ? '🔥 Focus Session Active' : 'Ready to Start'}
+                      </p>
+                    </div>
+
+                    {/* Timer Controls */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => onToggleFocusTimer?.()}
+                        className={`flex-1 py-2 rounded-xl font-black text-xs text-white transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                          isTimerRunning ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20'
+                        }`}
+                      >
+                        {isTimerRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                        <span>{isTimerRunning ? 'Pause' : 'Start Focus'}</span>
+                      </button>
+                      <button
+                        onClick={() => onResetFocusTimer?.()}
+                        className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 cursor-pointer"
+                        title="Reset Timer"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Quick Scratchpad Notes */}
+                  <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                      <div className="flex items-center gap-2">
+                        <Bookmark className="w-4 h-4 text-amber-500" />
+                        <h4 className="text-xs font-black text-slate-900">Quick Notes Scratchpad</h4>
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-bold">Auto-saved</span>
+                    </div>
+
+                    <textarea
+                      value={quickNotes}
+                      onChange={(e) => setQuickNotes(e.target.value)}
+                      rows={4}
+                      placeholder="Write down lecture points, formula reminders, or tasks..."
+                      className="w-full p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none text-slate-800"
+                    ></textarea>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+          )}
+
+          {/* ============================================================================ */}
+          {/* TAB 2: TASKS & TARGETS */}
+          {/* ============================================================================ */}
+          {activeInnerTab === 'table' && (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                  <div>
+                    <h2 className="text-base font-black text-slate-900">Full Tasks & Habit Management</h2>
+                    <p className="text-xs text-slate-500">Organize your coursework, coding targets, and daily routines</p>
+                  </div>
+                  <button
+                    onClick={() => setShowTaskModal(true)}
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Create New Target</span>
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-100 text-[10px] uppercase font-black text-slate-400 tracking-wider">
+                        <th className="py-3 px-2">Complete</th>
+                        <th className="py-3 px-2">Task Name</th>
+                        <th className="py-3 px-2">Subject / Tag</th>
+                        <th className="py-3 px-2">Priority</th>
+                        <th className="py-3 px-2">Status</th>
+                        <th className="py-3 px-2">Progress</th>
+                        <th className="py-3 px-2">Due Date</th>
+                        <th className="py-3 px-2 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {tasks.map(t => (
+                        <tr key={t.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="py-3 px-2">
+                            <button
+                              onClick={() => handleToggleTask(t.id)}
+                              className={`w-5 h-5 rounded-md border flex items-center justify-center cursor-pointer transition-colors ${
+                                t.completedToday ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 bg-white'
+                              }`}
+                            >
+                              {t.completedToday && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                            </button>
+                          </td>
+                          <td className="py-3 px-2 font-black text-slate-900">{t.name}</td>
+                          <td className="py-3 px-2">
+                            <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-extrabold text-[10px]">
+                              {t.subject}
+                            </span>
+                          </td>
+                          <td className="py-3 px-2 font-black text-[10px]">{t.priority}</td>
+                          <td className="py-3 px-2 font-semibold text-slate-600">{t.status}</td>
+                          <td className="py-3 px-2">{t.progress}%</td>
+                          <td className="py-3 px-2 font-medium text-slate-500">{t.dueDate}</td>
+                          <td className="py-3 px-2 text-right">
+                            <button
+                              onClick={() => handleDeleteTask(t.id)}
+                              className="p-1 rounded text-slate-400 hover:text-rose-600 cursor-pointer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
               </div>
             </div>
           )}
 
           {/* ============================================================================ */}
-          {/* TAB 6: ATTENDANCE TRACKER & PREDICTOR */}
+          {/* TAB 3: ATTENDANCE MANAGER */}
           {/* ============================================================================ */}
           {activeInnerTab === 'attendance' && (
             <AttendanceView
@@ -1119,100 +1336,457 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
             />
           )}
 
+          {/* ============================================================================ */}
+          {/* TAB 4: ANALYTICS & PERFORMANCE */}
+          {/* ============================================================================ */}
+          {activeInnerTab === 'analytics' && (
+            <div className="space-y-5 animate-in fade-in duration-300">
+              
+              {/* SHIFTED: Weekly Study Hours & Goal Completion Chart */}
+              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+                <div className="border-b border-slate-100 pb-3">
+                  <h3 className="text-base font-black text-slate-900">
+                    Weekly Study Hours & Goal Completion
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Tracks logged focus hours starting strictly from your account sign-in date (days prior remain at 0.0 hrs).
+                  </p>
+                </div>
+
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ReBarChart data={studyHoursData}>
+                      <XAxis dataKey="day" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                      <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#ffffff', borderRadius: '12px', borderColor: '#e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} 
+                      />
+                      <Bar dataKey="hours" name="Logged Focus Hours" fill="#2563eb" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="goal" name="Daily Goal Target" fill="#e2e8f0" radius={[6, 6, 0, 0]} />
+                    </ReBarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* 6-Week Attendance Stability Trend (%) */}
+                <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-3">
+                  <h3 className="text-sm font-black text-slate-900 border-b border-slate-100 pb-2">
+                    6-Week Attendance Stability Trend (%)
+                  </h3>
+                  <div className="h-56 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={attendanceTrendData}>
+                        <XAxis dataKey="week" stroke="#94a3b8" fontSize={11} />
+                        <YAxis stroke="#94a3b8" fontSize={11} domain={[0, 100]} />
+                        <Tooltip />
+                        <Area type="monotone" dataKey="rate" stroke="#10b981" fill="#d1fae5" strokeWidth={2} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Subject Mastery & Preparedness Radar */}
+                <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-3">
+                  <h3 className="text-sm font-black text-slate-900 border-b border-slate-100 pb-2">
+                    Subject Mastery & Preparedness Radar
+                  </h3>
+                  <div className="h-56 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                        <PolarGrid stroke="#e2e8f0" />
+                        <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: 700 }} />
+                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} />
+                        <Radar name="Score" dataKey="score" stroke="#2563eb" fill="#3b82f6" fillOpacity={0.4} />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* ============================================================================ */}
+          {/* TAB 5: DAILY MISSIONS & STREAKS */}
+          {/* ============================================================================ */}
+          {activeInnerTab === 'missions' && (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                  <div>
+                    <h2 className="text-base font-black text-slate-900">Daily Missions & Custom Targets</h2>
+                    <p className="text-xs text-slate-500 font-medium">Create your own missions and claim Gold credits upon completion</p>
+                  </div>
+
+                  <button
+                    onClick={() => setShowMissionModal(true)}
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Set Custom Mission</span>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {missions.length === 0 ? (
+                    <div className="text-center py-8 text-slate-400 text-xs font-semibold">
+                      No daily missions yet. Click "Set Custom Mission" above to start!
+                    </div>
+                  ) : (
+                    missions.map(m => {
+                      const isCompleted = m.currentCount >= m.targetCount || m.completed;
+                      return (
+                        <div key={m.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 flex items-center justify-between gap-3">
+                          <div>
+                            <h4 className="text-xs font-black text-slate-900">{m.title}</h4>
+                            <p className="text-[11px] text-slate-500">{m.description}</p>
+                            <p className="text-[10px] font-bold text-blue-600 mt-1">
+                              Target Progress: {m.currentCount} / {m.targetCount} • Reward: +{m.creditReward} Gold
+                            </p>
+                          </div>
+
+                          <div>
+                            {m.claimed ? (
+                              <span className="px-3 py-1 rounded-xl bg-emerald-100 text-emerald-800 font-black text-xs">
+                                Claimed ✅
+                              </span>
+                            ) : isCompleted ? (
+                              <button
+                                onClick={() => handleClaimMission(m.id)}
+                                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-xs hover:scale-105 transition-all shadow-md cursor-pointer animate-pulse"
+                              >
+                                Claim Reward 🎁
+                              </button>
+                            ) : (
+                              <span className="px-3 py-1 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs">
+                                In Progress ({Math.round((m.currentCount / m.targetCount) * 100)}%)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================================ */}
+          {/* TAB 6: ACADEMIC CALENDAR & MARKS ANALYSIS */}
+          {/* ============================================================================ */}
+          {activeInnerTab === 'calendar' && (
+            <div className="space-y-5 animate-in fade-in duration-300">
+              
+              {/* MARKS & GRADE PERFORMANCE ANALYZER */}
+              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                  <div>
+                    <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
+                      <GraduationCap className="w-5 h-5 text-blue-600" />
+                      <span>Marks & Performance Analyzer</span>
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      Enter exam scores to analyze overall percentage, estimated CGPA, and subject performance
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setEditingMark(null);
+                      setMarkForm({ subject: 'DBMS', examTitle: 'Mid-Term Exam', scoredMarks: 85, maxMarks: 100, examDate: new Date().toISOString().split('T')[0], semester: 'Semester 4' });
+                      setShowMarkModal(true);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Enter Exam Marks</span>
+                  </button>
+                </div>
+
+                {/* Score Summary Metrics */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="p-4 rounded-2xl bg-blue-50/80 border border-blue-200 space-y-1">
+                    <p className="text-[10px] uppercase font-black text-blue-700">Overall Marks Average</p>
+                    <p className="text-2xl font-black text-blue-900">{overallMarksPct}%</p>
+                    <p className="text-[10px] font-bold text-blue-600">Total: {totalScoredMarks} / {totalMaxMarks} Marks</p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 space-y-1">
+                    <p className="text-[10px] uppercase font-black text-amber-700">Estimated CGPA</p>
+                    <p className="text-2xl font-black text-amber-900">{estimatedCGPA} / 10</p>
+                    <p className="text-[10px] font-bold text-amber-600">Calculated on total scores</p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-1">
+                    <p className="text-[10px] uppercase font-black text-emerald-700">Exams Logged</p>
+                    <p className="text-2xl font-black text-emerald-900">{marks.length} Exams</p>
+                    <p className="text-[10px] font-bold text-emerald-600">Synced to Profile & Admin Panel</p>
+                  </div>
+                </div>
+
+                {/* Entered Marks Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-100 text-[10px] uppercase font-black text-slate-400 tracking-wider">
+                        <th className="py-2.5 px-2">Subject</th>
+                        <th className="py-2.5 px-2">Exam Title</th>
+                        <th className="py-2.5 px-2">Scored / Max</th>
+                        <th className="py-2.5 px-2">Percentage</th>
+                        <th className="py-2.5 px-2">Semester</th>
+                        <th className="py-2.5 px-2">Date</th>
+                        <th className="py-2.5 px-2 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {marks.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="py-6 text-center text-slate-400 text-xs font-semibold">
+                            No exam marks logged yet. Click "Enter Exam Marks" above!
+                          </td>
+                        </tr>
+                      ) : (
+                        marks.map(m => {
+                          const pct = m.maxMarks > 0 ? Math.round((m.scoredMarks / m.maxMarks) * 100) : 0;
+                          return (
+                            <tr key={m.id} className="hover:bg-slate-50 transition-colors">
+                              <td className="py-3 px-2 font-black text-slate-900">{m.subject}</td>
+                              <td className="py-3 px-2 font-bold text-slate-700">{m.examTitle}</td>
+                              <td className="py-3 px-2 font-mono font-bold text-slate-800">{m.scoredMarks} / {m.maxMarks}</td>
+                              <td className="py-3 px-2">
+                                <span className={`px-2 py-0.5 rounded font-black text-[10px] ${
+                                  pct >= 75 ? 'bg-emerald-100 text-emerald-800' :
+                                  pct >= 50 ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
+                                }`}>
+                                  {pct}%
+                                </span>
+                              </td>
+                              <td className="py-3 px-2 font-medium text-slate-500">{m.semester || 'N/A'}</td>
+                              <td className="py-3 px-2 font-medium text-slate-500">{m.examDate}</td>
+                              <td className="py-3 px-2 text-right">
+                                <button
+                                  onClick={() => handleDeleteMark(m.id)}
+                                  className="p-1 rounded text-slate-400 hover:text-rose-600 cursor-pointer"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* ACADEMIC CALENDAR & EVENT SCHEDULE */}
+              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div>
+                    <h2 className="text-base font-black text-slate-900">Academic Calendar & Schedule</h2>
+                    <p className="text-xs text-slate-500">Key exam dates, submission deadlines, and campus events</p>
+                  </div>
+
+                  <button
+                    onClick={() => setShowEventModal(true)}
+                    className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs flex items-center gap-1 shadow-sm cursor-pointer shrink-0"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Event</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {events.map(e => (
+                    <div key={e.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-2">
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${e.color}`}>
+                        {e.type}
+                      </span>
+                      <h4 className="text-xs font-black text-slate-900">{e.title}</h4>
+                      <p className="text-[10px] font-bold text-slate-500">Date: {e.date}</p>
+                      <p className="text-[10px] font-bold text-blue-600">Subject: {e.subject}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* ============================================================================ */}
+          {/* TAB 7: CAMPUS LEADERBOARD */}
+          {/* ============================================================================ */}
+          {activeInnerTab === 'leaderboard' && (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+                <div className="border-b border-slate-100 pb-3">
+                  <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-amber-500" />
+                    <span>Live Campus Leaderboard</span>
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Real-time rankings based on exam marks average, task completions, and daily study streaks
+                  </p>
+                </div>
+
+                {loadingLeaderboard ? (
+                  <div className="py-12 text-center text-slate-400 font-bold text-xs animate-pulse">
+                    Loading Campus Leaderboard...
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {leaderboardList.map((st, idx) => {
+                      const isTop1 = idx === 0;
+                      const isTop2 = idx === 1;
+                      const isTop3 = idx === 2;
+
+                      return (
+                        <div 
+                          key={st.uid} 
+                          className={`p-4 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
+                            st.uid === user?.uid 
+                              ? 'bg-blue-50/80 border-blue-300 ring-2 ring-blue-500/20' 
+                              : 'bg-slate-50 border-slate-200/70'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 rounded-full font-black text-xs flex items-center justify-center shrink-0 ${
+                              isTop1 ? 'bg-amber-400 text-amber-950 shadow-md shadow-amber-500/20' :
+                              isTop2 ? 'bg-slate-300 text-slate-900' :
+                              isTop3 ? 'bg-amber-700 text-white' :
+                              'bg-slate-200 text-slate-700'
+                            }`}>
+                              {isTop1 ? '🥇' : isTop2 ? '🥈' : isTop3 ? '🥉' : `#${idx + 1}`}
+                            </div>
+
+                            <div>
+                              <p className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                                <span>{st.displayName}</span>
+                                {st.uid === user?.uid && (
+                                  <span className="px-2 py-0.2 rounded bg-blue-600 text-white text-[9px] font-black">
+                                    YOU
+                                  </span>
+                                )}
+                              </p>
+                              <p className="text-[10px] text-slate-500 font-semibold">{st.university}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-4 text-right">
+                            <div>
+                              <p className="text-xs font-black text-slate-900">{st.marksAvg}%</p>
+                              <p className="text-[10px] text-slate-400 font-bold">Marks Avg</p>
+                            </div>
+
+                            <div>
+                              <p className="text-xs font-black text-orange-600 flex items-center gap-0.5 justify-end">
+                                <Flame className="w-3 h-3 fill-orange-500" />
+                                <span>{st.streak}d</span>
+                              </p>
+                              <p className="text-[10px] text-slate-400 font-bold">Streak</p>
+                            </div>
+
+                            <div>
+                              <p className="text-xs font-black text-blue-600">{st.studyHours.toFixed(1)}h</p>
+                              <p className="text-[10px] text-slate-400 font-bold">Study</p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 
       {/* ============================================================================ */}
-      {/* MODALS */}
+      {/* MODAL 1: ADD/EDIT TASK TARGET */}
       {/* ============================================================================ */}
+      {showTaskModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-black text-slate-900">
+                {editingTask ? 'Edit Task Target' : 'Add New Task Target'}
+              </h3>
+              <button
+                onClick={() => setShowTaskModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-      {/* Add / Edit Habit Modal */}
-      {showHabitModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl border border-slate-100 animate-in zoom-in-95">
-            <h3 className="text-base font-black text-slate-900">
-              {editingHabit ? 'Edit Habit Target' : 'Configure New Habit Target'}
-            </h3>
-            <form onSubmit={handleSaveHabit} className="space-y-3">
+            <form onSubmit={handleSaveTask} className="space-y-3 text-xs">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Habit Name</label>
+                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Task Title</label>
                 <input
                   type="text"
                   required
-                  value={habitForm.name}
-                  onChange={(e) => setHabitForm({ ...habitForm, name: e.target.value })}
-                  placeholder="e.g. Solve 1 CampusOS LeetCode Problem"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  value={taskForm.name}
+                  onChange={(e) => setTaskForm({ ...taskForm, name: e.target.value })}
+                  placeholder="e.g. Finish DBMS Normalization Assignment"
+                  className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Time Frame</label>
-                  <select
-                    value={habitForm.timeframe}
-                    onChange={(e: any) => setHabitForm({ ...habitForm, timeframe: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
-                  >
-                    <option value="Morning">Morning</option>
-                    <option value="Afternoon">Afternoon</option>
-                    <option value="Evening">Evening</option>
-                    <option value="Anytime">Anytime</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Category</label>
-                  <select
-                    value={habitForm.category}
-                    onChange={(e: any) => setHabitForm({ ...habitForm, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
-                  >
-                    {DEFAULT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Difficulty</label>
-                  <select
-                    value={habitForm.difficulty}
-                    onChange={(e: any) => setHabitForm({ ...habitForm, difficulty: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
-                  >
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">XP Value</label>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Subject</label>
                   <input
-                    type="number"
-                    min={10}
-                    max={200}
-                    value={habitForm.xpValue}
-                    onChange={(e) => setHabitForm({ ...habitForm, xpValue: parseInt(e.target.value) || 50 })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
+                    type="text"
+                    value={taskForm.subject}
+                    onChange={(e) => setTaskForm({ ...taskForm, subject: e.target.value })}
+                    placeholder="e.g. DBMS"
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Priority</label>
+                  <select
+                    value={taskForm.priority}
+                    onChange={(e) => setTaskForm({ ...taskForm, priority: e.target.value as any })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Due Date</label>
+                <input
+                  type="date"
+                  value={taskForm.dueDate}
+                  onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+
+              <div className="pt-3 flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowHabitModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200 transition-colors cursor-pointer"
+                  onClick={() => setShowTaskModal(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-blue-600 text-white font-black text-xs hover:bg-blue-700 transition-colors shadow-sm cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black transition-colors cursor-pointer shadow-sm"
                 >
-                  Save Habit
+                  Save Task
                 </button>
               </div>
             </form>
@@ -1220,73 +1794,83 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
         </div>
       )}
 
-      {/* Add Mission Modal */}
+      {/* ============================================================================ */}
+      {/* MODAL 2: ADD CUSTOM MISSION */}
+      {/* ============================================================================ */}
       {showMissionModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl border border-slate-100 animate-in zoom-in-95">
-            <h3 className="text-base font-black text-slate-900">Define Daily Mission</h3>
-            <form onSubmit={handleSaveMission} className="space-y-3">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-black text-slate-900">Set Custom Daily Mission</h3>
+              <button
+                onClick={() => setShowMissionModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveMission} className="space-y-3 text-xs">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mission Title</label>
+                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Mission Title</label>
                 <input
                   type="text"
                   required
                   value={missionForm.title}
                   onChange={(e) => setMissionForm({ ...missionForm, title: e.target.value })}
-                  placeholder="e.g. Master System Design Concept"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  placeholder="e.g. Solve 3 DSA Problems Today"
+                  className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Description</label>
+                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Description</label>
                 <input
                   type="text"
-                  required
                   value={missionForm.description}
                   onChange={(e) => setMissionForm({ ...missionForm, description: e.target.value })}
-                  placeholder="e.g. Log 2 habits today"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
+                  placeholder="e.g. Complete Array & String questions"
+                  className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Target Count</label>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Target Count</label>
                   <input
                     type="number"
-                    min={1}
+                    min="1"
                     value={missionForm.targetCount}
-                    onChange={(e) => setMissionForm({ ...missionForm, targetCount: parseInt(e.target.value) || 1 })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
+                    onChange={(e) => setMissionForm({ ...missionForm, targetCount: Math.max(1, Number(e.target.value)) })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">XP Reward</label>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Gold Reward</label>
                   <input
                     type="number"
-                    min={20}
-                    value={missionForm.xpReward}
-                    onChange={(e) => setMissionForm({ ...missionForm, xpReward: parseInt(e.target.value) || 100 })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
+                    min="10"
+                    value={missionForm.creditReward}
+                    onChange={(e) => setMissionForm({ ...missionForm, creditReward: Math.max(10, Number(e.target.value)) })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="pt-3 flex gap-2">
                 <button
                   type="button"
                   onClick={() => setShowMissionModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200 transition-colors cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-blue-600 text-white font-black text-xs hover:bg-blue-700 transition-colors shadow-sm cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black transition-colors cursor-pointer shadow-sm"
                 >
-                  Create Mission
+                  Save Mission
                 </button>
               </div>
             </form>
@@ -1294,95 +1878,195 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
         </div>
       )}
 
-      {/* Tuner Settings Modal */}
-      {showTunerModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl border border-slate-100 animate-in zoom-in-95">
-            <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-              <Sliders className="w-5 h-5 text-blue-600" />
-              Habiturex Tuner Engine
-            </h3>
-            <div className="space-y-3 text-xs font-semibold text-slate-700">
-              <div>
-                <label className="block mb-1">XP Multiplier</label>
-                <select
-                  value={xpMultiplier}
-                  onChange={(e) => setXpMultiplier(parseFloat(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold"
-                >
-                  <option value={1}>x1 Standard Boost</option>
-                  <option value={1.5}>x1.5 Placement Sprint</option>
-                  <option value={2}>x2 Double Level Boost</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="flex justify-end pt-2">
+      {/* ============================================================================ */}
+      {/* MODAL 3: ENTER EXAM MARKS */}
+      {/* ============================================================================ */}
+      {showMarkModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-black text-slate-900">Enter Exam Marks & Result</h3>
               <button
-                onClick={() => setShowTunerModal(false)}
-                className="px-5 py-2 rounded-xl bg-blue-600 text-white font-black text-xs hover:bg-blue-700 cursor-pointer"
+                onClick={() => setShowMarkModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
               >
-                Done
+                <X className="w-5 h-5" />
               </button>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* Add Attendance Subject Modal */}
-      {showAddSubjectModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl border border-slate-100 animate-in zoom-in-95">
-            <h3 className="text-base font-black text-slate-900">Add Course Subject</h3>
-            <form onSubmit={handleAddSubject} className="space-y-3">
+            <form onSubmit={handleSaveMark} className="space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Subject</label>
+                  <input
+                    type="text"
+                    required
+                    value={markForm.subject}
+                    onChange={(e) => setMarkForm({ ...markForm, subject: e.target.value })}
+                    placeholder="e.g. DBMS"
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Semester</label>
+                  <input
+                    type="text"
+                    value={markForm.semester}
+                    onChange={(e) => setMarkForm({ ...markForm, semester: e.target.value })}
+                    placeholder="e.g. Semester 4"
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Subject Name</label>
+                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Exam Title</label>
                 <input
                   type="text"
                   required
-                  value={newSubject.name}
-                  onChange={(e) => setNewSubject({ ...newSubject, name: e.target.value })}
-                  placeholder="e.g. Operating Systems"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  value={markForm.examTitle}
+                  onChange={(e) => setMarkForm({ ...markForm, examTitle: e.target.value })}
+                  placeholder="e.g. Mid-Term Theory Exam"
+                  className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Subject Code</label>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Scored Marks</label>
                   <input
-                    type="text"
-                    value={newSubject.code}
-                    onChange={(e) => setNewSubject({ ...newSubject, code: e.target.value })}
-                    placeholder="CS301"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
+                    type="number"
+                    required
+                    min="0"
+                    value={markForm.scoredMarks}
+                    onChange={(e) => setMarkForm({ ...markForm, scoredMarks: Number(e.target.value) })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Target %</label>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Max Marks</label>
                   <input
                     type="number"
-                    value={newSubject.targetPercentage}
-                    onChange={(e) => setNewSubject({ ...newSubject, targetPercentage: parseInt(e.target.value) || 75 })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
+                    required
+                    min="1"
+                    value={markForm.maxMarks}
+                    onChange={(e) => setMarkForm({ ...markForm, maxMarks: Number(e.target.value) })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Exam Date</label>
+                <input
+                  type="date"
+                  value={markForm.examDate}
+                  onChange={(e) => setMarkForm({ ...markForm, examDate: e.target.value })}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+
+              <div className="pt-3 flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowAddSubjectModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200 transition-colors cursor-pointer"
+                  onClick={() => setShowMarkModal(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 text-white font-black text-xs hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black transition-colors cursor-pointer shadow-sm"
                 >
-                  Add Subject
+                  Save Result
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================================ */}
+      {/* MODAL 4: ADD CALENDAR EVENT */}
+      {/* ============================================================================ */}
+      {showEventModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-black text-slate-900">Add Academic Calendar Event</h3>
+              <button
+                onClick={() => setShowEventModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEvent} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Event Title</label>
+                <input
+                  type="text"
+                  required
+                  value={eventForm.title}
+                  onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
+                  placeholder="e.g. DBMS End-Sem Exam"
+                  className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Subject</label>
+                  <input
+                    type="text"
+                    value={eventForm.subject}
+                    onChange={(e) => setEventForm({ ...eventForm, subject: e.target.value })}
+                    placeholder="e.g. DBMS"
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Type</label>
+                  <select
+                    value={eventForm.type}
+                    onChange={(e) => setEventForm({ ...eventForm, type: e.target.value as any })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  >
+                    <option value="Exam">Exam</option>
+                    <option value="Assignment">Assignment</option>
+                    <option value="Lecture">Lecture</option>
+                    <option value="Study">Study Session</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Event Date</label>
+                <input
+                  type="date"
+                  value={eventForm.date}
+                  onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+
+              <div className="pt-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEventModal(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black transition-colors cursor-pointer shadow-sm"
+                >
+                  Add Event
                 </button>
               </div>
             </form>

@@ -14,14 +14,28 @@ import {
   AlertCircle,
   Calendar,
   X,
-  AlertTriangle
+  AlertTriangle,
+  Clock,
+  Play,
+  Pause
 } from 'lucide-react';
 import { UserProfile, AppNotification } from '../../types';
 import { StreakService } from '../../lib/streakService';
 
+export interface FocusTimerInfo {
+  active: boolean;
+  isRunning: boolean;
+  minutes: number;
+  seconds: number;
+  mode: 'focus' | 'shortBreak' | 'longBreak';
+  onTogglePlay?: () => void;
+  onReset?: () => void;
+}
+
 interface HeaderProps {
   user: UserProfile;
   notifications: AppNotification[];
+  focusTimer?: FocusTimerInfo;
   onMarkReadNotification: (id: string) => void;
   onDeleteNotification: (id: string) => void;
   onClearNotifications: () => void;
@@ -34,6 +48,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   user,
   notifications,
+  focusTimer,
   onMarkReadNotification,
   onDeleteNotification,
   onClearNotifications,
@@ -96,7 +111,41 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        {/* Persistent Focus Time Watch (If active / running or when user leaves Habiturex) */}
+        {focusTimer && (focusTimer.active || focusTimer.isRunning) && (
+          <div 
+            onClick={() => onNavigateTab('habiturex')}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-black shadow-md cursor-pointer transition-all ${
+              focusTimer.isRunning
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-400 animate-pulse'
+                : 'bg-amber-50 text-amber-800 border-amber-300'
+            }`}
+            title="Focus Time Watch - Click to open Habiturex"
+          >
+            <Clock className={`w-3.5 h-3.5 shrink-0 ${focusTimer.isRunning ? 'text-amber-300 animate-spin' : 'text-amber-600'}`} />
+            <span className="tabular-nums font-mono text-[11px] sm:text-xs">
+              Focus: {String(focusTimer.minutes).padStart(2, '0')}:{String(focusTimer.seconds).padStart(2, '0')}
+            </span>
+
+            {focusTimer.onTogglePlay && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  focusTimer.onTogglePlay?.();
+                }}
+                className={`p-1 rounded-full transition-colors ${
+                  focusTimer.isRunning 
+                    ? 'bg-white/20 hover:bg-white/30 text-white' 
+                    : 'bg-amber-200 hover:bg-amber-300 text-amber-900'
+                }`}
+                title={focusTimer.isRunning ? 'Pause Focus Session' : 'Resume Focus Session'}
+              >
+                {focusTimer.isRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+              </button>
+            )}
+          </div>
+        )}
         {/* Study Streak Badge */}
         {(() => {
           const { streak, isAtRisk } = streakInfo;

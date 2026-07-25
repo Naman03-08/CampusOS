@@ -4,6 +4,7 @@ import { AssignmentItem } from '../../types';
 import { exportTextToPDF } from '../../lib/pdfExport';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { StreakService } from '../../lib/streakService';
+import { StructuredResponseFormatter } from '../chat/StructuredResponseFormatter';
 
 interface AssignmentSolverProps {
   assignments: AssignmentItem[];
@@ -210,13 +211,11 @@ export const AssignmentSolverView: React.FC<AssignmentSolverProps> = ({
               </div>
 
               {/* Solution Box */}
-              <div className="p-5 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-2">
-                <p className="text-xs font-bold uppercase text-indigo-700 flex items-center gap-1.5">
+              <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-2">
+                <p className="text-xs font-bold uppercase text-indigo-700 flex items-center gap-1.5 pb-2 border-b border-slate-100">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Verified Step-by-Step Solution
                 </p>
-                <pre className="text-xs sm:text-sm font-sans text-slate-800 whitespace-pre-wrap leading-relaxed">
-                  {selectedAssignment.solution}
-                </pre>
+                <StructuredResponseFormatter content={selectedAssignment.solutionMarkdown || selectedAssignment.solution || ''} />
               </div>
 
               {/* Formulas & References */}

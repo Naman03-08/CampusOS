@@ -20,7 +20,9 @@ import {
   MockInterviewResult,
   CertificateRecord,
   MonthlyProfitRecord,
-  StudentCoursePurchase
+  StudentCoursePurchase,
+  HabiturexData,
+  StudentMarkRecord
 } from '../types';
 import { 
   getZeroAttendance, 
@@ -39,6 +41,8 @@ export interface UserFullData {
   mockInterviews: MockInterviewResult[];
   resume: ResumeData | null;
   schedule: ScheduleEvent[];
+  habiturex?: HabiturexData | null;
+  marks?: StudentMarkRecord[];
 }
 
 export function sanitizeForFirestore<T>(data: T): T {
@@ -131,7 +135,7 @@ export class FirestoreService {
       const profile = await this.getProfile(uid);
       if (!profile) return null;
 
-      const [attendance, dsa, assignments, studySuites, mockInterviews, resume, schedule] = await Promise.all([
+      const [attendance, dsa, assignments, studySuites, mockInterviews, resume, schedule, habiturex, marks] = await Promise.all([
         this.getAttendance(uid),
         this.getDSA(uid),
         this.getAssignments(uid),
@@ -139,6 +143,8 @@ export class FirestoreService {
         this.getMockInterviews(uid),
         this.getResume(uid),
         this.getSchedule(uid),
+        this.getHabiturexData(uid),
+        this.getStudentMarks(uid)
       ]);
 
       return {
@@ -149,11 +155,77 @@ export class FirestoreService {
         studySuites,
         mockInterviews,
         resume,
-        schedule
+        schedule,
+        habiturex,
+        marks
       };
     } catch (e) {
       console.warn("Firestore getUserFullData error:", e);
       return null;
+    }
+  }
+
+  // ==========================================
+  // HABITUREX & MARKS DATA METHODS
+  // ==========================================
+  static async saveHabiturexData(uid: string, data: Partial<HabiturexData>): Promise<void> {
+    if (!db || !uid) return;
+    try {
+      const payload = sanitizeForFirestore({
+        userId: uid,
+        ...data,
+        updatedAt: new Date().toISOString()
+      });
+      await setDoc(doc(db, 'habiturex', uid), payload, { merge: true });
+    } catch (e) {
+      console.warn("Firestore saveHabiturexData error:", e);
+    }
+  }
+
+  static async getHabiturexData(uid: string): Promise<HabiturexData | null> {
+    if (!db || !uid) return null;
+    try {
+      const snap = await getDoc(doc(db, 'habiturex', uid));
+      if (snap.exists()) {
+        return snap.data() as HabiturexData;
+      }
+    } catch (e) {
+      console.warn("Firestore getHabiturexData error:", e);
+    }
+    return null;
+  }
+
+  static async saveStudentMarks(uid: string, marks: StudentMarkRecord[]): Promise<void> {
+    if (!db || !uid) return;
+    try {
+      for (const m of marks) {
+        await setDoc(doc(db, 'marks', m.id), sanitizeForFirestore({ ...m, userId: uid }), { merge: true });
+      }
+    } catch (e) {
+      console.warn("Firestore saveStudentMarks error:", e);
+    }
+  }
+
+  static async getStudentMarks(uid: string): Promise<StudentMarkRecord[]> {
+    if (!db || !uid) return [];
+    try {
+      const q = query(collection(db, 'marks'), where('userId', '==', uid));
+      const snap = await getDocs(q);
+      const list: StudentMarkRecord[] = [];
+      snap.forEach(d => list.push(d.data() as StudentMarkRecord));
+      return list.sort((a, b) => new Date(b.examDate).getTime() - new Date(a.examDate).getTime());
+    } catch (e) {
+      console.warn("Firestore getStudentMarks error:", e);
+      return [];
+    }
+  }
+
+  static async deleteStudentMark(id: string): Promise<void> {
+    if (!db || !id) return;
+    try {
+      await deleteDoc(doc(db, 'marks', id));
+    } catch (e) {
+      console.warn("Firestore deleteStudentMark error:", e);
     }
   }
 

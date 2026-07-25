@@ -312,6 +312,34 @@ export interface StudentCoursePurchase {
   paymentStatus: 'Completed' | 'Pending' | 'Cancelled (No Refund)';
 }
 
+export interface StudentMarkRecord {
+  id: string;
+  userId: string;
+  subject: string;
+  examTitle: string; // e.g. "DBMS Mid-Term", "OS Lab Quiz"
+  scoredMarks: number;
+  maxMarks: number;
+  examDate: string; // YYYY-MM-DD
+  semester?: string;
+  createdAt?: string;
+}
+
+export interface HabiturexData {
+  userId: string;
+  tasks: any[];
+  missions: any[];
+  events: any[];
+  marks: StudentMarkRecord[];
+  studyHoursLog: Record<string, number>; // e.g. { "2026-07-25": 4.5 }
+  stats: {
+    xp: number;
+    credits: number;
+    flameStreak: number;
+    perfectDays: number;
+  };
+  updatedAt?: string;
+}
+
 export interface AdminEmailPayload {
   recipientEmails: string[];
   subject: string;

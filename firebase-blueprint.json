@@ -176,10 +176,48 @@
         "paymentStatus": { "type": "string" }
       },
       "required": ["id", "userId", "courseId", "pricePaid"]
+    },
+    "habiturex": {
+      "title": "Habiturex Student OS Data",
+      "description": "Tasks, daily missions, study timer logs, and habits for students.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "tasks": { "type": "array" },
+        "missions": { "type": "array" },
+        "events": { "type": "array" },
+        "marks": { "type": "array" },
+        "studyHoursLog": { "type": "object" },
+        "stats": { "type": "object" }
+      },
+      "required": ["userId"]
+    },
+    "marks": {
+      "title": "Student Academic Exam Marks",
+      "description": "Entered test and exam marks for performance analytics.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "subject": { "type": "string" },
+        "examTitle": { "type": "string" },
+        "scoredMarks": { "type": "number" },
+        "maxMarks": { "type": "number" },
+        "examDate": { "type": "string" }
+      },
+      "required": ["id", "userId", "subject", "scoredMarks", "maxMarks"]
     }
   },
   "securityRules": {
     "users": {
+      "read": "true",
+      "write": "true"
+    },
+    "habiturex": {
+      "read": "true",
+      "write": "true"
+    },
+    "marks": {
       "read": "true",
       "write": "true"
     },
