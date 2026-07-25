@@ -549,6 +549,7 @@ export function App() {
                   attendance={attendance}
                   onUpdateAttendance={handleUpdateAttendance}
                   onNavigateTab={handleNavigateTabWithGuard}
+                  initialInnerTab={activeTab === 'attendance' ? 'attendance' : undefined}
                 />
               )}
 

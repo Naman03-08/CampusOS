@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckSquare, Plus, Trash2, AlertTriangle, ShieldCheck, Calculator } from 'lucide-react';
 import { AttendanceSubject } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
@@ -13,6 +13,10 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   onUpdateAttendance,
 }) => {
   const [subjects, setSubjects] = useState<AttendanceSubject[]>(attendance);
+
+  useEffect(() => {
+    setSubjects(attendance);
+  }, [attendance]);
 
   const [newName, setNewName] = useState('');
   const [newAttended, setNewAttended] = useState('28');

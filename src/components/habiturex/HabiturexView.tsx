@@ -49,12 +49,14 @@ import {
   Radar 
 } from 'recharts';
 import { AttendanceSubject, UserProfile } from '../../types';
+import { AttendanceView } from '../attendance/AttendanceView';
 
 interface HabiturexViewProps {
   user?: UserProfile;
   attendance: AttendanceSubject[];
   onUpdateAttendance: (updated: AttendanceSubject[]) => void;
   onNavigateTab?: (tab: string) => void;
+  initialInnerTab?: 'dashboard' | 'table' | 'missions' | 'analytics' | 'matrix' | 'attendance';
 }
 
 export interface HabitItem {
@@ -100,11 +102,18 @@ const STARTER_MISSIONS: Omit<DailyMission, 'id' | 'completed' | 'claimed'>[] = [
 export const HabiturexView: React.FC<HabiturexViewProps> = ({
   user,
   attendance,
-  onUpdateAttendance
+  onUpdateAttendance,
+  initialInnerTab
 }) => {
   // Inner Tab State
-  const [activeInnerTab, setActiveInnerTab] = useState<'dashboard' | 'table' | 'missions' | 'analytics' | 'matrix' | 'attendance'>('dashboard');
+  const [activeInnerTab, setActiveInnerTab] = useState<'dashboard' | 'table' | 'missions' | 'analytics' | 'matrix' | 'attendance'>(initialInnerTab || 'dashboard');
   const [innerSidebarCollapsed, setInnerSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (initialInnerTab) {
+      setActiveInnerTab(initialInnerTab);
+    }
+  }, [initialInnerTab]);
 
   // Stats State (Set to ZERO initially)
   const [xp, setXp] = useState<number>(() => {
@@ -626,10 +635,10 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
               >
                 <div className="flex items-center gap-2.5">
                   <CheckSquare className="w-4 h-4 text-emerald-500" />
-                  {!innerSidebarCollapsed && <span>Attendance Tracker</span>}
+                  {!innerSidebarCollapsed && <span>Attendance Manager</span>}
                 </div>
                 {!innerSidebarCollapsed && (
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">Merged</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">Active</span>
                 )}
               </button>
             </nav>
@@ -1101,121 +1110,13 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
           )}
 
           {/* ============================================================================ */}
-          {/* TAB 6: MERGED ATTENDANCE TRACKER */}
+          {/* TAB 6: ATTENDANCE TRACKER & PREDICTOR */}
           {/* ============================================================================ */}
           {activeInnerTab === 'attendance' && (
-            <div className="space-y-5 animate-in fade-in duration-300">
-              <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4 card-3d">
-                
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-                  <div>
-                    <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-                      <CheckSquare className="w-5 h-5 text-emerald-600" />
-                      Academic Attendance Tracker
-                    </h2>
-                    <p className="text-xs text-slate-500">Track class attendance, calculate minimum required classes, and maintain target thresholds.</p>
-                  </div>
-
-                  <button
-                    onClick={() => setShowAddSubjectModal(true)}
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Add Subject</span>
-                  </button>
-                </div>
-
-                {/* Overall Attendance Summary Bar */}
-                {attendance.length > 0 && (
-                  <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-emerald-950 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[10px] uppercase font-black tracking-widest text-emerald-400">OVERALL ATTENDANCE</p>
-                      {(() => {
-                        const totalHeld = attendance.reduce((acc, curr) => acc + curr.totalClasses, 0);
-                        const totalAttended = attendance.reduce((acc, curr) => acc + curr.attendedClasses, 0);
-                        const pct = totalHeld > 0 ? Math.round((totalAttended / totalHeld) * 100) : 0;
-                        return (
-                          <div className="flex items-baseline gap-2 mt-1">
-                            <span className="text-2xl font-black text-white">{pct}%</span>
-                            <span className="text-xs text-slate-300 font-medium">({totalAttended} / {totalHeld} Classes)</span>
-                          </div>
-                        );
-                      })()}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-black text-xs border border-emerald-500/30">
-                        SAFE ZONE ≥75%
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Subjects Grid */}
-                {attendance.length === 0 ? (
-                  <div className="p-10 text-center space-y-3">
-                    <CheckSquare className="w-10 h-10 text-slate-300 mx-auto" />
-                    <p className="text-sm font-black text-slate-800">No Subjects Added</p>
-                    <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                      Add your course subjects to log class attendance and keep your academic criteria safe.
-                    </p>
-                    <button
-                      onClick={() => setShowAddSubjectModal(true)}
-                      className="px-4 py-2 rounded-xl bg-emerald-600 text-white font-black text-xs hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
-                    >
-                      + Add Subject
-                    </button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {attendance.map((sub) => {
-                      const pct = sub.totalClasses > 0 ? Math.round((sub.attendedClasses / sub.totalClasses) * 100) : 0;
-                      const isSafe = pct >= sub.targetPercentage;
-
-                      return (
-                        <div key={sub.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <span className="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-black text-[9px] uppercase">
-                                {sub.code}
-                              </span>
-                              <h4 className="text-xs font-black text-slate-900 mt-1">{sub.name}</h4>
-                            </div>
-
-                            <span className={`px-2.5 py-1 rounded-xl font-black text-xs ${
-                              isSafe ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
-                            }`}>
-                              {pct}%
-                            </span>
-                          </div>
-
-                          <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
-                            <span>Classes: {sub.attendedClasses} / {sub.totalClasses}</span>
-                            <span>Target: {sub.targetPercentage}%</span>
-                          </div>
-
-                          {/* Quick Adjust Buttons */}
-                          <div className="flex items-center gap-2 pt-1">
-                            <button
-                              onClick={() => handleAttendanceChange(sub.id, 1, 1)}
-                              className="flex-1 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition-colors cursor-pointer"
-                            >
-                              + Present
-                            </button>
-                            <button
-                              onClick={() => handleAttendanceChange(sub.id, 0, 1)}
-                              className="flex-1 py-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 font-black text-xs transition-colors cursor-pointer"
-                            >
-                              + Absent
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
+            <AttendanceView
+              attendance={attendance}
+              onUpdateAttendance={onUpdateAttendance}
+            />
           )}
 
         </div>
