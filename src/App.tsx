@@ -85,7 +85,7 @@ export function App() {
       case 'attendance': return 'Attendance Manager & Calculator';
       case 'coding': return 'Coding Hub & 375 DSA Roadmap Sheet';
       case 'courses': return 'Interactive Coding Courses & Academies';
-      case 'interviewprep': return 'AI Technical & Behavioral Interview Prep';
+      case 'interviewprep': return 'Technical Interview Prep & Question Bank';
       case 'placement': return 'Startup Jobs & Internship Hub';
       default: return 'this AI feature';
     }

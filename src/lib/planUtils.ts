@@ -49,13 +49,13 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
       '3 CampusOS 375 DSA question AI solutions / day',
       '5 AI Assignment Solves (Step-by-step logic)',
       '2 ATS Resume Audit Scans & PDF Export',
-      '1 AI Technical Mock Interview session',
+      '256 Subjects Technical Interview Question Bank',
       'Attendance Tracker & Smart Calendar'
     ],
     notIncluded: [
-      'Unlimited AI Voice/Video Mock Interviews',
+      'Unlimited High-Score ATS Resume Scans',
       'Unlimited CampusOS 375 DSA Code Coach',
-      'Priority High-Speed AI Processing Engine'
+      'Priority High-Speed Processing Engine'
     ]
   },
   {
@@ -83,13 +83,13 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
       'Complete CampusOS 375 DSA Roadmap Sheet access',
       '15 High-Score ATS Resume Scans & Keyword Scans / month',
       '50 AI Study Suites & Flashcard Generators / month',
-      '5 AI Mock Interview Practice Sessions / month',
+      'Full Access to 256 Technical Interview Subjects & Questions',
       'Smart Calendar Auto-Scheduler with exam alerts',
       'UNLIMITED 24/7 AI Tutor Chat Assistant'
     ],
     notIncluded: [
-      'Unlimited AI Voice & Video Mock Interviews',
-      '1-on-1 AI Placement Mentor'
+      'Unlimited High-Score ATS Resume Builder',
+      '1-on-1 Company Placement Mentor'
     ]
   },
   {
@@ -108,12 +108,12 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
       dsaSolutions: 'UNLIMITED Code Coach',
       assignmentSolver: 'UNLIMITED Solves',
       resumeScans: 'UNLIMITED Scans & PDF Exports',
-      mockInterviews: 'UNLIMITED Voice/Video Sessions',
+      mockInterviews: 'UNLIMITED Question Bank Access',
       aiChatTutor: 'UNLIMITED Priority Chat'
     },
     features: [
       'Everything in ₹199 Plan, PLUS:',
-      'UNLIMITED 1-on-1 AI Voice & Video Mock Interviews',
+      'UNLIMITED Technical Interview Question Bank (All 256 Subjects)',
       'UNLIMITED High-Score ATS Resume Builder & Job Matcher',
       'UNLIMITED Instant CampusOS 375 DSA Code Coach (C++, Java, Python, TS)',
       'UNLIMITED AI Cover Letter Generators for Target Companies',

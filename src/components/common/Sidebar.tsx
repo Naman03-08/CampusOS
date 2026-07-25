@@ -42,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'attendance', label: 'Attendance', icon: CheckSquare },
     { id: 'coding', label: 'Coding Hub', icon: Code2, badge: 'DSA' },
     { id: 'courses', label: 'Coding Courses', icon: GraduationCap, badge: 'NEW' },
-    { id: 'interviewprep', label: 'AI Interview Prep', icon: Bot, badge: 'Mock' },
+    { id: 'interviewprep', label: 'Interview Prep', icon: BookOpen, badge: '256 Qs' },
     { id: 'placement', label: 'Startup Jobs & Internship Hub', icon: Briefcase, badge: 'Jobs' },
     { id: 'pricing', label: 'Upgrade Plans', icon: Zap, badge: 'Plans' },
     { id: 'settings', label: 'Settings', icon: Settings },
