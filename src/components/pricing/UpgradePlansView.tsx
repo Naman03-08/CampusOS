@@ -45,7 +45,37 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
   const [toastMessage, setToastMessage] = useState('Subscription Plan Updated Successfully!');
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Cancellation Modal State
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isProcessingCancel, setIsProcessingCancel] = useState(false);
+
   const planDetails = calculatePlanDetails(user);
+
+  const handleConfirmCancelSubscription = async () => {
+    setIsProcessingCancel(true);
+    setErrorMessage('');
+    try {
+      if (user && user.uid) {
+        await FirestoreService.cancelUserSubscriptionAndAdjustRevenue(user.uid, user.email);
+      }
+      if (onUpdateProfile) {
+        onUpdateProfile({
+          plan: 'Free Tier',
+          planExpiresAt: undefined,
+          planCancelled: true,
+          planCancelledAt: new Date().toISOString()
+        });
+      }
+      setShowCancelModal(false);
+      setToastMessage("Subscription cancelled successfully. As warned, paid amounts are non-refundable.");
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 6000);
+    } catch (err: any) {
+      setErrorMessage("Failed to cancel subscription: " + (err.message || err));
+    } finally {
+      setIsProcessingCancel(false);
+    }
+  };
 
   const handleSelectPlan = (plan: typeof PLAN_DEFINITIONS[0]) => {
     setErrorMessage('');
@@ -208,29 +238,40 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
           </div>
         </div>
 
-        {/* Cycle Switcher */}
-        <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl self-start md:self-auto shrink-0">
+        {/* Cancel Subscription & Cycle Switcher */}
+        <div className="flex flex-wrap items-center gap-3 self-start md:self-auto shrink-0">
           <button
-            onClick={() => setBillingCycle('monthly')}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              billingCycle === 'monthly'
-                ? 'bg-white text-blue-600 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
+            onClick={() => setShowCancelModal(true)}
+            className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+            title="Cancel Subscription Any Time"
           >
-            30-Day Monthly
+            <X className="w-3.5 h-3.5 text-rose-600" />
+            <span>Cancel Subscription</span>
           </button>
-          <button
-            onClick={() => setBillingCycle('yearly')}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              billingCycle === 'yearly'
-                ? 'bg-white text-blue-600 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <span>Annual</span>
-            <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-[10px] rounded-md font-extrabold">Save 20%</span>
-          </button>
+
+          <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl">
+            <button
+              onClick={() => setBillingCycle('monthly')}
+              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                billingCycle === 'monthly'
+                  ? 'bg-white text-blue-600 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              30-Day Monthly
+            </button>
+            <button
+              onClick={() => setBillingCycle('yearly')}
+              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                billingCycle === 'yearly'
+                  ? 'bg-white text-blue-600 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>Annual</span>
+              <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-[10px] rounded-md font-extrabold">Save 20%</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -602,6 +643,58 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Subscription Cancellation Warning Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 border border-rose-100 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 text-rose-600 border-b border-rose-100 pb-4">
+              <div className="p-2.5 bg-rose-100 rounded-2xl">
+                <AlertTriangle className="w-6 h-6 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900">Cancel Subscription Warning</h3>
+                <p className="text-xs text-rose-600 font-bold">Important Notice & Risk Acknowledgment</p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-2">
+              <p className="text-xs font-black text-rose-900 leading-relaxed">
+                ⚠️ Warning: The amount which has been paid will not be refunded any more so please cancel the subscription on your own risk.
+              </p>
+              <p className="text-[11px] text-rose-700 font-medium leading-normal">
+                Once cancelled, your plan will revert to Free Tier, premium AI feature access will be revoked, and this action will be logged in the admin financial dashboard.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                disabled={isProcessingCancel}
+                onClick={() => setShowCancelModal(false)}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+              >
+                Keep My Subscription
+              </button>
+              <button
+                type="button"
+                disabled={isProcessingCancel}
+                onClick={handleConfirmCancelSubscription}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/30 flex items-center gap-2 transition-all cursor-pointer"
+              >
+                {isProcessingCancel ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Cancelling...</span>
+                  </>
+                ) : (
+                  <span>Cancel Subscription At My Own Risk</span>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

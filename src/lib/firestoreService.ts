@@ -924,6 +924,172 @@ export class FirestoreService {
   }
 
   /**
+   * Cancel a user's subscription, downgrade user to Free Tier, set planCancelled status,
+   * mark subscription transactions as 'Cancelled (No Refund)', and deduct revenue from monthly_profits in Firestore.
+   */
+  static async cancelUserSubscriptionAndAdjustRevenue(uid: string, userEmail?: string): Promise<void> {
+    if (!db || !uid) return;
+    try {
+      const now = new Date();
+      const monthKey = now.toISOString().slice(0, 7);
+
+      // 1. Update user profile document in Firestore
+      const userRef = doc(db, 'users', uid);
+      await setDoc(userRef, {
+        plan: 'Free Tier',
+        planExpiresAt: null,
+        planCancelled: true,
+        planCancelledAt: now.toISOString(),
+        updatedAt: now.toISOString()
+      }, { merge: true });
+
+      // 2. Query course_purchases for matching subscription transactions
+      const purchasesSnap = await getDocs(collection(db, 'course_purchases'));
+      let subTransactionFound = false;
+      let totalSubDeduction = 0;
+
+      for (const dSnap of purchasesSnap.docs) {
+        const data = dSnap.data() as StudentCoursePurchase;
+        if (data && data.userId === uid) {
+          const isSub = data.id.startsWith('sub_') || data.courseTitle.toLowerCase().includes('subscription');
+          if (isSub && data.paymentStatus !== 'Cancelled (No Refund)') {
+            subTransactionFound = true;
+            totalSubDeduction += (data.pricePaid || 349);
+
+            // Mark transaction as Cancelled (No Refund)
+            await setDoc(doc(db, 'course_purchases', data.id), {
+              paymentStatus: 'Cancelled (No Refund)',
+              cancelledAt: now.toISOString()
+            }, { merge: true });
+
+            // Adjust monthly profit for this transaction's month
+            const pDate = new Date(data.purchaseDate || now);
+            const pMonthKey = !isNaN(pDate.getTime()) ? pDate.toISOString().slice(0, 7) : monthKey;
+
+            const allProfits = await this.getMonthlyProfits();
+            const existingMonth = allProfits.find(m => m.monthKey === pMonthKey);
+            if (existingMonth) {
+              const subRev = Math.max(0, (existingMonth.subscriptionRevenue || 0) - data.pricePaid);
+              const crsRev = existingMonth.courseRevenue || 0;
+              const subCount = Math.max(0, (existingMonth.subscriptionCount || 0) - 1);
+
+              await this.saveMonthlyProfit({
+                ...existingMonth,
+                subscriptionRevenue: subRev,
+                grossProfit: subRev + crsRev,
+                subscriptionCount: subCount,
+                updatedAt: now.toISOString()
+              });
+            }
+          }
+        }
+      }
+
+      // If no subscription record document was logged previously in course_purchases, adjust current month baseline
+      if (!subTransactionFound) {
+        const allProfits = await this.getMonthlyProfits();
+        const existingMonth = allProfits.find(m => m.monthKey === monthKey);
+        if (existingMonth) {
+          const defaultSubPrice = 349;
+          const subRev = Math.max(0, (existingMonth.subscriptionRevenue || 0) - defaultSubPrice);
+          const crsRev = existingMonth.courseRevenue || 0;
+          const subCount = Math.max(0, (existingMonth.subscriptionCount || 0) - 1);
+
+          await this.saveMonthlyProfit({
+            ...existingMonth,
+            subscriptionRevenue: subRev,
+            grossProfit: subRev + crsRev,
+            subscriptionCount: subCount,
+            updatedAt: now.toISOString()
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("Error cancelling user subscription and adjusting revenue:", e);
+    }
+  }
+
+  /**
+   * Cancel a user's course purchase, mark status as 'Cancelled (No Refund)' in course_purchases,
+   * delete course progress, and deduct course price from monthly_profits in Firestore.
+   */
+  static async cancelUserCoursePurchaseAndAdjustRevenue(uid: string, courseId: string, userEmail?: string): Promise<void> {
+    if (!db || !uid || !courseId) return;
+    try {
+      const now = new Date();
+      const monthKey = now.toISOString().slice(0, 7);
+
+      // 1. Delete or clear user course progress document
+      try {
+        const progressDocRef = doc(db, 'userCourseProgress', `${uid}_${courseId}`);
+        await deleteDoc(progressDocRef);
+      } catch (err) {
+        console.warn("Progress doc delete notice:", err);
+      }
+
+      // 2. Query course_purchases for matching course transaction
+      const purchasesSnap = await getDocs(collection(db, 'course_purchases'));
+      let courseDeductedAmount = 399; // Default course fee
+      let foundPurchase = false;
+
+      for (const dSnap of purchasesSnap.docs) {
+        const data = dSnap.data() as StudentCoursePurchase;
+        if (data && data.userId === uid && data.courseId === courseId) {
+          foundPurchase = true;
+          courseDeductedAmount = data.pricePaid || 399;
+
+          // Update status to 'Cancelled (No Refund)'
+          await setDoc(doc(db, 'course_purchases', data.id), {
+            paymentStatus: 'Cancelled (No Refund)',
+            cancelledAt: now.toISOString()
+          }, { merge: true });
+
+          // Adjust monthly profit for this transaction's month
+          const pDate = new Date(data.purchaseDate || now);
+          const pMonthKey = !isNaN(pDate.getTime()) ? pDate.toISOString().slice(0, 7) : monthKey;
+
+          const allProfits = await this.getMonthlyProfits();
+          const existingMonth = allProfits.find(m => m.monthKey === pMonthKey);
+          if (existingMonth) {
+            const subRev = existingMonth.subscriptionRevenue || 0;
+            const crsRev = Math.max(0, (existingMonth.courseRevenue || 0) - courseDeductedAmount);
+            const crsCount = Math.max(0, (existingMonth.coursePurchaseCount || 0) - 1);
+
+            await this.saveMonthlyProfit({
+              ...existingMonth,
+              courseRevenue: crsRev,
+              grossProfit: subRev + crsRev,
+              coursePurchaseCount: crsCount,
+              updatedAt: now.toISOString()
+            });
+          }
+        }
+      }
+
+      // If no purchase log found, adjust current month's course revenue
+      if (!foundPurchase) {
+        const allProfits = await this.getMonthlyProfits();
+        const existingMonth = allProfits.find(m => m.monthKey === monthKey);
+        if (existingMonth) {
+          const subRev = existingMonth.subscriptionRevenue || 0;
+          const crsRev = Math.max(0, (existingMonth.courseRevenue || 0) - courseDeductedAmount);
+          const crsCount = Math.max(0, (existingMonth.coursePurchaseCount || 0) - 1);
+
+          await this.saveMonthlyProfit({
+            ...existingMonth,
+            courseRevenue: crsRev,
+            grossProfit: subRev + crsRev,
+            coursePurchaseCount: crsCount,
+            updatedAt: now.toISOString()
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("Error cancelling course purchase and adjusting revenue:", e);
+    }
+  }
+
+  /**
    * Admin helper: Cancel a user's paid subscription and downgrade profile to Free Tier in Firestore.
    */
   static async cancelUserSubscription(uid: string): Promise<void> {
@@ -933,6 +1099,8 @@ export class FirestoreService {
       await setDoc(userRef, {
         plan: 'Free Tier',
         planExpiresAt: null,
+        planCancelled: true,
+        planCancelledAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }, { merge: true });
     } catch (e) {

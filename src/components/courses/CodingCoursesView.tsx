@@ -33,7 +33,9 @@ import {
   CheckSquare,
   Square,
   RotateCcw,
-  Zap
+  Zap,
+  XCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { UserProfile, CertificateRecord } from '../../types';
 import confetti from 'canvas-confetti';
@@ -4174,6 +4176,10 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
   const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
   const [paymentSuccessMessage, setPaymentSuccessMessage] = useState<boolean>(false);
 
+  // Course Cancellation Modal State
+  const [courseToCancel, setCourseToCancel] = useState<CourseItem | null>(null);
+  const [isCancelingCourse, setIsCancelingCourse] = useState<boolean>(false);
+
   // Certificate Verification Modal State
   const [showCertVerificationModal, setShowCertVerificationModal] = useState<boolean>(false);
   const [verificationCodeToView, setVerificationCodeToView] = useState<string | null>(null);
@@ -4261,6 +4267,58 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
         setPaymentSuccessMessage(false);
       }, 1000);
     }, 1200);
+  };
+
+  // Handler for user cancelling course purchase/enrollment
+  const handleConfirmCourseCancel = async () => {
+    if (!courseToCancel) return;
+    setIsCancelingCourse(true);
+
+    const targetCourse = courseToCancel;
+    const targetCourseId = targetCourse.id;
+
+    try {
+      if (user && user.uid) {
+        await FirestoreService.cancelUserCoursePurchaseAndAdjustRevenue(
+          user.uid,
+          targetCourseId,
+          user.email || undefined
+        );
+      }
+
+      // 1. Remove from unlocked courses
+      setUnlockedCourses((prev) => {
+        const updated = prev.filter(id => id !== targetCourseId);
+        localStorage.setItem('campus_os_unlocked_courses', JSON.stringify(updated));
+        return updated;
+      });
+
+      // 2. Clear topics for this course from completedTopics
+      setCompletedTopics((prev) => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach(key => {
+          if (key.startsWith(`${targetCourseId}::`)) {
+            delete updated[key];
+          }
+        });
+        localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
+        return updated;
+      });
+
+      if (activeCourseId === targetCourseId) {
+        setActiveCourseId(null);
+      }
+
+      onUpdateCourseTopics?.();
+
+      setLockWarningMessage(`Cancelled enrollment for "${targetCourse.title}". Course access revoked & revenue updated.`);
+      setTimeout(() => setLockWarningMessage(null), 5000);
+    } catch (err) {
+      console.error("Failed to cancel course enrollment:", err);
+    } finally {
+      setIsCancelingCourse(false);
+      setCourseToCancel(null);
+    }
   };
 
   const activeCourse = COURSES.find((c) => c.id === activeCourseId);
@@ -4506,6 +4564,12 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
               <span className="px-3 py-1 rounded-full bg-emerald-500/90 text-white text-xs font-black flex items-center gap-1 shadow-sm">
                 <CheckCircle2 className="w-3.5 h-3.5" /> Course Unlocked & Enrolled
               </span>
+              <button
+                onClick={() => setCourseToCancel(activeCourse)}
+                className="px-3.5 py-1 rounded-full bg-red-500/30 hover:bg-red-500/50 text-red-100 border border-red-300/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+              >
+                <XCircle className="w-3.5 h-3.5 text-red-200" /> Cancel Enrollment
+              </button>
             </div>
 
             <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
@@ -5088,14 +5152,23 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
                 {/* Footer Action Button */}
                 <div className="pt-2">
                   {isUnlocked ? (
-                    <button
-                      onClick={() => handleUnlockCourseClick(course)}
-                      className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-colors"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>{isDrive ? 'Open Syllabus & Drive' : 'Open Syllabus & Telegram'}</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleUnlockCourseClick(course)}
+                        className="flex-1 py-3.5 px-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                      >
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        <span>{isDrive ? 'Open Syllabus & Drive' : 'Open Syllabus & Telegram'}</span>
+                        <ChevronRight className="w-4 h-4 shrink-0" />
+                      </button>
+                      <button
+                        onClick={() => setCourseToCancel(course)}
+                        title="Cancel Course Enrollment"
+                        className="px-3.5 py-3.5 rounded-2xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-extrabold text-xs flex items-center justify-center cursor-pointer transition-colors shrink-0"
+                      >
+                        <XCircle className="w-4 h-4" />
+                      </button>
+                    </div>
                   ) : (
                     <button
                       onClick={() => handleUnlockCourseClick(course)}
@@ -5205,6 +5278,77 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
                   <>
                     <Lock className="w-4 h-4 text-amber-300" />
                     <span>Pay ₹{payingForCourse.price} & Unlock Course</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* COURSE CANCELLATION WARNING MODAL */}
+      {courseToCancel && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 sm:p-8 space-y-6">
+            
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-red-100 text-red-600">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 text-[10px] font-black uppercase tracking-wider">
+                    Cancel Course Enrollment
+                  </span>
+                  <h3 className="text-lg font-black text-slate-900 mt-0.5">{courseToCancel.title}</h3>
+                </div>
+              </div>
+              <button
+                onClick={() => setCourseToCancel(null)}
+                className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-red-50 border-2 border-red-200 space-y-2">
+              <div className="font-extrabold text-red-900 text-sm flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                <span>WARNING: NO REFUND POLICY</span>
+              </div>
+              <p className="text-xs text-red-800 font-medium leading-relaxed">
+                The amount which has been paid (<strong>₹{courseToCancel.price}</strong>) will <strong>NOT be refunded</strong> any more.
+                Please cancel the course subscription on your own risk.
+              </p>
+              <p className="text-[11px] text-red-700 font-medium leading-snug">
+                Once cancelled, your enrollment, interactive syllabus progress, certificates, and access to Telegram / Drive resources for this course will be revoked and removed from admin gross profits.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                onClick={() => setCourseToCancel(null)}
+                disabled={isCancelingCourse}
+                className="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs transition-colors cursor-pointer"
+              >
+                No, Keep Course
+              </button>
+
+              <button
+                onClick={handleConfirmCourseCancel}
+                disabled={isCancelingCourse}
+                className="px-5 py-3 rounded-2xl bg-red-600 hover:bg-red-700 disabled:opacity-75 text-white font-black text-xs shadow-lg shadow-red-600/20 flex items-center gap-2 transition-all cursor-pointer"
+              >
+                {isCancelingCourse ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Cancelling Course...</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="w-4 h-4" />
+                    <span>Yes, Cancel Course (No Refund)</span>
                   </>
                 )}
               </button>
