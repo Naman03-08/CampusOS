@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Briefcase, Zap, Award, FileText, Bot, Download, CheckCircle2, RefreshCw, Mic, Video, Star } from 'lucide-react';
+import { Briefcase, Zap, Award, FileText, Bot, Download, CheckCircle2, RefreshCw, Star } from 'lucide-react';
 import { ResumeData, UserProfile } from '../../types';
 import { exportTextToPDF } from '../../lib/pdfExport';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
@@ -15,21 +15,13 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
   resumeData,
   onUpdateResume,
 }) => {
-  const [activeTab, setActiveTab] = useState<'resume' | 'mock_interview' | 'cover_letter'>('resume');
+  const [activeTab, setActiveTab] = useState<'resume' | 'cover_letter'>('resume');
 
   // Resume state
   const [resume, setResume] = useState<ResumeData>(resumeData);
   const [targetRole, setTargetRole] = useState(user.targetRole || 'Software Engineer');
   const [evaluationResult, setEvaluationResult] = useState<any>(null);
   const [loadingEval, setLoadingEval] = useState(false);
-
-  // Interview Practice state
-  const [interviewRole, setInterviewRole] = useState('Software Engineer (Google / Meta)');
-  const [interviewQuestion, setInterviewQuestion] = useState('How do you design a LRU Cache with O(1) time complexity?');
-  const [userAnswer, setUserAnswer] = useState('');
-  const [recording, setRecording] = useState(false);
-  const [interviewFeedback, setInterviewFeedback] = useState<any>(null);
-  const [loadingInterview, setLoadingInterview] = useState(false);
 
   // Cover letter state
   const [companyName, setCompanyName] = useState('Google');
@@ -54,28 +46,6 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
       console.error('Resume eval error:', err);
     } finally {
       setLoadingEval(false);
-    }
-  };
-
-  const handleEvaluateInterviewAnswer = async () => {
-    setLoadingInterview(true);
-    try {
-      const res = await fetch('/api/ai/mock-interview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          role: interviewRole,
-          question: interviewQuestion,
-          userAnswer: userAnswer || 'I use a Doubly LinkedList combined with a Hash Map to store key-node pairs.',
-        }),
-      });
-
-      const data = await res.json();
-      setInterviewFeedback(data);
-    } catch (err) {
-      console.error('Interview eval error:', err);
-    } finally {
-      setLoadingInterview(false);
     }
   };
 
@@ -108,13 +78,11 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Section Usage Banner */}
       <SectionUsageBanner
-        title="Placement Hub & AI Interview Practice Suite"
-        subtitle="ATS Resume Scoring, AI Technical & Behavioral Interview Practice & Targeted Cover Letter Builder"
-        purpose="This section is used to prepare for campus hiring, software engineering roles, and corporate internships. It includes AI ATS Resume Audit tools, simulated technical interview practice with instant feedback scores, and personalized cover letter generators."
+        title="Placement Hub & Resume Suite"
+        subtitle="ATS Resume Scoring & Targeted Cover Letter Builder"
+        purpose="This section is used to prepare for campus hiring, software engineering roles, and corporate internships. It includes AI ATS Resume Audit tools and personalized cover letter generators."
         keyFeatures={[
           'AI ATS Resume Score & Keyword Optimizer',
-          'Simulated AI Technical & Behavioral Interview Practice',
-          'Instant Scoring & Answer Refinement Critique',
           'Custom Cover Letter Generator for Target Companies',
           'Export Professional Resume to PDF'
         ]}
@@ -152,14 +120,6 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
           }`}
         >
           ATS Resume Evaluator & Editor
-        </button>
-        <button
-          onClick={() => setActiveTab('mock_interview')}
-          className={`px-4 py-2 rounded-xl transition-all ${
-            activeTab === 'mock_interview' ? 'bg-white text-rose-600 shadow-xs' : 'text-slate-600'
-          }`}
-        >
-          Technical Interview Simulator
         </button>
         <button
           onClick={() => setActiveTab('cover_letter')}
@@ -286,107 +246,7 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
         </div>
       )}
 
-      {/* TAB 2: Technical Interview Simulator */}
-      {activeTab === 'mock_interview' && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
-            <div>
-              <span className="text-xs font-bold text-purple-600 uppercase bg-purple-50 px-2.5 py-1 rounded-md border border-purple-100">
-                Live AI Interview Stage
-              </span>
-              <h2 className="text-xl font-extrabold text-slate-900 mt-1">{interviewRole}</h2>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-200">
-                <Video className="w-3.5 h-3.5 text-emerald-600" /> Camera Ready
-              </span>
-              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200">
-                <Mic className="w-3.5 h-3.5 text-blue-600" /> Audio Stream Active
-              </span>
-            </div>
-          </div>
-
-          {/* Question Box */}
-          <div className="p-5 rounded-2xl bg-purple-50/80 border border-purple-200">
-            <p className="text-xs font-bold uppercase text-purple-700 mb-1">Interview Question 1 of 5</p>
-            <p className="text-base font-extrabold text-slate-900">{interviewQuestion}</p>
-          </div>
-
-          {/* User Answer Input */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-slate-700">Your Spoken / Typed Answer</label>
-              <button
-                type="button"
-                onClick={() => setRecording(!recording)}
-                className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
-                  recording ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-100 text-slate-700'
-                }`}
-              >
-                <Mic className="w-3.5 h-3.5" />
-                <span>{recording ? 'Recording Voice...' : 'Simulate Voice Input'}</span>
-              </button>
-            </div>
-
-            <textarea
-              rows={4}
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              placeholder="Type or speak your technical answer step-by-step..."
-              className="w-full p-3 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-none"
-            />
-
-            <button
-              onClick={handleEvaluateInterviewAnswer}
-              disabled={loadingInterview}
-              className="py-3 px-6 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md shadow-purple-600/20 flex items-center justify-center gap-2 transition-all"
-            >
-              {loadingInterview ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>AI is evaluating confidence & depth...</span>
-                </>
-              ) : (
-                <>
-                  <Bot className="w-4 h-4" />
-                  <span>Submit Answer For AI Evaluation</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Feedback Stage */}
-          {interviewFeedback && (
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-extrabold text-slate-900">AI Scoring & Detailed Analysis</h3>
-                <span className="text-base font-black text-purple-700 bg-purple-100 px-3 py-1 rounded-xl">
-                  Score: {interviewFeedback.score} / 100
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="p-3.5 rounded-xl bg-white border border-slate-200">
-                  <p className="font-bold text-emerald-700 mb-1">Strong Points</p>
-                  <p className="text-slate-600">{interviewFeedback.strengths}</p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-white border border-slate-200">
-                  <p className="font-bold text-amber-700 mb-1">Key Improvements Needed</p>
-                  <p className="text-slate-600">{interviewFeedback.improvements}</p>
-                </div>
-              </div>
-
-              <p className="text-xs font-semibold text-slate-700 bg-white p-3 rounded-xl border border-slate-200">
-                <strong>Ideal Benchmark Answer:</strong> {interviewFeedback.idealAnswer}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* TAB 3: Cover Letter Generator */}
+      {/* TAB 2: Cover Letter Generator */}
       {activeTab === 'cover_letter' && (
         <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
           <h2 className="font-extrabold text-slate-900 text-sm">Cover Letter Generator</h2>

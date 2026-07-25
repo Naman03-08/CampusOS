@@ -96,10 +96,10 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
     id: 'plan_349',
     name: 'Campus Pro Ultimate',
     tagline: 'Complete Placement & Academic Acceleration Pass',
-    priceMonthly: '₹349',
-    priceYearly: '₹3,299',
+    priceMonthly: '₹399',
+    priceYearly: '₹3,799',
     period: 'per month (30 Days)',
-    rawPrice: 349,
+    rawPrice: 399,
     popular: false,
     badge: 'Best Value for Placements',
     badgeColor: 'bg-indigo-600 text-white shadow-xs',
@@ -200,7 +200,7 @@ export function calculatePlanDetails(user: UserProfile) {
   } else {
     if (currentPlanId === 'free_trial') planName = 'Free Trial (4 Days)';
     if (currentPlanId === 'plan_199') planName = 'Pro Scholar (₹199)';
-    if (currentPlanId === 'plan_349') planName = 'Campus Pro Ultimate (₹349)';
+    if (currentPlanId === 'plan_349') planName = 'Campus Pro Ultimate (₹399)';
   }
 
   const formattedStartedAt = startedAtMs > 0 ? new Date(startedAtMs).toLocaleDateString('en-IN', {

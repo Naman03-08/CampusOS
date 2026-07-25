@@ -169,7 +169,7 @@ export const AIResumeBuilderView: React.FC<AIResumeBuilderViewProps> = ({
   // Navigation & Modal State
   const [activeTab, setActiveTab] = useState<
     'personal' | 'styling' | 'experience' | 'projects' | 'education' | 'skills' | 'leadership' | 'more' | 'copilot'
-  >('copilot');
+  >('personal');
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   // AI & Feedback State

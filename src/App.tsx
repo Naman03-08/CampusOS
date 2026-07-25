@@ -24,6 +24,7 @@ import { StudyHubView } from './components/studyhub/StudyHubView';
 import { AIChatView } from './components/chat/AIChatView';
 import { AssignmentSolverView } from './components/assignment/AssignmentSolverView';
 import { AttendanceView } from './components/attendance/AttendanceView';
+import { HabiturexView } from './components/habiturex/HabiturexView';
 import { CodingHubView } from './components/coding/CodingHubView';
 import { CodingCoursesView } from './components/courses/CodingCoursesView';
 import { InterviewPrepView } from './components/placement/InterviewPrepView';
@@ -73,7 +74,7 @@ export function App() {
     }
   }, []);
 
-  const gatedTabs = ['notes', 'studyhub', 'resumebuilder', 'chat', 'assignment', 'attendance', 'coding', 'courses', 'interviewprep', 'placement'];
+  const gatedTabs = ['notes', 'studyhub', 'resumebuilder', 'chat', 'assignment', 'attendance', 'habiturex', 'coding', 'courses', 'interviewprep', 'placement'];
 
   const getTabDisplayName = (tabId: string) => {
     switch (tabId) {
@@ -83,6 +84,7 @@ export function App() {
       case 'assignment':
         return 'AI Study, Chat & Assignment Solver';
       case 'attendance': return 'Attendance Manager & Calculator';
+      case 'habiturex': return 'Habiturex Daily Consistency OS';
       case 'coding': return 'Coding Hub & 375 DSA Roadmap Sheet';
       case 'courses': return 'Interactive Coding Courses & Academies';
       case 'interviewprep': return 'Technical Interview Prep & Question Bank';
@@ -541,10 +543,12 @@ export function App() {
                 />
               )}
 
-              {activeTab === 'attendance' && (
-                <AttendanceView
+              {(activeTab === 'habiturex' || activeTab === 'attendance') && (
+                <HabiturexView
+                  user={user}
                   attendance={attendance}
                   onUpdateAttendance={handleUpdateAttendance}
+                  onNavigateTab={handleNavigateTabWithGuard}
                 />
               )}
 

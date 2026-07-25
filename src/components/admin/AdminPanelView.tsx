@@ -65,8 +65,8 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
   const [errorMsg, setErrorMsg] = useState('');
   const [shake, setShake] = useState(false);
 
-  // Active Admin Section Tab: 'telemetry' | 'financials' | 'email_broadcast'
-  const [activeAdminTab, setActiveAdminTab] = useState<'telemetry' | 'financials' | 'email_broadcast'>('telemetry');
+  // Active Admin Section Tab: 'telemetry' | 'financials'
+  const [activeAdminTab, setActiveAdminTab] = useState<'telemetry' | 'financials'>('telemetry');
 
   // Firestore Registered Users State
   const [allUsers, setAllUsers] = useState<UserProfile[]>([]);
@@ -109,60 +109,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
   const [isDeletingPayment, setIsDeletingPayment] = useState(false);
   const [userToCancelSub, setUserToCancelSub] = useState<UserProfile | null>(null);
   const [isCancellingSub, setIsCancellingSub] = useState(false);
-
-  // -------------------------------------------------------------
-  // SECTION 2 STATE: Real Email Broadcast & AI Email Draft Helper
-  // -------------------------------------------------------------
-  const [selectedRecipientEmails, setSelectedRecipientEmails] = useState<string[]>([]);
-  const [emailSearch, setEmailSearch] = useState('');
-  const [emailTopicInput, setEmailTopicInput] = useState('');
-  const [isDraftingAI, setIsDraftingAI] = useState(false);
-
-  const [draftedSubject, setDraftedSubject] = useState('');
-  const [draftedText, setDraftedText] = useState('');
-
-  const [isSendingEmail, setIsSendingEmail] = useState(false);
-  const [emailStatusMessage, setEmailStatusMessage] = useState<{
-    type: 'success' | 'error';
-    text: string;
-    details?: string[];
-  } | null>(null);
-
-  // SMTP Credentials Config State & Live Testing
-  const [showSmtpSettings, setShowSmtpSettings] = useState(false);
-  const [isTestingSmtp, setIsTestingSmtp] = useState(false);
-  const [smtpTestResult, setSmtpTestResult] = useState<{ success: boolean; message: string; advice?: string } | null>(null);
-  const [smtpConfig, setSmtpConfig] = useState(() => {
-    try {
-      const saved = localStorage.getItem('campusos_admin_smtp_config');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.port === 535 || (parsed.host && parsed.host.includes('gmail') && parsed.port !== 465 && parsed.port !== 587)) {
-          parsed.port = 587;
-        }
-        return parsed;
-      }
-      return {
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        user: 'naman03mgs@gmail.com',
-        pass: '',
-        fromEmail: 'naman03mgs@gmail.com',
-        fromName: 'CampusOS AI Administrator'
-      };
-    } catch {
-      return {
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        user: 'naman03mgs@gmail.com',
-        pass: '',
-        fromEmail: 'naman03mgs@gmail.com',
-        fromName: 'CampusOS AI Administrator'
-      };
-    }
-  });
+  const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const currentUserEmail = user?.email?.trim().toLowerCase() || '';
   const isAuthorizedEmail = currentUserEmail === ADMIN_EMAIL;
@@ -181,9 +128,6 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
         finalUsers = [user];
       }
       setAllUsers(finalUsers);
-
-      // Initialize default selections for email
-      setSelectedRecipientEmails(finalUsers.map(u => u.email).filter(Boolean));
 
       // 2. Fetch Monthly Profits from Firestore
       const profitRecords = await FirestoreService.getMonthlyProfits();
@@ -262,13 +206,13 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       if (zeroRecords.length > 0) {
         setSelectedMonthKey(zeroRecords[0].monthKey);
       }
-      setEmailStatusMessage({
+      setActionFeedback({
         type: 'success',
         text: 'All revenue metrics and monthly profits have been reset to ₹0 baseline starting fresh from today!'
       });
     } catch (e: any) {
       console.error("Failed to reset financials:", e);
-      setEmailStatusMessage({
+      setActionFeedback({
         type: 'error',
         text: `Failed to reset financials: ${e.message || e}`
       });
@@ -302,203 +246,6 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
     setShowAddMonthModal(false);
   };
 
-  // Helper to normalize and auto-fix domain typos in SMTP settings
-  const normalizeConfig = (cfg: typeof smtpConfig) => {
-    let user = (cfg.user || '').trim().toLowerCase()
-      .replace(/@gmai\.com$/i, '@gmail.com')
-      .replace(/@gamil\.com$/i, '@gmail.com')
-      .replace(/@gmial\.com$/i, '@gmail.com');
-    let fromEmail = (cfg.fromEmail || user).trim().toLowerCase()
-      .replace(/@gmai\.com$/i, '@gmail.com')
-      .replace(/@gamil\.com$/i, '@gmail.com')
-      .replace(/@gmial\.com$/i, '@gmail.com');
-    let host = (cfg.host || 'smtp.gmail.com').trim().toLowerCase();
-    let port = Number(cfg.port) || 587;
-    if (port === 535 || (host.includes('gmail') && port !== 465 && port !== 587)) {
-      port = 587;
-    }
-    if (host.includes('gmail') || user.endsWith('@gmail.com')) {
-      host = 'smtp.gmail.com';
-      fromEmail = user; // Gmail requires From header to match authenticated Gmail account
-    }
-    // Strip spaces from password (e.g. Google App Passwords 'xxxx yyyy zzzz wwww' -> 'xxxxyyyyzzzzwwww')
-    const cleanedPass = (cfg.pass || '').toString().replace(/\s+/g, '').trim();
-
-    return {
-      ...cfg,
-      host,
-      port,
-      user,
-      fromEmail,
-      pass: cleanedPass
-    };
-  };
-
-  // Save SMTP Settings with live verification
-  const handleSaveSmtpSettings = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsTestingSmtp(true);
-    setSmtpTestResult(null);
-
-    const cleaned = normalizeConfig(smtpConfig);
-    setSmtpConfig(cleaned);
-
-    try {
-      const res = await fetch('/api/admin/test-smtp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ smtpConfig: cleaned })
-      });
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem('campusos_admin_smtp_config', JSON.stringify(cleaned));
-        setShowSmtpSettings(false);
-        setEmailStatusMessage({
-          type: 'success',
-          text: data.message || `SMTP Server verified & saved successfully! Test email delivered to ${cleaned.user}.`
-        });
-      } else {
-        setSmtpTestResult({
-          success: false,
-          message: data.error || 'Failed to authenticate with SMTP server.',
-          advice: data.advice || 'Please enter a valid 16-character Google App Password from myaccount.google.com/apppasswords'
-        });
-      }
-    } catch (err: any) {
-      setSmtpTestResult({
-        success: false,
-        message: err.message || 'Network error verifying SMTP server credentials.'
-      });
-    } finally {
-      setIsTestingSmtp(false);
-    }
-  };
-
-  // Test SMTP Server Connection
-  const handleTestSmtpConnection = async () => {
-    setIsTestingSmtp(true);
-    setSmtpTestResult(null);
-
-    const activeConfig = normalizeConfig(smtpConfig);
-    setSmtpConfig(activeConfig);
-
-    try {
-      const res = await fetch('/api/admin/test-smtp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ smtpConfig: activeConfig })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setSmtpTestResult({
-          success: true,
-          message: data.message || 'SMTP Connection Verified Successfully!'
-        });
-      } else {
-        setSmtpTestResult({
-          success: false,
-          message: data.error || 'Failed to connect to SMTP server.',
-          advice: data.advice
-        });
-      }
-    } catch (err: any) {
-      setSmtpTestResult({
-        success: false,
-        message: err.message || 'Network error testing SMTP connection.'
-      });
-    } finally {
-      setIsTestingSmtp(false);
-    }
-  };
-
-  // AI Email Draft Assistant in Simple English Text
-  const handleAIDraftEmail = async () => {
-    if (!emailTopicInput.trim()) return;
-    setIsDraftingAI(true);
-    setEmailStatusMessage(null);
-
-    try {
-      const res = await fetch('/api/admin/ai-draft-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          topic: emailTopicInput,
-          recipientCount: selectedRecipientEmails.length,
-          targetAudience: 'Registered CampusOS Students'
-        })
-      });
-
-      const data = await res.json();
-      if (data.subject && (data.message || data.bodyText)) {
-        setDraftedSubject(data.subject);
-        setDraftedText(data.message || data.bodyText);
-      }
-    } catch (err) {
-      console.error('Error drafting email with AI:', err);
-    } finally {
-      setIsDraftingAI(false);
-    }
-  };
-
-  // Dispatch Real Email
-  const handleSendEmailBroadcast = async () => {
-    if (selectedRecipientEmails.length === 0) {
-      setEmailStatusMessage({
-        type: 'error',
-        text: 'Please select at least 1 student recipient to send email.'
-      });
-      return;
-    }
-
-    if (!draftedSubject.trim() || !draftedText.trim()) {
-      setEmailStatusMessage({
-        type: 'error',
-        text: 'Please draft an email subject and message body in simple English before sending.'
-      });
-      return;
-    }
-
-    setIsSendingEmail(true);
-    setEmailStatusMessage(null);
-
-    try {
-      const res = await fetch('/api/admin/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recipientEmails: selectedRecipientEmails,
-          subject: draftedSubject,
-          message: draftedText,
-          bodyText: draftedText,
-          smtpConfig: normalizeConfig(smtpConfig)
-        })
-      });
-
-      const result = await res.json();
-      if (result.success) {
-        setEmailStatusMessage({
-          type: 'success',
-          text: result.message || `Successfully sent email to ${selectedRecipientEmails.length} recipients!`,
-          details: result.errors
-        });
-      } else {
-        setEmailStatusMessage({
-          type: 'error',
-          text: result.error || result.message || 'Failed to dispatch emails.',
-          details: result.advice ? [result.advice] : (result.errors || [])
-        });
-      }
-    } catch (err: any) {
-      console.error('Send email error:', err);
-      setEmailStatusMessage({
-        type: 'error',
-        text: err.message || 'Failed to dispatch email broadcast.'
-      });
-    } finally {
-      setIsSendingEmail(false);
-    }
-  };
-
   // Admin Handlers: Delete Payment Transaction & Cancel Subscription
   const handleDeletePayment = async () => {
     if (!paymentToDelete) return;
@@ -513,13 +260,13 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       setMonthlyProfits(updatedProfits);
 
       setPaymentToDelete(null);
-      setEmailStatusMessage({
+      setActionFeedback({
         type: 'success',
         text: `Payment of ₹${paymentToDelete.pricePaid} for '${paymentToDelete.courseTitle}' was permanently deleted and monthly profit adjusted in Firestore!`
       });
     } catch (e: any) {
       console.error("Failed to delete payment:", e);
-      setEmailStatusMessage({
+      setActionFeedback({
         type: 'error',
         text: `Failed to delete payment transaction: ${e.message || e}`
       });
@@ -536,13 +283,13 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       // Update local allUsers state
       setAllUsers(prev => prev.map(u => u.uid === userToCancelSub.uid ? { ...u, plan: 'Free Tier', planExpiresAt: undefined } : u));
       setUserToCancelSub(null);
-      setEmailStatusMessage({
+      setActionFeedback({
         type: 'success',
         text: `Subscription cancelled successfully for ${userToCancelSub.displayName || userToCancelSub.email}. User set to Free Tier in Firestore.`
       });
     } catch (e: any) {
       console.error("Failed to cancel subscription:", e);
-      setEmailStatusMessage({
+      setActionFeedback({
         type: 'error',
         text: `Failed to cancel user subscription: ${e.message || e}`
       });
@@ -840,15 +587,13 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Section Usage Banner */}
       <SectionUsageBanner
-        title="Admin Control, Financial Revenue & Real Email Broadcast"
-        subtitle="Full administrative command center for platform operations, financial tracking & student messaging"
-        purpose="This comprehensive admin dashboard enables platform administrators to track real-time gross profits from subscription plans and course purchases saved directly in Firebase Firestore. Inspect student subscription remaining days, manage monthly revenue history, and send real broadcast emails to registered student email IDs with AI drafting support."
+        title="Admin Control & Financial Revenue Center"
+        subtitle="Full administrative command center for platform operations and financial tracking"
+        purpose="This comprehensive admin dashboard enables platform administrators to track real-time gross profits from subscription plans and course purchases saved directly in Firebase Firestore, inspect student subscription remaining days, manage monthly revenue history, and track student telemetry."
         keyFeatures={[
           'Gross Profit & Monthly Revenue Records Saved in Firebase Firestore',
           'Student Subscription List with Expiration Days Remaining Calculator',
           'Separate Categorized List of Students who Purchased Coding Courses',
-          'Real Student Email Dispatch Hub with Custom SMTP Server Support',
-          'Gemini AI Email Drafting Assistant by Topic Input',
           'Live Registered Student Telemetry & Progress Inspector'
         ]}
         icon={<ShieldAlert className="w-6 h-6 text-white" />}
@@ -856,6 +601,15 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       />
 
       {/* Header Bar */}
+      {actionFeedback && (
+        <div className={`p-4 rounded-2xl border text-xs font-semibold flex items-center justify-between ${
+          actionFeedback.type === 'success' ? 'bg-emerald-50 text-emerald-900 border-emerald-200' : 'bg-red-50 text-red-900 border-red-200'
+        }`}>
+          <span>{actionFeedback.text}</span>
+          <button onClick={() => setActionFeedback(null)} className="text-xs font-bold underline cursor-pointer ml-2">Dismiss</button>
+        </div>
+      )}
+
       <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 card-3d">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-500/20 shrink-0">
@@ -908,19 +662,6 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
           <DollarSign className="w-4 h-4" />
           <span>Financials, Gross Profits & Subscriptions</span>
           <span className="ml-1 px-2 py-0.5 rounded-full bg-white/20 text-[10px]">₹ {totalGrossProfitAllTime.toLocaleString()}</span>
-        </button>
-
-        <button
-          onClick={() => setActiveAdminTab('email_broadcast')}
-          className={`px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
-            activeAdminTab === 'email_broadcast'
-              ? 'bg-blue-600 text-white shadow-md'
-              : 'text-slate-700 hover:bg-white hover:text-slate-900'
-          }`}
-        >
-          <Mail className="w-4 h-4" />
-          <span>Registered User Email Broadcast & AI Writer</span>
-          <span className="ml-1 px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px]">SMTP & AI</span>
         </button>
 
         <button
@@ -1190,210 +931,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
         </div>
       )}
 
-      {/* ======================================================================== */}
-      {/* SECTION 2 TAB: REGISTERED USER EMAIL BROADCAST & AI EMAIL DRAFT ASSISTANT */}
-      {/* ======================================================================== */}
-      {activeAdminTab === 'email_broadcast' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Student Directory & Selection Panel (5 Cols) */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4 card-3d">
-              <div className="flex items-center justify-between border-b pb-3">
-                <div>
-                  <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-                    <Users className="w-4 h-4 text-blue-600" />
-                    Recipient Selection ({selectedRecipientEmails.length} / {allUsers.length})
-                  </h3>
-                  <p className="text-xs text-slate-500">Select registered users to receive real emails</p>
-                </div>
 
-                <button
-                  onClick={() => setShowSmtpSettings(true)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
-                >
-                  <Settings className="w-3.5 h-3.5 text-slate-600" />
-                  <span>SMTP Config</span>
-                </button>
-              </div>
-
-              {/* Quick Select Buttons */}
-              <div className="flex items-center gap-2 text-xs font-bold">
-                <button
-                  onClick={() => setSelectedRecipientEmails(allUsers.map(u => u.email).filter(Boolean))}
-                  className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors cursor-pointer"
-                >
-                  Select All Users
-                </button>
-                <button
-                  onClick={() => setSelectedRecipientEmails([])}
-                  className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
-                >
-                  Deselect All
-                </button>
-              </div>
-
-              {/* Email List with Checkboxes */}
-              <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                {allUsers.map((u) => {
-                  const isChecked = selectedRecipientEmails.includes(u.email);
-                  return (
-                    <div
-                      key={u.uid}
-                      onClick={() => {
-                        if (isChecked) {
-                          setSelectedRecipientEmails(prev => prev.filter(e => e !== u.email));
-                        } else {
-                          setSelectedRecipientEmails(prev => [...prev, u.email]);
-                        }
-                      }}
-                      className={`p-3 rounded-2xl border flex items-center justify-between text-xs cursor-pointer transition-all ${
-                        isChecked
-                          ? 'bg-blue-50/80 border-blue-400 text-slate-900'
-                          : 'bg-slate-50 border-slate-200/80 text-slate-600 hover:bg-white'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                        {isChecked ? (
-                          <CheckSquare className="w-4 h-4 text-blue-600 shrink-0" />
-                        ) : (
-                          <Square className="w-4 h-4 text-slate-400 shrink-0" />
-                        )}
-                        <div className="min-w-0">
-                          <p className="font-extrabold truncate text-slate-900">{u.displayName}</p>
-                          <p className="text-[10px] font-mono text-slate-500 truncate">{u.email}</p>
-                        </div>
-                      </div>
-
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700 shrink-0">
-                        {u.university || 'Registered'}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Right AI Email Draft & Dispatch Hub (7 Cols) */}
-          <div className="lg:col-span-7 space-y-4">
-            <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-5 card-3d">
-              <div className="flex items-center justify-between border-b pb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 flex items-center justify-center font-black shadow-md">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-black text-slate-900">AI Email Draft & Dispatch Studio</h3>
-                    <p className="text-xs text-slate-500">Input why you want to email students & let AI draft it</p>
-                  </div>
-                </div>
-
-                <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200">
-                  Gemini AI Powered
-                </span>
-              </div>
-
-              {/* Status Message */}
-              {emailStatusMessage && (
-                <div className={`p-4 rounded-2xl border text-xs font-semibold space-y-1 ${
-                  emailStatusMessage.type === 'success'
-                    ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
-                    : 'bg-red-50 text-red-900 border-red-200'
-                }`}>
-                  <p>{emailStatusMessage.text}</p>
-                  {emailStatusMessage.details && emailStatusMessage.details.length > 0 && (
-                    <ul className="list-disc pl-4 text-[11px] opacity-90">
-                      {emailStatusMessage.details.map((d, i) => <li key={i}>{d}</li>)}
-                    </ul>
-                  )}
-                </div>
-              )}
-
-              {/* AI Draft Input Form */}
-              <div className="space-y-3">
-                <label className="block text-xs font-bold text-slate-700">
-                  Topic / Reason Admin Wants to Send Email
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={emailTopicInput}
-                    onChange={(e) => setEmailTopicInput(e.target.value)}
-                    placeholder="e.g. Announce Mid-Term Exam Cheat Sheets on Study Hub and 20% discount on Ultra AI plan"
-                    className="flex-1 px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium"
-                  />
-
-                  <button
-                    onClick={handleAIDraftEmail}
-                    disabled={isDraftingAI || !emailTopicInput.trim()}
-                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs shadow-md flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 shrink-0"
-                  >
-                    {isDraftingAI ? (
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-950" />
-                    ) : (
-                      <Sparkles className="w-3.5 h-3.5 text-slate-950" />
-                    )}
-                    <span>Draft Email with AI</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Draft Preview & Review */}
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Email Subject Line</label>
-                  <input
-                    type="text"
-                    value={draftedSubject}
-                    onChange={(e) => setDraftedSubject(e.target.value)}
-                    placeholder="Subject line generated by AI or custom..."
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-slate-700">Email Message Content (Simple English)</label>
-                    <span className="text-[10px] font-semibold text-slate-500">Plain Readable Text</span>
-                  </div>
-                  <textarea
-                    rows={10}
-                    value={draftedText}
-                    onChange={(e) => setDraftedText(e.target.value)}
-                    placeholder="Type or draft your email message in simple English text..."
-                    className="w-full p-3.5 text-xs font-sans rounded-xl bg-slate-50 text-slate-900 border border-slate-200 leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                </div>
-              </div>
-
-              {/* Action Dispatch Button */}
-              <div className="pt-2 flex items-center justify-between">
-                <span className="text-[11px] text-slate-500 font-medium">
-                  Sending to <strong>{selectedRecipientEmails.length}</strong> selected student email(s)
-                </span>
-
-                <button
-                  onClick={handleSendEmailBroadcast}
-                  disabled={isSendingEmail || selectedRecipientEmails.length === 0 || !draftedSubject}
-                  className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs sm:text-sm shadow-md shadow-blue-600/20 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 btn-3d-blue"
-                >
-                  {isSendingEmail ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Dispatching Real Emails...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 text-amber-300" />
-                      <span>Send Real Email to {selectedRecipientEmails.length} Users</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ======================================================================== */}
       {/* SECTION 3 TAB: ORIGINAL TELEMETRY & STUDENT PROGRESS INSPECTOR */}
@@ -1572,156 +1110,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
         </div>
       )}
 
-      {/* MODAL 2: SMTP CONFIGURATION */}
-      {showSmtpSettings && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 border border-slate-200 shadow-2xl animate-in zoom-in-95">
-            <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-                <Settings className="w-5 h-5 text-blue-600" />
-                Custom Real SMTP Credentials Setup
-              </h3>
-              <button onClick={() => setShowSmtpSettings(false)} className="p-1 rounded-lg hover:bg-slate-100">
-                <X className="w-5 h-5 text-slate-400" />
-              </button>
-            </div>
 
-            {/* App Password Instructions Box */}
-            <div className="p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200 text-slate-800 text-xs space-y-1.5 leading-relaxed">
-              <p className="font-extrabold text-amber-900 flex items-center gap-1.5">
-                <span>💡 Important for Gmail Users:</span>
-              </p>
-              <p className="text-[11px] text-slate-700">
-                Google requires a <strong>16-character App Password</strong> (not your normal password). To generate one:
-              </p>
-              <ol className="list-decimal pl-4 text-[11px] text-slate-700 space-y-0.5 font-medium">
-                <li>Go to <strong>Google Account &gt; Security</strong></li>
-                <li>Turn ON <strong>2-Step Verification</strong></li>
-                <li>Search or select <strong>App Passwords</strong> and generate a code</li>
-                <li>Paste the 16-character code into the Password field below</li>
-              </ol>
-            </div>
-
-            {smtpTestResult && (
-              <div className={`p-3.5 rounded-2xl border text-xs font-semibold space-y-1 ${
-                smtpTestResult.success ? 'bg-emerald-50 text-emerald-900 border-emerald-200' : 'bg-red-50 text-red-900 border-red-200'
-              }`}>
-                <p>{smtpTestResult.message}</p>
-                {smtpTestResult.advice && <p className="text-[11px] opacity-90">{smtpTestResult.advice}</p>}
-              </div>
-            )}
-
-            <form onSubmit={handleSaveSmtpSettings} className="space-y-3 text-xs font-bold text-slate-700">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block mb-1">SMTP Host</label>
-                  <input
-                    type="text"
-                    required
-                    value={smtpConfig.host}
-                    onChange={(e) => setSmtpConfig({ ...smtpConfig, host: e.target.value })}
-                    placeholder="smtp.gmail.com"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block">SMTP Port</label>
-                    <span className="text-[10px] text-blue-600 font-bold">587 (TLS) or 465 (SSL)</span>
-                  </div>
-                  <input
-                    type="number"
-                    required
-                    value={smtpConfig.port}
-                    onChange={(e) => {
-                      const val = Number(e.target.value);
-                      setSmtpConfig({ ...smtpConfig, port: val === 535 ? 587 : val });
-                    }}
-                    placeholder="587"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono"
-                  />
-                  {smtpConfig.port === 535 && (
-                    <p className="text-[10px] font-bold text-amber-600 mt-1">
-                      ⚠️ Note: 535 is an error code, not a port. Standard Gmail port is 587.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="block mb-1">SMTP Username / Email</label>
-                <input
-                  type="email"
-                  required
-                  value={smtpConfig.user}
-                  onChange={(e) => setSmtpConfig({ ...smtpConfig, user: e.target.value })}
-                  placeholder="naman03mgs@gmail.com"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1">SMTP Password / App Password</label>
-                <input
-                  type="password"
-                  value={smtpConfig.pass}
-                  onChange={(e) => setSmtpConfig({ ...smtpConfig, pass: e.target.value })}
-                  placeholder="16-character Gmail App Password or SendGrid Key"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block mb-1">From Sender Email</label>
-                  <input
-                    type="email"
-                    value={smtpConfig.fromEmail}
-                    onChange={(e) => setSmtpConfig({ ...smtpConfig, fromEmail: e.target.value })}
-                    placeholder="naman03mgs@gmail.com"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1">From Sender Name</label>
-                  <input
-                    type="text"
-                    value={smtpConfig.fromName}
-                    onChange={(e) => setSmtpConfig({ ...smtpConfig, fromName: e.target.value })}
-                    placeholder="CampusOS AI Admin"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={handleTestSmtpConnection}
-                  disabled={isTestingSmtp || !smtpConfig.pass}
-                  className="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
-                >
-                  {isTestingSmtp ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-600" />
-                  ) : (
-                    <CheckSquare className="w-3.5 h-3.5 text-blue-600" />
-                  )}
-                  <span>Test Connection</span>
-                </button>
-
-                <button
-                  type="submit"
-                  className="py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md cursor-pointer"
-                >
-                  Save Configuration
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* MODAL 3: STUDENT FULL DATA INSPECTOR */}
       {selectedUserUid && (

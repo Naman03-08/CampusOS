@@ -137,7 +137,6 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('All');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Solved' | 'Unsolved'>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'tracker' | 'ai_solver'>('tracker');
   const [pageSize, setPageSize] = useState<number>(30);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -145,12 +144,6 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
   React.useEffect(() => {
     setProblems(dsa);
   }, [dsa]);
-
-  // AI Code Solver State
-  const [codePrompt, setCodePrompt] = useState('');
-  const [codeLanguage, setCodeLanguage] = useState('cpp');
-  const [aiCodeSolution, setAiCodeSolution] = useState('');
-  const [loadingCode, setLoadingCode] = useState(false);
 
   // Category Counts map
   const categoryCounts = useMemo(() => {
@@ -214,40 +207,17 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
     }
   };
 
-  const handleSolveCodeAI = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoadingCode(true);
-
-    try {
-      const res = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: `You are the CampusOS AI Competitive Programming Coach. Provide clean, production-ready, optimal ${codeLanguage} code with detailed time & space complexity analysis for this problem:\n\n${codePrompt}`,
-        }),
-      });
-
-      const data = await res.json();
-      setAiCodeSolution(data.reply || 'Solution generated.');
-    } catch (err) {
-      console.error('Code solver error:', err);
-    } finally {
-      setLoadingCode(false);
-    }
-  };
-
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Section Usage Banner */}
       <SectionUsageBanner
         title="CampusOS 375 DSA Roadmap & Coding Mastery Hub"
-        subtitle="Complete 375 Curated DSA Questions across Arrays, DP, Graphs, Trees, System Design & AI Code Coach"
+        subtitle="Complete 375 Curated DSA Questions across Arrays, DP, Graphs, Trees & System Design"
         purpose="This hub contains the complete CampusOS 375 DSA Roadmap Sheet to help students systematically master Data Structures & Algorithms for software engineering interviews, coding rounds, and university exams."
         keyFeatures={[
           'Complete CampusOS 375 DSA Roadmap Questions',
           'Detailed Topic-Wise Categories (Arrays, Graphs, DP, Trees, Tries, Segment Trees)',
           'Difficulty & Completion Status Filtering with Instant Search',
-          'AI Code & Algorithm Coach for C++, Java, Python, TypeScript Solutions',
           'Real-time Progress Tracker & Streak Analytics'
         ]}
         icon={<Code2 className="w-6 h-6 text-white" />}
@@ -328,31 +298,8 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
         </div>
       </div>
 
-      {/* Sub Tabs */}
-      <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl w-fit text-xs font-bold">
-        <button
-          onClick={() => setActiveTab('tracker')}
-          className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${
-            activeTab === 'tracker' ? 'bg-white text-cyan-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <Code2 className="w-4 h-4" />
-          <span>375 Problem Sheet Tracker ({filteredProblems.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('ai_solver')}
-          className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${
-            activeTab === 'ai_solver' ? 'bg-white text-cyan-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <Zap className="w-4 h-4 text-cyan-600" />
-          <span>CampusOS AI Code & Algorithm Coach</span>
-        </button>
-      </div>
-
-      {activeTab === 'tracker' && (
-        <div className="space-y-5">
-          {/* Search & Secondary Filters */}
+      <div className="space-y-5">
+        {/* Search & Secondary Filters */}
           <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
               {/* Search Bar */}
@@ -649,77 +596,6 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
             )}
           </div>
         </div>
-      )}
-
-      {activeTab === 'ai_solver' && (
-        <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-cyan-600" /> CampusOS AI Competitive Coding Coach
-            </h2>
-            <span className="text-xs font-bold text-cyan-700 bg-cyan-50 px-2.5 py-1 rounded-xl border border-cyan-100">
-              Optimal Time & Space Complexity
-            </span>
-          </div>
-
-          <form onSubmit={handleSolveCodeAI} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Target Language</label>
-                <select
-                  value={codeLanguage}
-                  onChange={(e) => setCodeLanguage(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none font-bold text-slate-800"
-                >
-                  <option value="cpp">C++ (STL)</option>
-                  <option value="java">Java 21</option>
-                  <option value="python">Python 3</option>
-                  <option value="typescript">TypeScript / JavaScript</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Problem Description / Code snippet to debug</label>
-              <textarea
-                rows={5}
-                required
-                value={codePrompt}
-                onChange={(e) => setCodePrompt(e.target.value)}
-                placeholder="Enter any problem title from the CampusOS 375 DSA Roadmap or paste your code snippet for optimal solution..."
-                className="w-full p-3.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 font-medium"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loadingCode}
-              className="py-3 px-6 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs shadow-md shadow-cyan-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              {loadingCode ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>CampusOS AI is generating optimal algorithm...</span>
-                </>
-              ) : (
-                <>
-                  <Zap className="w-4 h-4" />
-                  <span>Generate Optimal Solution & Complexity Analysis</span>
-                </>
-              )}
-            </button>
-          </form>
-
-          {aiCodeSolution && (
-            <div className="p-5 rounded-2xl bg-slate-900 text-slate-100 space-y-2 mt-4 font-mono text-xs overflow-x-auto border border-slate-800 shadow-inner">
-              <p className="text-cyan-400 font-bold uppercase text-[10px] tracking-wider mb-2 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" /> CampusOS AI Solution & Complexity Output
-              </p>
-              <pre className="whitespace-pre-wrap leading-relaxed">{aiCodeSolution}</pre>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+      </div>
   );
 };
