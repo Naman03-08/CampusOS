@@ -153,7 +153,7 @@ export const CompanyQuestionsSection: React.FC<CompanyQuestionsSectionProps> = (
                       ? 'bg-amber-600 text-white font-semibold shadow-xs'
                       : diff === 'Hard'
                       ? 'bg-red-600 text-white font-semibold shadow-xs'
-                      : 'bg-slate-900 text-white font-semibold shadow-xs'
+                      : 'bg-amber-700 text-white font-semibold shadow-xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -192,7 +192,7 @@ export const CompanyQuestionsSection: React.FC<CompanyQuestionsSectionProps> = (
             onClick={() => setSelectedCompany('All')}
             className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
               selectedCompany === 'All'
-                ? 'bg-slate-900 text-white font-semibold'
+                ? 'bg-amber-700 text-white font-semibold'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
