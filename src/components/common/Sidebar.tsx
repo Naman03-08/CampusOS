@@ -36,7 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'notes', label: 'AI Notes Summarizer', icon: Sparkles, badge: 'AI' },
-    { id: 'studyhub', label: 'AI Study, Chat & Solver', icon: BookOpen, badge: 'AI Suite' },
+    { id: 'studyhub', label: 'AI Study, Chat & Solver', icon: BookOpen, badge: 'Tutor' },
     { id: 'resumebuilder', label: 'AI Resume Builder', icon: FileText, badge: 'ATS' },
     { id: 'attendance', label: 'Attendance', icon: CheckSquare },
     { id: 'coding', label: 'Coding Hub', icon: Code2, badge: 'DSA' },
@@ -104,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="text-xs font-black tracking-wide uppercase text-blue-100">Campus Pro</span>
         </div>
         <p className="text-[11px] text-blue-100 leading-snug mb-3.5 font-medium">
-          Unlimited AI study suites, ATS resume checks & live mock interviews!
+          Unlimited AI Chat Tutor, ATS resume checks & live mock interviews!
         </p>
         <button
           onClick={() => onSelectTab('pricing')}
