@@ -309,7 +309,7 @@ export interface StudentCoursePurchase {
   courseTitle: string;
   pricePaid: number;
   purchaseDate: string;
-  paymentStatus: 'Completed' | 'Pending';
+  paymentStatus: 'Completed' | 'Pending' | 'Cancelled (No Refund)';
 }
 
 export interface AdminEmailPayload {

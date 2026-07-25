@@ -415,10 +415,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               Practice 1-on-1 AI voice/video mock interviews for <strong>{user.targetRole || 'Software Engineer'}</strong>.
             </p>
             <button
-              onClick={() => onNavigateTab('placement')}
+              onClick={() => onNavigateTab('interviewprep')}
               className="w-full py-2.5 rounded-xl bg-white text-blue-700 font-bold text-xs hover:bg-blue-50 transition-all shadow-sm"
             >
-              Start Mock Interview
+              Start AI Mock Interview
             </button>
           </div>
 

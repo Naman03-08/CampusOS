@@ -14,7 +14,8 @@ import {
   ShieldAlert, 
   Zap, 
   GraduationCap,
-  Sparkles
+  Sparkles,
+  Bot
 } from 'lucide-react';
 import { UserProfile } from '../../types';
 
@@ -41,7 +42,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'attendance', label: 'Attendance', icon: CheckSquare },
     { id: 'coding', label: 'Coding Hub', icon: Code2, badge: 'DSA' },
     { id: 'courses', label: 'Coding Courses', icon: GraduationCap, badge: 'NEW' },
-    { id: 'placement', label: 'Placement & Interview', icon: Briefcase, badge: 'Jobs' },
+    { id: 'interviewprep', label: 'AI Interview Prep', icon: Bot, badge: 'Mock' },
+    { id: 'placement', label: 'Startup Jobs & Internship Hub', icon: Briefcase, badge: 'Jobs' },
     { id: 'pricing', label: 'Upgrade Plans', icon: Zap, badge: 'Plans' },
     { id: 'settings', label: 'Settings', icon: Settings },
     ...(isAdminUser ? [{ id: 'admin', label: 'Admin Panel', icon: ShieldAlert, badge: 'Lock' }] : []),

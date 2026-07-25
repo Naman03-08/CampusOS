@@ -26,7 +26,8 @@ import { AssignmentSolverView } from './components/assignment/AssignmentSolverVi
 import { AttendanceView } from './components/attendance/AttendanceView';
 import { CodingHubView } from './components/coding/CodingHubView';
 import { CodingCoursesView } from './components/courses/CodingCoursesView';
-import { PlacementHubView } from './components/placement/PlacementHubView';
+import { InterviewPrepView } from './components/placement/InterviewPrepView';
+import { StartupJobsHubView } from './components/placement/StartupJobsHubView';
 import { AIResumeBuilderView } from './components/resume/AIResumeBuilderView';
 import { SettingsView } from './components/settings/SettingsView';
 import { AdminPanelView } from './components/admin/AdminPanelView';
@@ -72,7 +73,7 @@ export function App() {
     }
   }, []);
 
-  const gatedTabs = ['notes', 'studyhub', 'resumebuilder', 'chat', 'assignment', 'attendance', 'coding', 'courses', 'placement'];
+  const gatedTabs = ['notes', 'studyhub', 'resumebuilder', 'chat', 'assignment', 'attendance', 'coding', 'courses', 'interviewprep', 'placement'];
 
   const getTabDisplayName = (tabId: string) => {
     switch (tabId) {
@@ -84,7 +85,8 @@ export function App() {
       case 'attendance': return 'Attendance Manager & Calculator';
       case 'coding': return 'Coding Hub & 375 DSA Roadmap Sheet';
       case 'courses': return 'Interactive Coding Courses & Academies';
-      case 'placement': return 'Placement Hub & AI Mock Interviews';
+      case 'interviewprep': return 'AI Technical & Behavioral Interview Prep';
+      case 'placement': return 'Startup Jobs & Internship Hub';
       default: return 'this AI feature';
     }
   };
@@ -572,11 +574,20 @@ export function App() {
                 />
               )}
 
+              {activeTab === 'interviewprep' && (
+                <InterviewPrepView
+                  user={user}
+                  resumeData={resumeData}
+                  onNavigateTab={handleNavigateTabWithGuard}
+                />
+              )}
+
               {activeTab === 'placement' && (
-                <PlacementHubView
+                <StartupJobsHubView
                   user={user}
                   resumeData={resumeData}
                   onUpdateResume={handleUpdateResume}
+                  onNavigateTab={handleNavigateTabWithGuard}
                 />
               )}
 
