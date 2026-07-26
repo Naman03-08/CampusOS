@@ -1300,46 +1300,75 @@ export const StartupJobsHubView: React.FC<StartupJobsHubViewProps> = () => {
                     hidden: { opacity: 0, y: 16 },
                     show: { opacity: 1, y: 0 }
                   }}
-                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                  className="p-5 rounded-2xl bg-[#F9FAFB] hover:bg-white border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative"
+                  whileHover={{ 
+                    y: -8, 
+                    scale: 1.025,
+                    rotateY: 6,
+                    rotateX: -3,
+                    boxShadow: p.category === 'Tech & Startups' 
+                      ? "0 25px 45px -15px rgba(59, 130, 246, 0.18)"
+                      : p.category === 'Internships & Freshers'
+                      ? "0 25px 45px -15px rgba(16, 185, 129, 0.18)"
+                      : p.category === 'Remote & Flexible'
+                      ? "0 25px 45px -15px rgba(245, 158, 11, 0.18)"
+                      : "0 25px 45px -15px rgba(139, 92, 246, 0.18)",
+                    transition: { duration: 0.25, type: 'spring', stiffness: 350, damping: 22 }
+                  }}
+                  style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+                  className="p-5 rounded-2xl bg-[#F9FAFB] hover:bg-white border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative cursor-pointer"
                   onClick={() => setSelectedPlatform(p)}
                 >
-                  <div className="space-y-3">
-                    {/* TOP ROW: Letter Badge + Bookmark Icon */}
-                    <div className="flex items-center justify-between">
-                      <div className={`w-9 h-9 rounded-xl ${p.avatarBg} ${p.avatarText} font-black text-sm flex items-center justify-center shadow-2xs border border-black/5`}>
+                  {/* Glowing custom background radial gradient on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none -z-1" />
+                  
+                  {/* Outer edge sparkle highlights */}
+                  <div className="absolute -inset-px rounded-2xl border border-transparent group-hover:border-slate-300/40 pointer-events-none transition-all duration-300" />
+                  
+                  <div className="space-y-3 relative" style={{ transformStyle: 'preserve-3d' }}>
+                    {/* TOP ROW: Letter Badge + Bookmark Icon with 3D translation */}
+                    <div className="flex items-center justify-between" style={{ transform: 'translateZ(30px)' }}>
+                      <div className={`w-9 h-9 rounded-xl ${p.avatarBg} ${p.avatarText} font-black text-sm flex items-center justify-center shadow-2xs border border-black/5 transition-transform duration-300 group-hover:scale-110`}>
                         {firstLetter}
                       </div>
 
-                      <button
-                        onClick={(e) => toggleSavePlatform(p.id, e)}
-                        className={`p-1.5 rounded-lg transition-all ${
-                          isSaved 
-                            ? 'text-amber-600 bg-amber-50' 
-                            : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
-                        }`}
-                        title={isSaved ? 'Saved to bookmarks' : 'Save platform'}
-                      >
-                        <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-amber-500' : ''}`} />
-                      </button>
+                      <div className="flex items-center gap-1.5">
+                        {p.badge && (
+                          <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 text-[9px] font-extrabold uppercase tracking-wide border border-purple-200 flex items-center gap-0.5">
+                            <Sparkles className="w-2.5 h-2.5 text-purple-600 animate-pulse" />
+                            <span>{p.badge.split(' ')[0]}</span>
+                          </span>
+                        )}
+                        <button
+                          onClick={(e) => toggleSavePlatform(p.id, e)}
+                          className={`p-1.5 rounded-lg transition-all ${
+                            isSaved 
+                              ? 'text-amber-600 bg-amber-50' 
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                          }`}
+                          title={isSaved ? 'Saved to bookmarks' : 'Save platform'}
+                        >
+                          <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-amber-500' : ''}`} />
+                        </button>
+                      </div>
                     </div>
 
-                    {/* TITLE & DESCRIPTION */}
-                    <div>
-                      <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug">
-                        {p.name}
+                    {/* TITLE & DESCRIPTION with 3D translation */}
+                    <div style={{ transform: 'translateZ(20px)' }}>
+                      <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug flex items-center gap-1">
+                        <span>{p.name}</span>
+                        <Sparkles className="w-3.5 h-3.5 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse" />
                       </h3>
                       <p className="text-xs text-slate-500 font-normal leading-relaxed line-clamp-2 mt-1.5 min-h-[36px]">
                         {p.description}
                       </p>
                     </div>
 
-                    {/* PILL TAGS */}
-                    <div className="flex flex-wrap gap-1.5 pt-1">
+                    {/* PILL TAGS with 3D translation */}
+                    <div className="flex flex-wrap gap-1.5 pt-1" style={{ transform: 'translateZ(10px)' }}>
                       {p.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100/90 text-slate-600 border border-slate-200/60"
+                          className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100/90 text-slate-600 border border-slate-200/60 group-hover:bg-blue-50/50 group-hover:text-blue-700 group-hover:border-blue-100 transition-colors duration-200"
                         >
                           {tag}
                         </span>
@@ -1347,14 +1376,14 @@ export const StartupJobsHubView: React.FC<StartupJobsHubViewProps> = () => {
                     </div>
                   </div>
 
-                  {/* BOTTOM ACTION BUTTON */}
-                  <div className="mt-5 pt-2">
+                  {/* BOTTOM ACTION BUTTON with 3D translation */}
+                  <div className="mt-5 pt-2" style={{ transform: 'translateZ(25px)' }}>
                     <a
                       href={p.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-slate-900 hover:text-white text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-all duration-200 border border-slate-200/90 hover:border-slate-900 shadow-2xs group/btn"
+                      className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 hover:text-white text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-all duration-200 border border-slate-200/90 hover:border-transparent shadow-2xs hover:shadow-md hover:shadow-blue-500/10 group/btn"
                     >
                       <span>Visit Jobs</span>
                       <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover/btn:text-white transition-colors" />

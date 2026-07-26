@@ -13,13 +13,102 @@ import {
   BookOpenCheck,
   Trophy,
   Sparkles,
-  AlertTriangle
+  AlertTriangle,
+  Award,
+  ShieldCheck,
+  Layers,
+  Info as InfoIcon,
+  Star
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { DSAProblem } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { getCampusOSDSASheet } from '../../data/dsaSheet375';
 import { StreakService } from '../../lib/streakService';
 import { getGfgUrl, getLeetcodeUrl, getPracticeUrl } from '../../lib/dsaProblemLinks';
+
+// Bespoke CampusOS Coding Hub 3D Orbiting Logo Component
+const CodingHubLogo: React.FC = () => {
+  return (
+    <motion.div 
+      className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center shrink-0"
+      whileHover={{ scale: 1.08, rotate: -5 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+    >
+      {/* Glow aura */}
+      <div className="absolute inset-0 bg-cyan-200/40 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '3.5s' }} />
+      <div className="absolute inset-3 bg-indigo-100/40 rounded-full blur-lg" />
+
+      {/* Outer rotating orbit ring with dash spacing */}
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-0 rounded-full border border-dashed border-cyan-400/80"
+      />
+      <motion.div 
+        animate={{ rotate: -360 }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-2 rounded-full border border-indigo-200/60"
+      />
+
+      {/* Orbiting sub-nodes */}
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-0"
+      >
+        <span className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-cyan-500 shadow-md" />
+      </motion.div>
+      <motion.div 
+        animate={{ rotate: -360 }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-2"
+      >
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-sm" />
+      </motion.div>
+
+      {/* Solid Tech Core */}
+      <div className="absolute inset-4 bg-gradient-to-br from-white to-slate-50 rounded-2xl border border-slate-200/95 shadow-md flex items-center justify-center overflow-hidden">
+        <svg viewBox="0 0 100 100" className="w-10/12 h-10/12 text-cyan-600">
+          <path d="M 25,35 L 75,35" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M 25,50 L 55,50" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M 25,65 L 65,65" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
+          
+          {/* Rotating AI/Sparkle node */}
+          <motion.rect
+            x="32"
+            y="32"
+            width="36"
+            height="36"
+            rx="8"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            animate={{ rotate: [0, 90, 180, 270, 360] }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+            className="text-cyan-500"
+          />
+          <motion.circle 
+            cx="50" 
+            cy="50" 
+            r="6" 
+            className="fill-cyan-50 text-cyan-500" 
+            stroke="currentColor" 
+            strokeWidth="1.5" 
+          />
+          <motion.path 
+            d="M 50,45 L 50,55 M 45,50 L 55,50" 
+            stroke="currentColor" 
+            strokeWidth="1.5" 
+            strokeLinecap="round"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </svg>
+      </div>
+    </motion.div>
+  );
+};
 
 interface CodingHubProps {
   dsa: DSAProblem[];
@@ -140,6 +229,10 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
   const [pageSize, setPageSize] = useState<number>(30);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
+  // Custom 3D Header Active Tab & Hover States
+  const [activeHeaderTab, setActiveHeaderTab] = useState<'sheet' | 'streak' | 'resources'>('sheet');
+  const [hovered3dCard, setHovered3dCard] = useState<number | null>(null);
+
   // Sync state if props change externally
   React.useEffect(() => {
     setProblems(dsa);
@@ -209,20 +302,386 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Section Usage Banner */}
-      <SectionUsageBanner
-        title="CampusOS 375 DSA Roadmap & Coding Mastery Hub"
-        subtitle="Complete 375 Curated DSA Questions across Arrays, DP, Graphs, Trees & System Design"
-        purpose="This hub contains the complete CampusOS 375 DSA Roadmap Sheet to help students systematically master Data Structures & Algorithms for software engineering interviews, coding rounds, and university exams."
-        keyFeatures={[
-          'Complete CampusOS 375 DSA Roadmap Questions',
-          'Detailed Topic-Wise Categories (Arrays, Graphs, DP, Trees, Tries, Segment Trees)',
-          'Difficulty & Completion Status Filtering with Instant Search',
-          'Real-time Progress Tracker & Streak Analytics'
-        ]}
-        icon={<Code2 className="w-6 h-6 text-white" />}
-        badge="CampusOS 375 DSA Sheet"
-      />
+      {/* 3D LUXURY CODING HUB HERO HEADER */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, type: 'spring', damping: 25 }}
+        className="w-full bg-gradient-to-br from-white via-[#F5FCFF] to-[#F1F3FF] rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden relative p-6 sm:p-8"
+      >
+        {/* Decorative background grids */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-35 -z-1" />
+        
+        {/* Glow point clouds */}
+        <div className="absolute -top-12 -left-12 w-64 h-64 bg-cyan-100/40 rounded-full blur-3xl -z-1" />
+        <div className="absolute -bottom-16 -right-16 w-80 h-80 bg-indigo-50/50 rounded-full blur-3xl -z-1" />
+        <div className="absolute top-1/2 left-2/3 w-72 h-72 bg-blue-50/40 rounded-full blur-3xl -z-1" />
+
+        {/* Floating AI Particles (Lots of AI Animation) */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-cyan-400/30 blur-[1px]"
+              initial={{
+                x: Math.random() * 800 + 50,
+                y: Math.random() * 300 + 50,
+                scale: Math.random() * 0.8 + 0.5,
+                opacity: Math.random() * 0.6 + 0.2
+              }}
+              animate={{
+                y: [0, -40, 0],
+                x: [0, Math.random() * 20 - 10, 0],
+                opacity: [0.3, 0.8, 0.3]
+              }}
+              transition={{
+                duration: 5 + i * 1.5,
+                repeat: Infinity,
+                ease: 'easeInOut'
+              }}
+              style={{
+                left: `${15 + i * 12}%`,
+                top: `${20 + (i % 3) * 20}%`
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+          
+          {/* LEFT COLUMN: Headings, description and active tabs */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="space-y-3.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, type: 'spring' }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-700 text-xs font-bold"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-600 animate-spin" style={{ animationDuration: '4s' }} />
+                  <span>CAMPUS CODE COPILOT</span>
+                </motion.div>
+
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600 animate-pulse" />
+                  <span>375 DSA Roadmap Sheet Vetted</span>
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                {/* Custom Coding Hub logo */}
+                <CodingHubLogo />
+                
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                    CampusOS 375 <br/>
+                    <span className="bg-gradient-to-r from-cyan-600 via-indigo-600 to-indigo-700 bg-clip-text text-transparent font-black">
+                      DSA Coding Hub
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 font-bold">Systematic Mastery across 17 Algorithmic Topics</p>
+                </div>
+              </div>
+
+              <p className="text-sm text-slate-500 leading-relaxed max-w-xl font-medium pt-2">
+                Accelerate technical placement preparedness. Access categorized sheets, instant solution codes (GFG, Leetcode), verified video lectures, and track your coding streak automatically with high precision.
+              </p>
+            </div>
+
+            {/* TAB LIST SELECTOR WITH SPRING TRANSITION */}
+            <div className="flex bg-slate-200/50 p-1 rounded-2xl max-w-sm sm:max-w-md border border-slate-200/40 relative">
+              {(['sheet', 'streak', 'resources'] as const).map((tab) => {
+                const isActive = activeHeaderTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveHeaderTab(tab)}
+                    className={`relative flex-1 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer capitalize ${
+                      isActive ? 'text-slate-900 font-extrabold' : 'text-slate-600 hover:text-slate-800'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeCodingHeroTabBg"
+                        className="absolute inset-0 bg-white rounded-xl border border-slate-200 shadow-sm -z-10"
+                        transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                      />
+                    )}
+                    {tab === 'sheet' ? 'DSA Sheet' : tab === 'streak' ? 'Streak Engine' : 'Vetted Resources'}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* TAB CARD DETAIL CONTAINER */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeHeaderTab}
+                initial={{ opacity: 0, x: -10, y: 5 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                exit={{ opacity: 0, x: 10, y: -5 }}
+                transition={{ duration: 0.25 }}
+                className="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/70 shadow-sm space-y-4"
+              >
+                {activeHeaderTab === 'sheet' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-cyan-50 text-cyan-600">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800">CampusOS 375 DSA Roadmap Syllabus</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Curated rigorously across 17 categories including Arrays, DP, Graphs, Segment Trees, and Tries. Fully mapped to high-yield engineering interview rounds at product-first firms.
+                    </p>
+                    <div className="grid grid-cols-3 gap-3 pt-2">
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-center">
+                        <div className="text-lg font-black text-cyan-600">{progressPct}%</div>
+                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Completion</div>
+                      </div>
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-center">
+                        <div className="text-lg font-black text-indigo-600">{solvedCount}</div>
+                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Solved</div>
+                      </div>
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-center">
+                        <div className="text-lg font-black text-emerald-600">{totalCount}</div>
+                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">DSA Sheet Total</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeHeaderTab === 'streak' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+                        <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800">Recruiter Streak Analytics Engine</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Recruiters prioritize daily consistency over cramming. Our built-in streak calendar logs coding actions daily to ensure you build reliable engineering muscle memory.
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+                        <span>Instant Streak Recording</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                        <span>Daily Consistency Logs</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                        <span>At-Risk Streak Alerts</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-emerald-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span>Systematic Problem Progress</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeHeaderTab === 'resources' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
+                        <BookOpenCheck className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800">Vetted Platform Integrations</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Every DSA question is directly integrated to external practice hosts and official CampusOS visual step-by-step video solutions. Focus on learning rather than search loop waste.
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700 text-[10px] font-bold shrink-0 mt-0.5">1</div>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          <strong className="text-slate-700">Practice Links</strong>: Direct redirect to LeetCode and GeeksforGeeks.
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700 text-[10px] font-bold shrink-0 mt-0.5">2</div>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          <strong className="text-slate-700">Lecture Series</strong>: Embedded YouTube tutorials mapped directly to the question title.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* RIGHT COLUMN: 3D FLOATING PERSPECTIVE CARDS GRID */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative min-h-[340px] sm:min-h-[380px] lg:min-h-[340px] px-4">
+            
+            {/* Perspective container */}
+            <div 
+              className="relative w-full max-w-[320px] h-full min-h-[300px] flex items-center justify-center" 
+              style={{ perspective: 1200 }}
+            >
+              
+              {/* BACK RADAR ANIMATIONS */}
+              <div className="absolute w-64 h-64 border border-dashed border-cyan-300 rounded-full animate-spin opacity-40 pointer-events-none" style={{ animationDuration: '32s' }} />
+              <div className="absolute w-44 h-44 border border-indigo-200 rounded-full animate-ping opacity-15 pointer-events-none" style={{ animationDuration: '6.5s' }} />
+
+              {/* CARD 1: LIVE SHEET PROGRESS CARD */}
+              <motion.div
+                animate={{
+                  y: hovered3dCard === 1 ? -15 : [0, -10, 0],
+                  rotateZ: hovered3dCard === 1 ? -6 : [-3, -1, -3],
+                }}
+                transition={{
+                  y: hovered3dCard === 1 ? { duration: 0.2 } : { duration: 4.5, repeat: Infinity, ease: "easeInOut" },
+                  rotateZ: hovered3dCard === 1 ? { duration: 0.2 } : { duration: 4.5, repeat: Infinity, ease: "easeInOut" }
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: -10,
+                  rotateX: 8,
+                  z: 40,
+                  boxShadow: "0 20px 40px -15px rgba(6, 182, 212, 0.2)"
+                }}
+                onHoverStart={() => setHovered3dCard(1)}
+                onHoverEnd={() => setHovered3dCard(null)}
+                className="absolute top-4 w-[240px] bg-cyan-50/90 hover:bg-white border border-cyan-200/80 hover:border-cyan-400 p-4 rounded-2xl shadow-sm transition-all duration-300 cursor-pointer text-slate-800 transform -translate-x-12 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold uppercase text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200">
+                    DSA PROGRESS METER
+                  </span>
+                  <div className="w-6 h-6 rounded-lg bg-cyan-500 flex items-center justify-center text-white">
+                    <Trophy className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <div className="flex items-baseline gap-1 mt-2.5">
+                  <span className="text-2xl font-black text-slate-900">{progressPct}%</span>
+                  <span className="text-xs font-bold text-cyan-600">Completed</span>
+                </div>
+                <div className="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                  <div className="bg-cyan-500 h-full rounded-full transition-all duration-500" style={{ width: `${progressPct}%` }} />
+                </div>
+                <p className="text-[10px] text-slate-500 leading-normal mt-2.5">
+                  Solved {solvedCount} of {totalCount} curated roadmap problems.
+                </p>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-[9px] text-slate-400 font-mono">sheet.completion.eval</span>
+                  <Sparkles className="w-3 h-3 text-cyan-500 animate-pulse" />
+                </div>
+              </motion.div>
+
+              {/* CARD 2: ACTIVE STREAK BURNER CARD */}
+              <motion.div
+                animate={{
+                  y: hovered3dCard === 2 ? -15 : [0, 8, 0],
+                  rotateZ: hovered3dCard === 2 ? 8 : [2, 0, 2],
+                }}
+                transition={{
+                  y: hovered3dCard === 2 ? { duration: 0.2 } : { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 },
+                  rotateZ: hovered3dCard === 2 ? { duration: 0.2 } : { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: 12,
+                  rotateX: -6,
+                  z: 50,
+                  boxShadow: "0 20px 40px -15px rgba(249, 115, 22, 0.2)"
+                }}
+                onHoverStart={() => setHovered3dCard(2)}
+                onHoverEnd={() => setHovered3dCard(null)}
+                className="absolute top-20 w-[240px] bg-amber-50 hover:bg-white border border-amber-200/80 hover:border-amber-400 p-4 rounded-2xl shadow-sm transition-all duration-300 cursor-pointer text-slate-800 transform translate-x-12 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                    STREAK MONITOR
+                  </span>
+                  <div className="w-6 h-6 rounded-lg bg-orange-500 flex items-center justify-center text-white">
+                    <Flame className="w-3.5 h-3.5 text-white fill-white animate-pulse" />
+                  </div>
+                </div>
+                {(() => {
+                  const { streak } = StreakService.getStreakInfo();
+                  return (
+                    <div>
+                      <div className="flex items-baseline gap-1 mt-2.5">
+                        <span className="text-2xl font-black text-slate-900">{streak} Days</span>
+                        <span className="text-xs font-bold text-amber-600">Active Fire</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 leading-normal mt-1.5">
+                        Excellent momentum. Code daily to satisfy recruiter filters.
+                      </p>
+                    </div>
+                  );
+                })()}
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-[9px] text-slate-400 font-mono">streak.consistency.factor</span>
+                  <Zap className="w-3 h-3 text-amber-500" />
+                </div>
+              </motion.div>
+
+              {/* CARD 3: KEYWORDS/TOPICS SANDBOX CARD */}
+              <motion.div
+                animate={{
+                  y: hovered3dCard === 3 ? -15 : [0, -12, 0],
+                  rotateZ: hovered3dCard === 3 ? 0 : [0, 1, 0],
+                }}
+                transition={{
+                  y: hovered3dCard === 3 ? { duration: 0.2 } : { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 },
+                  rotateZ: hovered3dCard === 3 ? { duration: 0.2 } : { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: 0,
+                  rotateX: 12,
+                  z: 60,
+                  boxShadow: "0 25px 45px -15px rgba(99, 102, 241, 0.25)"
+                }}
+                onHoverStart={() => setHovered3dCard(3)}
+                onHoverEnd={() => setHovered3dCard(null)}
+                className="absolute bottom-2 w-[244px] bg-indigo-50 hover:bg-white border border-indigo-200/80 hover:border-indigo-400 p-4 rounded-2xl shadow-md transition-all duration-300 cursor-pointer text-slate-800 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                    DSA BLUEPRINTS
+                  </span>
+                  <div className="w-6 h-6 rounded-lg bg-indigo-500 flex items-center justify-center text-white">
+                    <Code2 className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <div className="mt-2.5 flex flex-wrap gap-1">
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 bg-indigo-50 border border-indigo-100 rounded text-indigo-700">DP Matrix</span>
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 bg-cyan-50 border border-cyan-100 rounded text-cyan-700">Trie Node</span>
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 bg-purple-50 border border-purple-100 rounded text-purple-700">Segment Trees</span>
+                </div>
+                <div className="flex items-center justify-between mt-4">
+                  <span className="text-[9px] text-indigo-600 font-bold uppercase font-sans">
+                    17 Categorized Topics
+                  </span>
+                  <div className="flex gap-0.5">
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                  </div>
+                </div>
+              </motion.div>
+
+            </div>
+
+            {/* Subtitle helper explaining interactive 3D elements */}
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.6 }}
+              className="text-[11px] text-slate-400 font-bold mt-2 flex items-center gap-1 cursor-default text-center animate-pulse"
+            >
+              <InfoIcon className="w-3.5 h-3.5 text-cyan-500 animate-bounce" /> Hover or touch 3D cards to track sheet status
+            </motion.p>
+          </div>
+
+        </div>
+      </motion.div>
 
       {/* Header */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -457,20 +916,36 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                 const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent('CampusOS ' + prob.title + ' solution')}`;
 
                 return (
-                  <div
+                  <motion.div
                     key={prob.id}
-                    className={`p-3.5 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-3 ${
-                      prob.solved ? 'bg-emerald-50/40 border-emerald-200' : 'bg-slate-50/80 border-slate-200/80 hover:bg-white hover:border-slate-300'
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    whileHover={{ 
+                      y: -4,
+                      scale: 1.008,
+                      rotateY: 2,
+                      boxShadow: prob.solved 
+                        ? '0 12px 24px -10px rgba(16, 185, 129, 0.08)' 
+                        : '0 12px 24px -10px rgba(6, 182, 212, 0.12)',
+                      transition: { duration: 0.2 } 
+                    }}
+                    style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+                    className={`p-3.5 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-3 relative overflow-hidden group ${
+                      prob.solved ? 'bg-emerald-50/40 border-emerald-200' : 'bg-slate-50/80 border-slate-200/80 hover:bg-white hover:border-slate-300 shadow-2xs'
                     }`}
                   >
-                    <div className="flex items-center gap-3.5 min-w-0">
+                    {/* Hover light glow background */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none -z-1" />
+
+                    <div className="flex items-center gap-3.5 min-w-0" style={{ transform: 'translateZ(15px)' }}>
                       <span className="text-[11px] font-extrabold text-slate-400 w-8 shrink-0 text-right">
                         #{globalIndex}
                       </span>
 
                       <button
                         onClick={() => handleToggle(prob.id)}
-                        className="text-slate-300 hover:text-emerald-600 transition-colors shrink-0"
+                        className="text-slate-300 hover:text-emerald-600 transition-colors shrink-0 relative"
                         title={prob.solved ? 'Mark as unsolved' : 'Mark as solved'}
                       >
                         {prob.solved ? (
@@ -497,20 +972,23 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                             {prob.difficulty}
                           </span>
                         </div>
-                        <h3 className={`font-bold text-xs sm:text-sm mt-1 truncate ${prob.solved ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
-                          {prob.title}
+                        <h3 className={`font-bold text-xs sm:text-sm mt-1 truncate flex items-center gap-1.5 ${prob.solved ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
+                          <span>{prob.title}</span>
+                          {!prob.solved && (
+                            <Sparkles className="w-3.5 h-3.5 text-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse" />
+                          )}
                         </h3>
                       </div>
                     </div>
 
                     {/* Question Links */}
-                    <div className="flex items-center gap-1.5 flex-wrap shrink-0">
+                    <div className="flex items-center gap-1.5 flex-wrap shrink-0" style={{ transform: 'translateZ(20px)' }}>
                       {linkUrl && (
                         <a
                           href={linkUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs transition-colors flex items-center gap-1.5 shadow-2xs"
+                          className="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-gradient-to-r hover:from-cyan-600 hover:to-blue-600 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-2xs hover:shadow-md hover:scale-[1.03]"
                           title="Practice primary problem link"
                         >
                           <span>Practice</span>
@@ -523,7 +1001,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                           href={gfgUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-[11px] transition-colors flex items-center gap-1"
+                          className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-[11px] transition-all flex items-center gap-1 hover:scale-[1.03]"
                           title="Open GeeksforGeeks Problem"
                         >
                           <span>GFG</span>
@@ -536,7 +1014,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                           href={leetcodeUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-bold text-[11px] transition-colors flex items-center gap-1"
+                          className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-bold text-[11px] transition-all flex items-center gap-1 hover:scale-[1.03]"
                           title="Open LeetCode Problem"
                         >
                           <span>LeetCode</span>
@@ -549,7 +1027,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                           href={ytUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2.5 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold text-[11px] transition-colors flex items-center gap-1"
+                          className="px-2.5 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold text-[11px] transition-all flex items-center gap-1 hover:scale-[1.03]"
                           title="Search CampusOS Video Solution"
                         >
                           <span>Video Solution</span>
@@ -557,7 +1035,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                         </a>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })
             )}

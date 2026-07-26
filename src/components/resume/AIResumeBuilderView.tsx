@@ -40,11 +40,97 @@ import {
   SlidersHorizontal,
   X,
   Upload,
-  ArrowUpRight
+  ArrowUpRight,
+  Star,
+  Info as InfoIcon
 } from 'lucide-react';
 import { ResumeData, UserProfile } from '../../types';
 import { exportTextToPDF, exportCanvasToPDF } from '../../lib/pdfExport';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
+import { motion, AnimatePresence } from 'motion/react';
+
+// Bespoke CampusOS Resume Builder Core Logo Component
+const ResumeBuilderLogo: React.FC = () => {
+  return (
+    <motion.div 
+      className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center shrink-0"
+      whileHover={{ scale: 1.08, rotate: 5 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+    >
+      {/* Glow aura */}
+      <div className="absolute inset-0 bg-purple-200/40 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '3.5s' }} />
+      <div className="absolute inset-3 bg-violet-100/40 rounded-full blur-lg" />
+
+      {/* Outer rotating orbit ring with dash spacing */}
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-0 rounded-full border border-dashed border-purple-400/80"
+      />
+      <motion.div 
+        animate={{ rotate: -360 }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-2 rounded-full border border-violet-200/60"
+      />
+
+      {/* Orbiting sub-nodes */}
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-0"
+      >
+        <span className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-purple-500 shadow-md" />
+      </motion.div>
+      <motion.div 
+        animate={{ rotate: -360 }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-2"
+      >
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-violet-400 shadow-sm" />
+      </motion.div>
+
+      {/* Solid Tech Core */}
+      <div className="absolute inset-4 bg-gradient-to-br from-white to-slate-50 rounded-2xl border border-slate-200/95 shadow-md flex items-center justify-center overflow-hidden">
+        <svg viewBox="0 0 100 100" className="w-10/12 h-10/12 text-purple-600">
+          <path d="M 25,35 L 75,35" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M 25,50 L 55,50" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M 25,65 L 65,65" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
+          
+          {/* Rotating AI/Sparkle node */}
+          <motion.rect
+            x="32"
+            y="32"
+            width="36"
+            height="36"
+            rx="8"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            animate={{ rotate: [0, -90, -180, -270, -360] }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+            className="text-purple-500"
+          />
+          <motion.circle 
+            cx="50" 
+            cy="50" 
+            r="6" 
+            className="fill-purple-50 text-purple-500" 
+            stroke="currentColor" 
+            strokeWidth="1.5" 
+          />
+          <motion.path 
+            d="M 50,45 L 50,55 M 45,50 L 55,50" 
+            stroke="currentColor" 
+            strokeWidth="1.5" 
+            strokeLinecap="round"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </svg>
+      </div>
+    </motion.div>
+  );
+};
 
 interface AIResumeBuilderViewProps {
   user: UserProfile;
@@ -184,6 +270,10 @@ export const AIResumeBuilderView: React.FC<AIResumeBuilderViewProps> = ({
   const [selectedOptimizeSection, setSelectedOptimizeSection] = useState<string>('');
   const [draftTargetRole, setDraftTargetRole] = useState<string>('Full Stack Software Engineer');
   const [isDrafting, setIsDrafting] = useState<boolean>(false);
+
+  // Custom 3D Header Active Tab & Hover States
+  const [activeHeaderTab, setActiveHeaderTab] = useState<'ats' | 'design' | 'export'>('ats');
+  const [hovered3dCard, setHovered3dCard] = useState<number | null>(null);
 
   // Hidden File Input Ref for Importing JSON
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1200,22 +1290,345 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Usage Banner */}
-      <SectionUsageBanner
-        title="AI Resume Creator & Customizer"
-        subtitle="Real-Time Resume Builder with Live ATS Optimization, Custom Colors, Fonts & Layouts"
-        purpose="Construct single-page ATS resumes tailored for engineering roles. Customize colors, fonts, margins, add unlimited custom sections, and export print-ready PDFs."
-        keyFeatures={[
-          'HD Light-Theme Real-Time Canvas Preview with Zoom Controls',
-          'Full Color & Text Color Palette Picker + Custom Hex Input',
-          'Font Family (Sans, Serif, Mono, Display) & Size Controls',
-          'ATS-Optimized Template Layout Switcher (Harvard, SDE, Executive)',
-          'Unlimited Custom Sections (Certifications, Awards, Research, Languages, Volunteer)',
-          '1-Click PDF Export, Copy Text, Print & JSON Import/Export'
-        ]}
-        icon={<FileText className="w-6 h-6 text-purple-600" />}
-        badge="Light Theme & 100% ATS"
-      />
+      {/* 3D LUXURY RESUME BUILDER HERO HEADER */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, type: 'spring', damping: 25 }}
+        className="w-full bg-gradient-to-br from-white via-[#FAF9FF] to-[#F3F0FF] rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden relative p-6 sm:p-8"
+      >
+        {/* Decorative background grids */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-35 -z-1" />
+        
+        {/* Glow point clouds */}
+        <div className="absolute -top-12 -left-12 w-64 h-64 bg-purple-100/40 rounded-full blur-3xl -z-1" />
+        <div className="absolute -bottom-16 -right-16 w-80 h-80 bg-violet-50/50 rounded-full blur-3xl -z-1" />
+        <div className="absolute top-1/2 left-2/3 w-72 h-72 bg-fuchsia-50/40 rounded-full blur-3xl -z-1" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+          
+          {/* LEFT COLUMN: Headings, description and active tabs */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="space-y-3.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, type: 'spring' }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-purple-600 animate-spin" style={{ animationDuration: '4s' }} />
+                  <span>CAMPUS RESUME COPILOT</span>
+                </motion.div>
+
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600 animate-pulse" />
+                  <span>100% ATS Parser Safe</span>
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                {/* Custom Resume Builder logo */}
+                <ResumeBuilderLogo />
+                
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                    AI Resume <br/>
+                    <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-indigo-700 bg-clip-text text-transparent font-black">
+                      Creator & Customizer
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 font-bold">Tailor and Optimize Engineering CVs Instantly</p>
+                </div>
+              </div>
+
+              <p className="text-sm text-slate-500 leading-relaxed max-w-xl font-medium pt-2">
+                Design stunning, single-page chronological resumes that bypass rigorous applicant tracking systems. Access dynamic layout customizers, style rules, color swatches, and prompt our AI engine to refine summaries and key achievement bullets on the fly.
+              </p>
+            </div>
+
+            {/* TAB LIST SELECTOR WITH SPRING TRANSITION */}
+            <div className="flex bg-slate-200/50 p-1 rounded-2xl max-w-sm sm:max-w-md border border-slate-200/40 relative">
+              {(['ats', 'design', 'export'] as const).map((tab) => {
+                const isActive = activeHeaderTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveHeaderTab(tab)}
+                    className={`relative flex-1 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer capitalize ${
+                      isActive ? 'text-slate-900 font-extrabold' : 'text-slate-600 hover:text-slate-800'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeResumeHeroTabBg"
+                        className="absolute inset-0 bg-white rounded-xl border border-slate-200 shadow-sm -z-10"
+                        transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                      />
+                    )}
+                    {tab === 'ats' ? 'ATS Optimizer' : tab === 'design' ? 'Premium Customizer' : '1-Click Export'}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* TAB CARD DETAIL CONTAINER */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeHeaderTab}
+                initial={{ opacity: 0, x: -10, y: 5 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                exit={{ opacity: 0, x: 10, y: -5 }}
+                transition={{ duration: 0.25 }}
+                className="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/70 shadow-sm space-y-4"
+              >
+                {activeHeaderTab === 'ats' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800">Live ATS Scanner & Keywords Detector</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Our dynamic parser audits keyword density, layout ratios, contact information completeness, and chronological patterns in real time. Never submit an unquantified metric.
+                    </p>
+                    <div className="grid grid-cols-3 gap-3 pt-2">
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-center">
+                        <div className="text-lg font-black text-purple-600">{dynamicAudit.score}%</div>
+                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">ATS Score</div>
+                      </div>
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-center">
+                        <div className="text-lg font-black text-indigo-600">{resume.skills.length} Categories</div>
+                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Indexed Skills</div>
+                      </div>
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-center">
+                        <div className="text-lg font-black text-emerald-600">Green</div>
+                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Greenhouse Safe</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeHeaderTab === 'design' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+                        <Palette className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800">Advanced Typographic & Color Tuning</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Choose from classic, geometric, or tech monospace fonts. Fine-tune accent gradients, text presets, borders, line heights, and padding to craft beautiful visual balance.
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                        <span>15+ Custom Hex Accent Colors</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                        <span>8 Typographic Pairings</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                        <span>Adjustable Margin & Zoom</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-emerald-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span>Bullet Customizer & Spacing</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeHeaderTab === 'export' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-amber-50 text-amber-600">
+                        <Download className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800">Lossless PDF Engine & Local Backups</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Download crisp, print-ready PDFs compiled directly from your canvas browser viewport. You can also save backups to local JSON files and restore sessions instantly.
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 text-[10px] font-bold shrink-0 mt-0.5">1</div>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          <strong className="text-slate-700">"Download PDF"</strong>: Standard A4 single-page print viewport layout.
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 text-[10px] font-bold shrink-0 mt-0.5">2</div>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          <strong className="text-slate-700">"Backup & Import JSON"</strong>: Retain ultimate ownership over your personal data templates.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* RIGHT COLUMN: 3D FLOATING PERSPECTIVE CARDS GRID */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative min-h-[340px] sm:min-h-[380px] lg:min-h-[340px] px-4">
+            
+            {/* Perspective container */}
+            <div 
+              className="relative w-full max-w-[320px] h-full min-h-[300px] flex items-center justify-center" 
+              style={{ perspective: 1200 }}
+            >
+              
+              {/* BACK RADAR ANIMATIONS */}
+              <div className="absolute w-64 h-64 border border-dashed border-purple-300 rounded-full animate-spin opacity-40 pointer-events-none" style={{ animationDuration: '32s' }} />
+              <div className="absolute w-44 h-44 border border-violet-200 rounded-full animate-ping opacity-15 pointer-events-none" style={{ animationDuration: '6.5s' }} />
+
+              {/* CARD 1: LIVE ATS AUDIT METER */}
+              <motion.div
+                animate={{
+                  y: hovered3dCard === 1 ? -15 : [0, -10, 0],
+                  rotateZ: hovered3dCard === 1 ? -6 : [-3, -1, -3],
+                }}
+                transition={{
+                  y: hovered3dCard === 1 ? { duration: 0.2 } : { duration: 4.5, repeat: Infinity, ease: "easeInOut" },
+                  rotateZ: hovered3dCard === 1 ? { duration: 0.2 } : { duration: 4.5, repeat: Infinity, ease: "easeInOut" }
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: -10,
+                  rotateX: 8,
+                  z: 40,
+                  boxShadow: "0 20px 40px -15px rgba(147, 51, 234, 0.2)"
+                }}
+                onHoverStart={() => setHovered3dCard(1)}
+                onHoverEnd={() => setHovered3dCard(null)}
+                className="absolute top-4 w-[240px] bg-purple-50 hover:bg-white border border-purple-200/80 hover:border-purple-400 p-4 rounded-2xl shadow-sm transition-all duration-300 cursor-pointer text-slate-800 transform -translate-x-12 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold uppercase text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                    ATS COMPLIANCE METER
+                  </span>
+                  <div className="w-6 h-6 rounded-lg bg-purple-500 flex items-center justify-center text-white">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <div className="flex items-baseline gap-1 mt-2.5">
+                  <span className="text-2xl font-black text-slate-900">{dynamicAudit.score}%</span>
+                  <span className="text-xs font-bold text-emerald-600">Green Score</span>
+                </div>
+                <p className="text-[10px] text-slate-500 leading-normal mt-1">
+                  Chronological hierarchy, keyword richness & contact info checked.
+                </p>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-[9px] text-slate-400 font-mono">system.score.eval</span>
+                  <Sparkles className="w-3 h-3 text-purple-500 animate-pulse" />
+                </div>
+              </motion.div>
+
+              {/* CARD 2: MISSING KEYWORDS SCAN */}
+              <motion.div
+                animate={{
+                  y: hovered3dCard === 2 ? -15 : [0, 8, 0],
+                  rotateZ: hovered3dCard === 2 ? 8 : [2, 0, 2],
+                }}
+                transition={{
+                  y: hovered3dCard === 2 ? { duration: 0.2 } : { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 },
+                  rotateZ: hovered3dCard === 2 ? { duration: 0.2 } : { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: 12,
+                  rotateX: -6,
+                  z: 50,
+                  boxShadow: "0 20px 40px -15px rgba(99, 102, 241, 0.2)"
+                }}
+                onHoverStart={() => setHovered3dCard(2)}
+                onHoverEnd={() => setHovered3dCard(null)}
+                className="absolute top-20 w-[240px] bg-indigo-50 hover:bg-white border border-indigo-200/80 hover:border-indigo-400 p-4 rounded-2xl shadow-sm transition-all duration-300 cursor-pointer text-slate-800 transform translate-x-12 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                    KEYWORDS MONITOR
+                  </span>
+                  <div className="w-6 h-6 rounded-lg bg-indigo-500 flex items-center justify-center text-white">
+                    <Code className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <h5 className="font-bold text-xs text-slate-900 mt-2.5 font-sans">High-Yield SDE Keywords</h5>
+                <div className="flex flex-wrap gap-1 mt-1.5">
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 bg-indigo-50 border border-indigo-100 rounded text-indigo-700">Kubernetes</span>
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 bg-indigo-50 border border-indigo-100 rounded text-indigo-700">System Design</span>
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 bg-indigo-50 border border-indigo-100 rounded text-indigo-700">CI/CD</span>
+                </div>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-[9px] text-slate-400 font-mono">scan.keywords.density</span>
+                  <Zap className="w-3 h-3 text-amber-500" />
+                </div>
+              </motion.div>
+
+              {/* CARD 3: PAPER LAYOUT PREVIEW */}
+              <motion.div
+                animate={{
+                  y: hovered3dCard === 3 ? -15 : [0, -12, 0],
+                  rotateZ: hovered3dCard === 3 ? 0 : [0, 1, 0],
+                }}
+                transition={{
+                  y: hovered3dCard === 3 ? { duration: 0.2 } : { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 },
+                  rotateZ: hovered3dCard === 3 ? { duration: 0.2 } : { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: 0,
+                  rotateX: 12,
+                  z: 60,
+                  boxShadow: "0 25px 45px -15px rgba(236, 72, 153, 0.25)"
+                }}
+                onHoverStart={() => setHovered3dCard(3)}
+                onHoverEnd={() => setHovered3dCard(null)}
+                className="absolute bottom-2 w-[244px] bg-rose-50 hover:bg-white border border-rose-200/80 hover:border-rose-400 p-4 rounded-2xl shadow-md transition-all duration-300 cursor-pointer text-slate-800 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold uppercase text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                    CANVAS LIVE LAYOUT
+                  </span>
+                  <div className="w-6 h-6 rounded-lg bg-rose-500 flex items-center justify-center text-white">
+                    <Palette className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <div className="mt-2.5 space-y-1">
+                  <div className="h-2 bg-slate-200 rounded w-3/4 animate-pulse" />
+                  <div className="h-1.5 bg-slate-100 rounded w-1/2" />
+                  <div className="h-1 bg-slate-100 rounded w-full" />
+                </div>
+                <div className="flex items-center justify-between mt-4">
+                  <span className="text-[9px] text-rose-600 font-bold uppercase font-sans">
+                    {templateCatalog.find(t => t.id === template)?.name.split(' ')[0] || 'Modern'} Mode
+                  </span>
+                  <div className="flex gap-0.5">
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                  </div>
+                </div>
+              </motion.div>
+
+            </div>
+
+            {/* Subtitle helper explaining interactive 3D elements */}
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.6 }}
+              className="text-[11px] text-slate-400 font-bold mt-2 flex items-center gap-1 cursor-default text-center animate-pulse"
+            >
+              <InfoIcon className="w-3.5 h-3.5 text-purple-500 animate-bounce" /> Hover or touch 3D cards to track template compliance
+            </motion.p>
+          </div>
+
+        </div>
+      </motion.div>
 
       {/* TOP ACTION BAR: TEMPLATE SELECTOR & EXPORT BUTTONS */}
       <div className="bg-white/95 backdrop-blur-2xl rounded-3xl border border-slate-200/90 shadow-sm p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
