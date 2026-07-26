@@ -49,22 +49,10 @@ export const AIChatView: React.FC = () => {
     const cached = localStorage.getItem('campus_os_chat_limit_words');
     return cached !== 'false'; // defaults to true
   });
-  const [autoNewChat, setAutoNewChat] = useState<boolean>(() => {
-    const cached = localStorage.getItem('campus_os_chat_auto_new');
-    return cached !== 'false'; // defaults to true
-  });
-  const [tokensSaved, setTokensSaved] = useState<number>(() => {
-    const cached = localStorage.getItem('campus_os_chat_tokens_saved');
-    return cached ? parseInt(cached, 10) : 0;
-  });
 
   useEffect(() => {
     localStorage.setItem('campus_os_chat_limit_words', limitWords.toString());
   }, [limitWords]);
-
-  useEffect(() => {
-    localStorage.setItem('campus_os_chat_auto_new', autoNewChat.toString());
-  }, [autoNewChat]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -88,25 +76,12 @@ export const AIChatView: React.FC = () => {
     const hasPreviousUserMsg = messages.some((m) => m.sender === 'user');
     let activeMessages = [...messages];
 
-    if (autoNewChat && hasPreviousUserMsg) {
-      // Calculate words & approximate tokens saved from discarded history
-      const discardedText = messages.map((m) => m.text).join(' ');
-      const discardedWords = discardedText.trim().split(/\s+/).filter(Boolean).length;
-      const approxTokens = Math.round(discardedWords * 1.33);
-
-      if (approxTokens > 0) {
-        setTokensSaved((prev) => {
-          const newVal = prev + approxTokens;
-          localStorage.setItem('campus_os_chat_tokens_saved', newVal.toString());
-          return newVal;
-        });
-      }
-
-      // Automatically reset and start a fresh session with the new question
+    // Automatically reset and start a fresh session on every new question by default
+    if (hasPreviousUserMsg) {
       const initialMsg = messages[0] || {
         id: 'm1',
         sender: 'ai',
-        text: 'Hello! I am your Personal Assistant. Ask me any question, academic proof, coding debug, or advice!',
+        text: 'Hello! I am your Personal Assistant. Ask me any question, academic proof, coding debug, or task guidance!',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
@@ -194,7 +169,7 @@ export const AIChatView: React.FC = () => {
       <div className="bg-slate-50 border-b border-slate-200/70 p-3 px-6 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2">
           <Zap className="w-3.5 h-3.5 text-amber-500 animate-pulse shrink-0" />
-          <span className="font-bold text-slate-700">Token-Saver Optimization Settings</span>
+          <span className="font-bold text-slate-700">Optimization Settings</span>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <label className="flex items-center gap-1.5 cursor-pointer select-none">
@@ -206,21 +181,6 @@ export const AIChatView: React.FC = () => {
             />
             <span className="font-semibold text-slate-600 hover:text-slate-800 transition-colors">Strict Word Cap (&lt;1000 Words)</span>
           </label>
-          <label className="flex items-center gap-1.5 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={autoNewChat}
-              onChange={(e) => setAutoNewChat(e.target.checked)}
-              className="w-3.5 h-3.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
-            />
-            <span className="font-semibold text-slate-600 hover:text-slate-800 transition-colors">Auto-New Chat on Second Question</span>
-          </label>
-          {tokensSaved > 0 && (
-            <div className="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 font-extrabold flex items-center gap-1 shrink-0">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-              <span>Saved: ~{tokensSaved.toLocaleString()} API Tokens</span>
-            </div>
-          )}
         </div>
       </div>
 
