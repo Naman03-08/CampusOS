@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Bot, 
   Flame, 
@@ -16,8 +17,435 @@ import {
   Sparkles,
   Zap,
   ShieldAlert,
-  AlertTriangle
+  AlertTriangle,
+  Brain,
+  Activity
 } from 'lucide-react';
+
+// ============================================================================
+// AI ANIMATED SYNAPSE CORE WIDGET
+// ============================================================================
+const DashboardAIProcessorWidget: React.FC = () => {
+  const [activeNodes, setActiveNodes] = useState<number[]>([0, 1]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveNodes(() => {
+        const count = Math.floor(Math.random() * 2) + 1;
+        const nodes: number[] = [];
+        for (let i = 0; i < count; i++) {
+          nodes.push(Math.floor(Math.random() * 4));
+        }
+        return nodes;
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const nodeLabels = ['AI Analytics', 'ATS Ingest', 'DSA Solved', 'Streak Core'];
+
+  return (
+    <div className="relative w-36 h-36 flex items-center justify-center bg-gradient-to-br from-indigo-500/10 via-transparent to-blue-500/10 rounded-full border border-indigo-500/20 shrink-0">
+      {/* Conic scanning scan line */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-0 rounded-full pointer-events-none"
+        style={{
+          background: 'conic-gradient(from 0deg, rgba(99, 102, 241, 0.15) 0deg, rgba(99, 102, 241, 0) 120deg, rgba(99, 102, 241, 0) 360deg)'
+        }}
+      />
+
+      {/* Orbit Rings */}
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+        className="absolute w-32 h-32 border border-dashed border-indigo-400/20 rounded-full"
+      />
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+        className="absolute w-22 h-22 border border-dotted border-blue-400/30 rounded-full"
+      />
+
+      {/* Central brain element */}
+      <motion.div
+        animate={{ scale: [1, 1.08, 1] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/20 z-10"
+      >
+        <Brain className="w-5 h-5 text-indigo-50 animate-pulse" />
+      </motion.div>
+
+      {/* Connection Nodes */}
+      {[...Array(4)].map((_, i) => {
+        const angle = (i * 360) / 4;
+        const radius = 48;
+        const rad = (angle * Math.PI) / 180;
+        const x = Math.cos(rad) * radius;
+        const y = Math.sin(rad) * radius;
+
+        const isActive = activeNodes.includes(i);
+
+        return (
+          <div
+            key={i}
+            className="absolute flex flex-col items-center justify-center"
+            style={{ transform: `translate(${x}px, ${y}px)` }}
+          >
+            <motion.div
+              animate={{
+                scale: isActive ? [1, 1.25, 1] : 1,
+                backgroundColor: isActive ? '#6366F1' : '#475569',
+                boxShadow: isActive ? '0 0 10px #6366F1, 0 0 4px #3B82F6' : 'none'
+              }}
+              transition={{ duration: 1.0 }}
+              className="w-2 h-2 rounded-full border border-white/50 cursor-pointer relative group"
+            >
+              <div className="absolute bottom-3.5 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded bg-slate-900 text-[8px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20 shadow-sm border border-slate-700">
+                {nodeLabels[i]}
+              </div>
+            </motion.div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// ============================================================================
+// INTERACTIVE 3D STAT CARD
+// ============================================================================
+interface Dashboard3DStatCardProps {
+  title: string;
+  value: string | number;
+  subValue: string;
+  subValueColor: string;
+  icon: React.ReactNode;
+  bgIconClass: string;
+  progressPct?: number;
+  onClick: () => void;
+  accentColor: 'blue' | 'indigo' | 'cyan' | 'purple';
+}
+
+const Dashboard3DStatCard: React.FC<Dashboard3DStatCardProps> = ({
+  title,
+  value,
+  subValue,
+  subValueColor,
+  icon,
+  bgIconClass,
+  progressPct,
+  onClick,
+  accentColor
+}) => {
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((centerY - y) / (rect.height / 2)) * 6;
+    const rotateY = ((x - centerX) / (rect.width / 2)) * 6;
+    setCoords({ x: rotateY, y: rotateX });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setCoords({ x: 0, y: 0 });
+  };
+
+  const shadowColor = 
+    accentColor === 'blue' ? 'rgba(59,130,246,0.15)' :
+    accentColor === 'indigo' ? 'rgba(99,102,241,0.15)' :
+    accentColor === 'cyan' ? 'rgba(6,182,212,0.15)' :
+    'rgba(168,85,247,0.15)';
+
+  const hoverBorderColor = 
+    accentColor === 'blue' ? 'border-blue-300' :
+    accentColor === 'indigo' ? 'border-indigo-300' :
+    accentColor === 'cyan' ? 'border-cyan-300' :
+    'border-purple-300';
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      animate={{
+        rotateY: coords.x,
+        rotateX: coords.y,
+        scale: isHovered ? 1.025 : 1,
+        z: isHovered ? 10 : 0
+      }}
+      transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+      style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+      className={`p-5 rounded-2xl bg-white border transition-all duration-300 relative cursor-pointer ${
+        isHovered
+          ? `${hoverBorderColor} shadow-[0_15px_30px_-10px_${shadowColor}]`
+          : 'border-slate-200/80 shadow-2xs hover:bg-slate-50/10'
+      }`}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none -z-1" />
+
+      <div style={{ transform: 'translateZ(15px)' }} className="space-y-3 relative">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-black text-slate-400 uppercase tracking-wider">{title}</span>
+          <div className={`w-9 h-9 rounded-xl ${bgIconClass} flex items-center justify-center font-black shadow-2xs border border-black/5 transition-transform duration-300 ${isHovered ? 'scale-110' : ''}`}>
+            {icon}
+          </div>
+        </div>
+        <div>
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">{value}</p>
+          <p className={`text-[11px] font-black mt-2 inline-block px-2 py-0.5 rounded ${subValueColor}`}>{subValue}</p>
+        </div>
+
+        {progressPct !== undefined && (
+          <div className="h-1.5 w-full bg-slate-100 rounded-full mt-2.5 overflow-hidden border border-slate-200/40 shadow-inner">
+            <div 
+              className={`h-full rounded-full transition-all duration-500 ${
+                accentColor === 'blue' ? 'bg-emerald-500' :
+                accentColor === 'cyan' ? 'bg-cyan-600' :
+                accentColor === 'indigo' ? 'bg-indigo-600' :
+                'bg-purple-600'
+              }`} 
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
+// ============================================================================
+// INTERACTIVE 3D EVENT CARD
+// ============================================================================
+interface Dashboard3DEventCardProps {
+  item: ScheduleEvent;
+  onClick: () => void;
+}
+
+const Dashboard3DEventCard: React.FC<Dashboard3DEventCardProps> = ({ item, onClick }) => {
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((centerY - y) / (rect.height / 2)) * 5;
+    const rotateY = ((x - centerX) / (rect.width / 2)) * 5;
+    setCoords({ x: rotateY, y: rotateX });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setCoords({ x: 0, y: 0 });
+  };
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      animate={{
+        rotateY: coords.x,
+        rotateX: coords.y,
+        scale: isHovered ? 1.02 : 1,
+        z: isHovered ? 8 : 0
+      }}
+      transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+      style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+      className={`p-4 rounded-2xl bg-white border transition-all duration-300 cursor-pointer flex items-center justify-between ${
+        isHovered 
+          ? 'border-blue-300 shadow-[0_12px_24px_-8px_rgba(59,130,246,0.12)]' 
+          : 'border-slate-200/60'
+      }`}
+    >
+      <div className="flex items-center gap-3" style={{ transform: 'translateZ(12px)' }}>
+        <div className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center border transition-all ${
+          isHovered ? 'bg-blue-600 text-white border-blue-500 scale-105 shadow-md shadow-blue-500/20' : 'bg-blue-50 text-blue-700 border-blue-100'
+        }`}>
+          <Clock className="w-4 h-4" />
+        </div>
+        <div>
+          <p className="text-sm font-bold text-slate-900">{item.title}</p>
+          <p className="text-xs text-slate-500">{item.category} • {item.time} ({item.durationMinutes}m)</p>
+        </div>
+      </div>
+      <span 
+        style={{ transform: 'translateZ(15px)' }}
+        className={`text-xs font-bold px-3 py-1 rounded-full border transition-all ${
+          item.completed 
+            ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+            : 'bg-blue-50 text-blue-600 border-blue-100'
+        }`}
+      >
+        {item.completed ? 'Completed' : 'Pending'}
+      </span>
+    </motion.div>
+  );
+};
+
+// ============================================================================
+// INTERACTIVE 3D STUDY SUITE CARD
+// ============================================================================
+interface Dashboard3DStudySuiteCardProps {
+  suite: StudySuite;
+  onClick: () => void;
+}
+
+const Dashboard3DStudySuiteCard: React.FC<Dashboard3DStudySuiteCardProps> = ({ suite, onClick }) => {
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((centerY - y) / (rect.height / 2)) * 5;
+    const rotateY = ((x - centerX) / (rect.width / 2)) * 5;
+    setCoords({ x: rotateY, y: rotateX });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setCoords({ x: 0, y: 0 });
+  };
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      animate={{
+        rotateY: coords.x,
+        rotateX: coords.y,
+        scale: isHovered ? 1.02 : 1,
+        z: isHovered ? 8 : 0
+      }}
+      transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+      style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+      className={`p-4 rounded-2xl bg-white border transition-all duration-300 cursor-pointer flex flex-col justify-between group h-full ${
+        isHovered 
+          ? 'border-indigo-300 shadow-[0_15px_30px_-10px_rgba(99,102,241,0.12)]' 
+          : 'border-slate-200/60 shadow-2xs'
+      }`}
+    >
+      <div style={{ transform: 'translateZ(12px)' }} className="space-y-2">
+        <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-md border transition-all ${
+          isHovered ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-indigo-50 text-indigo-600 border-indigo-100'
+        }`}>
+          {suite.subject}
+        </span>
+        <h3 className="font-extrabold text-sm text-slate-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">{suite.title}</h3>
+        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed min-h-[32px]">{suite.summary}</p>
+      </div>
+
+      <div 
+        style={{ transform: 'translateZ(8px)' }}
+        className="flex items-center gap-3 text-[11px] font-bold text-slate-400 mt-4 pt-2 border-t border-slate-100"
+      >
+        <span>{suite.flashcards.length} Flashcards</span>
+        <span>•</span>
+        <span>{suite.quiz.length} Quiz Qs</span>
+      </div>
+    </motion.div>
+  );
+};
+
+// ============================================================================
+// INTERACTIVE 3D CAREER ASSISTANT WIDGET
+// ============================================================================
+interface DashboardCareerAssistantWidgetProps {
+  user: UserProfile;
+  onClick: () => void;
+}
+
+const DashboardCareerAssistantWidget: React.FC<DashboardCareerAssistantWidgetProps> = ({ user, onClick }) => {
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((centerY - y) / (rect.height / 2)) * 5;
+    const rotateY = ((x - centerX) / (rect.width / 2)) * 5;
+    setCoords({ x: rotateY, y: rotateX });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setCoords({ x: 0, y: 0 });
+  };
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      animate={{
+        rotateY: coords.x,
+        rotateX: coords.y,
+        scale: isHovered ? 1.025 : 1,
+        z: isHovered ? 10 : 0
+      }}
+      transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+      style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+      className={`p-6 rounded-[28px] bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950 text-white shadow-xl relative overflow-hidden border cursor-pointer ${
+        isHovered ? 'border-indigo-400/60 shadow-[0_20px_40px_-15px_rgba(99,102,241,0.3)]' : 'border-slate-800'
+      }`}
+    >
+      <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-transparent pointer-events-none" />
+      <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+
+      <div style={{ transform: 'translateZ(15px)' }} className="space-y-4 relative">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center justify-center">
+            <Bot className="w-4.5 h-4.5" />
+          </div>
+          <h3 className="text-sm font-black tracking-tight text-white uppercase flex items-center gap-1.5">
+            <span>Placement AI Core</span>
+            <Sparkles className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
+          </h3>
+        </div>
+
+        <p className="text-xs text-indigo-200/90 font-medium leading-relaxed">
+          Practice technical interview questions, resume review modules, & custom mock exams curated for <strong>{user.targetRole || 'Software Engineer'}</strong>.
+        </p>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
+          className="w-full py-3 rounded-xl bg-white hover:bg-gradient-to-r hover:from-indigo-500 hover:to-blue-600 text-slate-900 hover:text-white font-black text-xs transition-all shadow-md cursor-pointer hover:scale-105 active:scale-95"
+        >
+          Practice Technical Interviews
+        </button>
+      </div>
+    </motion.div>
+  );
+};
 import { UserProfile, AttendanceSubject, ScheduleEvent, DSAProblem, StudySuite, AssignmentItem } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { calculatePlanDetails } from '../../lib/planUtils';
@@ -149,12 +577,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       )}
 
       {/* Personalized Welcome Banner */}
-      <div className="p-6 sm:p-8 rounded-[28px] bg-gradient-to-br from-[#2563EB] via-blue-600 to-indigo-600 text-white shadow-2xl relative overflow-hidden card-3d">
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="p-6 sm:p-8 rounded-[28px] bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-950 text-white shadow-2xl relative overflow-hidden border border-indigo-500/20 card-3d">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-          <div>
-            <div className="flex items-center gap-2 mb-2.5">
+          <div className="space-y-4 max-w-xl">
+            <div className="flex items-center gap-2">
               {(() => {
                 const { streak, isAtRisk } = StreakService.getStreakInfo();
                 if (isAtRisk) {
@@ -166,40 +596,44 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   );
                 }
                 return (
-                  <span className={`px-3 py-1 rounded-full font-extrabold text-xs backdrop-blur-md border flex items-center gap-1.5 shadow-2xs ${
-                    streak > 0 ? 'bg-white/20 border-white/30 text-white' : 'bg-black/20 border-white/20 text-blue-100'
-                  }`}>
-                    <Flame className={`w-3.5 h-3.5 ${streak > 0 ? 'text-orange-300 fill-orange-300 animate-pulse' : 'text-slate-300'}`} />
+                  <span className="px-3 py-1 rounded-full font-extrabold text-xs backdrop-blur-md border border-indigo-500/30 bg-indigo-500/20 text-indigo-200 flex items-center gap-1.5 shadow-2xs">
+                    <Flame className={`w-3.5 h-3.5 ${streak > 0 ? 'text-orange-400 fill-orange-400 animate-pulse' : 'text-slate-400'}`} />
                     {streak} Day{streak === 1 ? '' : 's'} Study Streak
                   </span>
                 );
               })()}
-              <span className="text-xs text-blue-100 font-bold">{user.university || 'Stanford University'}</span>
+              <span className="text-xs text-indigo-200/80 font-bold">{user.university || 'Stanford University'}</span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-black tracking-tight drop-shadow-xs">
-              Welcome back, {user.displayName || 'Alex'}! 👋
-            </h1>
-            <p className="text-xs sm:text-sm text-blue-100 mt-1.5 max-w-xl leading-relaxed font-medium">
-              Target Role: <strong className="text-white font-extrabold">{user.targetRole || 'Software Engineer'}</strong> | Major: <strong className="text-white font-extrabold">{user.major || 'Computer Science'}</strong>
-            </p>
+            <div className="space-y-1.5">
+              <h1 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight">
+                Welcome back, {user.displayName || 'Alex'}! 👋
+              </h1>
+              <p className="text-xs sm:text-sm text-indigo-200/70 leading-relaxed font-medium">
+                Target Role: <strong className="text-white font-extrabold">{user.targetRole || 'Software Engineer'}</strong> | Major: <strong className="text-white font-extrabold">{user.major || 'Computer Science'}</strong>
+              </p>
+            </div>
+
+            <div className="pt-1 flex flex-wrap gap-2.5">
+              <button
+                onClick={() => onNavigateTab('notes')}
+                className="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm shadow-xl hover:scale-105 cursor-pointer transition-all flex items-center gap-2"
+              >
+                <Sparkles className="w-4 h-4 fill-slate-950 text-slate-950" />
+                AI Notes Summarizer
+              </button>
+              <button
+                onClick={onOpenStudyHubUpload}
+                className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs sm:text-sm border border-white/20 cursor-pointer transition-all flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4 text-white" />
+                Upload Study Notes
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0 flex-wrap">
-            <button
-              onClick={() => onNavigateTab('notes')}
-              className="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm shadow-xl hover:scale-105 cursor-pointer transition-all flex items-center gap-2"
-            >
-              <Sparkles className="w-4 h-4 fill-slate-950 text-slate-950" />
-              AI Notes Summarizer
-            </button>
-            <button
-              onClick={onOpenStudyHubUpload}
-              className="px-5 py-3 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-extrabold text-xs sm:text-sm border border-white/40 cursor-pointer transition-all flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4 text-white" />
-              Upload Study Notes
-            </button>
+          <div className="hidden md:block">
+            <DashboardAIProcessorWidget />
           </div>
         </div>
       </div>
@@ -207,89 +641,54 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Attendance Widget */}
-        <div 
+        <Dashboard3DStatCard
+          title="Attendance"
+          value={`${overallAttendance}%`}
+          subValue="Safe & Above 75%"
+          subValueColor="text-emerald-700 bg-emerald-100/90"
+          icon={<CheckSquare className="w-4.5 h-4.5 text-blue-600" />}
+          bgIconClass="bg-blue-50/90"
+          progressPct={overallAttendance}
           onClick={() => onNavigateTab('attendance')}
-          className="bg-white/80 backdrop-blur-xl p-5 rounded-2xl border border-white/90 shadow-3d-sm hover:shadow-xl card-3d transition-all cursor-pointer group"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-black text-slate-500 uppercase tracking-wider">Attendance</span>
-            <div className="w-9 h-9 rounded-xl bg-blue-50/90 text-blue-600 flex items-center justify-center font-black shadow-2xs">
-              <CheckSquare className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-black text-slate-900">{overallAttendance}%</span>
-            <span className="text-[11px] font-black text-emerald-700 bg-emerald-100/90 backdrop-blur-md px-2 py-0.5 rounded-md border border-emerald-200">
-              Safe & Above 75%
-            </span>
-          </div>
-          <div className="h-2 w-full bg-slate-200/80 rounded-full mt-3 overflow-hidden shadow-inner">
-            <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${overallAttendance}%` }}></div>
-          </div>
-          <p className="text-[11px] text-slate-500 mt-2 font-medium">Target goal: 80% across all subjects</p>
-        </div>
+          accentColor="blue"
+        />
 
         {/* AI Study Suites */}
-        <div 
+        <Dashboard3DStatCard
+          title="Study Suites"
+          value={studySuites.length}
+          subValue="Active Suites"
+          subValueColor="text-indigo-700 bg-indigo-100/90"
+          icon={<BookOpen className="w-4.5 h-4.5 text-indigo-600" />}
+          bgIconClass="bg-indigo-50"
           onClick={() => onNavigateTab('studyhub')}
-          className="bg-white/80 backdrop-blur-xl p-5 rounded-2xl border border-white/90 shadow-3d-sm hover:shadow-xl card-3d transition-all cursor-pointer group"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-black text-slate-500 uppercase tracking-wider">Study Suites</span>
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black shadow-2xs">
-              <BookOpen className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-black text-slate-900">{studySuites.length}</span>
-            <span className="text-[11px] font-black text-amber-700 bg-amber-100/90 px-2 py-0.5 rounded-md border border-amber-200">
-              Active Suites
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-500 mt-2 font-medium">Notes, Flashcards & Quizzes Ready</p>
-        </div>
+          accentColor="indigo"
+        />
 
         {/* DSA Coding Progress */}
-        <div 
+        <Dashboard3DStatCard
+          title="DSA Solved"
+          value={`${solvedDSA} / ${totalDSA}`}
+          subValue={`${dsaProgressPct}% Completed`}
+          subValueColor="text-cyan-800 bg-cyan-100/90"
+          icon={<Code2 className="w-4.5 h-4.5 text-cyan-600" />}
+          bgIconClass="bg-cyan-50"
+          progressPct={dsaProgressPct}
           onClick={() => onNavigateTab('coding')}
-          className="bg-white/80 backdrop-blur-xl p-5 rounded-2xl border border-white/90 shadow-3d-sm hover:shadow-xl card-3d transition-all cursor-pointer group"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-black text-slate-500 uppercase tracking-wider">DSA Solved</span>
-            <div className="w-9 h-9 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-black shadow-2xs">
-              <Code2 className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-black text-slate-900">{solvedDSA} / {totalDSA}</span>
-            <span className="text-[11px] font-black text-cyan-800 bg-cyan-100/90 backdrop-blur-md px-2 py-0.5 rounded-md border border-cyan-200">
-              {dsaProgressPct}%
-            </span>
-          </div>
-          <div className="h-2 w-full bg-slate-200/80 rounded-full mt-3 overflow-hidden shadow-inner">
-            <div className="h-full bg-cyan-600 rounded-full" style={{ width: `${dsaProgressPct}%` }}></div>
-          </div>
-        </div>
+          accentColor="cyan"
+        />
 
         {/* ATS Resume Score */}
-        <div 
+        <Dashboard3DStatCard
+          title="ATS Resume"
+          value="88 / 100"
+          subValue="Top 5%"
+          subValueColor="text-purple-800 bg-purple-100/90"
+          icon={<Award className="w-4.5 h-4.5 text-purple-600" />}
+          bgIconClass="bg-purple-50"
           onClick={() => onNavigateTab('resumebuilder')}
-          className="bg-white/80 backdrop-blur-xl p-5 rounded-2xl border border-white/90 shadow-3d-sm hover:shadow-xl card-3d transition-all cursor-pointer group"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-black text-slate-500 uppercase tracking-wider">ATS Resume</span>
-            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black shadow-2xs">
-              <Award className="w-4.5 h-4.5" />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-black text-slate-900">88 / 100</span>
-            <span className="text-[11px] font-black text-purple-800 bg-purple-100/90 backdrop-blur-md px-2 py-0.5 rounded-md border border-purple-200">
-              Top 5%
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-500 mt-2 font-medium">Matched against {user.targetRole || 'SWE'}</p>
-        </div>
+          accentColor="purple"
+        />
       </div>
 
       {/* Main Content Layout */}
@@ -307,7 +706,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
               <button
                 onClick={() => onNavigateTab('habiturex')}
-                className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1"
+                className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
               >
                 View Planner <ArrowRight className="w-3.5 h-3.5" />
               </button>
@@ -316,24 +715,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {schedule.length > 0 ? (
               <div className="space-y-3">
                 {schedule.slice(0, 3).map((item) => (
-                  <div
+                  <Dashboard3DEventCard
                     key={item.id}
+                    item={item}
                     onClick={() => onNavigateTab('habiturex')}
-                    className="p-4 rounded-2xl bg-white border border-slate-200/60 flex items-center justify-between hover:border-blue-200 transition-all cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 font-bold text-xs flex flex-col items-center justify-center border border-blue-100">
-                        <Clock className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-900">{item.title}</p>
-                        <p className="text-xs text-slate-500">{item.category} • {item.time} ({item.durationMinutes}m)</p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
-                      {item.completed ? 'Completed' : 'Pending'}
-                    </span>
-                  </div>
+                  />
                 ))}
               </div>
             ) : (
@@ -341,7 +727,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <p className="text-xs font-semibold text-slate-500">No events or planner items recorded for today.</p>
                 <button
                   onClick={() => onNavigateTab('habiturex')}
-                  className="mt-2 text-xs font-bold text-blue-600 hover:underline"
+                  className="mt-2 text-xs font-bold text-blue-600 hover:underline cursor-pointer"
                 >
                   + Create Event in Consistency Planner
                 </button>
@@ -360,7 +746,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
               <button
                 onClick={() => onNavigateTab('studyhub')}
-                className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1"
+                className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
               >
                 View All <ArrowRight className="w-3.5 h-3.5" />
               </button>
@@ -369,22 +755,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {studySuites.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {studySuites.slice(0, 4).map((suite) => (
-                  <div
+                  <Dashboard3DStudySuiteCard
                     key={suite.id}
+                    suite={suite}
                     onClick={() => onNavigateTab('studyhub')}
-                    className="p-4 rounded-2xl bg-white border border-slate-200/60 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group"
-                  >
-                    <span className="text-[10px] font-bold text-blue-600 uppercase bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                      {suite.subject}
-                    </span>
-                    <h3 className="font-extrabold text-sm text-slate-900 mt-2 line-clamp-1 group-hover:text-blue-600 transition-colors">{suite.title}</h3>
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-2">{suite.summary}</p>
-                    <div className="flex items-center gap-3 text-[11px] font-bold text-slate-400 mt-3 pt-2 border-t border-slate-100">
-                      <span>{suite.flashcards.length} Flashcards</span>
-                      <span>•</span>
-                      <span>{suite.quiz.length} Quiz Qs</span>
-                    </div>
-                  </div>
+                  />
                 ))}
               </div>
             ) : (
@@ -394,7 +769,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <p className="text-xs text-slate-500 mb-3">Upload your syllabus notes or slides to generate flashcards and quizzes.</p>
                 <button
                   onClick={onOpenStudyHubUpload}
-                  className="px-4 py-2 rounded-xl bg-[#2563EB] text-white text-xs font-bold shadow-md shadow-blue-500/20 hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 rounded-xl bg-[#2563EB] text-white text-xs font-bold shadow-md shadow-blue-500/20 hover:bg-blue-700 transition-colors cursor-pointer"
                 >
                   + Upload Document
                 </button>
@@ -406,21 +781,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         {/* Right Column (1 col): Quick Placement & AI Shortcuts */}
         <div className="space-y-6">
           {/* AI Career Assistant Launcher */}
-          <div className="p-6 rounded-[28px] bg-gradient-to-br from-[#2563EB] to-indigo-600 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden">
-            <div className="flex items-center gap-2 mb-3">
-              <Bot className="w-5 h-5 text-blue-200" />
-              <h3 className="text-base font-extrabold">Placement AI Ready</h3>
-            </div>
-            <p className="text-xs text-blue-100 leading-relaxed mb-4">
-              Practice technical interview questions & coding drills for <strong>{user.targetRole || 'Software Engineer'}</strong>.
-            </p>
-            <button
-              onClick={() => onNavigateTab('interviewprep')}
-              className="w-full py-2.5 rounded-xl bg-white text-blue-700 font-bold text-xs hover:bg-blue-50 transition-all shadow-sm"
-            >
-              Practice Technical Interviews
-            </button>
-          </div>
+          <DashboardCareerAssistantWidget
+            user={user}
+            onClick={() => onNavigateTab('interviewprep')}
+          />
 
           {/* Quick Attendance Check */}
           <div className="p-6 rounded-[28px] bg-white/80 backdrop-blur-xl border border-slate-200/60 shadow-xs">
@@ -450,7 +814,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
             <button
               onClick={() => onNavigateTab('attendance')}
-              className="w-full mt-5 py-2.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors border border-blue-100"
+              className="w-full mt-5 py-2.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors border border-blue-100 cursor-pointer"
             >
               Open Attendance Calculator
             </button>

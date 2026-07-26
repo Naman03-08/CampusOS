@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Trophy, 
   Award, 
@@ -30,7 +31,10 @@ import {
   Flame, 
   Sparkles,
   Medal,
-  Edit2
+  Edit2,
+  Brain,
+  Activity,
+  Compass
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -53,6 +57,284 @@ import { FirestoreService } from '../../lib/firestoreService';
 import { StreakService } from '../../lib/streakService';
 import { db } from '../../lib/firebase';
 import { collection, query, onSnapshot } from 'firebase/firestore';
+
+// ----------------------------------------------------------------------------
+// HIGH-TECH AI ORBITS & SCANNING RADAR ANIMATION MATRIX FOR HABITUREX
+// ----------------------------------------------------------------------------
+const HabiturexAIAnimationMatrix: React.FC = () => {
+  const [activeNodes, setActiveNodes] = useState<number[]>([0, 2, 4]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveNodes(prev => {
+        const count = Math.floor(Math.random() * 3) + 2;
+        const nodes: number[] = [];
+        for (let i = 0; i < count; i++) {
+          nodes.push(Math.floor(Math.random() * 6));
+        }
+        return nodes;
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const nodeLabels = ['Attendance', 'Focus Log', 'Exams', 'Credits', 'Streak', 'Missions'];
+
+  return (
+    <div className="relative w-44 h-44 flex items-center justify-center bg-radial from-indigo-500/10 via-transparent to-transparent rounded-full border border-indigo-100/20 shrink-0">
+      {/* Dynamic Conic Scanning Radar */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-0 rounded-full pointer-events-none"
+        style={{
+          background: 'conic-gradient(from 0deg, rgba(99, 102, 241, 0.15) 0deg, rgba(99, 102, 241, 0) 120deg, rgba(99, 102, 241, 0) 360deg)'
+        }}
+      />
+
+      {/* Orbit Rings */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+        className="absolute w-40 h-40 border border-dashed border-indigo-400/20 rounded-full"
+      />
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+        className="absolute w-28 h-28 border border-dotted border-blue-400/30 rounded-full"
+      />
+
+      {/* Core Processor Element */}
+      <motion.div
+        animate={{ scale: [1, 1.06, 1] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute w-16 h-16 rounded-full bg-gradient-to-br from-indigo-600 via-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/20"
+      >
+        <Brain className="w-6 h-6 text-white animate-pulse" />
+      </motion.div>
+
+      {/* Synaptic Orbital Nodes */}
+      {[...Array(6)].map((_, i) => {
+        const angle = (i * 360) / 6;
+        const radius = 60;
+        const rad = (angle * Math.PI) / 180;
+        const x = Math.cos(rad) * radius;
+        const y = Math.sin(rad) * radius;
+
+        const isActive = activeNodes.includes(i);
+
+        return (
+          <div
+            key={i}
+            className="absolute flex flex-col items-center justify-center"
+            style={{ transform: `translate(${x}px, ${y}px)` }}
+          >
+            <motion.div
+              animate={{
+                scale: isActive ? [1, 1.3, 1] : 1,
+                backgroundColor: isActive ? '#4F46E5' : '#94A3B8',
+                boxShadow: isActive ? '0 0 12px #6366F1, 0 0 4px #4F46E5' : 'none'
+              }}
+              transition={{ duration: 1.2 }}
+              className="w-3 h-3 rounded-full border border-white cursor-pointer relative group"
+            >
+              {/* Tooltip on Hover */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-slate-900 text-[8px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20 shadow-sm border border-slate-700">
+                {nodeLabels[i]}
+              </div>
+            </motion.div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// ----------------------------------------------------------------------------
+// INTERACTIVE 3D MOUSE TILT STAT CARD (DASHBOARD HUB)
+// ----------------------------------------------------------------------------
+interface InteractiveHabitCardProps {
+  title: string;
+  value: string | number;
+  subValue: string;
+  subValueColor: string;
+  icon: React.ReactNode;
+  bgIconClass: string;
+}
+
+const InteractiveHabitCard: React.FC<InteractiveHabitCardProps> = ({
+  title,
+  value,
+  subValue,
+  subValueColor,
+  icon,
+  bgIconClass
+}) => {
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((centerY - y) / (rect.height / 2)) * 8;
+    const rotateY = ((x - centerX) / (rect.width / 2)) * 8;
+    setCoords({ x: rotateY, y: rotateX });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setCoords({ x: 0, y: 0 });
+  };
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      animate={{
+        rotateY: coords.x,
+        rotateX: coords.y,
+        scale: isHovered ? 1.03 : 1,
+        z: isHovered ? 15 : 0
+      }}
+      transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+      style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+      className={`p-4 rounded-2xl bg-white border transition-all relative ${
+        isHovered
+          ? 'border-indigo-300 shadow-[0_12px_28px_-8px_rgba(99,102,241,0.14)] bg-indigo-50/5'
+          : 'border-slate-200/80 shadow-2xs'
+      }`}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-blue-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none -z-1" />
+
+      <div style={{ transform: 'translateZ(15px)' }} className="space-y-2.5 relative">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider">{title}</span>
+          <div className={`w-7.5 h-7.5 rounded-lg ${bgIconClass} flex items-center justify-center shadow-2xs border border-black/5 transition-transform duration-300 ${isHovered ? 'scale-110' : ''}`}>
+            {icon}
+          </div>
+        </div>
+        <div>
+          <p className="text-xl font-black text-slate-900 tracking-tight leading-none">{value}</p>
+          <p className={`text-[10px] font-black mt-1.5 ${subValueColor}`}>{subValue}</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// ----------------------------------------------------------------------------
+// INTERACTIVE 3D MOUSE TILT MISSION CARD (DASHBOARD HUB)
+// ----------------------------------------------------------------------------
+interface InteractiveMissionCardProps {
+  m: DailyMission;
+  onClaim: () => void;
+  onAddProgress: () => void;
+}
+
+const InteractiveMissionCard: React.FC<InteractiveMissionCardProps> = ({
+  m,
+  onClaim,
+  onAddProgress
+}) => {
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((centerY - y) / (rect.height / 2)) * 6;
+    const rotateY = ((x - centerX) / (rect.width / 2)) * 6;
+    setCoords({ x: rotateY, y: rotateX });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setCoords({ x: 0, y: 0 });
+  };
+
+  const isCompleted = m.currentCount >= m.targetCount || m.completed;
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      animate={{
+        rotateY: coords.x,
+        rotateX: coords.y,
+        scale: isHovered ? 1.02 : 1,
+        z: isHovered ? 12 : 0
+      }}
+      transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+      style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+      className={`p-4.5 rounded-2xl border transition-all duration-300 relative flex flex-col justify-between ${
+        isCompleted
+          ? 'bg-emerald-50/20 border-emerald-300/80 shadow-xs'
+          : isHovered
+          ? 'bg-white border-indigo-300 shadow-[0_15px_30px_-10px_rgba(99,102,241,0.12)]'
+          : 'bg-[#F9FAFB] border-slate-200/70 shadow-2xs'
+      }`}
+    >
+      <div style={{ transform: 'translateZ(10px)' }} className="space-y-3">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h4 className="text-xs font-black text-slate-900 leading-tight flex items-center gap-1.5">
+              <span>{m.title}</span>
+              {isCompleted && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
+            </h4>
+            <p className="text-[11px] text-slate-500 font-medium leading-relaxed mt-1">{m.description}</p>
+          </div>
+          <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-extrabold text-[10px] border border-amber-200/60 shrink-0 shadow-2xs">
+            +{m.creditReward} Gold
+          </span>
+        </div>
+      </div>
+
+      <div className="pt-3 border-t border-slate-100 mt-4 flex items-center justify-between" style={{ transform: 'translateZ(15px)' }}>
+        <div className="flex items-center gap-1.5">
+          <div className="w-16 h-1.5 rounded-full bg-slate-200 overflow-hidden">
+            <div 
+              className={`h-full rounded-full transition-all duration-300 ${isCompleted ? 'bg-emerald-500' : 'bg-indigo-600'}`}
+              style={{ width: `${Math.min(100, (m.currentCount / m.targetCount) * 100)}%` }}
+            />
+          </div>
+          <span className="text-[10px] font-bold text-slate-600">
+            {m.currentCount} / {m.targetCount}
+          </span>
+        </div>
+
+        {m.claimed ? (
+          <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-black text-[10px] border border-emerald-200">
+            Claimed ✅
+          </span>
+        ) : isCompleted ? (
+          <button
+            onClick={onClaim}
+            className="px-2.5 py-1 rounded bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-[10px] hover:scale-105 transition-all shadow-md cursor-pointer animate-pulse"
+          >
+            Claim 🎁
+          </button>
+        ) : (
+          <button
+            onClick={onAddProgress}
+            className="px-2 py-0.5 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/50 font-extrabold text-[10px] cursor-pointer transition-all hover:scale-105"
+          >
+            + Progress
+          </button>
+        )}
+      </div>
+    </motion.div>
+  );
+};
 
 export interface TaskItem {
   id: string;
@@ -167,6 +449,95 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
   // Leaderboard Data
   const [leaderboardList, setLeaderboardList] = useState<LeaderboardEntry[]>([]);
   const [loadingLeaderboard, setLoadingLeaderboard] = useState<boolean>(false);
+
+  // AI Diagnostics State
+  const [showAIDiagnosticsModal, setShowAIDiagnosticsModal] = useState(false);
+  const [aiLoading, setAILoading] = useState(false);
+  const [aiResult, setAIResult] = useState<{
+    score: number;
+    tier: string;
+    description: string;
+    tips: string[];
+    gradeForecasts: { subject: string; grade: string; color: string }[];
+  } | null>(null);
+  const [aiLoadingStep, setAiLoadingStep] = useState(0);
+
+  const triggerAIDiagnostics = () => {
+    setShowAIDiagnosticsModal(true);
+    setAILoading(true);
+    setAiLoadingStep(0);
+    setAIResult(null);
+
+    const timer1 = setTimeout(() => setAiLoadingStep(1), 600);
+    const timer2 = setTimeout(() => setAiLoadingStep(2), 1200);
+    const timer3 = setTimeout(() => setAiLoadingStep(3), 1800);
+    const timer4 = setTimeout(() => {
+      setAILoading(false);
+
+      const taskDoneCount = tasks.filter(t => t.status === 'Completed' || t.completedToday).length;
+      const taskTotal = Math.max(1, tasks.length);
+      const taskRatio = taskDoneCount / taskTotal;
+
+      const scoreValue = Math.round(
+        (overallAttendancePct * 0.35) + 
+        (taskRatio * 25) + 
+        (overallMarksPct * 0.25) + 
+        (Math.min(10, flameStreak) * 1.5)
+      );
+
+      const finalScore = Math.min(100, Math.max(15, scoreValue));
+
+      let tier = 'Rising Dynamo';
+      let desc = 'You are starting your academic journey. Establish consistent focus logs and complete pending tasks to climb the campus leaderboard.';
+      let tips = [
+        'Complete at least 1 task today to keep your streak alive and earn gold credits.',
+        'Log a 25-minute study block in the Focus Timer Watch to boost your weekly hours.',
+        'Attend upcoming classes to ensure your attendance rate stays comfortably above 75%.'
+      ];
+
+      if (finalScore >= 85) {
+        tier = 'Dean’s List Legend';
+        desc = 'Phenomenal performance! You have exceptional attendance, excellent exam preparation, and stellar task consistency.';
+        tips = [
+          'Maintain your current elite momentum and continue claiming custom daily mission rewards.',
+          'Help peers on the campus leaderboard by hosting study hubs.',
+          'Consider attempting critical priority mock tests to secure top tier grade forecasts.'
+        ];
+      } else if (finalScore >= 70) {
+        tier = 'Consistent Scholar';
+        desc = 'Splendid consistency. Your study routines are robust and you maintain a healthy balance between classroom attendance and assignments.';
+        tips = [
+          'Target higher priority tasks to push your preparedness rating beyond 85%.',
+          'Use the Focus Timer for consecutive intervals to scale up study hour metrics.',
+          'Complete custom daily missions to rapidly multiply your Gold credits.'
+        ];
+      } else if (finalScore >= 50) {
+        tier = 'Capable Workhorse';
+        desc = 'Good foundation. You are completing standard milestones but there is clear scope to optimize preparation routines and exam marks average.';
+        tips = [
+          'Improve your marks average by logging subject-specific marks in the schedule planner.',
+          'Light up your active streak flame by completing targets consistently.',
+          'Aim to raise overall attendance to unlock top tier performance bonuses.'
+        ];
+      }
+
+      const gradeForecasts = [
+        { subject: 'DBMS', grade: overallMarksPct >= 90 ? 'A+' : overallMarksPct >= 75 ? 'A' : 'B', color: 'text-indigo-600' },
+        { subject: 'OS', grade: overallAttendancePct >= 85 ? 'A' : overallAttendancePct >= 70 ? 'B+' : 'B', color: 'text-blue-600' },
+        { subject: 'DSA', grade: taskRatio >= 0.8 ? 'A+' : taskRatio >= 0.5 ? 'A' : 'B+', color: 'text-emerald-600' },
+        { subject: 'CN', grade: overallMarksPct >= 80 ? 'A' : 'B', color: 'text-purple-600' },
+        { subject: 'System Design', grade: flameStreak >= 5 ? 'A+' : 'A', color: 'text-rose-600' }
+      ];
+
+      setAIResult({
+        score: finalScore,
+        tier: tier,
+        description: desc,
+        tips: tips,
+        gradeForecasts: gradeForecasts
+      });
+    }, 2400);
+  };
 
   // Search & Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -749,27 +1120,44 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
             <div className="space-y-5 animate-in fade-in duration-300">
               
               {/* Hero Greeting Banner */}
-              <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-lg space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="space-y-1">
+              <div className="p-6 rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-950 text-white shadow-xl relative overflow-hidden border border-indigo-500/20">
+                {/* Background high-tech grids and circles */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,0.04)_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
+                <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                  <div className="space-y-4 max-w-xl">
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-black text-[10px] tracking-wider uppercase backdrop-blur-md">
-                        STUDENT HABITUREX CONSOLE
+                      <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 font-extrabold text-[10px] tracking-wider uppercase border border-indigo-400/30 backdrop-blur-md flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-indigo-400 animate-pulse" />
+                        <span>AI-POWERED HABITUREX SYSTEM</span>
                       </span>
                     </div>
-                    <h2 className="text-2xl font-black tracking-tight text-white">
-                      Welcome, {user?.displayName || 'Student'} 👋
-                    </h2>
-                    <p className="text-xs text-blue-100 font-medium max-w-xl">
-                      "Consistency turns effort into excellence. Set your custom daily missions, complete active tasks to keep your streak alive, and track your performance."
-                    </p>
+                    <div className="space-y-1.5">
+                      <h2 className="text-2xl font-black tracking-tight text-white leading-tight">
+                        Welcome to your Synaptic Space, {user?.displayName || 'Student'}
+                      </h2>
+                      <p className="text-xs text-indigo-200/80 font-medium leading-relaxed">
+                        Track focus sessions, complete active targets to keep your streak alive, and deploy real-time academic analytics diagnostics.
+                      </p>
+                    </div>
+
+                    <div className="pt-1 flex flex-wrap gap-2.5">
+                      <button
+                        onClick={triggerAIDiagnostics}
+                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white font-black text-xs transition-all shadow-md shadow-indigo-500/20 flex items-center gap-2 hover:scale-105 active:scale-95 cursor-pointer group"
+                      >
+                        <Brain className="w-4 h-4 text-indigo-100 group-hover:animate-bounce" />
+                        <span>Ask AI Academic Coach</span>
+                        <Sparkles className="w-3 h-3 text-indigo-200 animate-pulse" />
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-right">
-                      <p className="text-[10px] uppercase font-bold text-blue-200">Today's Date</p>
-                      <p className="text-xs font-black text-white">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                    </div>
+                  {/* Gorgeous high-tech AI animation matrix */}
+                  <div className="hidden md:flex items-center justify-center pr-4">
+                    <HabiturexAIAnimationMatrix />
                   </div>
                 </div>
               </div>
@@ -778,120 +1166,84 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
                 
                 {/* 1. Attendance Rate */}
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-black text-slate-400">Attendance Rate</span>
-                    <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                      <CheckSquare className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-slate-900">{overallAttendancePct}%</p>
-                    <p className="text-[10px] font-bold text-emerald-600 mt-0.5">Target ≥75%</p>
-                  </div>
-                </div>
+                <InteractiveHabitCard
+                  title="Attendance Rate"
+                  value={`${overallAttendancePct}%`}
+                  subValue="Target ≥75%"
+                  subValueColor="text-emerald-600"
+                  icon={<CheckSquare className="w-4 h-4 text-emerald-600" />}
+                  bgIconClass="bg-emerald-50"
+                />
 
                 {/* 2. Active Tasks */}
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-black text-slate-400">Active Tasks</span>
-                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                      <FileText className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-slate-900">{tasks.length} Total</p>
-                    <p className="text-[10px] font-bold text-blue-600 mt-0.5">{tasks.filter(t => t.status !== 'Completed').length} Pending</p>
-                  </div>
-                </div>
+                <InteractiveHabitCard
+                  title="Active Tasks"
+                  value={`${tasks.length} Total`}
+                  subValue={`${tasks.filter(t => t.status !== 'Completed').length} Pending`}
+                  subValueColor="text-blue-600"
+                  icon={<FileText className="w-4 h-4 text-blue-600" />}
+                  bgIconClass="bg-blue-50"
+                />
 
                 {/* 3. Completed Tasks */}
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-black text-slate-400">Completed Tasks</span>
-                    <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-slate-900">{tasks.filter(t => t.status === 'Completed' || t.completedToday).length} Done</p>
-                    <p className="text-[10px] font-bold text-indigo-600 mt-0.5">Streak Active</p>
-                  </div>
-                </div>
+                <InteractiveHabitCard
+                  title="Completed Tasks"
+                  value={`${tasks.filter(t => t.status === 'Completed' || t.completedToday).length} Done`}
+                  subValue="Streak Active"
+                  subValueColor="text-indigo-600"
+                  icon={<CheckCircle2 className="w-4 h-4 text-indigo-600" />}
+                  bgIconClass="bg-indigo-50"
+                />
 
                 {/* 4. Total Focus Hours */}
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-black text-slate-400">Focus Hours</span>
-                    <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-                      <Clock className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-slate-900">
-                      {Object.values(studyHoursLog).reduce<number>((a, b) => a + Number(b), 0).toFixed(1)} hrs
-                    </p>
-                    <p className="text-[10px] font-bold text-purple-600 mt-0.5">Logged Total</p>
-                  </div>
-                </div>
+                <InteractiveHabitCard
+                  title="Focus Hours"
+                  value={`${Object.values(studyHoursLog).reduce<number>((a, b) => a + Number(b), 0).toFixed(1)} hrs`}
+                  subValue="Logged Total"
+                  subValueColor="text-purple-600"
+                  icon={<Clock className="w-4 h-4 text-purple-600" />}
+                  bgIconClass="bg-purple-50"
+                />
 
                 {/* 5. Exam Marks Avg */}
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-black text-slate-400">Exam Marks Avg</span>
-                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                      <GraduationCap className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-slate-900">{overallMarksPct}%</p>
-                    <p className="text-[10px] font-bold text-amber-600 mt-0.5">EST. CGPA: {estimatedCGPA}</p>
-                  </div>
-                </div>
+                <InteractiveHabitCard
+                  title="Exam Marks Avg"
+                  value={`${overallMarksPct}%`}
+                  subValue={`EST. CGPA: ${estimatedCGPA}`}
+                  subValueColor="text-amber-600"
+                  icon={<GraduationCap className="w-4 h-4 text-amber-600" />}
+                  bgIconClass="bg-amber-50"
+                />
 
                 {/* 6. Gold Credits */}
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-black text-slate-400">Gold Credits</span>
-                    <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
-                      <Award className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-amber-900">{credits}</p>
-                    <p className="text-[10px] font-bold text-amber-600 mt-0.5">Redeem Rewards</p>
-                  </div>
-                </div>
+                <InteractiveHabitCard
+                  title="Gold Credits"
+                  value={credits}
+                  subValue="Redeem Rewards"
+                  subValueColor="text-amber-600"
+                  icon={<Award className="w-4 h-4 text-amber-600" />}
+                  bgIconClass="bg-amber-100"
+                />
 
                 {/* 7. Upcoming Exams */}
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-black text-slate-400">Upcoming Exams</span>
-                    <div className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-slate-900">
-                      {events.filter(e => e.type === 'Exam').length} Scheduled
-                    </p>
-                    <p className="text-[10px] font-bold text-rose-600 mt-0.5">Calendar Active</p>
-                  </div>
-                </div>
+                <InteractiveHabitCard
+                  title="Upcoming Exams"
+                  value={`${events.filter(e => e.type === 'Exam').length} Scheduled`}
+                  subValue="Calendar Active"
+                  subValueColor="text-rose-600"
+                  icon={<AlertCircle className="w-4 h-4 text-rose-600" />}
+                  bgIconClass="bg-rose-50"
+                />
 
                 {/* 8. Flame Streak */}
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-black text-slate-400">Daily Streak</span>
-                    <div className="w-7 h-7 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
-                      <Flame className="w-3.5 h-3.5 fill-orange-500" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-slate-900">{flameStreak} Days</p>
-                    <p className="text-[10px] font-bold text-orange-600 mt-0.5">Task Streak</p>
-                  </div>
-                </div>
+                <InteractiveHabitCard
+                  title="Daily Streak"
+                  value={`${flameStreak} Days`}
+                  subValue="Task Streak"
+                  subValueColor="text-orange-600"
+                  icon={<Flame className="w-4 h-4 text-orange-500 fill-orange-500" />}
+                  bgIconClass="bg-orange-50"
+                />
 
               </div>
 
@@ -922,49 +1274,17 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {missions.map(m => {
-                      const isCompleted = m.currentCount >= m.targetCount || m.completed;
                       return (
-                        <div key={m.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-2 flex flex-col justify-between">
-                          <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <h4 className="text-xs font-black text-slate-900">{m.title}</h4>
-                              <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-extrabold text-[10px]">
-                                +{m.creditReward} Gold
-                              </span>
-                            </div>
-                            <p className="text-[11px] text-slate-500">{m.description}</p>
-                          </div>
-
-                          <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-slate-600">
-                              Target: {m.currentCount} / {m.targetCount}
-                            </span>
-
-                            {m.claimed ? (
-                              <span className="px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-800 font-black text-[10px]">
-                                Claimed ✅
-                              </span>
-                            ) : isCompleted ? (
-                              <button
-                                onClick={() => handleClaimMission(m.id)}
-                                className="px-3 py-1 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-xs hover:scale-105 transition-all shadow-md cursor-pointer animate-pulse"
-                              >
-                                Claim Reward 🎁
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => {
-                                  const updatedMissions = missions.map(ms => ms.id === m.id ? { ...ms, currentCount: ms.currentCount + 1, completed: ms.currentCount + 1 >= ms.targetCount } : ms);
-                                  setMissions(updatedMissions);
-                                  saveAllToFirestore(tasks, updatedMissions);
-                                }}
-                                className="px-2.5 py-1 rounded-xl bg-blue-100 text-blue-700 hover:bg-blue-200 font-extrabold text-[10px] cursor-pointer"
-                              >
-                                + Progress
-                              </button>
-                            )}
-                          </div>
-                        </div>
+                        <InteractiveMissionCard
+                          key={m.id}
+                          m={m}
+                          onClaim={() => handleClaimMission(m.id)}
+                          onAddProgress={() => {
+                            const updatedMissions = missions.map(ms => ms.id === m.id ? { ...ms, currentCount: ms.currentCount + 1, completed: ms.currentCount + 1 >= ms.targetCount } : ms);
+                            setMissions(updatedMissions);
+                            saveAllToFirestore(tasks, updatedMissions);
+                          }}
+                        />
                       );
                     })}
                   </div>
@@ -2065,6 +2385,144 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================================ */}
+      {/* MODAL 5: AI ACADEMIC DIAGNOSTICS & COACH */}
+      {/* ============================================================================ */}
+      {showAIDiagnosticsModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-300">
+          <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-6 relative overflow-hidden">
+            {/* Ambient Background Glows */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3 relative z-10">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center">
+                  <Brain className="w-4.5 h-4.5 animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black tracking-tight text-white uppercase">AI Academic Coach & Advisor</h3>
+                  <p className="text-[10px] text-slate-400 font-semibold">Real-Time Cognitive Diagnostics</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowAIDiagnosticsModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {aiLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center space-y-6 relative z-10">
+                {/* Custom animated radar scanner */}
+                <div className="relative w-24 h-24 flex items-center justify-center">
+                  {/* Outer breathing ring */}
+                  <div className="absolute inset-0 rounded-full border-2 border-indigo-500/20 animate-ping" />
+                  {/* Middle rotating dashed ring */}
+                  <div className="absolute inset-2 rounded-full border border-dashed border-indigo-400/40 animate-[spin_8s_linear_infinite]" />
+                  {/* Inner glowing dot */}
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-blue-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/50 relative">
+                    <Activity className="w-5 h-5 animate-pulse" />
+                  </div>
+                </div>
+
+                <div className="text-center space-y-1.5 max-w-xs">
+                  <p className="text-sm font-black text-white tracking-tight animate-pulse">
+                    {aiLoadingStep === 0 && 'Connecting to Cognitive Core...'}
+                    {aiLoadingStep === 1 && 'Ingesting active attendance streams...'}
+                    {aiLoadingStep === 2 && 'Calibrating streak trajectories...'}
+                    {aiLoadingStep === 3 && 'Generating grade forecasts & advising...'}
+                  </p>
+                  <p className="text-[10px] text-slate-400 font-bold">
+                    Telemetry is calculated relative to your real-time academic logs.
+                  </p>
+                </div>
+              </div>
+            ) : aiResult ? (
+              <div className="space-y-5 relative z-10 text-xs animate-in slide-in-from-bottom-3 duration-300">
+                {/* Metric circular summary */}
+                <div className="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/20 flex items-center gap-4">
+                  <div className="relative w-16 h-16 shrink-0 flex items-center justify-center bg-indigo-500/10 rounded-full border border-indigo-500/30">
+                    <svg className="absolute inset-0 w-full h-full -rotate-90">
+                      <circle
+                        cx="32"
+                        cy="32"
+                        r="28"
+                        className="stroke-slate-800"
+                        strokeWidth="4"
+                        fill="transparent"
+                      />
+                      <circle
+                        cx="32"
+                        cy="32"
+                        r="28"
+                        className="stroke-indigo-500"
+                        strokeWidth="4"
+                        fill="transparent"
+                        strokeDasharray={2 * Math.PI * 28}
+                        strokeDashoffset={2 * Math.PI * 28 * (1 - aiResult.score / 100)}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <span className="text-sm font-black text-white">{aiResult.score}</span>
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap gap-1.5 items-center mb-1">
+                      <span className="px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-extrabold text-[9px] tracking-wide uppercase border border-indigo-400/20">
+                        {aiResult.tier}
+                      </span>
+                    </div>
+                    <h4 className="text-xs font-black text-white">Synaptic Academic Index</h4>
+                    <p className="text-[10px] text-slate-400 font-medium leading-relaxed mt-0.5">{aiResult.description}</p>
+                  </div>
+                </div>
+
+                {/* Subject Grade Forecasts */}
+                <div className="space-y-2">
+                  <h5 className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">Semester Grade Forecasts</h5>
+                  <div className="grid grid-cols-5 gap-2">
+                    {aiResult.gradeForecasts.map((f, i) => (
+                      <div key={i} className="p-2 rounded-xl bg-slate-800/60 border border-slate-700/60 text-center">
+                        <p className="text-[9px] font-bold text-slate-400 truncate">{f.subject}</p>
+                        <p className={`text-xs font-black ${f.color} mt-0.5`}>{f.grade}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* AI Coaching Tips */}
+                <div className="space-y-2">
+                  <h5 className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">Dynamic Coaching Prescriptions</h5>
+                  <div className="space-y-1.5">
+                    {aiResult.tips.map((t, i) => (
+                      <div key={i} className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-800 flex gap-2.5 items-start">
+                        <span className="w-4 h-4 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                          {i + 1}
+                        </span>
+                        <p className="text-[11px] text-slate-300 font-semibold leading-relaxed">{t}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-2 flex">
+                  <button
+                    type="button"
+                    onClick={() => setShowAIDiagnosticsModal(false)}
+                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white font-black transition-all cursor-pointer text-center hover:scale-102"
+                  >
+                    Close Diagnostics
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       )}

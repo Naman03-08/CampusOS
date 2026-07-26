@@ -246,22 +246,71 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
         </div>
       )}
 
+      {/* CSS Styles for shiny gold shimmer, pulsing glow, and floating animations */}
+      <style>{`
+        @keyframes gold-shimmer {
+          0% { transform: translate(-100%, -50%) rotate(25deg); }
+          40% { transform: translate(100%, -50%) rotate(25deg); }
+          100% { transform: translate(100%, -50%) rotate(25deg); }
+        }
+        @keyframes float-dust-1 {
+          0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.15; }
+          50% { transform: translate(15px, -15px) scale(1.2); opacity: 0.4; }
+        }
+        @keyframes float-dust-2 {
+          0%, 100% { transform: translate(0, 0) scale(1.2); opacity: 0.2; }
+          50% { transform: translate(-20px, -10px) scale(0.9); opacity: 0.45; }
+        }
+        @keyframes border-glow-shine {
+          0%, 100% { 
+            border-color: #E5C158; 
+            box-shadow: 0 0 25px rgba(229, 193, 88, 0.25), inset 0 0 10px rgba(229, 193, 88, 0.1); 
+          }
+          50% { 
+            border-color: #FCD34D; 
+            box-shadow: 0 0 45px rgba(252, 211, 77, 0.6), inset 0 0 20px rgba(252, 211, 77, 0.35); 
+          }
+        }
+      `}</style>
+
       {/* Main Certificate Outer Container (Increased Width, Reduced Height aspect ratio) */}
       <div
         id={`cert_node_${certificateId}`}
         ref={certificateRef}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B1A3A] via-[#10254C] to-[#0A1835] text-slate-900 border-2 border-[#E5C158] shadow-2xl p-2 sm:p-2.5 font-sans select-none max-w-[1240px] mx-auto w-full"
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#09152E] via-[#0E1E3C] to-[#060D19] text-slate-900 border-4 border-[#E5C158] shadow-2xl p-2.5 sm:p-3 font-sans select-none max-w-[1240px] mx-auto w-full transition-all duration-500"
+        style={{ animation: 'border-glow-shine 4s infinite ease-in-out' }}
       >
+        {/* Shimmering Metallic Light Reflection Sweeps */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl z-30">
+          <div 
+            className="absolute inset-0 w-[200%] h-[200%] opacity-20"
+            style={{
+              background: 'linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.7) 55%, transparent 65%)',
+              transform: 'translate(-100%, -50%) rotate(25deg)',
+              animation: 'gold-shimmer 8s infinite linear',
+            }}
+          />
+        </div>
+
+        {/* Floating Accent Sparkles */}
+        <div className="absolute top-1/4 left-[15%] text-[#F5D061] text-sm select-none pointer-events-none z-10" style={{ animation: 'float-dust-1 9s infinite ease-in-out' }}>✦</div>
+        <div className="absolute bottom-1/3 right-[15%] text-blue-400 text-sm select-none pointer-events-none z-10" style={{ animation: 'float-dust-2 11s infinite ease-in-out' }}>✦</div>
+        <div className="absolute top-2/3 left-[30%] text-indigo-300 text-xs select-none pointer-events-none z-10" style={{ animation: 'float-dust-1 13s infinite ease-in-out' }}>✦</div>
+
         {/* Glowing Corner Light Flares */}
-        <div className="absolute top-0 left-0 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-32 h-32 bg-amber-400/20 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 left-0 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-48 h-48 bg-amber-400/20 rounded-full blur-3xl pointer-events-none" />
 
         {/* Inner Canvas Box with compact padding for reduced length */}
-        <div className="relative rounded-2xl bg-gradient-to-b from-[#FFFFFF] via-[#F6F9FF] to-[#E9EFFB] p-4 sm:p-5 md:p-6 overflow-hidden border border-white/80 shadow-inner">
+        <div className="relative rounded-2xl bg-gradient-to-b from-[#FFFFFF] via-[#F7FAFF] to-[#EBF2FE] p-5 sm:p-6 md:p-7 overflow-hidden border border-white/90 shadow-inner">
+          
+          {/* Classical Thin Golden Dual Border Frame inside the margin */}
+          <div className="absolute top-2.5 left-2.5 right-2.5 bottom-2.5 border border-[#D4AF37]/35 rounded-xl pointer-events-none z-10" />
+          <div className="absolute top-3.5 left-3.5 right-3.5 bottom-3.5 border border-[#D4AF37]/15 rounded-lg pointer-events-none z-10" />
 
           {/* Background Radial Mesh Texture Overlay */}
           <div 
-            className="absolute inset-0 opacity-20 pointer-events-none"
+            className="absolute inset-0 opacity-15 pointer-events-none"
             style={{
               backgroundImage: 'radial-gradient(#2563eb 0.5px, transparent 0.5px), radial-gradient(#d4af37 0.5px, #f6f9ff 0.5px)',
               backgroundSize: '20px 20px, 40px 40px',
@@ -271,17 +320,28 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
 
           {/* TOP LEFT DARK NAVY SWOOCH WITH GOLDEN EDGE */}
           <div 
-            className="absolute -top-1 -left-1 w-48 sm:w-60 h-16 sm:h-20 bg-gradient-to-br from-[#0A1835] via-[#0F2248] to-[#1E3A8A] border-r-2 border-b-2 border-[#D4AF37] rounded-br-[60px] shadow-lg p-2.5 sm:p-3 z-10 flex flex-col justify-center"
+            className="absolute -top-1 -left-1 w-[180px] sm:w-[240px] h-16 sm:h-20 bg-gradient-to-br from-[#0A1835] via-[#0F2248] to-[#1E3A8A] border-r-2 border-b-2 border-[#D4AF37] rounded-br-[60px] shadow-lg p-3 sm:p-4 z-20 flex flex-col justify-center"
           >
-            <div className="text-[9px] sm:text-[11px] font-semibold text-white/90 leading-tight">
-              Building India's <span className="font-bold text-sky-200">Next Generation</span> of Learners 🚀
+            <div className="text-[9.5px] sm:text-[11px] font-semibold text-white leading-snug">
+              Building India's <span className="font-extrabold text-[#FCD34D] drop-shadow-xs">Next Gen</span> of Learners 🚀
             </div>
           </div>
 
-          {/* TOP RIGHT DARK NAVY CORNER SWOOCH */}
+          {/* TOP RIGHT DARK NAVY SWOOCH WITH GOLDEN EDGE (INTEGRATED CERTIFICATE ID) */}
           <div 
-            className="absolute -top-1 -right-1 w-36 sm:w-48 h-14 sm:h-18 bg-gradient-to-bl from-[#0A1835] via-[#0F2248] to-[#1E3A8A] border-l-2 border-b-2 border-[#D4AF37] rounded-bl-[50px] pointer-events-none z-0"
-          />
+            className="absolute -top-1 -right-1 w-[180px] sm:w-[240px] h-16 sm:h-20 bg-gradient-to-bl from-[#0A1835] via-[#0F2248] to-[#1E3A8A] border-l-2 border-b-2 border-[#D4AF37] rounded-bl-[60px] shadow-lg p-3 sm:p-4 z-20 flex flex-col justify-center items-end text-right"
+          >
+            <div className="text-[7px] sm:text-[8px] font-black text-[#FCD34D] uppercase tracking-widest leading-none mb-1 flex items-center gap-1 justify-end">
+              <svg className="w-2 sm:w-2.5 h-2 sm:h-2.5 text-[#FCD34D]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              <span>CERTIFICATE ID</span>
+            </div>
+            <div className="text-[10px] sm:text-xs font-black text-white font-mono tracking-wider">
+              {certificateId}
+            </div>
+          </div>
 
           {/* BOTTOM LEFT DARK NAVY CORNER SWOOCH */}
           <div 
@@ -293,14 +353,14 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
             className="absolute -bottom-1 -right-1 w-36 sm:w-48 h-14 sm:h-18 bg-gradient-to-tl from-[#0A1835] via-[#0F2248] to-[#1E3A8A] border-l-2 border-t-2 border-[#D4AF37] rounded-tl-[50px] pointer-events-none z-0"
           />
 
-          {/* TOP ROW: LOGO CENTER & CERTIFICATE ID TOP RIGHT */}
-          <div className="relative z-20 flex flex-row items-center justify-between gap-4 mb-1.5">
+          {/* TOP ROW: LOGO CENTER */}
+          <div className="relative z-10 flex flex-row items-center justify-between gap-4 mb-3">
             
             {/* Top Left Placeholder matching swooch width */}
-            <div className="w-36 sm:w-48 shrink-0" />
+            <div className="w-[180px] sm:w-[240px] shrink-0" />
 
             {/* Center Logo */}
-            <div className="flex flex-col items-center justify-center text-center">
+            <div className="flex flex-col items-center justify-center text-center flex-1">
               <div className="flex items-center gap-2">
                 {/* 3D Glowing C• Circle Logo */}
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-[#0B1A3A] via-[#2563EB] to-[#F3CA52] p-0.5 shadow-md flex items-center justify-center shrink-0">
@@ -323,22 +383,8 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
               </div>
             </div>
 
-            {/* Top Right Certificate ID Badge */}
-            <div className="flex justify-end shrink-0">
-              <div className="px-2.5 py-1 rounded-xl bg-white/90 border border-blue-200 shadow-2xs flex items-center gap-1.5">
-                <div className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center">
-                  <ShieldCheck className="w-2.5 h-2.5" />
-                </div>
-                <div className="text-right">
-                  <div className="text-[7px] font-black text-slate-500 uppercase tracking-widest leading-none">
-                    Certificate ID
-                  </div>
-                  <div className="text-xs font-black text-[#0B192C] font-mono tracking-wider">
-                    {certificateId}
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Top Right Placeholder matching swooch width to maintain perfect centering */}
+            <div className="w-[180px] sm:w-[240px] shrink-0" />
 
           </div>
 
@@ -346,25 +392,27 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
           <div className="relative z-20 my-1 text-center">
             
             {/* Small Top Badge: OFFICIAL */}
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50/90 border border-amber-300 text-amber-800 text-[9px] font-extrabold uppercase tracking-widest shadow-2xs mb-0.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-50/95 border border-amber-300 text-amber-800 text-[9px] font-extrabold uppercase tracking-widest shadow-2xs mb-1">
               <span className="text-amber-500 text-xs">⭐</span>
               <span>OFFICIAL</span>
             </div>
 
             {/* 3D Laurel Wreath Framing Title */}
-            <div className="flex items-center justify-center gap-2 sm:gap-4 my-0.5">
+            <div className="flex items-center justify-center gap-2 sm:gap-4 my-1">
               <LaurelWreathLeftSVG />
               
               <div className="text-center space-y-0.5">
                 <div 
-                  className="text-xl sm:text-3xl text-[#0B192C] font-bold tracking-tight"
+                  className="text-xl sm:text-2xl text-[#0B192C] font-semibold tracking-tight"
                   style={{ fontFamily: "'Playfair Display', serif" }}
                 >
-                  Certificate <span className="italic font-normal font-serif text-slate-700">of</span>
+                  Certificate <span className="italic font-normal font-serif text-slate-600">of</span>
                 </div>
                 <h1 
-                  className="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#1D4ED8] tracking-tight leading-none drop-shadow-xs"
-                  style={{ fontFamily: "'Cinzel', serif" }}
+                  className="text-3xl sm:text-5xl font-black text-[#1E3A8A] tracking-tight leading-none"
+                  style={{ 
+                    fontFamily: "'Cinzel', serif"
+                  }}
                 >
                   Completion
                 </h1>
@@ -380,31 +428,35 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
               <LaurelWreathRightSVG />
             </div>
 
-            <div className="text-[10px] sm:text-xs font-semibold text-slate-600 uppercase tracking-widest">
+            <div className="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">
               This certificate is proudly presented to
             </div>
 
             {/* CALLIGRAPHIC RECIPIENT NAME */}
-            <div className="py-0.5">
-              <div 
-                className="text-3xl sm:text-5xl text-[#0B192C] font-normal tracking-wide inline-block px-4 relative"
-                style={{ fontFamily: "'Great Vibes', cursive" }}
+            <div className="my-3.5 sm:my-5 relative">
+              <span 
+                className="text-4xl sm:text-6xl text-[#0B192C] font-normal tracking-wide inline-block px-6 py-1"
+                style={{ fontFamily: "'Great Vibes', cursive", lineHeight: '1.2' }}
               >
                 {userName}
-                {/* Cyan Glow Bar underneath name */}
-                <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-sky-400 to-transparent rounded-full opacity-60 mt-0.5" />
-              </div>
+              </span>
+              {/* Gold/Cyan Glow Bar underneath name */}
+              <div className="h-[2px] max-w-sm mx-auto bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent rounded-full opacity-60 mt-1" />
             </div>
 
-            <div className="text-[11px] text-slate-600 font-medium">
+            <div className="text-[11px] text-slate-500 font-bold tracking-wide mt-1">
               for successfully completing the
             </div>
 
             {/* COURSE TITLE 3D GLASS BADGE */}
-            <div className="mt-1 mb-1 max-w-2xl mx-auto">
-              <div className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-blue-50/90 via-indigo-50/90 to-blue-50/90 border border-blue-200/80 shadow-sm flex items-center justify-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-2xs shrink-0">
-                  <GraduationCap className="w-3.5 h-3.5" />
+            <div className="mt-2 mb-2 max-w-2xl mx-auto">
+              <div className="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-50/95 via-indigo-50/95 to-blue-50/95 border border-blue-200/80 shadow-xs flex items-center justify-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-2xs shrink-0">
+                  {/* Custom GraduationCap SVG */}
+                  <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.91a2 2 0 0 0 1.66 0z" />
+                    <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                  </svg>
                 </div>
                 <h2 className="text-sm sm:text-lg font-black text-[#0B192C] tracking-tight leading-snug font-sans">
                   {courseTitle}
@@ -412,45 +464,59 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
               </div>
             </div>
 
-            <p className="text-[10px] sm:text-xs text-slate-600 max-w-2xl mx-auto leading-tight">
+            <p className="text-[10px] sm:text-xs text-slate-500 max-w-2xl mx-auto leading-relaxed mt-1">
               An intensive learning journey powered by <span className="font-extrabold text-[#2563EB]">CampusOS</span>, recognizing your dedication, curiosity, and commitment to continuous growth.
             </p>
 
           </div>
 
           {/* MIDDLE WIDE HORIZONTAL LAYOUT: 4 PILLS IN HORIZONTAL ROW (LEFT) + QUOTE BLOCK (RIGHT) */}
-          <div className="relative z-20 grid grid-cols-1 sm:grid-cols-12 gap-3 my-2 items-center">
+          <div className="relative z-20 grid grid-cols-1 sm:grid-cols-12 gap-3 my-3 items-center">
             
             {/* Left 9 Cols: Horizontal 4 Glass Pills Grid */}
             <div className="sm:col-span-9 grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-              <div className="px-2 py-1 rounded-xl bg-white/80 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
-                <div className="p-0.5 rounded-md bg-blue-100 text-blue-600 shrink-0">
-                  <BookOpen className="w-3 h-3" />
+              <div className="px-2 py-1.5 rounded-xl bg-white/95 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
+                <div className="p-0.5 rounded-md bg-blue-100/80 text-blue-600 shrink-0">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                  </svg>
                 </div>
                 <span>Hands-on Learning</span>
               </div>
-              <div className="px-2 py-1 rounded-xl bg-white/80 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
-                <div className="p-0.5 rounded-md bg-blue-100 text-blue-600 shrink-0">
-                  <TrendingUp className="w-3 h-3" />
+              <div className="px-2 py-1.5 rounded-xl bg-white/95 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
+                <div className="p-0.5 rounded-md bg-blue-100/80 text-blue-600 shrink-0">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                    <polyline points="17 6 23 6 23 12" />
+                  </svg>
                 </div>
                 <span>Skill Development</span>
               </div>
-              <div className="px-2 py-1 rounded-xl bg-white/80 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
-                <div className="p-0.5 rounded-md bg-blue-100 text-blue-600 shrink-0">
-                  <Users className="w-3 h-3" />
+              <div className="px-2 py-1.5 rounded-xl bg-white/95 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
+                <div className="p-0.5 rounded-md bg-blue-100/80 text-blue-600 shrink-0">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
                 </div>
                 <span>Global Community</span>
               </div>
-              <div className="px-2 py-1 rounded-xl bg-white/80 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
-                <div className="p-0.5 rounded-md bg-blue-100 text-blue-600 shrink-0">
-                  <Briefcase className="w-3 h-3" />
+              <div className="px-2 py-1.5 rounded-xl bg-white/95 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
+                <div className="p-0.5 rounded-md bg-blue-100/80 text-blue-600 shrink-0">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                  </svg>
                 </div>
                 <span>Career Opportunities</span>
               </div>
             </div>
 
             {/* Right 3 Cols: Quote Block */}
-            <div className="sm:col-span-3 relative pl-3 flex flex-col justify-center border-l-2 border-blue-600 py-0.5">
+            <div className="sm:col-span-3 relative pl-4 flex flex-col justify-center border-l-2 border-[#2563EB] py-0.5">
               <p className="text-[10px] sm:text-[11px] font-serif italic text-slate-800 font-semibold leading-tight">
                 “Keep learning, keep building, keep growing..”
               </p>
@@ -462,13 +528,18 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
           </div>
 
           {/* FOOTER SECTION: 4 BALANCED COLUMNS (Date, Signature of Naman Pandey, 3D Seal, QR Code) */}
-          <div className="relative z-20 grid grid-cols-1 sm:grid-cols-4 gap-3 items-center pt-2 border-t border-slate-200">
+          <div className="relative z-20 grid grid-cols-1 sm:grid-cols-4 gap-3 items-center pt-3 border-t border-slate-200">
             
             {/* Col 1: Completed On Glass Pill */}
             <div className="flex items-center gap-2 justify-center sm:justify-start">
-              <div className="px-2.5 py-1 rounded-xl bg-white/90 border border-blue-100 shadow-2xs flex items-center gap-2">
-                <div className="p-1 rounded-lg bg-blue-900 text-amber-400 shrink-0">
-                  <Calendar className="w-3.5 h-3.5" />
+              <div className="px-2.5 py-1.5 rounded-xl bg-white/95 border border-[#D4AF37]/35 shadow-2xs flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-[#0B1A3A] text-[#F5D061] shrink-0 flex items-center justify-center">
+                  <svg className="w-3.5 h-3.5 text-[#F5D061]" viewBox="0 0 24 24" fill="none" stroke="#F5D061" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                    <line x1="16" x2="16" y1="2" y2="6" />
+                    <line x1="8" x2="8" y1="2" y2="6" />
+                    <line x1="3" x2="21" y1="10" y2="10" />
+                  </svg>
                 </div>
                 <div className="text-left">
                   <div className="text-[7px] font-black text-slate-500 uppercase tracking-widest leading-none">
@@ -482,26 +553,26 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
             </div>
 
             {/* Col 2: Signature of Naman Pandey (Founder, CampusOS) */}
-            <div className="text-center space-y-0.5">
+            <div className="text-center space-y-1">
               <div className="relative inline-block text-center">
                 <div 
-                  className="text-2xl sm:text-3xl text-[#0B192C] font-semibold tracking-wide leading-none select-none"
+                  className="text-2xl sm:text-3xl text-[#0B192C] font-semibold tracking-wide leading-none select-none pb-1"
                   style={{ fontFamily: "'Great Vibes', cursive" }}
                 >
                   N Pandey
                 </div>
-                <svg className="w-24 sm:w-28 h-2 mx-auto text-[#0B192C] overflow-visible -mt-1" viewBox="0 0 120 10">
+                <svg className="w-24 sm:w-28 h-1.5 mx-auto text-[#0B192C] overflow-visible" viewBox="0 0 120 6">
                   <path 
-                    d="M 5 2 C 35 8, 75 1, 115 5 C 118 6, 119 3, 110 2 C 85 1, 40 5, 5 2" 
+                    d="M 5 2 C 35 6, 75 1, 115 4 C 118 5, 119 3, 110 2 C 85 1, 40 4, 5 2" 
                     fill="currentColor" 
                   />
                 </svg>
               </div>
-              <div className="w-20 mx-auto border-b border-amber-500/60 my-0.5" />
+              <div className="w-20 mx-auto border-b border-amber-500/40 my-1" />
               <div className="text-[10px] font-black text-[#0B192C] leading-none">
                 Naman Pandey
               </div>
-              <div className="text-[9px] font-bold text-blue-600 leading-none">
+              <div className="text-[9px] font-bold text-[#2563EB] leading-none">
                 Founder, CampusOS
               </div>
             </div>
@@ -513,8 +584,8 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
 
             {/* Col 4: QR Code & Verify Certificate Glass Badge */}
             <div className="flex items-center gap-2 justify-center sm:justify-end">
-              <div className="px-2.5 py-1 rounded-xl bg-white/90 border border-blue-100 shadow-2xs flex items-center gap-2">
-                <div className="p-1 bg-white border border-slate-300 rounded-lg shrink-0">
+              <div className="px-2.5 py-1.5 rounded-xl bg-white/95 border border-[#D4AF37]/35 shadow-2xs flex items-center gap-2">
+                <div className="p-1 bg-white border border-slate-200 rounded-lg shrink-0">
                   <QRCodeSVG
                     value={verificationUrl}
                     size={36}
@@ -524,11 +595,16 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
                 </div>
                 <div className="text-left">
                   <button
+                    type="button"
                     onClick={onVerifyClick}
-                    className="font-black text-[#0B192C] hover:text-blue-600 flex items-center gap-1 transition-colors cursor-pointer text-[9px]"
+                    className="font-black text-[#0B192C] hover:text-[#2563EB] flex items-center gap-1 transition-colors cursor-pointer text-[9px]"
                   >
                     <span>Verify Certificate</span>
-                    <ExternalLink className="w-2.5 h-2.5" />
+                    <svg className="w-2.5 h-2.5 text-slate-800" viewBox="0 0 24 24" fill="none" stroke="#1E293B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" x2="21" y1="14" y2="3" />
+                    </svg>
                   </button>
                   <div className="text-[8px] text-emerald-600 font-bold flex items-center gap-0.5 mt-0.5">
                     <span>campusos.com/verify</span>
@@ -541,8 +617,8 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
           </div>
 
           {/* BOTTOM CENTER PILL BADGE */}
-          <div className="relative z-20 mt-2 text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-white/80 border border-blue-200/80 text-[8px] sm:text-[9px] font-extrabold uppercase tracking-widest text-slate-700 shadow-2xs">
+          <div className="relative z-20 mt-3 text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-white/90 border border-blue-200/80 text-[8px] sm:text-[9px] font-extrabold uppercase tracking-widest text-slate-700 shadow-2xs">
               <span className="text-amber-500">✦</span>
               <span>POWERED BY CAMPUSOS</span>
               <span className="text-slate-400">|</span>
