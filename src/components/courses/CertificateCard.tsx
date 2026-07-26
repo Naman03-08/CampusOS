@@ -123,11 +123,11 @@ const GoldenLaurelWreathSVG: React.FC = () => (
   </svg>
 );
 
-// 3D Metallic Gold Medal Seal with Royal Blue Ribbon Tails
+// 3D Metallic Gold Medal Seal (Official Campus OS Academy Seal)
 const GoldRibbonSealSVG: React.FC = () => (
   <div className="relative flex flex-col items-center shrink-0">
-    {/* Scalloped Gold Medal */}
-    <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 drop-shadow-2xl z-10">
+    {/* Scalloped Gold Medal - Larger Size */}
+    <div className="relative w-24 h-24 sm:w-28 sm:h-28 shrink-0 drop-shadow-2xl z-10">
       <svg className="w-full h-full" viewBox="0 0 120 120">
         <defs>
           <radialGradient id="goldMedalGrad3D_v2" cx="35%" cy="35%" r="65%">
@@ -148,40 +148,61 @@ const GoldRibbonSealSVG: React.FC = () => (
           </radialGradient>
         </defs>
 
-        {/* Outer Starburst Scallop */}
+        {/* Outer Starburst Scallop Centered at (60,60) */}
         <path
-          d="M 60 5 L 64 12 L 72 7 L 74 15 L 83 12 L 83 20 L 92 20 L 90 28 L 98 31 L 93 38 L 100 44 L 93 50 L 98 57 L 90 60 L 92 68 L 83 68 L 83 76 L 74 73 L 72 81 L 64 76 L 60 83 L 56 76 L 48 81 L 46 73 L 37 76 L 37 68 L 28 68 L 30 60 L 22 57 L 27 50 L 20 44 L 27 38 L 22 31 L 30 28 L 28 20 L 37 20 L 37 12 L 46 15 L 48 7 L 56 12 Z"
+          d="M 60 6 L 65 14 L 73 9 L 75 18 L 84 15 L 84 24 L 93 23 L 91 32 L 100 33 L 95 41 L 103 45 L 97 52 L 104 58 L 97 64 L 103 71 L 95 75 L 100 83 L 91 84 L 93 93 L 84 92 L 84 101 L 75 98 L 73 107 L 65 102 L 60 110 L 55 102 L 47 107 L 45 98 L 36 101 L 36 92 L 27 93 L 29 84 L 20 83 L 25 75 L 17 71 L 23 64 L 16 58 L 23 52 L 17 45 L 25 41 L 20 33 L 29 32 L 27 23 L 36 24 L 36 15 L 45 18 L 47 9 L 55 14 Z"
           fill="url(#goldMedalGrad3D_v2)"
           stroke="url(#goldBorder3D_v2)"
           strokeWidth="2.5"
         />
 
-        {/* Outer Ring */}
-        <circle cx="60" cy="44" r="32" fill="url(#hologramCenterGrad)" stroke="url(#goldBorder3D_v2)" strokeWidth="2.5" />
+        {/* Outer Ridge Circle */}
+        <circle cx="60" cy="60" r="44" fill="none" stroke="url(#goldBorder3D_v2)" strokeWidth="1.5" />
 
-        {/* Inner Gold Shield / Crest */}
-        <circle cx="60" cy="42" r="15" fill="url(#goldMedalGrad3D_v2)" />
-        <circle cx="60" cy="42" r="12" fill="#0B1A3A" />
-        <text x="60" y="46" fill="#FAD86B" fontSize="12" fontWeight="900" textAnchor="middle" fontFamily="Cinzel, sans-serif">
-          C•OS
+        {/* Hologram Navy Center Circle */}
+        <circle cx="60" cy="60" r="41" fill="url(#hologramCenterGrad)" stroke="url(#goldBorder3D_v2)" strokeWidth="2.5" />
+
+        {/* Beaded Dash Circle */}
+        <circle cx="60" cy="60" r="36" fill="none" stroke="#FAD86B" strokeWidth="1" strokeDasharray="3,2" opacity="0.8" />
+
+        {/* Inner Gold Medallion Ring */}
+        <circle cx="60" cy="60" r="31" fill="url(#goldMedalGrad3D_v2)" stroke="url(#goldBorder3D_v2)" strokeWidth="1" />
+        <circle cx="60" cy="60" r="27" fill="#0B1A3A" stroke="url(#goldBorder3D_v2)" strokeWidth="1.5" />
+
+        {/* Top Decorative Stars */}
+        <text x="60" y="44" fill="#FAD86B" fontSize="7" textAnchor="middle">★ ★ ★</text>
+
+        {/* Complete Name: CAMPUS OS */}
+        <text
+          x="60"
+          y="56"
+          fill="#FAD86B"
+          fontSize="8"
+          fontWeight="900"
+          textAnchor="middle"
+          letterSpacing="0.6px"
+          fontFamily="Cinzel, sans-serif"
+        >
+          CAMPUS OS
         </text>
 
-        <text x="44" y="65" fill="#FAD86B" fontSize="8">★</text>
-        <text x="60" y="66" fill="#FAD86B" fontSize="9">★</text>
-        <text x="76" y="65" fill="#FAD86B" fontSize="8">★</text>
-      </svg>
-    </div>
+        {/* Subtitle: ACADEMY */}
+        <text
+          x="60"
+          y="66"
+          fill="#FFF5C0"
+          fontSize="6"
+          fontWeight="800"
+          textAnchor="middle"
+          letterSpacing="0.8px"
+          fontFamily="Cinzel, sans-serif"
+        >
+          ACADEMY
+        </text>
 
-    {/* Royal Blue V-Cut Ribbon Tails hanging underneath */}
-    <div className="flex gap-2.5 -mt-3 z-0">
-      <div 
-        className="w-4 h-9 bg-gradient-to-b from-[#1E3A8A] via-[#10244A] to-[#0A1835] border-x border-b border-[#D4AF37] transform -rotate-12 shadow-lg"
-        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%)' }}
-      />
-      <div 
-        className="w-4 h-9 bg-gradient-to-b from-[#1E3A8A] via-[#10244A] to-[#0A1835] border-x border-b border-[#D4AF37] transform rotate-12 shadow-lg"
-        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%)' }}
-      />
+        {/* Bottom Star */}
+        <text x="60" y="76" fill="#FAD86B" fontSize="7" textAnchor="middle">★</text>
+      </svg>
     </div>
   </div>
 );
