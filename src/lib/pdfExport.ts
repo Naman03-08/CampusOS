@@ -65,15 +65,15 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
           clonedDoc.body.style.height = 'auto';
           clonedDoc.body.style.margin = '0';
           clonedDoc.body.style.padding = '0';
-          clonedDoc.body.style.overflow = 'visible';
-          clonedDoc.body.style.backgroundColor = '#0B1220';
+          clonedDoc.body.style.overflow = 'hidden';
+          clonedDoc.body.style.backgroundColor = '#FAF8F3';
         }
 
         let parent = clonedElem.parentElement;
         while (parent && parent !== clonedDoc.body) {
           parent.style.maxWidth = 'none';
           parent.style.width = '1200px';
-          parent.style.overflow = 'visible';
+          parent.style.overflow = 'hidden';
           parent.style.maxHeight = 'none';
           parent.style.height = 'auto';
           parent.style.padding = '0';
@@ -89,7 +89,8 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
         clonedElem.style.maxHeight = 'none';
         clonedElem.style.boxSizing = 'border-box';
         clonedElem.style.borderRadius = '24px';
-        clonedElem.style.overflow = 'visible';
+        clonedElem.style.overflow = 'hidden';
+        clonedElem.style.backgroundColor = '#FAF8F3';
       } else {
         clonedElem.style.width = '100%';
         clonedElem.style.maxWidth = '100%';
@@ -114,42 +115,41 @@ export async function exportCanvasToPDF(elementId: string, filename: string = 'R
     allowTaint: true,
     logging: false,
     windowWidth: 1200,
-    backgroundColor: isCert ? '#0B1220' : '#ffffff',
+    backgroundColor: '#FAF8F3',
     onclone: (clonedDoc) => {
       sanitizeDocumentForHtml2Canvas(clonedDoc, elementId);
     }
   });
 
   const imgData = canvas.toDataURL('image/png', 1.0);
-  const pdf = new jsPDF({
-    orientation: isCert ? 'landscape' : 'portrait',
-    unit: 'mm',
-    format: 'a4'
-  });
-
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = pdf.internal.pageSize.getHeight();
 
   if (isCert) {
-    const margin = 4; // 4mm margin for pristine full certificate fitting
-    const availWidth = pdfWidth - margin * 2;
-    const availHeight = pdfHeight - margin * 2;
+    // Convert canvas pixels to PDF dimensions in millimeters (1 px = 0.264583 mm)
+    const pdfWidth = canvas.width * 0.264583;
+    const pdfHeight = canvas.height * 0.264583;
 
-    const ratio = Math.min(availWidth / canvas.width, availHeight / canvas.height);
-    const renderWidth = canvas.width * ratio;
-    const renderHeight = canvas.height * ratio;
+    const pdf = new jsPDF({
+      orientation: pdfWidth > pdfHeight ? 'landscape' : 'portrait',
+      unit: 'mm',
+      format: [pdfWidth, pdfHeight]
+    });
 
-    const xOffset = (pdfWidth - renderWidth) / 2;
-    const yOffset = (pdfHeight - renderHeight) / 2;
-
-    pdf.addImage(imgData, 'PNG', xOffset, yOffset, renderWidth, renderHeight, undefined, 'FAST');
+    // Draw edge-to-edge to eliminate all white letterboxes and margins
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+    pdf.save(filename);
   } else {
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
     const imgHeight = (canvas.height * pdfWidth) / canvas.width;
     const yOffset = imgHeight < pdfHeight ? (pdfHeight - imgHeight) / 2 : 0;
     pdf.addImage(imgData, 'PNG', 0, yOffset, pdfWidth, imgHeight, undefined, 'FAST');
+    pdf.save(filename);
   }
-
-  pdf.save(filename);
 }
 
 export function exportTextToPDF(title: string, content: string, filename: string = 'document.pdf') {

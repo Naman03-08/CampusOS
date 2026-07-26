@@ -259,7 +259,7 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
         allowTaint: true,
         logging: false,
         windowWidth: 1280,
-        backgroundColor: '#0B1220',
+        backgroundColor: '#FAF8F3',
         onclone: (clonedDoc) => {
           sanitizeDocumentForHtml2Canvas(clonedDoc, `cert_node_${certificateId}`);
         }
