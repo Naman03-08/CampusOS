@@ -35,6 +35,21 @@ export class StreakService {
     }
   }
 
+  static syncStreak(remoteStreak?: number, remoteLastActivityDate?: string) {
+    if (typeof remoteStreak !== 'number' || remoteStreak < 0) return;
+    const current = this.getStreakData();
+    const today = getFormattedDateStr();
+
+    // If local storage is empty or behind remote Firestore data, hydrate local storage
+    if (!current.lastActivityDate || remoteStreak > current.streak) {
+      const actDate = remoteLastActivityDate ? remoteLastActivityDate.split('T')[0] : (remoteStreak > 0 ? today : undefined);
+      this.saveStreakData({
+        streak: remoteStreak,
+        lastActivityDate: actDate
+      });
+    }
+  }
+
   static getStreakInfo(): StreakInfo {
     return this.evaluateStreak();
   }

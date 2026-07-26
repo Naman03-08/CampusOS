@@ -185,7 +185,7 @@ export class FirestoreService {
       const marksAvg = totalMax > 0 ? Math.round((totalScored / totalMax) * 100) : 0;
 
       const tasksCompleted = (habData?.tasks || []).filter((t: any) => t.completedToday || t.status === 'Completed').length;
-      const streak = habData?.stats?.flameStreak || 0;
+      const streak = profile?.stats?.dsaStreak ?? habData?.stats?.flameStreak ?? 0;
       const studyHours = Object.values(habData?.studyHoursLog || {}).reduce((a: number, b: any) => a + Number(b || 0), 0);
 
       const entry = {

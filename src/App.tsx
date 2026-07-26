@@ -335,6 +335,10 @@ export function App() {
         setUser(fsProfile);
         StorageService.saveProfile(fsProfile);
 
+        if (typeof fsProfile.stats?.dsaStreak === 'number') {
+          StreakService.syncStreak(fsProfile.stats.dsaStreak, fsProfile.stats.lastActiveAt);
+        }
+
         // Hydrate data from Firestore
         try {
           const fsSuites = await FirestoreService.getStudySuites(fbUser.uid);
@@ -635,6 +639,7 @@ export function App() {
                   user={user}
                   attendance={attendance}
                   onUpdateAttendance={handleUpdateAttendance}
+                  onSyncUserStats={() => syncUserStats(user, attendance, dsa, assignments, studySuites, resumeData)}
                   focusTimerSeconds={focusTimerSeconds}
                   focusTimerInitialMinutes={focusTimerInitialMinutes}
                   isFocusTimerRunning={isFocusTimerRunning}

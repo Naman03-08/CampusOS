@@ -385,6 +385,7 @@ interface HabiturexViewProps {
   user: UserProfile;
   attendance: AttendanceSubject[];
   onUpdateAttendance: (subjects: AttendanceSubject[]) => void;
+  onSyncUserStats?: () => void;
   initialInnerTab?: 'dashboard' | 'table' | 'attendance' | 'analytics' | 'missions' | 'calendar' | 'leaderboard';
   focusTimerSeconds?: number;
   focusTimerInitialMinutes?: number;
@@ -399,6 +400,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
   user,
   attendance,
   onUpdateAttendance,
+  onSyncUserStats,
   initialInnerTab,
   focusTimerSeconds = 25 * 60,
   focusTimerInitialMinutes = 25,
@@ -589,6 +591,13 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
     async function loadHabiturexData() {
       if (!user?.uid) return;
       try {
+        // Hydrate StreakService from user.stats.dsaStreak if available
+        if (typeof user.stats?.dsaStreak === 'number') {
+          StreakService.syncStreak(user.stats.dsaStreak, user.stats.lastActiveAt);
+        }
+        const streakInfo = StreakService.getStreakInfo();
+        const currentEvaluatedStreak = streakInfo.streak;
+
         const habData = await FirestoreService.getHabiturexData(user.uid);
         const userMarks = await FirestoreService.getStudentMarks(user.uid);
 
@@ -599,8 +608,12 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
             setEvents(habData.events || []);
             setStudyHoursLog(habData.studyHoursLog || {});
             setCredits(habData.stats?.credits || 0);
-            setFlameStreak(habData.stats?.flameStreak || 0);
+
+            const unifiedStreak = Math.max(habData.stats?.flameStreak || 0, currentEvaluatedStreak, user.stats?.dsaStreak || 0);
+            setFlameStreak(unifiedStreak);
             setPerfectDays(habData.stats?.perfectDays || 0);
+          } else {
+            setFlameStreak(currentEvaluatedStreak);
           }
           if (userMarks) {
             setMarks(userMarks);
@@ -613,7 +626,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
 
     loadHabiturexData();
     return () => { isMounted = false; };
-  }, [user?.uid]);
+  }, [user?.uid, user?.stats?.dsaStreak]);
 
   // Auto Save to Firestore
   const saveAllToFirestore = async (
@@ -626,6 +639,9 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
   ) => {
     if (!user?.uid) return;
     try {
+      const streakInfo = StreakService.getStreakInfo();
+      const unifiedStreak = updatedStreak !== undefined ? updatedStreak : streakInfo.streak;
+
       await FirestoreService.saveHabiturexData(user.uid, {
         tasks: updatedTasks,
         missions: updatedMissions,
@@ -634,10 +650,29 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
         stats: {
           xp: 0,
           credits: updatedCredits,
-          flameStreak: updatedStreak,
+          flameStreak: unifiedStreak,
           perfectDays
         }
       });
+
+      // Synchronize profile stats in Firestore & local user object so header and habiturex are 100% identical!
+      if (user.stats) {
+        const updatedProfileStats = {
+          ...user.stats,
+          dsaStreak: unifiedStreak,
+          streakAtRisk: streakInfo.isAtRisk,
+          streakCompletedToday: streakInfo.completedToday,
+          lastActiveAt: new Date().toISOString()
+        };
+        await FirestoreService.saveProfile({
+          ...user,
+          stats: updatedProfileStats
+        });
+      }
+
+      if (onSyncUserStats) {
+        onSyncUserStats();
+      }
     } catch (e) {
       console.warn("Error saving Habiturex data:", e);
     }
@@ -645,13 +680,12 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
 
   // Toggle Task Status & Record Streak
   const handleToggleTask = async (taskId: string) => {
+    let isTaskCompleting = false;
     const updated = tasks.map(t => {
       if (t.id !== taskId) return t;
       const isCompleting = !t.completedToday;
-      
       if (isCompleting) {
-        // Record active activity for streak
-        StreakService.recordActivity();
+        isTaskCompleting = true;
       }
 
       return {
@@ -663,15 +697,19 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
       };
     });
 
-    const completedCount = updated.filter(t => t.completedToday).length;
     let newStreak = flameStreak;
-    if (completedCount > 0) {
-      newStreak = Math.max(flameStreak, 1);
+    if (isTaskCompleting) {
+      const streakInfo = StreakService.recordActivity();
+      newStreak = streakInfo.streak;
+      setFlameStreak(newStreak);
+    } else {
+      const streakInfo = StreakService.getStreakInfo();
+      newStreak = streakInfo.streak;
       setFlameStreak(newStreak);
     }
 
     setTasks(updated);
-    saveAllToFirestore(updated, missions, events, studyHoursLog, credits, newStreak);
+    await saveAllToFirestore(updated, missions, events, studyHoursLog, credits, newStreak);
   };
 
   // Add or Edit Task
@@ -746,10 +784,14 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
       return { ...m, claimed: true };
     });
 
+    const streakInfo = StreakService.recordActivity();
+    const newStreak = streakInfo.streak;
+    setFlameStreak(newStreak);
+
     const newCredits = credits + rewardGranted;
     setCredits(newCredits);
     setMissions(updated);
-    saveAllToFirestore(tasks, updated, events, studyHoursLog, newCredits);
+    saveAllToFirestore(tasks, updated, events, studyHoursLog, newCredits, newStreak);
     alert(`🎉 Reward Claimed! +${rewardGranted} Gold Credits added to your account.`);
   };
 
