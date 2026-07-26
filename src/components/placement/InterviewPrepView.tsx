@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   BookOpen, 
   Search, 
@@ -37,6 +38,327 @@ import { CompanyQuestionsSection } from './CompanyQuestionsSection';
 import { CheatSheetsSection } from './CheatSheetsSection';
 import { MCQPracticeSection } from './MCQPracticeSection';
 
+// Beautiful Real-Time Interactive AI Concentric Orbit Animation Core
+const AIAnimationMatrix: React.FC = () => {
+  const [activeNodes, setActiveNodes] = useState<number[]>([1, 3, 5]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveNodes(prev => {
+        const count = Math.floor(Math.random() * 3) + 2;
+        const newNodes: number[] = [];
+        for (let i = 0; i < count; i++) {
+          newNodes.push(Math.floor(Math.random() * 8) + 1);
+        }
+        return newNodes;
+      });
+    }, 1800);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="relative w-40 h-40 flex items-center justify-center bg-radial from-blue-500/10 via-transparent to-transparent rounded-full border border-blue-100/30 shrink-0">
+      {/* Scanning Radar Line */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-0 rounded-full pointer-events-none"
+        style={{
+          background: 'conic-gradient(from 0deg, rgba(59, 130, 246, 0.15) 0deg, rgba(59, 130, 246, 0) 90deg, rgba(59, 130, 246, 0) 360deg)'
+        }}
+      />
+
+      {/* Outer Orbit */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        className="absolute w-36 h-36 border border-dashed border-blue-400/30 rounded-full"
+      />
+      {/* Middle Orbit */}
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+        className="absolute w-26 h-26 border border-dotted border-indigo-400/40 rounded-full"
+      />
+      {/* Inner Core */}
+      <motion.div
+        animate={{ scale: [1, 1.08, 1] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 border border-blue-400/20"
+      >
+        <Sparkles className="w-5 h-5 text-white animate-pulse" />
+      </motion.div>
+
+      {/* Orbiting AI Nodes */}
+      {[...Array(8)].map((_, i) => {
+        const angle = (i * 360) / 8;
+        const radius = 54; 
+        const rad = (angle * Math.PI) / 180;
+        const x = Math.cos(rad) * radius;
+        const y = Math.sin(rad) * radius;
+
+        const isActive = activeNodes.includes(i + 1);
+
+        return (
+          <motion.div
+            key={i}
+            style={{ x, y }}
+            animate={{
+              scale: isActive ? [1, 1.35, 1] : 1,
+              backgroundColor: isActive ? '#2563EB' : '#94A3B8',
+              boxShadow: isActive ? '0 0 12px #3B82F6, 0 0 4px #2563EB' : 'none'
+            }}
+            transition={{ duration: 1 }}
+            className="absolute w-2.5 h-2.5 rounded-full"
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+// Interactive 3D Subject Browser Card with dynamic Mouse Tilt
+const InteractiveSubjectCard: React.FC<{
+  sub: InterviewBitSubject;
+  isSelected: boolean;
+  onClick: () => void;
+}> = ({ sub, isSelected, onClick }) => {
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = (centerY - y) / (rect.height / 2) * 8; 
+    const rotateY = (x - centerX) / (rect.width / 2) * 8; 
+    setCoords({ x: rotateY, y: rotateX });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setCoords({ x: 0, y: 0 });
+  };
+
+  return (
+    <motion.div
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      animate={{
+        rotateY: coords.x,
+        rotateX: coords.y,
+        scale: isHovered ? 1.025 : 1,
+        z: isHovered ? 15 : 0
+      }}
+      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+      className={`p-4 rounded-2xl border transition-all cursor-pointer group relative ${
+        isSelected
+          ? 'bg-blue-50/95 border-blue-500 shadow-md shadow-blue-500/5'
+          : 'bg-white border-slate-200/90 hover:border-blue-300 hover:bg-slate-50 shadow-2xs'
+      }`}
+    >
+      <div style={{ transform: 'translateZ(15px)' }} className="relative z-10 space-y-2">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs font-black text-slate-900 group-hover:text-blue-600 transition-colors">
+            {sub.name}
+          </span>
+          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+            {sub.category}
+          </span>
+        </div>
+
+        <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed font-medium">
+          {sub.description}
+        </p>
+
+        <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 pt-2 border-t border-slate-100">
+          <div className="flex items-center gap-1">
+            <Building2 className="w-3 h-3 text-slate-400" />
+            <span className="truncate max-w-[150px]">{sub.popularCompanies.slice(0, 3).join(', ')}</span>
+          </div>
+          <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isSelected ? 'text-blue-600 translate-x-1' : 'text-slate-300'}`} />
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// Interactive 3D Question Card with dynamic Mouse Tilt
+const InteractiveQuestionCard: React.FC<{
+  q: InterviewQuestion;
+  idx: number;
+  isMastered: boolean;
+  isBookmarked: boolean;
+  isAnswerVisible: boolean;
+  onToggleBookmark: (e: React.MouseEvent) => void;
+  onToggleMastered: (e: React.MouseEvent) => void;
+  onToggleAnswer: (e: React.MouseEvent) => void;
+  copiedQuestionId: string | null;
+  copyAnswerText: (e: React.MouseEvent) => void;
+}> = ({
+  q,
+  idx,
+  isMastered,
+  isBookmarked,
+  isAnswerVisible,
+  onToggleBookmark,
+  onToggleMastered,
+  onToggleAnswer,
+  copiedQuestionId,
+  copyAnswerText
+}) => {
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = (centerY - y) / (rect.height / 2) * 5; 
+    const rotateY = (x - centerX) / (rect.width / 2) * 5; 
+    setCoords({ x: rotateY, y: rotateX });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setCoords({ x: 0, y: 0 });
+  };
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      animate={{
+        rotateY: coords.x,
+        rotateX: coords.y,
+        scale: isHovered ? 1.015 : 1,
+        z: isHovered ? 12 : 0
+      }}
+      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+      style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+      className={`p-5 rounded-2xl bg-white border transition-all relative ${
+        isMastered
+          ? 'border-emerald-300 bg-emerald-50/20 shadow-xs'
+          : 'border-slate-200/90 hover:border-slate-300 shadow-2xs hover:shadow-md'
+      }`}
+    >
+      <div style={{ transform: 'translateZ(10px)' }}>
+        {/* Question Header */}
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-2 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] font-black px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                Q{idx + 1}
+              </span>
+              <span
+                className={`text-[10px] font-black px-2 py-0.5 rounded ${
+                  q.difficulty === 'Easy'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : q.difficulty === 'Medium'
+                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                    : 'bg-rose-50 text-rose-700 border border-rose-200'
+                }`}
+              >
+                {q.difficulty}
+              </span>
+
+              {q.companyTags.slice(0, 3).map((comp) => (
+                <span key={comp} className="text-[10px] font-bold text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200/60">
+                  {comp}
+                </span>
+              ))}
+            </div>
+
+            <h3 className="text-sm font-black text-slate-900 leading-snug">
+              {q.question}
+            </h3>
+          </div>
+
+          {/* Action Controls */}
+          <div className="flex items-center gap-1.5 shrink-0" style={{ transform: 'translateZ(15px)' }}>
+            <button
+              onClick={onToggleBookmark}
+              className={`p-2 rounded-xl transition-all ${
+                isBookmarked
+                  ? 'bg-amber-100 text-amber-700'
+                  : 'bg-slate-50 text-slate-400 hover:text-slate-600'
+              }`}
+              title={isBookmarked ? 'Bookmarked' : 'Bookmark question'}
+            >
+              {isBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+            </button>
+
+            <button
+              onClick={onToggleMastered}
+              className={`p-2 rounded-xl transition-all ${
+                isMastered
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'bg-slate-50 text-slate-400 hover:text-slate-600'
+              }`}
+              title={isMastered ? 'Mastered' : 'Mark as Mastered'}
+            >
+              <CheckCircle2 className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={onToggleAnswer}
+              className="px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 font-bold text-xs hover:bg-blue-100 border border-blue-200/60 flex items-center gap-1"
+            >
+              {isAnswerVisible ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              {isAnswerVisible ? 'Hide' : 'Answer'}
+            </button>
+          </div>
+        </div>
+
+        {/* Collapsible Answer & Code Box */}
+        {isAnswerVisible && (
+          <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
+            <div className="text-xs text-slate-700 leading-relaxed font-medium bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+              <span className="font-bold text-blue-600 block mb-1">Answer & Conceptual Breakdown:</span>
+              {q.answer}
+            </div>
+
+            {q.codeSnippet && (
+              <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-900 text-slate-100" style={{ transform: 'translateZ(5px)' }}>
+                <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700 text-[11px] font-mono text-slate-300">
+                  <span>{q.codeLanguage || 'code'}</span>
+                  <button
+                    onClick={copyAnswerText}
+                    className="hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    {copiedQuestionId === q.id ? (
+                      <span className="text-emerald-400 flex items-center gap-1">
+                        <Check className="w-3.5 h-3.5" /> Copied
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1">
+                        <Copy className="w-3.5 h-3.5" /> Copy Code
+                      </span>
+                    )}
+                  </button>
+                </div>
+                <pre className="p-4 text-xs font-mono text-slate-100 overflow-x-auto leading-relaxed">
+                  <code>{q.codeSnippet}</code>
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
 interface InterviewPrepViewProps {
   onNavigateTab?: (tab: string) => void;
 }
@@ -52,6 +374,11 @@ export const InterviewPrepView: React.FC<InterviewPrepViewProps> = ({ onNavigate
   
   // Selected Subject State
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('java');
+
+  // Interactive AI Preparedness Analyzer states
+  const [showAIAnalyzer, setShowAIAnalyzer] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
 
   // User Progress State (Mastered & Bookmarked Qs saved in localStorage)
   const [masteredIds, setMasteredIds] = useState<string[]>(() => {
@@ -161,49 +488,98 @@ export const InterviewPrepView: React.FC<InterviewPrepViewProps> = ({ onNavigate
   const totalMasteredCount = masteredIds.length;
   const totalBookmarkedCount = bookmarkedIds.length;
 
+  const runAIAnalysis = () => {
+    setIsAnalyzing(true);
+    setShowAIAnalyzer(true);
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      const score = Math.min(30 + totalMasteredCount * 12 + totalBookmarkedCount * 4, 98);
+      setAnalysisResult({
+        score,
+        tier: score > 80 ? 'Master Architect' : score > 50 ? 'Associate Engineer' : 'Rising Talent',
+        recommendations: [
+          totalMasteredCount < 3 
+            ? 'Solve at least 5 standard subject technical questions to unlock advanced AI interview matching matrices.'
+            : 'Excellent progress on code compilation & analysis conceptual paradigms! Keep mastering new subjects to scale your score.',
+          'Your bookmark index is highly optimized. Use the Cheat Sheet cards to revise system structures rapidly.'
+        ],
+        targetPreparedness: {
+          Google: Math.min(25 + totalMasteredCount * 8, 92),
+          Amazon: Math.min(35 + totalMasteredCount * 9, 95),
+          Microsoft: Math.min(30 + totalMasteredCount * 10, 94),
+          Startups: Math.min(45 + totalMasteredCount * 11, 98),
+        }
+      });
+    }, 2000);
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Top Header Card */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-bold uppercase tracking-wider border border-blue-200 flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+      
+      {/* Dynamic 3D Header Card with AI Orbit Animations */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative overflow-hidden">
+        {/* Soft Decorative Ambient Gradients */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-100/35 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 left-10 w-60 h-60 bg-indigo-50/50 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex-1 space-y-4">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-[11px] font-bold uppercase tracking-wider border border-blue-200 flex items-center gap-1.5 shadow-2xs">
+              <BookOpen className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
               256 TECHNICAL SUBJECTS
             </span>
-            <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-[11px] font-bold uppercase tracking-wider border border-amber-200 flex items-center gap-1.5">
+            <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-[11px] font-bold uppercase tracking-wider border border-amber-200 flex items-center gap-1.5 shadow-2xs">
               <Building2 className="w-3.5 h-3.5 text-amber-600" />
               COMPANY SPECIFIC QUESTIONS
             </span>
-            <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-[11px] font-bold uppercase tracking-wider border border-purple-200 flex items-center gap-1.5">
+            <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-[11px] font-bold uppercase tracking-wider border border-purple-200 flex items-center gap-1.5 shadow-2xs">
               <HelpCircle className="w-3.5 h-3.5 text-purple-600" />
               INTERACTIVE MCQ ENGINE
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Technical Interview Preparation Hub
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1 max-w-2xl leading-relaxed">
-            All-in-one interview toolkit: 256 subject technical Q&As, company-specific question vaults, rapid cheat sheet reference cards, and interactive MCQ practice with live scoring.
-          </p>
+
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-none flex items-center gap-2">
+              Technical Interview Preparation Hub
+              <Sparkles className="w-5 h-5 text-blue-600 animate-bounce" />
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 font-medium mt-2.5 max-w-2xl leading-relaxed">
+              All-in-one interview toolkit: 256 subject technical Q&As, company-specific question vaults, rapid cheat sheet reference cards, and interactive MCQ practice with live scoring.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={runAIAnalysis}
+              className="px-4 py-2.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold flex items-center gap-2 transition-all shadow-sm hover:scale-[1.02]"
+            >
+              <Sparkles className="w-4 h-4 text-blue-400 animate-spin" style={{ animationDuration: '3s' }} />
+              Analyze Preparation with AI
+            </button>
+
+            {/* Global Progress Counters */}
+            <div className="flex items-center gap-2.5">
+              <div className="px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
+                <span className="text-[9px] font-bold text-slate-500 block uppercase tracking-wider">Subjects</span>
+                <span className="text-sm font-extrabold text-slate-900">{totalSubjectsCount}</span>
+              </div>
+
+              <div className="px-3.5 py-2 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-center">
+                <span className="text-[9px] font-bold text-emerald-700 block uppercase tracking-wider">Mastered</span>
+                <span className="text-sm font-extrabold text-emerald-800">{totalMasteredCount}</span>
+              </div>
+
+              <div className="px-3.5 py-2 rounded-xl bg-amber-50/70 border border-amber-200/80 text-center">
+                <span className="text-[9px] font-bold text-amber-700 block uppercase tracking-wider">Saved</span>
+                <span className="text-sm font-extrabold text-amber-800">{totalBookmarkedCount}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Global Progress Counters */}
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200/80 text-center">
-            <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">Subjects</span>
-            <span className="text-xl font-extrabold text-slate-900">{totalSubjectsCount}</span>
-          </div>
-
-          <div className="px-4 py-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-center">
-            <span className="text-[10px] font-bold text-emerald-700 block uppercase tracking-wider">Mastered</span>
-            <span className="text-xl font-extrabold text-emerald-800">{totalMasteredCount}</span>
-          </div>
-
-          <div className="px-4 py-3 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-center">
-            <span className="text-[10px] font-bold text-amber-700 block uppercase tracking-wider">Saved</span>
-            <span className="text-xl font-extrabold text-amber-800">{totalBookmarkedCount}</span>
-          </div>
+        {/* Beautiful AI Rotating Concentric Orbit Animation Panel (Right Side) */}
+        <div className="flex items-center justify-center relative bg-slate-50/40 p-4 rounded-2xl border border-slate-100">
+          <AIAnimationMatrix />
         </div>
       </div>
 
@@ -337,7 +713,7 @@ export const InterviewPrepView: React.FC<InterviewPrepViewProps> = ({ onNavigate
             <div className="lg:col-span-4 lg:sticky lg:top-20 lg:self-start space-y-3 z-10">
               <div className="flex items-center justify-between px-1">
                 <h2 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-blue-600" />
+                  <Layers className="w-4 h-4 text-blue-600 animate-spin" style={{ animationDuration: '10s' }} />
                   Subjects ({filteredSubjects.length} of {totalSubjectsCount})
                 </h2>
                 <span className="text-[10px] font-bold text-slate-400">Select subject</span>
@@ -352,36 +728,12 @@ export const InterviewPrepView: React.FC<InterviewPrepViewProps> = ({ onNavigate
                   filteredSubjects.map((sub) => {
                     const isSelected = selectedSubjectId === sub.id;
                     return (
-                      <div
+                      <InteractiveSubjectCard
                         key={sub.id}
+                        sub={sub}
+                        isSelected={isSelected}
                         onClick={() => setSelectedSubjectId(sub.id)}
-                        className={`p-4 rounded-2xl border transition-all cursor-pointer group ${
-                          isSelected
-                            ? 'bg-blue-50/90 border-blue-500 shadow-2xs'
-                            : 'bg-white border-slate-200/90 hover:border-blue-300 hover:bg-slate-50'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-black text-slate-900 group-hover:text-blue-600 transition-colors">
-                            {sub.name}
-                          </span>
-                          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                            {sub.category}
-                          </span>
-                        </div>
-
-                        <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed mb-2">
-                          {sub.description}
-                        </p>
-
-                        <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 pt-2 border-t border-slate-100">
-                          <div className="flex items-center gap-1">
-                            <Building2 className="w-3 h-3 text-slate-400" />
-                            <span className="truncate max-w-[150px]">{sub.popularCompanies.slice(0, 3).join(', ')}</span>
-                          </div>
-                          <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isSelected ? 'text-blue-600 translate-x-1' : 'text-slate-300'}`} />
-                        </div>
-                      </div>
+                      />
                     );
                   })
                 )}
@@ -391,7 +743,7 @@ export const InterviewPrepView: React.FC<InterviewPrepViewProps> = ({ onNavigate
             {/* RIGHT COLUMN: Questions and Technical Answers (8 Cols) */}
             <div className="lg:col-span-8 space-y-4">
               
-      {/* ACTIVE SUBJECT BANNER HEADER */}
+              {/* ACTIVE SUBJECT BANNER HEADER */}
               {activeSubject && (
                 <div className="p-6 rounded-3xl bg-gradient-to-br from-blue-50 via-indigo-50/70 to-sky-50 text-slate-900 border border-blue-200/80 shadow-xs relative overflow-hidden">
                   <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -462,116 +814,19 @@ export const InterviewPrepView: React.FC<InterviewPrepViewProps> = ({ onNavigate
                     const isAnswerVisible = showAllAnswers || visibleAnswerIds.includes(q.id);
 
                     return (
-                      <div
+                      <InteractiveQuestionCard
                         key={q.id}
-                        className={`p-5 rounded-2xl bg-white border transition-all ${
-                          isMastered
-                            ? 'border-emerald-300/80 bg-emerald-50/30'
-                            : 'border-slate-200/90 hover:border-slate-300 shadow-2xs'
-                        }`}
-                      >
-                        {/* Question Header */}
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="space-y-2 flex-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-[10px] font-black px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                                Q{idx + 1}
-                              </span>
-                              <span
-                                className={`text-[10px] font-black px-2 py-0.5 rounded ${
-                                  q.difficulty === 'Easy'
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                    : q.difficulty === 'Medium'
-                                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                    : 'bg-rose-50 text-rose-700 border border-rose-200'
-                                }`}
-                              >
-                                {q.difficulty}
-                              </span>
-
-                              {q.companyTags.slice(0, 3).map((comp) => (
-                                <span key={comp} className="text-[10px] font-bold text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200/60">
-                                  {comp}
-                                </span>
-                              ))}
-                            </div>
-
-                            <h3 className="text-sm font-black text-slate-900 leading-snug">
-                              {q.question}
-                            </h3>
-                          </div>
-
-                          {/* Action Controls */}
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <button
-                              onClick={(e) => toggleBookmark(q.id, e)}
-                              className={`p-2 rounded-xl transition-all ${
-                                isBookmarked
-                                  ? 'bg-amber-100 text-amber-700'
-                                  : 'bg-slate-50 text-slate-400 hover:text-slate-600'
-                              }`}
-                              title={isBookmarked ? 'Bookmarked' : 'Bookmark question'}
-                            >
-                              {isBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-                            </button>
-
-                            <button
-                              onClick={(e) => toggleMastered(q.id, e)}
-                              className={`p-2 rounded-xl transition-all ${
-                                isMastered
-                                  ? 'bg-emerald-100 text-emerald-700'
-                                  : 'bg-slate-50 text-slate-400 hover:text-slate-600'
-                              }`}
-                              title={isMastered ? 'Mastered' : 'Mark as Mastered'}
-                            >
-                              <CheckCircle2 className="w-4 h-4" />
-                            </button>
-
-                            <button
-                              onClick={(e) => toggleAnswerVisibility(q.id, e)}
-                              className="px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 font-bold text-xs hover:bg-blue-100 border border-blue-200/60 flex items-center gap-1"
-                            >
-                              {isAnswerVisible ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                              {isAnswerVisible ? 'Hide' : 'Answer'}
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Collapsible Answer & Code Box */}
-                        {isAnswerVisible && (
-                          <div className="mt-4 pt-4 border-t border-slate-100 space-y-3 animate-in fade-in duration-200">
-                            <div className="text-xs text-slate-700 leading-relaxed font-medium bg-slate-50 p-4 rounded-xl border border-slate-200/80">
-                              <span className="font-bold text-blue-600 block mb-1">Answer & Conceptual Breakdown:</span>
-                              {q.answer}
-                            </div>
-
-                            {q.codeSnippet && (
-                              <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-900 text-slate-100">
-                                <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700 text-[11px] font-mono text-slate-300">
-                                  <span>{q.codeLanguage || 'code'}</span>
-                                  <button
-                                    onClick={(e) => copyAnswerText(q, e)}
-                                    className="hover:text-white flex items-center gap-1 transition-colors"
-                                  >
-                                    {copiedQuestionId === q.id ? (
-                                      <span className="text-emerald-400 flex items-center gap-1">
-                                        <Check className="w-3.5 h-3.5" /> Copied
-                                      </span>
-                                    ) : (
-                                      <span className="flex items-center gap-1">
-                                        <Copy className="w-3.5 h-3.5" /> Copy Code
-                                      </span>
-                                    )}
-                                  </button>
-                                </div>
-                                <pre className="p-4 text-xs font-mono text-slate-100 overflow-x-auto leading-relaxed">
-                                  <code>{q.codeSnippet}</code>
-                                </pre>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
+                        q={q}
+                        idx={idx}
+                        isMastered={isMastered}
+                        isBookmarked={isBookmarked}
+                        isAnswerVisible={isAnswerVisible}
+                        onToggleBookmark={(e) => toggleBookmark(q.id, e)}
+                        onToggleMastered={(e) => toggleMastered(q.id, e)}
+                        onToggleAnswer={(e) => toggleAnswerVisibility(q.id, e)}
+                        copiedQuestionId={copiedQuestionId}
+                        copyAnswerText={(e) => copyAnswerText(q, e)}
+                      />
                     );
                   })
                 )}
@@ -580,6 +835,122 @@ export const InterviewPrepView: React.FC<InterviewPrepViewProps> = ({ onNavigate
           </div>
         </div>
       )}
+
+      {/* AI COPILOT ANALYZER MODAL WITH SCANNERS */}
+      <AnimatePresence>
+        {showAIAnalyzer && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+            >
+              {/* Modal Header */}
+              <div className="p-6 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 animate-pulse text-amber-300" />
+                  <h3 className="text-lg font-black tracking-tight">AI Copilot Core Predictor</h3>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowAIAnalyzer(false);
+                    setAnalysisResult(null);
+                  }}
+                  className="p-1.5 rounded-full hover:bg-white/15 text-white/80 transition-all"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <div className="p-6 space-y-6">
+                {isAnalyzing ? (
+                  <div className="py-12 flex flex-col items-center justify-center space-y-4">
+                    <div className="relative w-24 h-24 flex items-center justify-center">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-0 rounded-full border-4 border-blue-100 border-t-blue-600"
+                      />
+                      <Sparkles className="w-8 h-8 text-blue-600 animate-pulse" />
+                    </div>
+                    <div className="text-center space-y-1">
+                      <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">Scanning Prep Levels</h4>
+                      <p className="text-xs text-slate-500 font-medium">Validating compiled algorithms & core master records...</p>
+                    </div>
+                  </div>
+                ) : (
+                  analysisResult && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="space-y-6"
+                    >
+                      {/* Preparedness Score Matrix */}
+                      <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex items-center justify-between gap-4">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">PREPARATION RANK</span>
+                          <h4 className="text-lg font-black text-slate-900">{analysisResult.tier}</h4>
+                          <span className="text-xs text-slate-500 font-medium">Based on {totalMasteredCount} mastered concepts</span>
+                        </div>
+                        <div className="relative w-20 h-20 flex items-center justify-center bg-blue-50 rounded-2xl border border-blue-100 shadow-2xs">
+                          <div className="text-center">
+                            <span className="text-2xl font-black text-blue-600">{analysisResult.score}%</span>
+                            <span className="text-[9px] font-bold text-blue-400 block uppercase">READY</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Targeted Company Estimates */}
+                      <div className="space-y-2.5">
+                        <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                          <Building2 className="w-3.5 h-3.5" /> Predicted Clearance Probability
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          {Object.entries(analysisResult.targetPreparedness).map(([company, val]: any) => (
+                            <div key={company} className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex items-center justify-between">
+                              <span className="text-xs font-bold text-slate-700">{company}</span>
+                              <span className="text-xs font-extrabold text-blue-600">{val}%</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Strategic Smart Advice */}
+                      <div className="space-y-3 p-4.5 rounded-2xl bg-blue-50/60 border border-blue-100 text-blue-900">
+                        <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-800">
+                          <Zap className="w-4 h-4 text-blue-600 animate-bounce" />
+                          Copilot Strategic Recommendations:
+                        </div>
+                        <ul className="space-y-2 text-xs font-medium text-slate-700 pl-1 list-disc list-inside">
+                          {analysisResult.recommendations.map((rec: string, idx: number) => (
+                            <li key={idx} className="leading-relaxed">{rec}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </motion.div>
+                  )
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-4.5 bg-slate-50 border-t border-slate-100 text-right">
+                <button
+                  onClick={() => {
+                    setShowAIAnalyzer(false);
+                    setAnalysisResult(null);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold transition-all"
+                >
+                  Confirm Study Path
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 };

@@ -43,6 +43,90 @@ import { CertificateCard } from './CertificateCard';
 import { CertificateVerificationModal } from './CertificateVerificationModal';
 import { FirestoreService } from '../../lib/firestoreService';
 import { StreakService } from '../../lib/streakService';
+import { motion, AnimatePresence } from 'motion/react';
+
+// Bespoke CampusOS Academy Hub 3D Orbiting Logo Component
+const AcademyHubLogo: React.FC = () => {
+  return (
+    <motion.div 
+      className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center shrink-0"
+      whileHover={{ scale: 1.08, rotate: 5 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+    >
+      {/* Glow aura */}
+      <div className="absolute inset-0 bg-purple-200/40 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '3.5s' }} />
+      <div className="absolute inset-3 bg-indigo-100/40 rounded-full blur-lg" />
+
+      {/* Outer rotating orbit ring with dash spacing */}
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-0 rounded-full border border-dashed border-purple-400/80"
+      />
+      <motion.div 
+        animate={{ rotate: -360 }}
+        transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-2 rounded-full border border-indigo-200/60"
+      />
+
+      {/* Orbiting sub-nodes */}
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-0"
+      >
+        <span className="absolute top-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-purple-500 shadow-md shadow-purple-500/50" />
+      </motion.div>
+      <motion.div 
+        animate={{ rotate: -360 }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-2"
+      >
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-sky-400 shadow-sm shadow-sky-400/50" />
+      </motion.div>
+
+      {/* Solid Tech Core */}
+      <div className="absolute inset-4 bg-gradient-to-br from-white to-slate-50 rounded-2xl border border-slate-200/95 shadow-md flex items-center justify-center overflow-hidden">
+        <svg viewBox="0 0 100 100" className="w-10/12 h-10/12 text-purple-600">
+          <path d="M 30,35 Q 50,20 70,35" fill="none" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M 25,50 L 75,50" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M 30,65 Q 50,80 70,65" fill="none" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
+          
+          {/* Rotating AI/Sparkle node */}
+          <motion.rect
+            x="32"
+            y="32"
+            width="36"
+            height="36"
+            rx="10"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            animate={{ rotate: [0, -90, -180, -270, -360] }}
+            transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+            className="text-purple-500"
+          />
+          <motion.circle 
+            cx="50" 
+            cy="50" 
+            r="6" 
+            className="fill-purple-50 text-purple-500" 
+            stroke="currentColor" 
+            strokeWidth="1.5" 
+          />
+          <motion.path 
+            d="M 50,44 L 50,56 M 44,50 L 56,50" 
+            stroke="currentColor" 
+            strokeWidth="1.5" 
+            strokeLinecap="round"
+            animate={{ scale: [1, 1.25, 1] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </svg>
+      </div>
+    </motion.div>
+  );
+};
 
 interface CodingCoursesViewProps {
   user: UserProfile;
@@ -4135,6 +4219,25 @@ void INLINE_COURSES;
 export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNavigateTab, onUpdateCourseTopics }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeCourseId, setActiveCourseId] = useState<string | null>(null);
+  const [tiltedCards, setTiltedCards] = useState<Record<string, { rx: number; ry: number }>>({});
+  
+  // Dynamic mouse tilt handler for beautiful immersive 3D effect
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>, id: string) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    // Calculate rotation (-12deg to 12deg)
+    const rx = ((centerY - y) / centerY) * 12;
+    const ry = ((x - centerX) / centerX) * 12;
+    setTiltedCards((prev) => ({ ...prev, [id]: { rx, ry } }));
+  };
+
+  const handleCardMouseLeave = (id: string) => {
+    setTiltedCards((prev) => ({ ...prev, [id]: { rx: 0, ry: 0 } }));
+  };
   
   // Unlocked courses persistence state
   const [unlockedCourses, setUnlockedCourses] = useState<string[]>(() => {
@@ -5025,141 +5128,243 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
   return (
     <div className="w-full max-w-full px-2 sm:px-4 py-4 space-y-8 animate-in fade-in duration-300">
       
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 border border-purple-200/80 p-8 sm:p-12 text-slate-900 shadow-sm">
-        <div className="absolute -right-10 -bottom-10 w-80 h-80 bg-purple-200/40 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100 border border-purple-200 text-purple-800 text-xs font-black uppercase tracking-wider">
-            <Sparkles className="w-4 h-4 text-purple-600" /> Interactive Coding Courses & Detailed Syllabi
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-            Level Up Your Code & Track Your Syllabus Progress
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed">
-            Enroll in top-rated structured courses designed by industry experts. Track your topic completion with live interactive checkboxes, access complete syllabus roadmaps, and join official Telegram / Google Drive resources for ₹399 each.
-          </p>
+      {/* 3D Immersive Hero Header Banner with Orbiting AI Core */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/20 p-8 sm:p-12 text-slate-100 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-8">
+        
+        {/* Floating cyber particles overlay */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+          <div className="absolute w-2 h-2 rounded-full bg-purple-400 blur-[2px] top-10 left-[20%] animate-ping" style={{ animationDuration: '4s' }} />
+          <div className="absolute w-1.5 h-1.5 rounded-full bg-sky-300 blur-[1px] bottom-12 left-[40%] animate-ping" style={{ animationDuration: '6s' }} />
+          <div className="absolute w-3 h-3 rounded-full bg-indigo-500/30 blur-xs top-1/2 right-[15%] animate-pulse" />
+          <div className="absolute -left-10 top-1/2 w-60 h-60 bg-purple-600/10 rounded-full blur-3xl" />
+          <div className="absolute right-20 -top-10 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl" />
         </div>
+
+        <div className="relative z-10 max-w-2xl space-y-5">
+          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/10 backdrop-blur-md text-purple-300 text-xs font-black uppercase tracking-wider shadow-inner">
+            <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" /> Interactive CampusOS Academy Hub
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+            Level Up Your Code & Track Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">Syllabus Progress</span>
+          </h1>
+          <p className="text-sm sm:text-base text-slate-300 font-medium leading-relaxed">
+            Enroll in premium, production-oriented courses designed by top industry experts. Track your daily topic completion with interactive checkboxes, explore deep syllabus roadmaps, and instantly unlock curated Google Drive lectures & direct mentor chat channels.
+          </p>
+
+          {/* AI Metrics indicators */}
+          <div className="pt-4 grid grid-cols-2 sm:grid-cols-3 gap-4 border-t border-slate-800">
+            <div>
+              <div className="text-xl font-black text-white">12,450+</div>
+              <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wide">Active Placements</div>
+            </div>
+            <div>
+              <div className="text-xl font-black text-emerald-400">98.7%</div>
+              <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wide">Completion Success</div>
+            </div>
+            <div className="hidden sm:block">
+              <div className="text-xl font-black text-purple-400">1-on-1</div>
+              <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wide">Mentor Guidance</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Visual Right Column (Immersive 3D overlapping card widgets with glowing AI nodes) */}
+        <div className="hidden lg:flex flex-col items-center justify-center shrink-0 w-[340px] relative h-[300px]">
+          {/* Custom logo embedded */}
+          <div className="absolute -top-6 -right-6 scale-90 opacity-60">
+            <AcademyHubLogo />
+          </div>
+
+          <div className="absolute w-[240px] h-[150px] rounded-3xl bg-slate-950/95 border border-slate-800/90 p-5 shadow-2xl text-white transform -rotate-12 -translate-x-10 translate-y-6 hover:translate-y-2 hover:scale-105 hover:-rotate-6 transition-all duration-300 group cursor-pointer z-10" style={{ transformStyle: 'preserve-3d', perspective: 1000 }}>
+            <div className="flex items-center justify-between mb-3" style={{ transform: 'translateZ(15px)' }}>
+              <span className="text-[9px] uppercase font-black text-purple-400">Interactive Syllabus</span>
+              <div className="w-2 h-2 rounded-full bg-purple-500 animate-ping" />
+            </div>
+            <h4 className="text-xs font-black text-white mb-2" style={{ transform: 'translateZ(20px)' }}>Curriculum Checklist</h4>
+            <p className="text-[10px] text-slate-400 font-medium leading-relaxed" style={{ transform: 'translateZ(10px)' }}>Check off syllabus checkpoints as you study and unlock next levels sequentially.</p>
+            {/* Floating AI energy line */}
+            <div className="absolute bottom-4 left-5 right-5 h-1 bg-slate-900 rounded-full overflow-hidden">
+              <motion.div className="h-full bg-gradient-to-r from-purple-500 via-indigo-400 to-sky-400" animate={{ x: [-120, 120] }} transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }} style={{ width: '40%' }} />
+            </div>
+          </div>
+
+          <div className="absolute w-[240px] h-[150px] rounded-3xl bg-gradient-to-br from-indigo-700 to-purple-800 border border-indigo-500/30 p-5 shadow-2xl text-white transform rotate-6 translate-x-12 -translate-y-6 hover:-translate-y-10 hover:scale-105 hover:rotate-2 transition-all duration-300 group cursor-pointer z-20" style={{ transformStyle: 'preserve-3d', perspective: 1000 }}>
+            <div className="flex items-center justify-between mb-3" style={{ transform: 'translateZ(15px)' }}>
+              <span className="text-[9px] uppercase font-black text-amber-300">Verified Credentials</span>
+              <Award className="w-4 h-4 text-amber-400" />
+            </div>
+            <h4 className="text-xs font-black text-white mb-2" style={{ transform: 'translateZ(20px)' }}>Official Certificates</h4>
+            <p className="text-[10px] text-indigo-100 font-medium leading-relaxed" style={{ transform: 'translateZ(10px)' }}>Complete 100% of course checkpoints to instantly download a secure student certificate.</p>
+            <div className="absolute top-1/2 right-4 w-12 h-12 bg-white/10 rounded-full blur-md pointer-events-none" />
+          </div>
+        </div>
+
       </div>
 
-      {/* Category Filter Pills */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4">
-        <div className="text-xs font-black text-slate-400 uppercase tracking-wider mr-2 flex items-center gap-1">
-          <Filter className="w-3.5 h-3.5" /> Filter:
+      {/* Category Filter Pills (With Smooth Spring Transitions) */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4 relative">
+        <div className="text-xs font-black text-slate-400 uppercase tracking-wider mr-2 flex items-center gap-1.5">
+          <Filter className="w-3.5 h-3.5 text-slate-500" /> Filter Catalogue:
         </div>
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all duration-200 relative overflow-hidden cursor-pointer ${
               selectedCategory === cat
-                ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
+                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-600/30 scale-[1.03]'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
             }`}
           >
-            {cat}
+            {selectedCategory === cat && (
+              <motion.div 
+                layoutId="activeTabGlow"
+                className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent pointer-events-none"
+                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">{cat}</span>
           </button>
         ))}
       </div>
 
-      {/* Courses Cards Grid */}
+      {/* 3D Courses Cards Grid with Interactive Parallax Layers */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredCourses.map((course) => {
           const isUnlocked = unlockedCourses.includes(course.id);
           const IconComp = course.icon;
           const isDrive = course.linkType === 'drive';
           const stats = getCourseStats(course);
-
+          
           return (
-            <div
+            <motion.div
               key={course.id}
-              className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+              onMouseMove={(e) => handleCardMouseMove(e, course.id)}
+              onMouseLeave={() => handleCardMouseLeave(course.id)}
+              style={{
+                transform: `perspective(1000px) rotateX(${tiltedCards[course.id]?.rx || 0}deg) rotateY(${tiltedCards[course.id]?.ry || 0}deg)`,
+                transformStyle: 'preserve-3d',
+                transition: 'transform 0.15s cubic-bezier(0.25, 1, 0.5, 1)',
+              }}
+              className="bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-2xl flex flex-col overflow-hidden group relative"
             >
-              {/* Card Header with Background Image Overlay */}
-              <div className={`p-6 bg-gradient-to-br ${course.bgGradient} text-white relative min-h-[170px] flex flex-col justify-between overflow-hidden`}>
-                {course.bgImageUrl && (
+              {/* Dynamic hover color-matching bottom neon aura */}
+              <div className="absolute -inset-1 rounded-[25px] opacity-0 group-hover:opacity-100 bg-gradient-to-b from-transparent to-indigo-500/5 blur-xl transition-opacity duration-300 pointer-events-none -z-10" />
+
+              {/* Card Header (Parallax Layer 1) */}
+              <div 
+                className={`p-6 bg-gradient-to-br ${course.bgGradient} text-white relative min-h-[175px] flex flex-col justify-between overflow-hidden`}
+                style={{ transform: 'translateZ(10px)', transformStyle: 'preserve-3d' }}
+              >
+                {/* Background image / overlay */}
+                {course.bgImageUrl ? (
                   <img
                     src={course.bgImageUrl}
                     alt={course.title}
-                    className="absolute inset-0 w-full h-full object-cover object-center opacity-30 mix-blend-overlay group-hover:scale-105 transition-transform duration-500"
+                    className="absolute inset-0 w-full h-full object-cover object-center opacity-25 mix-blend-overlay group-hover:scale-108 transition-transform duration-700 pointer-events-none"
                     referrerPolicy="no-referrer"
                   />
+                ) : (
+                  <div className="absolute inset-0 bg-radial-gradient from-white/10 to-transparent opacity-40 pointer-events-none" />
                 )}
-                <div className="relative z-10 flex items-center justify-between mb-3">
-                  <span className={`px-3 py-1 rounded-full text-[11px] font-black border backdrop-blur-md ${course.badgeBg}`}>
+                
+                {/* Cyber network lines vector behind title */}
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
+                  <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="0" y1="10%" x2="100%" y2="80%" stroke="currentColor" strokeWidth="1" />
+                    <line x1="10%" y1="90%" x2="90%" y2="0" stroke="currentColor" strokeWidth="1" />
+                  </svg>
+                </div>
+
+                <div className="relative z-10 flex items-center justify-between" style={{ transform: 'translateZ(20px)' }}>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black border backdrop-blur-md transition-all shadow-2xs ${course.badgeBg}`}>
                     {course.category}
                   </span>
-                  <div className="p-2.5 rounded-2xl bg-white/20 backdrop-blur-md text-white shadow-sm">
-                    <IconComp className="w-6 h-6" />
+                  <div className="p-2.5 rounded-2xl bg-white/15 backdrop-blur-md text-white shadow-sm group-hover:bg-white/25 transition-all">
+                    <IconComp className="w-5.5 h-5.5 animate-pulse" />
                   </div>
                 </div>
 
-                <div className="relative z-10">
-                  <h3 className="text-lg font-black text-white tracking-tight leading-snug mb-1.5 drop-shadow-sm">
-                    {course.title}
+                <div className="relative z-10 mt-4" style={{ transform: 'translateZ(25px)' }}>
+                  <h3 className="text-base sm:text-lg font-black text-white tracking-tight leading-snug mb-1 drop-shadow-sm flex items-center gap-1.5">
+                    <span>{course.title}</span>
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </h3>
                   
-                  <p className="text-xs text-white/90 line-clamp-2 font-medium drop-shadow-xs">
+                  <p className="text-[11px] text-white/90 line-clamp-2 font-medium leading-relaxed">
                     {course.tagline}
                   </p>
                 </div>
               </div>
 
-              {/* Card Body */}
-              <div className="p-6 flex-1 flex flex-col justify-between space-y-6">
+              {/* Card Body (Parallax Layer 2) */}
+              <div 
+                className="p-6 flex-1 flex flex-col justify-between space-y-5"
+                style={{ transform: 'translateZ(15px)', transformStyle: 'preserve-3d' }}
+              >
                 
                 <div className="space-y-4">
-                  {/* Pricing tag */}
-                  <div className="flex items-baseline justify-between border-b border-slate-100 pb-3">
+                  {/* Pricing Tag with interactive details */}
+                  <div className="flex items-baseline justify-between border-b border-slate-100 pb-3" style={{ transform: 'translateZ(10px)' }}>
                     <div>
                       <span className="text-2xl font-black text-slate-900">₹{course.price}</span>
                       <span className="text-xs text-slate-400 font-bold ml-1.5 line-through">₹2,999</span>
                     </div>
-                    <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                      87% OFF
+                    <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                      87% Placements OFF
                     </span>
                   </div>
 
-                  {/* Syllabus Progress Bar on Card if Topics exist */}
-                  <div className="p-3 rounded-2xl bg-purple-50/60 border border-purple-100 space-y-1.5">
+                  {/* Syllabus Checkpoint Tracker (Mini preview inside catalog) */}
+                  <div 
+                    className="p-3.5 rounded-2xl bg-purple-50/40 border border-purple-100/60 space-y-2 relative overflow-hidden"
+                    style={{ transform: 'translateZ(15px)' }}
+                  >
                     <div className="flex items-center justify-between text-[11px] font-black text-slate-700">
                       <span className="flex items-center gap-1">
-                        <CheckSquare className="w-3.5 h-3.5 text-purple-600" /> Syllabus Progress
+                        <CheckSquare className="w-3.5 h-3.5 text-purple-600 animate-bounce" /> Syllabus Progress
                       </span>
-                      <span className="text-purple-700">{stats.completedCount}/{stats.totalTopics} Topics ({stats.percentage}%)</span>
+                      <span className="text-purple-700 font-black">{stats.completedCount}/{stats.totalTopics} Topics ({stats.percentage}%)</span>
                     </div>
-                    <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden relative">
                       <div 
-                        className="bg-purple-600 h-full rounded-full transition-all duration-300"
+                        className="bg-gradient-to-r from-purple-600 to-indigo-600 h-full rounded-full transition-all duration-500 shadow-xs"
                         style={{ width: `${stats.percentage}%` }}
                       />
                     </div>
                   </div>
 
-                  {/* Highlights list */}
-                  <div className="space-y-2">
-                    <div className="text-[11px] font-extrabold text-slate-800 uppercase tracking-wider">
+                  {/* Highlights Bullet List */}
+                  <div className="space-y-2" style={{ transform: 'translateZ(10px)' }}>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
                       Key Highlights:
                     </div>
-                    {course.features.map((feat, fidx) => (
-                      <div key={fidx} className="flex items-start gap-2 text-xs text-slate-600 font-medium">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                        <span>{feat}</span>
-                      </div>
-                    ))}
+                    <div className="grid grid-cols-1 gap-1.5">
+                      {course.features.map((feat, fidx) => (
+                        <div key={fidx} className="flex items-start gap-2 text-xs text-slate-600 font-medium">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                          <span className="line-clamp-1">{feat}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* Footer Action Button */}
-                <div className="pt-2">
+                {/* Foot Action Button */}
+                <div className="pt-2" style={{ transform: 'translateZ(25px)' }}>
                   {isUnlocked ? (
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleUnlockCourseClick(course)}
-                        className="flex-1 py-3.5 px-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                        className="flex-1 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs shadow-md hover:shadow-lg flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:scale-[1.02]"
                       >
                         <CheckCircle2 className="w-4 h-4 shrink-0" />
-                        <span>{isDrive ? 'Open Syllabus & Drive' : 'Open Syllabus & Telegram'}</span>
-                        <ChevronRight className="w-4 h-4 shrink-0" />
+                        <span>{isDrive ? 'Open Study Drive' : 'Launch Course'}</span>
+                        <ChevronRight className="w-4 h-4 shrink-0 animate-pulse" />
                       </button>
                       <button
                         onClick={() => setCourseToCancel(course)}
@@ -5172,22 +5377,22 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
                   ) : (
                     <button
                       onClick={() => handleUnlockCourseClick(course)}
-                      className="w-full py-3.5 px-4 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-black text-xs shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.01]"
+                      className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs shadow-lg hover:shadow-xl shadow-purple-600/10 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.02]"
                     >
-                      <Lock className="w-4 h-4 text-amber-300" />
+                      <Lock className="w-4 h-4 text-amber-300 animate-pulse" />
                       <span>Unlock Course for ₹{course.price}</span>
                     </button>
                   )}
                 </div>
 
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
 
       {/* Trust & Guarantee Banner */}
-      <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 text-slate-700">
+      <div className="bg-gradient-to-r from-slate-50 via-indigo-50/20 to-slate-50 border border-slate-200/80 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 text-slate-700 shadow-2xs">
         <div className="flex items-center gap-4">
           <div className="p-3.5 rounded-2xl bg-purple-100 text-purple-700 shrink-0">
             <ShieldCheck className="w-8 h-8" />
