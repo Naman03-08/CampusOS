@@ -373,7 +373,7 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
 
       {/* Fonts & Shimmer Animations for Certificate */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,700&family=Cinzel:wght@600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Herr+Von+Muellerhoff&family=Monsieur+La+Doulaise&family=Alex+Brush&family=Great+Vibes&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,700&family=Cinzel:wght@600;700;800;900&display=swap');
 
         @keyframes gold-metallic-glow {
           0%, 100% { 
@@ -396,6 +396,13 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
           background-size: 200% auto;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
+        }
+
+        .runny-signature-font {
+          font-family: 'Herr Von Muellerhoff', 'Monsieur La Doulaise', 'Alex Brush', cursive, serif;
+          font-style: italic;
+          letter-spacing: 0.05em;
+          text-shadow: 0.5px 0.5px 1px rgba(11, 26, 58, 0.15);
         }
 
         .gold-border-bevel {
@@ -529,28 +536,15 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
               </div>
             </div>
 
-            {/* FOOTER: Date, 3D Gold Ribbon Seal, Dual Signatures & Live QR Code */}
-            <div className="pt-3 border-t-2 border-amber-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
+            {/* FOOTER: Date, 3D Gold Ribbon Seal, Sole Founder Signature & Live QR Code */}
+            <div className="pt-3 border-t-2 border-amber-200/80 flex flex-col sm:flex-row items-center justify-between gap-6 px-4">
               
               {/* Date Issued & Verified Status */}
               <div className="text-center sm:text-left space-y-1">
                 <div className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400">Date Issued</div>
-                <div className="text-xs font-black text-[#0B1A3A] bg-amber-50/90 px-3 py-1 rounded-lg border border-amber-300/80 inline-block shadow-2xs">
+                <div className="text-xs font-black text-[#0B1A3A] bg-amber-50/90 px-3.5 py-1.5 rounded-xl border border-amber-300/80 inline-block shadow-2xs">
                   {issuedAt}
                 </div>
-              </div>
-
-              {/* Founder Signature 1 */}
-              <div className="text-center space-y-0.5">
-                <div 
-                  className="text-xl sm:text-2xl text-[#0B1A3A] font-normal tracking-wide"
-                  style={{ fontFamily: "'Great Vibes', cursive, serif" }}
-                >
-                  Naman Pandey
-                </div>
-                <div className="w-28 h-0.5 bg-slate-300 mx-auto" />
-                <div className="text-[11px] font-black text-[#0B1A3A]">Naman Pandey</div>
-                <div className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Founder & CEO, CampusOS</div>
               </div>
 
               {/* 3D Metallic Gold Seal with Blue Ribbons */}
@@ -561,25 +555,31 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
                 </span>
               </div>
 
-              {/* Academic Council Signature 2 */}
-              <div className="text-center space-y-0.5">
+              {/* Sole Founder Signature Block (Naman Pandey) - Ultra-runny calligraphic pen style */}
+              <div className="text-center space-y-0.5 relative px-4">
                 <div 
-                  className="text-xl sm:text-2xl text-[#0B1A3A] font-normal tracking-wide"
-                  style={{ fontFamily: "'Great Vibes', cursive, serif" }}
+                  className="text-3xl sm:text-4xl text-[#0B1A3A] font-normal tracking-wide transform -rotate-3 leading-none py-1 select-none runny-signature-font"
+                  style={{ 
+                    transform: 'rotate(-4deg) scaleY(1.1)',
+                    filter: 'drop-shadow(0px 1px 1px rgba(15, 44, 89, 0.25))'
+                  }}
                 >
-                  Dr. A. Sharma
+                  Naman Pandey
                 </div>
-                <div className="w-28 h-0.5 bg-slate-300 mx-auto" />
-                <div className="text-[11px] font-black text-[#0B1A3A]">Dr. A. Sharma</div>
-                <div className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Academic Council Head</div>
+                {/* Custom Calligraphic Pen Swoosh Line under Signature */}
+                <svg className="w-36 h-2 mx-auto text-[#0B1A3A] opacity-80" viewBox="0 0 120 10" fill="none">
+                  <path d="M 5 5 Q 35 1, 60 6 T 115 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+                <div className="text-[12px] font-black text-[#0B1A3A] tracking-wide mt-1">Naman Pandey</div>
+                <div className="text-[9px] font-extrabold text-[#D4AF37] uppercase tracking-widest">Founder & CEO, CampusOS</div>
               </div>
 
               {/* Live QR Code Verification Box */}
               <div className="flex flex-col items-center">
-                <div className="p-1 bg-white border-2 border-[#D4AF37] rounded-xl shadow-md">
+                <div className="p-1.5 bg-white border-2 border-[#D4AF37] rounded-xl shadow-md">
                   <QRCodeSVG
                     value={verificationUrl}
-                    size={42}
+                    size={46}
                     level="M"
                     includeMargin={false}
                   />
