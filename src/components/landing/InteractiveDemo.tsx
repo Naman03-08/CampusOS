@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Zap, BookOpen, FileCheck, Bot, CheckCircle2, ArrowRight, RefreshCw, MessageSquarePlus, Star } from 'lucide-react';
 
 export const InteractiveDemo: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'flashcard' | 'assignment' | 'interview'>('flashcard');
+  const [activeTab, setActiveTab] = useState<'flashcard' | 'interview'>('flashcard');
   const [isFlipped, setIsFlipped] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -53,16 +53,7 @@ export const InteractiveDemo: React.FC = () => {
             <BookOpen className="w-4 h-4" /> AI Flashcard
           </button>
 
-          <button
-            onClick={() => setActiveTab('assignment')}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition-all ${
-              activeTab === 'assignment'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                : 'bg-white/50 backdrop-blur-md text-slate-700 hover:bg-white/70 border border-white/60'
-            }`}
-          >
-            <FileCheck className="w-4 h-4" /> Assignment Solver
-          </button>
+
 
           <button
             onClick={() => setActiveTab('interview')}
@@ -99,23 +90,7 @@ export const InteractiveDemo: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'assignment' && (
-            <div className="text-left space-y-4">
-              <div className="p-4 rounded-2xl bg-white border border-slate-200">
-                <p className="text-xs font-bold text-slate-400 uppercase">Question</p>
-                <p className="text-sm font-semibold text-slate-800">{assignmentData.question}</p>
-              </div>
 
-              <div className="p-4 rounded-2xl bg-blue-50/80 border border-blue-200">
-                <p className="text-xs font-bold text-blue-600 uppercase flex items-center gap-1.5 mb-2">
-                  <Zap className="w-4 h-4" /> AI Step-by-Step Solution
-                </p>
-                <pre className="text-xs sm:text-sm font-mono text-slate-800 whitespace-pre-wrap leading-relaxed">
-                  {assignmentData.solution}
-                </pre>
-              </div>
-            </div>
-          )}
 
           {activeTab === 'interview' && (
             <div className="text-left space-y-4">
@@ -144,7 +119,7 @@ export const InteractiveDemo: React.FC = () => {
             </div>
             <div>
               <p className="text-xs sm:text-sm font-extrabold text-slate-900">Tried our AI Playground?</p>
-              <p className="text-[11px] text-slate-500 font-medium">Rate the interactive flashcards, assignment solver, or interview practice!</p>
+              <p className="text-[11px] text-slate-500 font-medium">Rate the interactive flashcards or interview practice!</p>
             </div>
           </div>
           <a

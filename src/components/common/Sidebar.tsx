@@ -37,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'notes', label: 'AI Notes Summarizer', icon: Sparkles, badge: 'AI' },
-    { id: 'studyhub', label: 'AI Study, Chat & Solver', icon: BookOpen, badge: 'Tutor' },
+    { id: 'studyhub', label: 'Personal Assistant', icon: Bot, badge: 'AI' },
     { id: 'resumebuilder', label: 'AI Resume Builder', icon: FileText, badge: 'ATS' },
     { id: 'coding', label: 'Coding Hub', icon: Code2, badge: 'DSA' },
     { id: 'courses', label: 'Coding Courses', icon: GraduationCap, badge: 'NEW' },

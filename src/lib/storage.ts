@@ -28,13 +28,7 @@ const STORAGE_KEYS = {
 };
 
 // ZERO BASELINE GENERATORS FOR NEW REGISTERED USERS
-export const getZeroAttendance = (userId: string = 'new_user'): AttendanceSubject[] => [
-  { id: `att-1-${userId}`, userId, code: 'CS301', name: 'Data Structures & Algorithms', totalClasses: 0, attendedClasses: 0, targetPercentage: 75, scheduleDays: ['Mon', 'Wed', 'Fri'] },
-  { id: `att-2-${userId}`, userId, code: 'CS302', name: 'Database Management Systems', totalClasses: 0, attendedClasses: 0, targetPercentage: 75, scheduleDays: ['Tue', 'Thu'] },
-  { id: `att-3-${userId}`, userId, code: 'CS303', name: 'Operating Systems', totalClasses: 0, attendedClasses: 0, targetPercentage: 75, scheduleDays: ['Mon', 'Wed'] },
-  { id: `att-4-${userId}`, userId, code: 'CS304', name: 'Computer Networks', totalClasses: 0, attendedClasses: 0, targetPercentage: 75, scheduleDays: ['Tue', 'Fri'] },
-  { id: `att-5-${userId}`, userId, code: 'MA301', name: 'Discrete Mathematics', totalClasses: 0, attendedClasses: 0, targetPercentage: 75, scheduleDays: ['Wed', 'Fri'] }
-];
+export const getZeroAttendance = (userId: string = 'new_user'): AttendanceSubject[] => [];
 
 export const getZeroDSA = (userId: string = 'new_user'): DSAProblem[] => getCampusOSDSASheet(userId);
 
@@ -250,7 +244,12 @@ export class StorageService {
 
   // Attendance
   static getAttendance(): AttendanceSubject[] {
-    return this.get<AttendanceSubject[]>(STORAGE_KEYS.ATTENDANCE, getZeroAttendance('guest'));
+    const list = this.get<AttendanceSubject[]>(STORAGE_KEYS.ATTENDANCE, []);
+    const filtered = list.filter(item => !item.id.startsWith('att-'));
+    if (filtered.length !== list.length) {
+      this.saveAttendance(filtered);
+    }
+    return filtered;
   }
 
   static saveAttendance(list: AttendanceSubject[]): void {

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Trash2, Copy, Check, BookOpen, RefreshCw } from 'lucide-react';
+import { Send, Bot, User, Trash2, Copy, Check, BookOpen, RefreshCw, Zap } from 'lucide-react';
 import { ChatMessage } from '../../types';
 import { StructuredResponseFormatter } from './StructuredResponseFormatter';
 
@@ -8,7 +8,7 @@ export const AIChatView: React.FC = () => {
     {
       id: 'm1',
       sender: 'ai',
-      text: 'Hello! I am your CampusOS AI Tutor. Ask me any academic question, math proof, coding debug, or study advice!',
+      text: 'Hello! I am your Personal Assistant. Ask me any question, academic proof, coding debug, or task guidance!',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -17,6 +17,28 @@ export const AIChatView: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Token saving and word limit settings (default true)
+  const [limitWords, setLimitWords] = useState<boolean>(() => {
+    const cached = localStorage.getItem('campus_os_chat_limit_words');
+    return cached !== 'false'; // defaults to true
+  });
+  const [autoNewChat, setAutoNewChat] = useState<boolean>(() => {
+    const cached = localStorage.getItem('campus_os_chat_auto_new');
+    return cached !== 'false'; // defaults to true
+  });
+  const [tokensSaved, setTokensSaved] = useState<number>(() => {
+    const cached = localStorage.getItem('campus_os_chat_tokens_saved');
+    return cached ? parseInt(cached, 10) : 0;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('campus_os_chat_limit_words', limitWords.toString());
+  }, [limitWords]);
+
+  useEffect(() => {
+    localStorage.setItem('campus_os_chat_auto_new', autoNewChat.toString());
+  }, [autoNewChat]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -37,7 +59,38 @@ export const AIChatView: React.FC = () => {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const hasPreviousUserMsg = messages.some((m) => m.sender === 'user');
+    let activeMessages = [...messages];
+
+    if (autoNewChat && hasPreviousUserMsg) {
+      // Calculate words & approximate tokens saved from discarded history
+      const discardedText = messages.map((m) => m.text).join(' ');
+      const discardedWords = discardedText.trim().split(/\s+/).filter(Boolean).length;
+      const approxTokens = Math.round(discardedWords * 1.33);
+
+      if (approxTokens > 0) {
+        setTokensSaved((prev) => {
+          const newVal = prev + approxTokens;
+          localStorage.setItem('campus_os_chat_tokens_saved', newVal.toString());
+          return newVal;
+        });
+      }
+
+      // Automatically reset and start a fresh session with the new question
+      const initialMsg = messages[0] || {
+        id: 'm1',
+        sender: 'ai',
+        text: 'Hello! I am your Personal Assistant. Ask me any question, academic proof, coding debug, or advice!',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+
+      activeMessages = [initialMsg, userMsg];
+      setMessages([initialMsg, userMsg]);
+    } else {
+      activeMessages = [...messages, userMsg];
+      setMessages((prev) => [...prev, userMsg]);
+    }
+
     const promptToSend = inputText;
     setInputText('');
     setLoading(true);
@@ -48,7 +101,11 @@ export const AIChatView: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           prompt: promptToSend,
-          history: messages.map((m) => ({ role: m.sender === 'user' ? 'user' : 'model', parts: [{ text: m.text }] })),
+          limitWords,
+          history: activeMessages.map((m) => ({
+            role: m.sender === 'user' ? 'user' : 'model',
+            parts: [{ text: m.text }],
+          })),
         }),
       });
 
@@ -91,8 +148,8 @@ export const AIChatView: React.FC = () => {
             <Bot className="w-5 h-5 text-amber-300" />
           </div>
           <div>
-            <h2 className="font-black text-sm sm:text-base text-white tracking-tight">CampusOS AI Academic Tutor & Assistant</h2>
-            <p className="text-[11px] text-blue-300 font-bold">Autonomous AI Reasoning & Step-by-Step Problem Solver</p>
+            <h2 className="font-black text-sm sm:text-base text-white tracking-tight">CampusOS Personal Assistant</h2>
+            <p className="text-[11px] text-blue-300 font-bold">Your Autonomous Personal AI Assistant & Tutor</p>
           </div>
         </div>
 
@@ -103,6 +160,40 @@ export const AIChatView: React.FC = () => {
         >
           <Trash2 className="w-4 h-4" />
         </button>
+      </div>
+
+      {/* Token-Saving Settings Banner */}
+      <div className="bg-slate-50 border-b border-slate-200 p-3 px-6 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2">
+          <Zap className="w-3.5 h-3.5 text-amber-500 animate-pulse shrink-0" />
+          <span className="font-bold text-slate-700">Token-Saver Optimization Settings</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-4">
+          <label className="flex items-center gap-1.5 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={limitWords}
+              onChange={(e) => setLimitWords(e.target.checked)}
+              className="w-3.5 h-3.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+            />
+            <span className="font-semibold text-slate-600 hover:text-slate-800 transition-colors">Strict Word Cap (&lt;1000 Words)</span>
+          </label>
+          <label className="flex items-center gap-1.5 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={autoNewChat}
+              onChange={(e) => setAutoNewChat(e.target.checked)}
+              className="w-3.5 h-3.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+            />
+            <span className="font-semibold text-slate-600 hover:text-slate-800 transition-colors">Auto-New Chat on Second Question</span>
+          </label>
+          {tokensSaved > 0 && (
+            <div className="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 font-extrabold flex items-center gap-1 shrink-0">
+              <Bot className="w-3.5 h-3.5 shrink-0" />
+              <span>Saved: ~{tokensSaved.toLocaleString()} API Tokens</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Messages Scroll Area */}

@@ -19,9 +19,9 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   }, [attendance]);
 
   const [newName, setNewName] = useState('');
-  const [newAttended, setNewAttended] = useState('28');
-  const [newTotal, setNewTotal] = useState('32');
-  const [newTarget, setNewTarget] = useState('80');
+  const [newAttended, setNewAttended] = useState('');
+  const [newTotal, setNewTotal] = useState('');
+  const [newTarget, setNewTarget] = useState('75');
 
   const handleAddSubject = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +42,8 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
     setSubjects(updated);
     onUpdateAttendance(updated);
     setNewName('');
+    setNewAttended('');
+    setNewTotal('');
   };
 
   const handleIncrement = (id: string, type: 'attended' | 'missed') => {
@@ -115,7 +117,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
         </div>
 
         <form onSubmit={handleAddSubject} className="grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-end">
-          <div className="sm:col-span-4 space-y-1">
+          <div className="sm:col-span-3 space-y-1">
             <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
               Subject Name
             </label>
@@ -124,14 +126,14 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
               required
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              placeholder="e.g. Database Systems"
+              placeholder="e.g. Data Structures"
               className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
             />
           </div>
 
           <div className="sm:col-span-2 space-y-1">
             <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
-              Classes Attended (28)
+              Classes Attended
             </label>
             <input
               type="number"
@@ -139,14 +141,14 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
               required
               value={newAttended}
               onChange={(e) => setNewAttended(e.target.value)}
-              placeholder="Attended count (e.g. 28)"
+              placeholder="e.g. 15"
               className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
             />
           </div>
 
-          <div className="sm:col-span-3 space-y-1">
+          <div className="sm:col-span-2 space-y-1">
             <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
-              Total Conducted (32)
+              Total Conducted
             </label>
             <input
               type="number"
@@ -154,7 +156,23 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
               required
               value={newTotal}
               onChange={(e) => setNewTotal(e.target.value)}
-              placeholder="Total conducted (e.g. 32)"
+              placeholder="e.g. 20"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
+            />
+          </div>
+
+          <div className="sm:col-span-2 space-y-1">
+            <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
+              Target %
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="100"
+              required
+              value={newTarget}
+              onChange={(e) => setNewTarget(e.target.value)}
+              placeholder="e.g. 75"
               className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
             />
           </div>

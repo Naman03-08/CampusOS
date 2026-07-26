@@ -80,5 +80,10 @@ service cloud.firestore {
     match /marks/{docId} {
       allow read, write: if true;
     }
+
+    // Leaderboard
+    match /leaderboard/{docId} {
+      allow read, write: if true;
+    }
   }
 }

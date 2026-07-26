@@ -158,11 +158,11 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
       <SectionUsageBanner
         title="CampusOS Upgrade & Subscription Plans"
         subtitle="Choose the ideal plan to accelerate your academic grades, DSA mastery, and placement success"
-        purpose="Upgrade to unlock unlimited AI Assignment Solving, full CampusOS 375 DSA Roadmap Code Coach, unlimited ATS Resume Scans, and Technical Interview Prep."
+        purpose="Upgrade to unlock unlimited AI Academic Tutor Chat, full CampusOS 375 DSA Roadmap Code Coach, unlimited ATS Resume Scans, and Technical Interview Prep."
         keyFeatures={[
           '3 Plans: 4-Day Free Trial (1x Lifetime, Choose When to Start), ₹199 & ₹399 Plans',
           '30-Day Auto Renewal Cycles for Pro Scholar & Ultimate Plans',
-          'Unlimited AI Study Suites, Assignment Solving & 375 DSA Sheet Solutions',
+          'Unlimited AI Study Suites, AI Academic Tutor Chat & 375 DSA Sheet Solutions',
           'Instant Activation via UPI, QR Code, Net Banking, or Cards'
         ]}
         icon={<Zap className="w-6 h-6 text-white" />}
@@ -352,7 +352,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                       <span className="text-slate-900 font-extrabold">{plan.usageLimits.studySuites}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-500">AI Assignment Solver:</span>
+                      <span className="text-slate-500">AI Academic Tutor:</span>
                       <span className="text-slate-900 font-extrabold">{plan.usageLimits.assignmentSolver}</span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -480,11 +480,11 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
               </tr>
               <tr>
                 <td className="py-3.5 px-4 font-bold flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-orange-500" /> AI Assignment Solver
+                  <Flame className="w-4 h-4 text-orange-500" /> AI Academic Tutor
                 </td>
-                <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">5 Solves Total</td>
-                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">UNLIMITED Solves</td>
-                <td className="py-3.5 px-4 text-center font-extrabold text-indigo-600">UNLIMITED Solves</td>
+                <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">5 Chats Total</td>
+                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">UNLIMITED Chats</td>
+                <td className="py-3.5 px-4 text-center font-extrabold text-indigo-600">UNLIMITED Chats</td>
               </tr>
               <tr>
                 <td className="py-3.5 px-4 font-bold flex items-center gap-2">

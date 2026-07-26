@@ -22,7 +22,6 @@ import { DashboardView } from './components/dashboard/DashboardView';
 import { AINotesSummarizerView } from './components/notes/AINotesSummarizerView';
 import { StudyHubView } from './components/studyhub/StudyHubView';
 import { AIChatView } from './components/chat/AIChatView';
-import { AssignmentSolverView } from './components/assignment/AssignmentSolverView';
 import { AttendanceView } from './components/attendance/AttendanceView';
 import { HabiturexView } from './components/habiturex/HabiturexView';
 import { CodingHubView } from './components/coding/CodingHubView';
@@ -61,11 +60,46 @@ export function App() {
   const [upgradeFeatureName, setUpgradeFeatureName] = useState<string>('this feature');
   const [pendingTabAfterTrial, setPendingTabAfterTrial] = useState<string | null>(null);
 
-  // Global Focus Timer State for Navbar Watch & Habiturex
-  const [focusTimerSeconds, setFocusTimerSeconds] = useState<number>(25 * 60);
-  const [focusTimerInitialMinutes, setFocusTimerInitialMinutes] = useState<number>(25);
-  const [isFocusTimerRunning, setIsFocusTimerRunning] = useState<boolean>(false);
+  // Global Focus Timer State for Navbar Watch & Habiturex (Backed by Local Storage to prevent reset bugs)
+  const [focusTimerInitialMinutes, setFocusTimerInitialMinutes] = useState<number>(() => {
+    const cached = localStorage.getItem('campus_os_focus_initial_minutes');
+    return cached ? parseInt(cached, 10) : 25;
+  });
+
+  const [focusTimerSeconds, setFocusTimerSeconds] = useState<number>(() => {
+    const cachedSeconds = localStorage.getItem('campus_os_focus_seconds');
+    if (cachedSeconds) {
+      return parseInt(cachedSeconds, 10);
+    }
+    const cachedMins = localStorage.getItem('campus_os_focus_initial_minutes');
+    return cachedMins ? parseInt(cachedMins, 10) * 60 : 25 * 60;
+  });
+
+  const [isFocusTimerRunning, setIsFocusTimerRunning] = useState<boolean>(() => {
+    const cachedRunning = localStorage.getItem('campus_os_focus_running');
+    return cachedRunning === 'true';
+  });
+
   const [focusTimerMode, setFocusTimerMode] = useState<'focus' | 'shortBreak' | 'longBreak'>('focus');
+
+  // Keep Local Storage synced with Focus Timer state
+  useEffect(() => {
+    localStorage.setItem('campus_os_focus_initial_minutes', focusTimerInitialMinutes.toString());
+  }, [focusTimerInitialMinutes]);
+
+  useEffect(() => {
+    localStorage.setItem('campus_os_focus_seconds', focusTimerSeconds.toString());
+  }, [focusTimerSeconds]);
+
+  useEffect(() => {
+    localStorage.setItem('campus_os_focus_running', isFocusTimerRunning.toString());
+  }, [isFocusTimerRunning]);
+
+  // Use a ref to access latest user data without restarting interval ticks
+  const userRefForTimer = React.useRef(user);
+  useEffect(() => {
+    userRefForTimer.current = user;
+  }, [user]);
 
   // Focus Timer Tick Interval in App.tsx (never unmounts during tab switches)
   useEffect(() => {
@@ -78,16 +112,17 @@ export function App() {
           }
           // Timer completed!
           setIsFocusTimerRunning(false);
-          if (user?.uid) {
+          const currentUid = userRefForTimer.current?.uid;
+          if (currentUid) {
             const today = new Date().toISOString().split('T')[0];
-            FirestoreService.getHabiturexData(user.uid).then(data => {
+            FirestoreService.getHabiturexData(currentUid).then(data => {
               const currentLog = data?.studyHoursLog || {};
               const currentStats = data?.stats || { credits: 0, flameStreak: 0, xp: 0, perfectDays: 0 };
               const newLog = {
                 ...currentLog,
                 [today]: (currentLog[today] || 0) + 0.5
               };
-              FirestoreService.saveHabiturexData(user.uid, {
+              FirestoreService.saveHabiturexData(currentUid, {
                 tasks: data?.tasks || [],
                 missions: data?.missions || [],
                 events: data?.events || [],
@@ -107,7 +142,7 @@ export function App() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isFocusTimerRunning, user?.uid]);
+  }, [isFocusTimerRunning]);
 
   const displayFocusMinutes = Math.floor(focusTimerSeconds / 60);
   const displayFocusSeconds = focusTimerSeconds % 60;
@@ -121,7 +156,8 @@ export function App() {
     onTogglePlay: () => setIsFocusTimerRunning(prev => !prev),
     onReset: () => {
       setIsFocusTimerRunning(false);
-      setFocusTimerSeconds(focusTimerInitialMinutes * 60);
+      const resetSeconds = focusTimerInitialMinutes * 60;
+      setFocusTimerSeconds(resetSeconds);
     }
   };
 
@@ -138,15 +174,14 @@ export function App() {
     }
   }, []);
 
-  const gatedTabs = ['notes', 'studyhub', 'resumebuilder', 'chat', 'assignment', 'attendance', 'habiturex', 'coding', 'courses', 'interviewprep', 'placement'];
+  const gatedTabs = ['notes', 'studyhub', 'resumebuilder', 'chat', 'attendance', 'habiturex', 'coding', 'courses', 'interviewprep', 'placement'];
 
   const getTabDisplayName = (tabId: string) => {
     switch (tabId) {
       case 'notes': return 'AI Smart Notes Summarizer';
       case 'studyhub':
       case 'chat': 
-      case 'assignment':
-        return 'AI Study, Chat & Assignment Solver';
+        return 'Personal Assistant';
       case 'attendance': return 'Attendance Manager & Calculator';
       case 'habiturex': return 'Habiturex Daily Consistency OS';
       case 'coding': return 'Coding Hub & 375 DSA Roadmap Sheet';
@@ -309,12 +344,16 @@ export function App() {
           setAssignments(fsAssignments);
 
           const fsAttendance = await FirestoreService.getAttendance(fbUser.uid);
-          if (fsAttendance.length > 0) {
-            setAttendance(fsAttendance);
-          } else {
-            const zeroAtt = getZeroAttendance(fbUser.uid);
-            setAttendance(zeroAtt);
-            await FirestoreService.saveAttendance(fbUser.uid, zeroAtt);
+          const filteredAttendance = fsAttendance.filter(item => !item.id.startsWith('att-'));
+          setAttendance(filteredAttendance);
+          StorageService.saveAttendance(filteredAttendance);
+          
+          if (filteredAttendance.length !== fsAttendance.length) {
+            // Delete the default preloaded subjects from Firestore
+            const defaultSubjects = fsAttendance.filter(item => item.id.startsWith('att-'));
+            for (const item of defaultSubjects) {
+              await FirestoreService.deleteAttendanceSubject(item.id);
+            }
           }
 
           const fsSchedule = await FirestoreService.getSchedule(fbUser.uid);
@@ -407,11 +446,18 @@ export function App() {
     }
   };
 
-  const handleUpdateAttendance = (subs: AttendanceSubject[]) => {
+  const handleUpdateAttendance = async (subs: AttendanceSubject[]) => {
+    // Find deleted subjects to remove from database
+    const deletedSubjects = attendance.filter(oldSub => !subs.some(newSub => newSub.id === oldSub.id));
+    
     setAttendance(subs);
     StorageService.saveAttendance(subs);
+    
     if (user.uid) {
-      FirestoreService.saveAttendance(user.uid, subs);
+      for (const item of deletedSubjects) {
+        await FirestoreService.deleteAttendanceSubject(item.id);
+      }
+      await FirestoreService.saveAttendance(user.uid, subs);
       syncUserStats(user, subs, dsa, assignments, studySuites, resumeData);
     }
   };
@@ -576,35 +622,11 @@ export function App() {
                 />
               )}
 
-              {activeTab === 'studyhub' && (
+              {(activeTab === 'studyhub' || activeTab === 'chat') && (
                 <StudyHubView
                   studySuites={studySuites}
                   onSaveSuite={handleSaveSuite}
                   onDeleteSuite={handleDeleteSuite}
-                  assignments={assignments}
-                  onAddAssignment={handleAddAssignment}
-                />
-              )}
-
-              {activeTab === 'chat' && (
-                <StudyHubView
-                  studySuites={studySuites}
-                  onSaveSuite={handleSaveSuite}
-                  onDeleteSuite={handleDeleteSuite}
-                  assignments={assignments}
-                  onAddAssignment={handleAddAssignment}
-                  initialMode="chat"
-                />
-              )}
-
-              {activeTab === 'assignment' && (
-                <StudyHubView
-                  studySuites={studySuites}
-                  onSaveSuite={handleSaveSuite}
-                  onDeleteSuite={handleDeleteSuite}
-                  assignments={assignments}
-                  onAddAssignment={handleAddAssignment}
-                  initialMode="assignment"
                 />
               )}
 

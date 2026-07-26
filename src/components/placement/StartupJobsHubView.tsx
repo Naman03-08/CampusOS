@@ -18,7 +18,11 @@ import {
   Briefcase,
   Globe,
   Share2,
-  Info
+  Info,
+  Zap,
+  TrendingUp,
+  Layers,
+  Award
 } from 'lucide-react';
 import { UserProfile, ResumeData } from '../../types';
 
@@ -753,6 +757,8 @@ export const StartupJobsHubView: React.FC<StartupJobsHubViewProps> = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<JobPlatform | null>(null);
+  const [activeIntroTab, setActiveIntroTab] = useState<'overview' | 'categories' | 'tips'>('overview');
+  const [hovered3dCard, setHovered3dCard] = useState<number | null>(null);
 
   useEffect(() => {
     try {
@@ -803,6 +809,323 @@ export const StartupJobsHubView: React.FC<StartupJobsHubViewProps> = () => {
   return (
     <div className="min-h-screen bg-[#F4F5F8] -m-6 sm:-m-8 p-4 sm:p-8 space-y-6 text-slate-800 font-sans">
       
+      {/* BRAND NEW ANIMATED & INTERACTIVE 3D HERO SECTION */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, type: 'spring', damping: 25 }}
+        className="w-full bg-gradient-to-br from-white via-[#F8FAFC] to-[#F1F5F9] rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden relative p-6 sm:p-8"
+      >
+        {/* Decorative background grid and glowing patterns */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-35 -z-1" />
+        
+        {/* Soft, low-saturation background blur points (Light Mode Luxuries) */}
+        <div className="absolute -top-12 -left-12 w-64 h-64 bg-blue-100/40 rounded-full blur-3xl -z-1" />
+        <div className="absolute -bottom-16 -right-16 w-80 h-80 bg-emerald-50/50 rounded-full blur-3xl -z-1" />
+        <div className="absolute top-1/2 left-2/3 w-72 h-72 bg-amber-50/40 rounded-full blur-3xl -z-1" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+          
+          {/* LEFT CONTENT: Headline, Description & Tabs (7 Columns) */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="space-y-3">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, type: 'spring' }}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-blue-600 animate-spin" style={{ animationDuration: '3s' }} />
+                <span>INTELLIGENT HUB DIRECTORY</span>
+              </motion.div>
+              
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                Accelerate Your Tech Journey <br/>
+                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 bg-clip-text text-transparent font-black">
+                  with Curated Industry Hubs
+                </span>
+              </h2>
+              
+              <p className="text-sm text-slate-500 leading-relaxed max-w-2xl font-medium">
+                The ultimate decentralized resource for ambitious students and developers. Discover vetted portals, Y-Combinator opportunities, high-paying remote roles, and official public sector fellowships.
+              </p>
+            </div>
+
+            {/* TAB SELECTOR (LIGHT NEUTRAL PILLS WITH SPRINGY BACKGROUNDS) */}
+            <div className="flex bg-slate-200/50 p-1 rounded-2xl max-w-sm sm:max-w-md border border-slate-200/40 relative">
+              {(['overview', 'categories', 'tips'] as const).map((tab) => {
+                const isActive = activeIntroTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveIntroTab(tab)}
+                    className={`relative flex-1 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer capitalize ${
+                      isActive ? 'text-slate-900 font-extrabold' : 'text-slate-600 hover:text-slate-800'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeIntroTabBackground"
+                        className="absolute inset-0 bg-white rounded-xl border border-slate-200 shadow-sm -z-10"
+                        transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                      />
+                    )}
+                    {tab}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* INTERACTIVE TAB WINDOWS WITH HEIGHT AND ENVELOPE MOTION */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeIntroTab}
+                initial={{ opacity: 0, x: -10, y: 5 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                exit={{ opacity: 0, x: 10, y: -5 }}
+                transition={{ duration: 0.25 }}
+                className="bg-white/90 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/70 shadow-sm space-y-4"
+              >
+                {activeIntroTab === 'overview' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
+                        <Compass className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800">Your Gateway to Global Careers</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      This directory removes the exhausting labor of jumping between generic job boards. We've vetted and cataloged over 80+ top-tier platforms, classifying them so you can secure summer internships, work directly under startup founders, or compete for premium Big Tech roles with maximum efficiency.
+                    </p>
+                    <div className="grid grid-cols-3 gap-3 pt-2">
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-center">
+                        <div className="text-lg font-black text-blue-600">80+</div>
+                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Indexed Hubs</div>
+                      </div>
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-center">
+                        <div className="text-lg font-black text-emerald-600">100%</div>
+                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Free Portals</div>
+                      </div>
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-center">
+                        <div className="text-lg font-black text-amber-600">6</div>
+                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Categories</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeIntroTab === 'categories' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
+                        <Layers className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800">Precision Categorization</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Skip standard search query spam. Discover precise categories curated for student-oriented lifestyles:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                        <span>YC & High Growth Startups</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span>Verified Paid Internships</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
+                        <span>Vetted Global Remote Boards</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                        <span>Big Tech STEP & Explore Paths</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeIntroTab === 'tips' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-amber-50 text-amber-600">
+                        <Zap className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800">How to Maximize Your Placement Success</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Make the platform work for you. Follow these three strategic developer habits:
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 text-[10px] font-bold shrink-0 mt-0.5">1</div>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          <strong className="text-slate-700">Save Your Hubs</strong>: Hit the bookmark star on portals you visit frequently to create your own personalized workspace dashboard.
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 text-[10px] font-bold shrink-0 mt-0.5">2</div>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          <strong className="text-slate-700">Target Direct Founders</strong>: Platforms labeled with YC or AngelList allow you to bypass heavy ATS systems and contact core decisions makers immediately.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* RIGHT PANEL: IMMERSIVE 3D FLOATING CARDS & INTERACTION (5 Columns) */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative min-h-[340px] sm:min-h-[380px] lg:min-h-[340px] px-4">
+            
+            {/* Ambient Perspective container */}
+            <div 
+              className="relative w-full max-w-[320px] h-full min-h-[300px] flex items-center justify-center" 
+              style={{ perspective: 1200 }}
+            >
+              
+              {/* BACK DECORATIVE RADAR */}
+              <div className="absolute w-64 h-64 border border-dashed border-slate-300 rounded-full animate-spin opacity-40 pointer-events-none" style={{ animationDuration: '30s' }} />
+              <div className="absolute w-44 h-44 border border-slate-200 rounded-full animate-ping opacity-15 pointer-events-none" style={{ animationDuration: '6s' }} />
+
+              {/* CARD 1: YC STARTUPS PORTAL CARD */}
+              <motion.div
+                animate={{
+                  y: hovered3dCard === 1 ? -15 : [0, -10, 0],
+                  rotateZ: hovered3dCard === 1 ? -6 : [-3, -1, -3],
+                }}
+                transition={{
+                  y: hovered3dCard === 1 ? { duration: 0.2 } : { duration: 4.5, repeat: Infinity, ease: "easeInOut" },
+                  rotateZ: hovered3dCard === 1 ? { duration: 0.2 } : { duration: 4.5, repeat: Infinity, ease: "easeInOut" }
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: -10,
+                  rotateX: 8,
+                  z: 40,
+                  boxShadow: "0 20px 40px -15px rgba(245, 158, 11, 0.2)"
+                }}
+                onHoverStart={() => setHovered3dCard(1)}
+                onHoverEnd={() => setHovered3dCard(null)}
+                className="absolute top-4 w-[240px] bg-[#FFFBEB] hover:bg-white border border-amber-200/80 hover:border-amber-400 p-4 rounded-2xl shadow-sm transition-all duration-300 cursor-pointer text-slate-800 transform -translate-x-12 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                    STARTUP TECH
+                  </span>
+                  <div className="w-6 h-6 rounded-lg bg-amber-500 flex items-center justify-center text-white text-[10px] font-bold">
+                    Y
+                  </div>
+                </div>
+                <h5 className="font-bold text-xs text-slate-900 mt-2.5">Y Combinator Careers</h5>
+                <p className="text-[10px] text-slate-500 leading-normal mt-1">
+                  Connect with founders of active YC companies. Equity options & raw roles.
+                </p>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-[9px] text-slate-400 font-mono">yc.com/jobs</span>
+                  <Sparkles className="w-3 h-3 text-amber-500 animate-pulse" />
+                </div>
+              </motion.div>
+
+              {/* CARD 2: REMOTIVE / GLOBAL CARD */}
+              <motion.div
+                animate={{
+                  y: hovered3dCard === 2 ? -15 : [0, 8, 0],
+                  rotateZ: hovered3dCard === 2 ? 8 : [2, 0, 2],
+                }}
+                transition={{
+                  y: hovered3dCard === 2 ? { duration: 0.2 } : { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 },
+                  rotateZ: hovered3dCard === 2 ? { duration: 0.2 } : { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: 12,
+                  rotateX: -6,
+                  z: 50,
+                  boxShadow: "0 20px 40px -15px rgba(16, 185, 129, 0.2)"
+                }}
+                onHoverStart={() => setHovered3dCard(2)}
+                onHoverEnd={() => setHovered3dCard(null)}
+                className="absolute top-20 w-[240px] bg-[#ECFDF5] hover:bg-white border border-emerald-200/80 hover:border-emerald-400 p-4 rounded-2xl shadow-sm transition-all duration-300 cursor-pointer text-slate-800 transform translate-x-12 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    REMOTE EXPERTS
+                  </span>
+                  <div className="w-6 h-6 rounded-lg bg-emerald-500 flex items-center justify-center text-white">
+                    <Globe className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <h5 className="font-bold text-xs text-slate-900 mt-2.5">Remotive Jobs</h5>
+                <p className="text-[10px] text-slate-500 leading-normal mt-1">
+                  Vetted digital nomad roles & software gigs paying in USD/EUR.
+                </p>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-[9px] text-slate-400 font-mono">remotive.com</span>
+                  <TrendingUp className="w-3 h-3 text-emerald-500" />
+                </div>
+              </motion.div>
+
+              {/* CARD 3: INTERNSHALA / FRESHERS CARD */}
+              <motion.div
+                animate={{
+                  y: hovered3dCard === 3 ? -15 : [0, -12, 0],
+                  rotateZ: hovered3dCard === 3 ? 0 : [0, 1, 0],
+                }}
+                transition={{
+                  y: hovered3dCard === 3 ? { duration: 0.2 } : { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 },
+                  rotateZ: hovered3dCard === 3 ? { duration: 0.2 } : { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: 0,
+                  rotateX: 12,
+                  z: 60,
+                  boxShadow: "0 25px 45px -15px rgba(59, 130, 246, 0.25)"
+                }}
+                onHoverStart={() => setHovered3dCard(3)}
+                onHoverEnd={() => setHovered3dCard(null)}
+                className="absolute bottom-2 w-[244px] bg-[#EFF6FF] hover:bg-white border border-blue-200/80 hover:border-blue-400 p-4 rounded-2xl shadow-md transition-all duration-300 cursor-pointer text-slate-800 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold uppercase text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    INTERNSHIPS FAVORITE
+                  </span>
+                  <div className="w-6 h-6 rounded-lg bg-blue-500 flex items-center justify-center text-white">
+                    <Award className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <h5 className="font-bold text-xs text-slate-900 mt-2.5 font-sans">Internshala Platform</h5>
+                <p className="text-[10px] text-slate-500 leading-normal mt-1">
+                  Over 80,000+ paid virtual and localized summer internships.
+                </p>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-[9px] text-slate-400 font-mono">internshala.com</span>
+                  <div className="flex gap-0.5">
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                  </div>
+                </div>
+              </motion.div>
+
+            </div>
+
+            {/* Subtitle helper explaining interactive 3D elements */}
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.6 }}
+              className="text-[11px] text-slate-400 font-bold mt-2 flex items-center gap-1 cursor-default text-center"
+            >
+              <Info className="w-3.5 h-3.5 text-blue-500 animate-bounce" /> Hover or tap cards to inspect 3D layers and details
+            </motion.p>
+          </div>
+
+        </div>
+      </motion.div>
+
       {/* TOP HEADER / SEARCH & COUNTER BAR */}
       <motion.div 
         initial={{ opacity: 0, y: -12 }}

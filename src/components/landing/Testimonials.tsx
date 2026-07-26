@@ -87,9 +87,9 @@ const INITIAL_REVIEWS: ReviewItem[] = [
     id: '8',
     name: 'Aarav Mehta',
     role: 'Verified Aspirant • IIT Delhi',
-    badge: 'ASSIGNMENT SOLVER',
+    badge: 'AI ACADEMIC TUTOR',
     date: '18/06/2026',
-    review: 'The step-by-step formula proofs and assignment solutions are super accurate. Outputting downloadable PDFs directly for college submission saved me countless hours during lab weeks.',
+    review: 'The AI Academic Tutor & reasoning engine is super accurate. Explaining deep code proofs and complex engineering concepts in conversational terms saved me countless hours.',
     rating: 5,
     initials: 'AR',
   },
@@ -144,7 +144,7 @@ const MODULE_OPTIONS = [
   'CODING COURSES',
   'PLACEMENT & INTERVIEWS',
   'ATTENDANCE TRACKER',
-  'ASSIGNMENT SOLVER',
+  'AI ACADEMIC TUTOR',
 ];
 
 export const Testimonials: React.FC = () => {

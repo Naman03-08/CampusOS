@@ -344,7 +344,7 @@ Generate a complete, structured study suite in JSON format with:
 // 2. AI Chat Route
 app.post("/api/ai/chat", async (req, res) => {
   try {
-    const { messages, prompt, query, history, documentContext } = req.body;
+    const { messages, prompt, query, history, documentContext, limitWords } = req.body;
     
     let userQuery = prompt || query || "";
     if (!userQuery && Array.isArray(messages) && messages.length > 0) {
@@ -362,7 +362,7 @@ app.post("/api/ai/chat", async (req, res) => {
       return res.json({ reply: "Hello! Please ask a question, request a proof, or provide a topic to begin." });
     }
 
-    const systemPrompt = `You are CampusOS AI Assistant, an elite academic and career tutor for college students.
+    let systemPrompt = `You are CampusOS AI Assistant, an elite academic and career tutor for college students.
 Provide thorough, accurate, step-by-step, and deeply helpful answers using clear, clean Markdown formatting.
 
 CRITICAL FORMATTING INSTRUCTIONS:
@@ -376,10 +376,17 @@ CRITICAL FORMATTING INSTRUCTIONS:
    - ### Viva Exam Tip
 ${documentContext ? `Document Context:\n"""${documentContext}"""` : ""}`;
 
+    if (limitWords) {
+      systemPrompt += `\n\nSTRICT WORD LIMIT WARNING:
+- You MUST answer the user's question in LESS THAN 1000 WORDS (absolute maximum 1100 words, use less if possible).
+- This is a strict token containment rule: keep descriptions direct, elegant, and avoid any long, redundant commentary. Be crisp.`;
+    }
+
     if (process.env.GEMINI_API_KEY) {
       try {
         const response = await generateContentWithFallback({
           contents: `${systemPrompt}\n\nUser Question: ${userQuery}`,
+          config: limitWords ? { maxOutputTokens: 1400 } : undefined,
         });
         const replyText = response.text || "";
         if (replyText.trim()) {

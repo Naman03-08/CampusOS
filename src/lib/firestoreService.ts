@@ -91,6 +91,7 @@ export class FirestoreService {
     if (!db || !profile.uid) return;
     try {
       await setDoc(doc(db, 'users', profile.uid), sanitizeForFirestore(profile), { merge: true });
+      await this.updateLeaderboardEntry(profile.uid);
     } catch (e) {
       console.warn("Firestore saveProfile error:", e);
     }
@@ -168,6 +169,42 @@ export class FirestoreService {
   // ==========================================
   // HABITUREX & MARKS DATA METHODS
   // ==========================================
+  static async updateLeaderboardEntry(uid: string): Promise<void> {
+    if (!db || !uid) return;
+    try {
+      const [profile, marks, habData] = await Promise.all([
+        this.getProfile(uid),
+        this.getStudentMarks(uid),
+        this.getHabiturexData(uid)
+      ]);
+
+      if (!profile) return;
+
+      const totalScored = marks.reduce((acc, m) => acc + (m.scoredMarks || 0), 0);
+      const totalMax = marks.reduce((acc, m) => acc + (m.maxMarks || 0), 0);
+      const marksAvg = totalMax > 0 ? Math.round((totalScored / totalMax) * 100) : 0;
+
+      const tasksCompleted = (habData?.tasks || []).filter((t: any) => t.completedToday || t.status === 'Completed').length;
+      const streak = habData?.stats?.flameStreak || 0;
+      const studyHours = Object.values(habData?.studyHoursLog || {}).reduce((a: number, b: any) => a + Number(b || 0), 0);
+
+      const entry = {
+        uid,
+        displayName: profile.displayName || 'Campus Student',
+        university: profile.university || 'Engineering Cohort',
+        marksAvg,
+        tasksCompleted,
+        streak,
+        studyHours,
+        updatedAt: new Date().toISOString()
+      };
+
+      await setDoc(doc(db, 'leaderboard', uid), sanitizeForFirestore(entry), { merge: true });
+    } catch (e) {
+      console.warn("Firestore updateLeaderboardEntry error:", e);
+    }
+  }
+
   static async saveHabiturexData(uid: string, data: Partial<HabiturexData>): Promise<void> {
     if (!db || !uid) return;
     try {
@@ -177,6 +214,7 @@ export class FirestoreService {
         updatedAt: new Date().toISOString()
       });
       await setDoc(doc(db, 'habiturex', uid), payload, { merge: true });
+      await this.updateLeaderboardEntry(uid);
     } catch (e) {
       console.warn("Firestore saveHabiturexData error:", e);
     }
@@ -201,6 +239,7 @@ export class FirestoreService {
       for (const m of marks) {
         await setDoc(doc(db, 'marks', m.id), sanitizeForFirestore({ ...m, userId: uid }), { merge: true });
       }
+      await this.updateLeaderboardEntry(uid);
     } catch (e) {
       console.warn("Firestore saveStudentMarks error:", e);
     }
@@ -220,10 +259,13 @@ export class FirestoreService {
     }
   }
 
-  static async deleteStudentMark(id: string): Promise<void> {
+  static async deleteStudentMark(id: string, uid?: string): Promise<void> {
     if (!db || !id) return;
     try {
       await deleteDoc(doc(db, 'marks', id));
+      if (uid) {
+        await this.updateLeaderboardEntry(uid);
+      }
     } catch (e) {
       console.warn("Firestore deleteStudentMark error:", e);
     }
@@ -349,6 +391,15 @@ export class FirestoreService {
     } catch (e) {
       console.warn("Firestore getAttendance error:", e);
       return [];
+    }
+  }
+
+  static async deleteAttendanceSubject(id: string): Promise<void> {
+    if (!db || !id) return;
+    try {
+      await deleteDoc(doc(db, 'attendance', id));
+    } catch (e) {
+      console.warn("Firestore deleteAttendanceSubject error:", e);
     }
   }
 

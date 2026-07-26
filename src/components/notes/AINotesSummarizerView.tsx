@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Sparkles, 
   FileText, 
@@ -21,7 +22,14 @@ import {
   Tag,
   Send,
   Pin,
-  ChevronRight
+  ChevronRight,
+  Cpu,
+  Activity,
+  Compass,
+  Terminal,
+  Award,
+  Star,
+  Info as InfoIcon
 } from 'lucide-react';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { exportTextToPDF } from '../../lib/pdfExport';
@@ -89,12 +97,99 @@ BCNF (Boyce-Codd Normal Form): A stricter version of 3NF. For every functional d
   }
 ];
 
+// Bespoke Campus-AI Personalized Synthesis Engine Logo Component
+const CampusAISynthesisLogo: React.FC = () => {
+  return (
+    <motion.div 
+      className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center shrink-0"
+      whileHover={{ scale: 1.08, rotate: 5 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+    >
+      {/* Glowing atmospheric halo */}
+      <div className="absolute inset-0 bg-indigo-200/30 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '4s' }} />
+      <div className="absolute inset-3 bg-purple-100/40 rounded-full blur-lg" />
+
+      {/* Triple concentric gear-orbits */}
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-0 rounded-full border border-dashed border-indigo-300/70"
+      />
+      <motion.div 
+        animate={{ rotate: -360 }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-2.5 rounded-full border border-purple-200/50"
+      />
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-5 rounded-full border border-emerald-200/50"
+      />
+
+      {/* Orbiting cyber-beads */}
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-0"
+      >
+        <span className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-indigo-500 shadow-sm" />
+      </motion.div>
+      <motion.div 
+        animate={{ rotate: -360 }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-2.5"
+      >
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-xs" />
+      </motion.div>
+
+      {/* The Central Solid Tech Crest */}
+      <div className="absolute inset-4.5 bg-gradient-to-br from-white to-slate-50 rounded-2xl border border-slate-200/95 shadow-md flex items-center justify-center overflow-hidden">
+        <svg viewBox="0 0 100 100" className="w-10/12 h-10/12 text-indigo-600">
+          {/* Subtle design alignments */}
+          <path d="M 15,50 L 85,50" stroke="#E2E8F0" strokeWidth="1.5" />
+          <path d="M 50,15 L 50,85" stroke="#E2E8F0" strokeWidth="1.5" />
+          
+          {/* Geometric Diamond Layer */}
+          <motion.polygon 
+            points="50,18 82,50 50,82 18,50" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2.5"
+            animate={{ strokeDashoffset: [0, 240] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+            strokeDasharray="8, 6"
+          />
+          
+          {/* Inner core matrix */}
+          <circle cx="50" cy="50" r="11" className="fill-indigo-50 text-indigo-500" stroke="currentColor" strokeWidth="2.5" />
+          <motion.circle 
+            cx="50" 
+            cy="50" 
+            r="4.5" 
+            className="fill-emerald-400"
+            animate={{ scale: [1, 1.35, 1] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          
+          {/* Node micro-junctions */}
+          <circle cx="18" cy="50" r="3.5" className="fill-indigo-500" />
+          <circle cx="82" cy="50" r="3.5" className="fill-indigo-500" />
+          <circle cx="50" cy="18" r="3.5" className="fill-purple-500" />
+          <circle cx="50" cy="82" r="3.5" className="fill-purple-500" />
+        </svg>
+      </div>
+    </motion.div>
+  );
+};
+
 export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
   user,
   onSaveSuite,
   onNavigateTab
 }) => {
   const [activeTab, setActiveTab] = useState<'summarizer' | 'saved'>('summarizer');
+  const [activeHeroTab, setActiveHeroTab] = useState<'synthesis' | 'benefits' | 'workflow'>('synthesis');
+  const [hoveredCard3d, setHoveredCard3d] = useState<number | null>(null);
 
   // Input states
   const [inputTitle, setInputTitle] = useState('');
@@ -282,20 +377,358 @@ export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300 max-w-7xl mx-auto">
-      {/* Section Usage Banner */}
-      <SectionUsageBanner
-        title="AI Smart Notes & Text Summarizer"
-        subtitle="Instant High-Yield Lecture Summaries, Exam Flashcards & Key Terminology"
-        purpose="Transform long lecture transcripts, textbook chapters, or raw study notes into structured executive summaries, active recall flashcards, terminology sheets, and predicted exam questions."
-        keyFeatures={[
-          'Instant High-Yield Executive Summaries & Key Takeaways',
-          'Structured Study Notes with Terminology Breakdown',
-          'Interactive Active Recall Flashcards & Practice Questions',
-          'Export to PDF or Save directly to AI Study Suite'
-        ]}
-        icon={<Sparkles className="w-6 h-6 text-white" />}
-        badge="AI Summarizer"
-      />
+      {/* BRAND NEW INTERACTIVE 3D AI INTRO HERO */}
+      <motion.div
+        initial={{ opacity: 0, y: -24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, type: 'spring', damping: 24 }}
+        className="w-full bg-gradient-to-br from-white via-[#F8FAFC] to-[#F1F5F9] rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden relative p-6 sm:p-8 mb-6"
+      >
+        {/* Glowing Neural Path Network and Subtle Dots Layer */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-35 -z-1" />
+        
+        {/* Interactive Floating AI Sparks (Background Animation Orbs) */}
+        <div className="absolute top-12 left-1/4 w-32 h-32 bg-indigo-100/40 rounded-full blur-3xl pointer-events-none -z-1" />
+        <div className="absolute bottom-6 right-1/4 w-40 h-40 bg-purple-100/40 rounded-full blur-3xl pointer-events-none -z-1" />
+        <div className="absolute top-1/2 left-3/4 w-28 h-28 bg-emerald-50/50 rounded-full blur-2xl pointer-events-none -z-1" />
+
+        {/* Floating animated ambient dust tokens (Thought Streams) */}
+        {[...Array(4)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 rounded-full bg-indigo-400/20 blur-xs pointer-events-none -z-1"
+            animate={{
+              x: [0, (i % 2 === 0 ? 40 : -40), 0],
+              y: [0, (i % 2 === 0 ? -40 : 40), 0],
+              scale: [1, 1.5, 1],
+              opacity: [0.15, 0.45, 0.15]
+            }}
+            transition={{
+              duration: 8 + i * 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            style={{
+              top: `${20 + i * 22}%`,
+              left: `${15 + i * 20}%`,
+            }}
+          />
+        ))}
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+          
+          {/* LEFT SIDE: Header & Tabbed Information Suite */}
+          <div className="lg:col-span-7 space-y-5">
+            <div className="space-y-3.5">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, type: 'spring' }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold"
+                >
+                  <Cpu className="w-3.5 h-3.5 text-indigo-600 animate-spin" style={{ animationDuration: '4s' }} />
+                  <span>CAMPUS-AI COGNITIVE SUITE</span>
+                </motion.div>
+
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                  <Activity className="w-3 h-3 text-emerald-600 animate-pulse" />
+                  <span>Real-time Synthesis</span>
+                </span>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                {/* Custom Bespoke AI Logo in place of generic icon */}
+                <CampusAISynthesisLogo />
+                
+                <div className="space-y-1">
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight leading-tight">
+                    AI Smart Notes <br/>
+                    <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-600 bg-clip-text text-transparent font-black">
+                      & Neural Summarizer
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Powering high-yield study notes with a robust personal synthesis engine.
+                  </p>
+                </div>
+              </div>
+              
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-xl font-medium pt-1">
+                Say goodbye to unorganized lectures and infinite PDFs. Input transcript chunks, web notes, or textbook materials to generate beautiful executive digests, terminology libraries, flashcards, and practice exam Q&As instantly.
+              </p>
+            </div>
+
+            {/* LIGHTWEIGHT TAB PILLS FOR DETAILED INFO DISPLAY */}
+            <div className="flex bg-slate-200/55 p-1 rounded-2xl max-w-md border border-slate-200/50">
+              {(['synthesis', 'benefits', 'workflow'] as const).map((tab) => {
+                const isActive = activeHeroTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveHeroTab(tab)}
+                    className={`relative flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer capitalize ${
+                      isActive ? 'text-slate-950 font-black' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeNotesHeroTabBg"
+                        className="absolute inset-0 bg-white rounded-xl border border-slate-200/70 shadow-2xs -z-10"
+                        transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+                      />
+                    )}
+                    {tab === 'synthesis' ? 'Synthesis Core' : tab === 'benefits' ? 'Recall Advantages' : 'Smart Workflow'}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* EXPANDED INTERACTIVE WORKSPACE CARD FOR THE TABS */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeHeroTab}
+                initial={{ opacity: 0, x: -12, y: 4 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                exit={{ opacity: 0, x: 12, y: -4 }}
+                transition={{ duration: 0.25 }}
+                className="bg-white/95 backdrop-blur-xs p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4"
+              >
+                {activeHeroTab === 'synthesis' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+                        <Terminal className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-900">Bespoke Semantic Abstraction Engine</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Our proprietary neural pipelines map lecture structure based on technical hierarchy. The engine extracts abstract dependencies, isolates complex topics like virtualization or algorithmic variance, and translates them into dense, digestible mental units.
+                    </p>
+                    <div className="grid grid-cols-3 gap-3.5 pt-2">
+                      <div className="p-3 bg-slate-50/70 rounded-xl border border-slate-200/50 text-center">
+                        <span className="text-base font-black text-indigo-600 block">5x</span>
+                        <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider block">Time Saved</span>
+                      </div>
+                      <div className="p-3 bg-slate-50/70 rounded-xl border border-slate-200/50 text-center">
+                        <span className="text-base font-black text-emerald-600 block">98.4%</span>
+                        <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider block">Recall Rate</span>
+                      </div>
+                      <div className="p-3 bg-slate-50/70 rounded-xl border border-slate-200/50 text-center">
+                        <span className="text-base font-black text-purple-600 block">100%</span>
+                        <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider block">Vetted Study</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeHeroTab === 'benefits' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
+                        <Award className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-900">Cognitive Acceleration Features</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Standard text summaries only scratch the surface. Campus-AI builds real study weapons to help you conquer exams with confidence:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-bold text-slate-600">
+                      <div className="flex items-center gap-2 p-2 bg-slate-50/60 rounded-xl border border-slate-200/30">
+                        <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                        <span>Interactive Q&A Difficulty Shields</span>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 bg-slate-50/60 rounded-xl border border-slate-200/30">
+                        <span className="w-2 h-2 rounded-full bg-purple-500" />
+                        <span>Active Recall Double-Sided Flashcards</span>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 bg-slate-50/60 rounded-xl border border-slate-200/30">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span>Formatted PDF Export Pipelines</span>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 bg-slate-50/60 rounded-xl border border-slate-200/30">
+                        <span className="w-2 h-2 rounded-full bg-amber-500" />
+                        <span>One-Click AI Study Suite Syncing</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeHeroTab === 'workflow' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600">
+                        <Compass className="w-4 h-4" />
+                      </div>
+                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-900">Optimal 3-Step Study Loop</h4>
+                    </div>
+                    <div className="space-y-2.5">
+                      <div className="flex gap-3">
+                        <div className="w-5 h-5 rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-700 text-[10px] font-black shrink-0 mt-0.5">1</div>
+                        <p className="text-xs text-slate-500 leading-normal">
+                          <strong className="text-slate-800 font-extrabold">Ingest</strong>: Paste lecture slides, voice transcripts, or select a predefined operating system or database preset.
+                        </p>
+                      </div>
+                      <div className="flex gap-3">
+                        <div className="w-5 h-5 rounded-full bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700 text-[10px] font-black shrink-0 mt-0.5">2</div>
+                        <p className="text-xs text-slate-500 leading-normal">
+                          <strong className="text-slate-800 font-extrabold">Synthesize & Pin</strong>: Trigger the personal AI engine, pin notes to your saved drawer, and download verified PDFs.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* RIGHT SIDE: INTERACTIVE 3D PERSPECTIVE CARDS GRID */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative min-h-[350px] lg:min-h-[330px] px-2 sm:px-4">
+            
+            <div 
+              className="relative w-full max-w-[310px] min-h-[290px] flex items-center justify-center" 
+              style={{ perspective: 1200 }}
+            >
+              
+              {/* Spinning background halo lines */}
+              <div className="absolute w-60 h-60 border border-dashed border-indigo-200 rounded-full animate-spin opacity-40 pointer-events-none" style={{ animationDuration: '35s' }} />
+              <div className="absolute w-44 h-44 border border-purple-100 rounded-full animate-ping opacity-15 pointer-events-none" style={{ animationDuration: '7s' }} />
+
+              {/* 3D CARD 1: RAW INGESTION CARD */}
+              <motion.div
+                animate={{
+                  y: hoveredCard3d === 1 ? -12 : [0, -8, 0],
+                  rotateZ: hoveredCard3d === 1 ? -4 : [-2, 0, -2],
+                }}
+                transition={{
+                  y: hoveredCard3d === 1 ? { duration: 0.25 } : { duration: 4.8, repeat: Infinity, ease: "easeInOut" },
+                  rotateZ: hoveredCard3d === 1 ? { duration: 0.25 } : { duration: 4.8, repeat: Infinity, ease: "easeInOut" }
+                }}
+                whileHover={{
+                  scale: 1.06,
+                  rotateY: -12,
+                  rotateX: 8,
+                  z: 40,
+                  boxShadow: "0 22px 40px -15px rgba(99, 102, 241, 0.22)"
+                }}
+                onHoverStart={() => setHoveredCard3d(1)}
+                onHoverEnd={() => setHoveredCard3d(null)}
+                className="absolute top-2 w-[220px] bg-[#EEF2F6] hover:bg-white border border-slate-300/70 hover:border-indigo-400 p-3.5 rounded-2xl shadow-xs transition-all duration-300 cursor-pointer transform -translate-x-10 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[8px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                    STAGE 01 • INPUT
+                  </span>
+                  <div className="w-5 h-5 rounded-md bg-indigo-600 flex items-center justify-center text-white text-[9px] font-bold">
+                    <FileText className="w-3 h-3" />
+                  </div>
+                </div>
+                <h5 className="font-extrabold text-xs text-slate-900 mt-2">Raw Data Ingestion</h5>
+                <p className="text-[10px] text-slate-500 leading-normal mt-1 font-medium">
+                  Accepts lecture PDFs, text, and raw voice transcripts.
+                </p>
+                <div className="flex items-center justify-between mt-2.5">
+                  <span className="text-[9px] text-indigo-500 font-mono font-bold">utf8_parsing_ok</span>
+                  <Activity className="w-3 h-3 text-indigo-500 animate-pulse" />
+                </div>
+              </motion.div>
+
+              {/* 3D CARD 2: RECALL & FLASHCARDS CARD */}
+              <motion.div
+                animate={{
+                  y: hoveredCard3d === 2 ? -12 : [0, 8, 0],
+                  rotateZ: hoveredCard3d === 2 ? 6 : [3, 1, 3],
+                }}
+                transition={{
+                  y: hoveredCard3d === 2 ? { duration: 0.25 } : { duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 },
+                  rotateZ: hoveredCard3d === 2 ? { duration: 0.25 } : { duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }
+                }}
+                whileHover={{
+                  scale: 1.06,
+                  rotateY: 12,
+                  rotateX: -8,
+                  z: 50,
+                  boxShadow: "0 22px 40px -15px rgba(168, 85, 247, 0.22)"
+                }}
+                onHoverStart={() => setHoveredCard3d(2)}
+                onHoverEnd={() => setHoveredCard3d(null)}
+                className="absolute top-16 w-[220px] bg-[#FAF5FF] hover:bg-white border border-purple-200 hover:border-purple-400 p-3.5 rounded-2xl shadow-xs transition-all duration-300 cursor-pointer transform translate-x-12 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[8px] font-black uppercase text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                    STAGE 02 • PARSING
+                  </span>
+                  <div className="w-5 h-5 rounded-md bg-purple-600 flex items-center justify-center text-white">
+                    <Brain className="w-3 h-3" />
+                  </div>
+                </div>
+                <h5 className="font-extrabold text-xs text-slate-900 mt-2">Semantic Extraction</h5>
+                <p className="text-[10px] text-slate-500 leading-normal mt-1 font-medium">
+                  Isolates key terminologies and auto-generates exam QA.
+                </p>
+                <div className="flex items-center justify-between mt-2.5">
+                  <span className="text-[9px] text-purple-500 font-mono font-bold">nlp_matrix_100</span>
+                  <Sparkles className="w-3 h-3 text-purple-500" />
+                </div>
+              </motion.div>
+
+              {/* 3D CARD 3: FLASHCARDS CARD */}
+              <motion.div
+                animate={{
+                  y: hoveredCard3d === 3 ? -12 : [0, -10, 0],
+                  rotateZ: hoveredCard3d === 3 ? 0 : [0, 1, 0],
+                }}
+                transition={{
+                  y: hoveredCard3d === 3 ? { duration: 0.25 } : { duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
+                  rotateZ: hoveredCard3d === 3 ? { duration: 0.25 } : { duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 }
+                }}
+                whileHover={{
+                  scale: 1.06,
+                  rotateY: 0,
+                  rotateX: 12,
+                  z: 60,
+                  boxShadow: "0 25px 45px -15px rgba(16, 185, 129, 0.22)"
+                }}
+                onHoverStart={() => setHoveredCard3d(3)}
+                onHoverEnd={() => setHoveredCard3d(null)}
+                className="absolute bottom-2 w-[224px] bg-[#ECFDF5] hover:bg-white border border-emerald-200 hover:border-emerald-400 p-3.5 rounded-2xl shadow-sm transition-all duration-300 cursor-pointer text-slate-800 select-none"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[8px] font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    STAGE 03 • OUTPUT
+                  </span>
+                  <div className="w-5 h-5 rounded-md bg-emerald-600 flex items-center justify-center text-white">
+                    <Layers className="w-3 h-3" />
+                  </div>
+                </div>
+                <h5 className="font-extrabold text-xs text-slate-900 mt-2 font-sans">Active Recall Cards</h5>
+                <p className="text-[10px] text-slate-500 leading-normal mt-1 font-medium">
+                  Produces study slides, terminal flashcards & exam preps.
+                </p>
+                <div className="flex items-center justify-between mt-2.5">
+                  <span className="text-[9px] text-emerald-600 font-mono font-bold">suite_ready_true</span>
+                  <div className="flex gap-0.5">
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                    <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                  </div>
+                </div>
+              </motion.div>
+
+            </div>
+
+            {/* Hover guidance label */}
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.65 }}
+              className="text-[11px] text-slate-400 font-bold mt-2.5 flex items-center gap-1.5 cursor-default text-center"
+            >
+              <InfoIcon className="w-3.5 h-3.5 text-indigo-500 animate-bounce" /> Hover or touch 3D cards to track semantic layers
+            </motion.p>
+          </div>
+
+        </div>
+      </motion.div>
 
       {/* Navigation Bar */}
       <div className="p-2 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between gap-2">

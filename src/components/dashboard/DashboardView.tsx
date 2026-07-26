@@ -229,24 +229,24 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <p className="text-[11px] text-slate-500 mt-2 font-medium">Target goal: 80% across all subjects</p>
         </div>
 
-        {/* Upcoming Assignments */}
+        {/* AI Study Suites */}
         <div 
-          onClick={() => onNavigateTab('assignment')}
+          onClick={() => onNavigateTab('studyhub')}
           className="bg-white/80 backdrop-blur-xl p-5 rounded-2xl border border-white/90 shadow-3d-sm hover:shadow-xl card-3d transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-black text-slate-500 uppercase tracking-wider">Assignments</span>
+            <span className="text-xs font-black text-slate-500 uppercase tracking-wider">Study Suites</span>
             <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black shadow-2xs">
-              <Clock className="w-4.5 h-4.5" />
+              <BookOpen className="w-4.5 h-4.5" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-black text-slate-900">{assignments.length}</span>
+            <span className="text-2xl sm:text-3xl font-black text-slate-900">{studySuites.length}</span>
             <span className="text-[11px] font-black text-amber-700 bg-amber-100/90 px-2 py-0.5 rounded-md border border-amber-200">
-              Due This Week
+              Active Suites
             </span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-2 font-medium">AI Step-by-Step Solver Ready</p>
+          <p className="text-[11px] text-slate-500 mt-2 font-medium">Notes, Flashcards & Quizzes Ready</p>
         </div>
 
         {/* DSA Coding Progress */}
@@ -296,54 +296,54 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column (2 cols): Schedule & Recent Notes */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Today's Schedule Card */}
+          {/* Today's Schedule & Events Card */}
           <div className="p-6 sm:p-7 rounded-[28px] bg-white/45 backdrop-blur-2xl border border-white/80 shadow-2xs">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
                   <Clock className="w-5 h-5" />
                 </div>
-                <h2 className="text-base font-extrabold text-slate-900">Active Assignments & Deadlines</h2>
+                <h2 className="text-base font-extrabold text-slate-900">Today's Study Checklist & Events</h2>
               </div>
               <button
-                onClick={() => onNavigateTab('assignment')}
+                onClick={() => onNavigateTab('habiturex')}
                 className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1"
               >
-                View Solver <ArrowRight className="w-3.5 h-3.5" />
+                View Planner <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {assignments.length > 0 ? (
+            {schedule.length > 0 ? (
               <div className="space-y-3">
-                {assignments.slice(0, 3).map((item) => (
+                {schedule.slice(0, 3).map((item) => (
                   <div
                     key={item.id}
-                    onClick={() => onNavigateTab('assignment')}
+                    onClick={() => onNavigateTab('habiturex')}
                     className="p-4 rounded-2xl bg-white border border-slate-200/60 flex items-center justify-between hover:border-blue-200 transition-all cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 font-bold text-xs flex flex-col items-center justify-center border border-indigo-100">
+                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 font-bold text-xs flex flex-col items-center justify-center border border-blue-100">
                         <Clock className="w-4 h-4" />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-slate-900">{item.title}</p>
-                        <p className="text-xs text-slate-500">{item.subject} • Due: {item.dueDate}</p>
+                        <p className="text-xs text-slate-500">{item.category} • {item.time} ({item.durationMinutes}m)</p>
                       </div>
                     </div>
                     <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
-                      Solve AI
+                      {item.completed ? 'Completed' : 'Pending'}
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="p-8 rounded-2xl bg-slate-50/70 border border-dashed border-slate-200 text-center">
-                <p className="text-xs font-semibold text-slate-500">No active assignment deadlines recorded.</p>
+                <p className="text-xs font-semibold text-slate-500">No events or planner items recorded for today.</p>
                 <button
-                  onClick={() => onNavigateTab('assignment')}
+                  onClick={() => onNavigateTab('habiturex')}
                   className="mt-2 text-xs font-bold text-blue-600 hover:underline"
                 >
-                  + Solve Assignment with AI
+                  + Create Event in Consistency Planner
                 </button>
               </div>
             )}

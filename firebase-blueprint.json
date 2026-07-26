@@ -206,10 +206,30 @@
         "examDate": { "type": "string" }
       },
       "required": ["id", "userId", "subject", "scoredMarks", "maxMarks"]
+    },
+    "leaderboard": {
+      "title": "Live Campus Leaderboard",
+      "description": "Consolidated leaderboard stats computed per student for real-time rank and streak lookup.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "university": { "type": "string" },
+        "marksAvg": { "type": "number" },
+        "tasksCompleted": { "type": "number" },
+        "streak": { "type": "number" },
+        "studyHours": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "displayName", "university"]
     }
   },
   "securityRules": {
     "users": {
+      "read": "true",
+      "write": "true"
+    },
+    "leaderboard": {
       "read": "true",
       "write": "true"
     },

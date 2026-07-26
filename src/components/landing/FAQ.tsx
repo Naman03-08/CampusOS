@@ -10,8 +10,8 @@ export const FAQ: React.FC = () => {
       a: 'CampusOS AI supports PDF, DOCX, PPTX, TXT, images (PNG, JPG), and direct YouTube or syllabus text pastes. Our AI engine processes up to 1M context tokens seamlessly.',
     },
     {
-      q: 'How does the Assignment Solver maintain academic integrity?',
-      a: 'The solver provides step-by-step conceptual guidance, mathematical proofs, and textbooks citations to help you understand the solution thoroughly rather than simply copying standard answers.',
+      q: 'How does the AI Academic Tutor maintain study quality?',
+      a: 'The tutor provides step-by-step conceptual guidance, logical proofs, and textbook citations to help you understand subjects thoroughly rather than simply memorizing standard answers.',
     },
     {
       q: 'How does the Attendance Predictor work?',
@@ -19,7 +19,7 @@ export const FAQ: React.FC = () => {
     },
     {
       q: 'Can I export generated study suites and resumes to PDF?',
-      a: 'Yes! All study notes, flashcards, assignment solutions, and ATS resumes can be exported as clean, beautifully formatted PDFs with one click.',
+      a: 'Yes! All study notes, flashcards, and ATS resumes can be exported as clean, beautifully formatted PDFs with one click.',
     },
     {
       q: 'Is my uploaded data private and secure?',

@@ -60,7 +60,7 @@ export const UpgradePromptModal: React.FC<UpgradePromptModalProps> = ({
               <span>Please upgrade to a Pro Plan or start your 4-Day Free Trial</span>
             </p>
             <p className="text-xs text-blue-800/90 leading-relaxed pl-5">
-              To unlock full access to <strong className="text-blue-950">{featureName}</strong>, study suites, DSA solutions, and AI solvers, please select an option below:
+              To unlock full access to <strong className="text-blue-950">{featureName}</strong>, study suites, DSA solutions, and AI study tools, please select an option below:
             </p>
           </div>
 
@@ -123,7 +123,7 @@ export const UpgradePromptModal: React.FC<UpgradePromptModalProps> = ({
             <div className="grid grid-cols-2 gap-1.5 text-[11px] font-bold text-slate-700">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>Unlimited AI Assignment Solver</span>
+                <span>Unlimited AI Academic Tutor</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />

@@ -26,7 +26,7 @@ export const FooterLanding: React.FC = () => {
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">Core Modules</h4>
             <ul className="space-y-2.5 text-xs font-semibold">
               <li><a href="#features" className="hover:text-purple-600 transition-colors">AI Study Hub</a></li>
-              <li><a href="#features" className="hover:text-purple-600 transition-colors">Assignment Solver</a></li>
+              <li><a href="#features" className="hover:text-purple-600 transition-colors">AI Academic Tutor</a></li>
               <li><a href="#features" className="hover:text-purple-600 transition-colors">Attendance Manager</a></li>
               <li><a href="#features" className="hover:text-purple-600 transition-colors">Smart Calendar</a></li>
               <li><a href="#features" className="hover:text-purple-600 transition-colors">DSA Coding Hub</a></li>

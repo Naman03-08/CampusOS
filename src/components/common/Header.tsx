@@ -77,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-2 max-w-5xl mx-auto">
             <AlertTriangle className="w-4 h-4 text-amber-300 shrink-0" />
             <span>
-              <strong>STREAK AT RISK! ⚠️</strong> You haven't done any activity today. Complete 1 coding question, course topic, or assignment today to save your <strong>{streakInfo.streak}-day streak</strong>, or it will reset to 0 tomorrow!
+              <strong>STREAK AT RISK! ⚠️</strong> You haven't done any activity today. Complete 1 coding question or course topic today to save your <strong>{streakInfo.streak}-day streak</strong>, or it will reset to 0 tomorrow!
             </span>
           </div>
           <button 
@@ -96,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-blue-600 transition-colors" />
           <input
             type="text"
-            placeholder="Ask CampusOS AI... 'Solve assignment' or 'Check attendance'"
+            placeholder="Ask CampusOS AI... 'Explain dynamic programming' or 'Check attendance'"
             className="w-full pl-10 pr-12 py-2 text-xs sm:text-sm rounded-xl bg-white/80 backdrop-blur-md border border-white/90 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 shadow-3d-sm transition-all font-semibold text-slate-800 placeholder:text-slate-400"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {

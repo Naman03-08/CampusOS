@@ -38,7 +38,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
     usageLimits: {
       studySuites: '5 Generations total',
       dsaSolutions: '3 Solutions / day',
-      assignmentSolver: '5 Problems total',
+      assignmentSolver: '5 Chats total',
       resumeScans: '2 ATS Resume Audits total',
       interviewPrep: '1 Practice Session total',
       aiChatTutor: '20 Messages total'
@@ -47,7 +47,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
       '4 Days Full Access to basic features',
       '5 AI Study Suite generations (Notes, Flashcards, Quiz)',
       '3 CampusOS 375 DSA question AI solutions / day',
-      '5 AI Assignment Solves (Step-by-step logic)',
+      '5 AI Academic Tutor Sessions',
       '2 ATS Resume Audit Scans & PDF Export',
       '256 Subjects Technical Interview Question Bank',
       'Attendance Tracker & Smart Calendar'
@@ -72,14 +72,14 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
     usageLimits: {
       studySuites: '50 Generations / month',
       dsaSolutions: 'Unlimited 375 DSA Sheet',
-      assignmentSolver: 'Unlimited Problems',
+      assignmentSolver: 'Unlimited Chats',
       resumeScans: '15 ATS Scans / month',
       interviewPrep: '5 Sessions / month',
       aiChatTutor: 'Unlimited 24/7 Chat'
     },
     features: [
       'Everything in Free Trial, PLUS:',
-      'UNLIMITED AI Assignment Solver with step-by-step logic',
+      'UNLIMITED AI Academic Tutor with step-by-step logic',
       'Complete CampusOS 375 DSA Roadmap Sheet access',
       '15 High-Score ATS Resume Scans & Keyword Scans / month',
       '50 AI Study Suites & Flashcard Generators / month',
@@ -106,7 +106,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
     usageLimits: {
       studySuites: 'UNLIMITED Generations',
       dsaSolutions: 'UNLIMITED Code Coach',
-      assignmentSolver: 'UNLIMITED Solves',
+      assignmentSolver: 'UNLIMITED Chats',
       resumeScans: 'UNLIMITED Scans & PDF Exports',
       interviewPrep: 'UNLIMITED Question Bank Access',
       aiChatTutor: 'UNLIMITED Priority Chat'

@@ -202,27 +202,7 @@ const SANDBOX_MODULES: SandboxModule[] = [
     ],
     icon: Calculator,
   },
-  {
-    id: 'assignment',
-    title: 'Assignment & Formula Solver',
-    badge: 'STEP-BY-STEP SOLUTION ENGINE',
-    badgeBg: 'bg-fuchsia-100/80 border-fuchsia-200/80',
-    badgeText: 'text-fuchsia-800',
-    cardBg: 'bg-fuchsia-50/70',
-    cardBorder: 'border-fuchsia-200/90',
-    iconBg: 'bg-fuchsia-100/90 border-fuchsia-200',
-    iconColor: 'text-fuchsia-600',
-    bulletColor: 'bg-fuchsia-600',
-    metricLabel: 'SOLUTION ACCURACY',
-    metricValue: '99.4% Verified Proofs',
-    description: 'Solves complex engineering mathematics, physics equations, and code lab assignments with step-by-step explanations.',
-    bullets: [
-      'Generates formatted PDF submission writeups',
-      'Step-by-step derivation proofs and graph plots',
-      'Clean LaTeX math formula rendering',
-    ],
-    icon: BookOpen,
-  },
+
 ];
 
 interface AgentSandboxesCarouselProps {

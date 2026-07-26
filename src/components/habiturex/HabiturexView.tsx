@@ -51,6 +51,8 @@ import { UserProfile, AttendanceSubject, StudentMarkRecord, HabiturexData } from
 import { AttendanceView } from '../attendance/AttendanceView';
 import { FirestoreService } from '../../lib/firestoreService';
 import { StreakService } from '../../lib/streakService';
+import { db } from '../../lib/firebase';
+import { collection, query, onSnapshot } from 'firebase/firestore';
 
 export interface TaskItem {
   id: string;
@@ -413,7 +415,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
   const handleDeleteMark = async (id: string) => {
     const updated = marks.filter(m => m.id !== id);
     setMarks(updated);
-    await FirestoreService.deleteStudentMark(id);
+    await FirestoreService.deleteStudentMark(id, user.uid);
   };
 
   // Save Calendar Event
@@ -444,53 +446,46 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
     saveAllToFirestore(tasks, missions, updated);
   };
 
-  // Load Campus Leaderboard Data from Firestore
+  // Load Campus Leaderboard Data from Firestore with real-time updates
   useEffect(() => {
-    if (activeInnerTab === 'leaderboard') {
+    if (activeInnerTab === 'leaderboard' && db) {
       setLoadingLeaderboard(true);
-      async function fetchLeaderboard() {
-        try {
-          const users = await FirestoreService.getAllUsers();
-          const entries: LeaderboardEntry[] = [];
 
-          for (const u of users) {
-            const [uMarks, uHab] = await Promise.all([
-              FirestoreService.getStudentMarks(u.uid),
-              FirestoreService.getHabiturexData(u.uid)
-            ]);
-
-            const totalScored = uMarks.reduce((acc, m) => acc + m.scoredMarks, 0);
-            const totalMax = uMarks.reduce((acc, m) => acc + m.maxMarks, 0);
-            const marksAvg = totalMax > 0 ? Math.round((totalScored / totalMax) * 100) : 0;
-
-            const tasksCompleted = (uHab?.tasks || []).filter((t: any) => t.completedToday || t.status === 'Completed').length;
-            const streak = uHab?.stats?.flameStreak || 0;
-            const studyHours = Object.values(uHab?.studyHoursLog || {}).reduce((a, b) => a + Number(b), 0);
-
-            entries.push({
-              uid: u.uid,
-              displayName: u.displayName || 'Campus Student',
-              university: u.university || 'Engineering Cohort',
-              marksAvg,
-              tasksCompleted,
-              streak,
-              studyHours
-            });
-          }
-
-          // Sort by highest marks avg, then completed tasks, then streak
-          entries.sort((a, b) => b.marksAvg - a.marksAvg || b.tasksCompleted - a.tasksCompleted || b.streak - a.streak);
-          setLeaderboardList(entries);
-        } catch (e) {
-          console.warn("Failed fetching leaderboard:", e);
-        } finally {
-          setLoadingLeaderboard(false);
-        }
+      // Proactively sync local/latest stats of current user to ensure they are on the leaderboard
+      if (user && user.uid) {
+        FirestoreService.updateLeaderboardEntry(user.uid).catch(e => console.warn(e));
       }
 
-      fetchLeaderboard();
+      const q = query(collection(db, 'leaderboard'));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const entries: LeaderboardEntry[] = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data && data.uid) {
+            entries.push({
+              uid: data.uid,
+              displayName: data.displayName || 'Campus Student',
+              university: data.university || 'Engineering Cohort',
+              marksAvg: Number(data.marksAvg) || 0,
+              tasksCompleted: Number(data.tasksCompleted) || 0,
+              streak: Number(data.streak) || 0,
+              studyHours: Number(data.studyHours) || 0
+            });
+          }
+        });
+
+        // Sort by highest marks avg, then completed tasks, then streak
+        entries.sort((a, b) => b.marksAvg - a.marksAvg || b.tasksCompleted - a.tasksCompleted || b.streak - a.streak);
+        setLeaderboardList(entries);
+        setLoadingLeaderboard(false);
+      }, (error) => {
+        console.warn("Real-time leaderboard subscribe error:", error);
+        setLoadingLeaderboard(false);
+      });
+
+      return () => unsubscribe();
     }
-  }, [activeInnerTab]);
+  }, [activeInnerTab, user]);
 
   // Overall Attendance Percentage
   const totalHeldClasses = attendance.reduce((acc, curr) => acc + curr.totalClasses, 0);

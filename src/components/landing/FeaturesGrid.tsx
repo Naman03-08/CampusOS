@@ -23,10 +23,10 @@ export const FeaturesGrid: React.FC = () => {
       desc: 'Upload PDFs, PPTs or syllabus notes. AI instantly outputs executive summaries, full notes, flashcards, quizzes, and 7-day revision plans.',
     },
     {
-      icon: FileCheck,
+      icon: MessageSquarePlus,
       color: 'from-indigo-500 to-purple-600',
-      title: 'Assignment Solver',
-      desc: 'Get step-by-step verified problem solutions with core references, formula proofs, and one-click PDF exports.',
+      title: 'AI Smart Revision Plans',
+      desc: 'Receive AI-optimized daily flashcard review cycles, predictive exam question guides, and revision schedules.',
     },
     {
       icon: CheckSquare,
