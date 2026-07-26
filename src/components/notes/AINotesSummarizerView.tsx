@@ -165,12 +165,23 @@ export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
     setProcessingStep('Reading complete PDF document & extracting text...');
 
     try {
-      const arrayBuffer = await file.arrayBuffer();
+      // 1. Read Base64 using FileReader to avoid detaching ArrayBuffer or stack overflow
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          const base64 = result.includes(',') ? result.split(',')[1] : result;
+          resolve(base64);
+        };
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+      });
 
-      // Extract text using pdfjs-dist if possible
+      // 2. Extract text using pdfjs-dist if possible
       let extractedText = '';
       try {
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer.slice(0)) }).promise;
         let textChunks: string[] = [];
         for (let i = 1; i <= Math.min(pdf.numPages, 100); i++) {
           const page = await pdf.getPage(i);
@@ -184,14 +195,6 @@ export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
       }
 
       setProcessingStep('Sending complete PDF to Gemini AI for deep synthesis...');
-
-      // Convert array buffer to base64
-      const bytes = new Uint8Array(arrayBuffer);
-      let binary = '';
-      for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      const base64Data = btoa(binary);
 
       const res = await fetch('/api/ai/summarize-notes', {
         method: 'POST',
