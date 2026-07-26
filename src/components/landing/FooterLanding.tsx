@@ -1,5 +1,6 @@
 import React from 'react';
 import { GraduationCap, Heart, ShieldCheck } from 'lucide-react';
+import logoImg from '../logo.png';
 
 export const FooterLanding: React.FC = () => {
   return (
@@ -8,8 +9,8 @@ export const FooterLanding: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-purple-200/60">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white font-bold shadow-xs">
-                <GraduationCap className="w-5 h-5 text-purple-100" />
+              <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center bg-white border border-slate-100 shadow-2xs">
+                <img src={logoImg} alt="CampusOS Logo" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
               </div>
               <span className="font-extrabold text-xl text-slate-900 tracking-tight">CampusOS AI</span>
             </div>

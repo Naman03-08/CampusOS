@@ -5,6 +5,7 @@ import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPass
 import { UserProfile } from '../../types';
 import { StorageService } from '../../lib/storage';
 import { FirestoreService } from '../../lib/firestoreService';
+import logoImg from '../logo.png';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -294,8 +295,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
-            <GraduationCap className="w-4 h-4 text-blue-200" />
+          <div className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center bg-white border border-slate-100 shadow-xs">
+            <img src={logoImg} alt="CampusOS AI Logo" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
           </div>
           <span className="font-extrabold text-lg text-slate-900">CampusOS AI</span>
         </div>

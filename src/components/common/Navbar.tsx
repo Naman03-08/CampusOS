@@ -1,5 +1,6 @@
 import React from 'react';
 import { GraduationCap, Zap, ArrowRight, BookOpen, Code, Award, Calendar, CheckSquare, Sparkles } from 'lucide-react';
+import logoImg from '../logo.png';
 
 interface NavbarProps {
   onNavigateLandingSection: (sectionId: string) => void;
@@ -22,8 +23,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => onNavigateLandingSection('hero')} 
           className="flex items-center gap-3 cursor-pointer group"
         >
-          <div className="w-10 h-10 bg-[#2563EB] rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:scale-105 transition-transform">
-            <GraduationCap className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform bg-white border border-slate-100">
+            <img src={logoImg} alt="CampusOS AI" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
           </div>
           <div className="flex flex-col">
             <span className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-1.5">

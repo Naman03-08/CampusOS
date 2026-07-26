@@ -18,6 +18,7 @@ import {
   Bot
 } from 'lucide-react';
 import { UserProfile } from '../../types';
+import logoImg from '../logo.png';
 
 interface SidebarProps {
   activeTab: string;
@@ -54,8 +55,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Brand Header */}
       <div>
         <div className="flex items-center gap-2.5 px-3.5 py-3 mb-5 bg-white/80 backdrop-blur-md border border-white/90 rounded-2xl shadow-3d-sm">
-          <div className="w-8 h-8 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shadow-md shadow-blue-500/30">
-            <GraduationCap className="w-4.5 h-4.5" />
+          <div className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center shadow-md shadow-blue-500/20 bg-white border border-slate-100">
+            <img src={logoImg} alt="CampusOS Logo" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
           </div>
           <div>
             <p className="text-xs font-black text-slate-900 tracking-tight">CampusOS <span className="text-blue-600">AI</span></p>

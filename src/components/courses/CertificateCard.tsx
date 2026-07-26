@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { exportCanvasToPDF, sanitizeDocumentForHtml2Canvas } from '../../lib/pdfExport';
 import html2canvas from 'html2canvas-pro';
+import certImg from '../cert.png';
 
 export interface CertificateCardProps {
   certificateId: string;
@@ -273,17 +274,17 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
         }
       `}</style>
 
-      {/* Main Certificate Outer Container (Increased Width, Reduced Height aspect ratio) */}
+      {/* Main Certificate Outer Container using cert.png */}
       <div
         id={`cert_node_${certificateId}`}
         ref={certificateRef}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#09152E] via-[#0E1E3C] to-[#060D19] text-slate-900 border-4 border-[#E5C158] shadow-2xl p-2.5 sm:p-3 font-sans select-none max-w-[1240px] mx-auto w-full transition-all duration-500"
+        className="relative overflow-hidden rounded-3xl text-slate-900 border-4 border-[#E5C158] shadow-2xl font-sans select-none max-w-[1000px] mx-auto w-full aspect-[1000/680] transition-all duration-500 bg-[#0B1220]"
         style={{ animation: 'border-glow-shine 4s infinite ease-in-out' }}
       >
         {/* Shimmering Metallic Light Reflection Sweeps */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl z-30">
           <div 
-            className="absolute inset-0 w-[200%] h-[200%] opacity-20"
+            className="absolute inset-0 w-[200%] h-[200%] opacity-15"
             style={{
               background: 'linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.7) 55%, transparent 65%)',
               transform: 'translate(-100%, -50%) rotate(25deg)',
@@ -292,338 +293,88 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
           />
         </div>
 
-        {/* Floating Accent Sparkles */}
-        <div className="absolute top-1/4 left-[15%] text-[#F5D061] text-sm select-none pointer-events-none z-10" style={{ animation: 'float-dust-1 9s infinite ease-in-out' }}>✦</div>
-        <div className="absolute bottom-1/3 right-[15%] text-blue-400 text-sm select-none pointer-events-none z-10" style={{ animation: 'float-dust-2 11s infinite ease-in-out' }}>✦</div>
-        <div className="absolute top-2/3 left-[30%] text-indigo-300 text-xs select-none pointer-events-none z-10" style={{ animation: 'float-dust-1 13s infinite ease-in-out' }}>✦</div>
+        {/* Background Certificate Image */}
+        <img 
+          src={certImg} 
+          alt="CampusOS AI Certificate" 
+          className="absolute inset-0 w-full h-full object-fill z-0" 
+          referrerPolicy="no-referrer"
+        />
 
-        {/* Glowing Corner Light Flares */}
-        <div className="absolute top-0 left-0 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-48 h-48 bg-amber-400/20 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Inner Canvas Box with compact padding for reduced length */}
-        <div className="relative rounded-2xl bg-gradient-to-b from-[#FFFFFF] via-[#F7FAFF] to-[#EBF2FE] p-5 sm:p-6 md:p-7 overflow-hidden border border-white/90 shadow-inner">
+        {/* Dynamic Overlays Container (Percentage-based for perfect fluid responsiveness!) */}
+        <div className="absolute inset-0 z-10 font-sans pointer-events-none">
           
-          {/* Classical Thin Golden Dual Border Frame inside the margin */}
-          <div className="absolute top-2.5 left-2.5 right-2.5 bottom-2.5 border border-[#D4AF37]/35 rounded-xl pointer-events-none z-10" />
-          <div className="absolute top-3.5 left-3.5 right-3.5 bottom-3.5 border border-[#D4AF37]/15 rounded-lg pointer-events-none z-10" />
-
-          {/* Background Radial Mesh Texture Overlay */}
-          <div 
-            className="absolute inset-0 opacity-15 pointer-events-none"
-            style={{
-              backgroundImage: 'radial-gradient(#2563eb 0.5px, transparent 0.5px), radial-gradient(#d4af37 0.5px, #f6f9ff 0.5px)',
-              backgroundSize: '20px 20px, 40px 40px',
-              backgroundPosition: '0 0, 10px 10px'
-            }}
-          />
-
-          {/* TOP LEFT DARK NAVY SWOOCH WITH GOLDEN EDGE */}
-          <div 
-            className="absolute -top-1 -left-1 w-[180px] sm:w-[240px] h-16 sm:h-20 bg-gradient-to-br from-[#0A1835] via-[#0F2248] to-[#1E3A8A] border-r-2 border-b-2 border-[#D4AF37] rounded-br-[60px] shadow-lg p-3 sm:p-4 z-20 flex flex-col justify-center"
-          >
-            <div className="text-[9.5px] sm:text-[11px] font-semibold text-white leading-snug">
-              Building India's <span className="font-extrabold text-[#FCD34D] drop-shadow-xs">Next Gen</span> of Learners 🚀
-            </div>
-          </div>
-
-          {/* TOP RIGHT DARK NAVY SWOOCH WITH GOLDEN EDGE (INTEGRATED CERTIFICATE ID) */}
-          <div 
-            className="absolute -top-1 -right-1 w-[180px] sm:w-[240px] h-16 sm:h-20 bg-gradient-to-bl from-[#0A1835] via-[#0F2248] to-[#1E3A8A] border-l-2 border-b-2 border-[#D4AF37] rounded-bl-[60px] shadow-lg p-3 sm:p-4 z-20 flex flex-col justify-center items-end text-right"
-          >
-            <div className="text-[7px] sm:text-[8px] font-black text-[#FCD34D] uppercase tracking-widest leading-none mb-1 flex items-center gap-1 justify-end">
-              <svg className="w-2 sm:w-2.5 h-2 sm:h-2.5 text-[#FCD34D]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <path d="m9 12 2 2 4-4" />
-              </svg>
+          {/* Certificate ID in the Top Right Area */}
+          <div className="absolute top-[6%] right-[8%] flex flex-col items-end text-right">
+            <span className="text-[7px] sm:text-[8px] font-black text-amber-300 uppercase tracking-widest leading-none mb-1 flex items-center gap-1 justify-end">
               <span>CERTIFICATE ID</span>
-            </div>
-            <div className="text-[10px] sm:text-xs font-black text-white font-mono tracking-wider">
+            </span>
+            <span className="text-[9px] sm:text-[11px] font-black text-white font-mono tracking-wider bg-slate-950/50 px-2 py-0.5 rounded-md border border-white/10">
               {certificateId}
-            </div>
+            </span>
           </div>
 
-          {/* BOTTOM LEFT DARK NAVY CORNER SWOOCH */}
-          <div 
-            className="absolute -bottom-1 -left-1 w-36 sm:w-48 h-14 sm:h-18 bg-gradient-to-tr from-[#0A1835] via-[#0F2248] to-[#1E3A8A] border-r-2 border-t-2 border-[#D4AF37] rounded-tr-[50px] pointer-events-none z-0"
-          />
-
-          {/* BOTTOM RIGHT DARK NAVY CORNER SWOOCH */}
-          <div 
-            className="absolute -bottom-1 -right-1 w-36 sm:w-48 h-14 sm:h-18 bg-gradient-to-tl from-[#0A1835] via-[#0F2248] to-[#1E3A8A] border-l-2 border-t-2 border-[#D4AF37] rounded-tl-[50px] pointer-events-none z-0"
-          />
-
-          {/* TOP ROW: LOGO CENTER */}
-          <div className="relative z-10 flex flex-row items-center justify-between gap-4 mb-3">
-            
-            {/* Top Left Placeholder matching swooch width */}
-            <div className="w-[180px] sm:w-[240px] shrink-0" />
-
-            {/* Center Logo */}
-            <div className="flex flex-col items-center justify-center text-center flex-1">
-              <div className="flex items-center gap-2">
-                {/* 3D Glowing C• Circle Logo */}
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-[#0B1A3A] via-[#2563EB] to-[#F3CA52] p-0.5 shadow-md flex items-center justify-center shrink-0">
-                  <div className="w-full h-full rounded-full bg-[#0B1A3A] flex items-center justify-center text-[#F3CA52] font-black text-base sm:text-lg font-sans tracking-tight">
-                    C•
-                  </div>
-                </div>
-                <div className="text-left font-sans">
-                  <div className="text-xl sm:text-2xl font-black text-[#0B192C] tracking-tight leading-none">
-                    Campus<span className="text-[#2563EB]">OS</span>
-                  </div>
-                  <div className="text-[8px] sm:text-[9px] font-bold text-slate-600 tracking-widest uppercase mt-0.5 flex items-center gap-1">
-                    <span>Learn</span>
-                    <span className="text-[#2563EB]">•</span>
-                    <span>Build</span>
-                    <span className="text-[#2563EB]">•</span>
-                    <span>Achieve</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Top Right Placeholder matching swooch width to maintain perfect centering */}
-            <div className="w-[180px] sm:w-[240px] shrink-0" />
-
-          </div>
-
-          {/* MAIN CENTER SECTION: LAUREL WREATH & CERTIFICATE OF COMPLETION */}
-          <div className="relative z-20 my-1 text-center">
-            
-            {/* Small Top Badge: OFFICIAL */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-50/95 border border-amber-300 text-amber-800 text-[9px] font-extrabold uppercase tracking-widest shadow-2xs mb-1">
-              <span className="text-amber-500 text-xs">⭐</span>
-              <span>OFFICIAL</span>
-            </div>
-
-            {/* 3D Laurel Wreath Framing Title */}
-            <div className="flex items-center justify-center gap-2 sm:gap-4 my-1">
-              <LaurelWreathLeftSVG />
-              
-              <div className="text-center space-y-0.5">
-                <div 
-                  className="text-xl sm:text-2xl text-[#0B192C] font-semibold tracking-tight"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
-                >
-                  Certificate <span className="italic font-normal font-serif text-slate-600">of</span>
-                </div>
-                <h1 
-                  className="text-3xl sm:text-5xl font-black text-[#1E3A8A] tracking-tight leading-none"
-                  style={{ 
-                    fontFamily: "'Cinzel', serif"
-                  }}
-                >
-                  Completion
-                </h1>
-                
-                {/* Underline Gold Line with Center Star */}
-                <div className="flex items-center justify-center gap-2 pt-0.5">
-                  <div className="h-0.5 w-20 sm:w-36 bg-gradient-to-r from-transparent via-[#D4AF37] to-[#D4AF37]" />
-                  <span className="text-[#D4AF37] text-[10px]">✦</span>
-                  <div className="h-0.5 w-20 sm:w-36 bg-gradient-to-l from-transparent via-[#D4AF37] to-[#D4AF37]" />
-                </div>
-              </div>
-
-              <LaurelWreathRightSVG />
-            </div>
-
-            <div className="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">
+          {/* RECIPIENT NAME: Perfectly Centered calligraphic overlay */}
+          <div className="absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2 text-center w-full max-w-[80%] flex flex-col items-center">
+            <span className="text-[8px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 sm:mb-2 font-mono">
               This certificate is proudly presented to
-            </div>
+            </span>
+            <h1 
+              className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-[#0B192C] font-semibold tracking-wide inline-block"
+              style={{ fontFamily: "'Great Vibes', cursive", lineHeight: '1.2' }}
+            >
+              {userName}
+            </h1>
+            <div className="h-[2px] w-[50%] max-w-xs bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent rounded-full opacity-60 mt-2" />
+          </div>
 
-            {/* CALLIGRAPHIC RECIPIENT NAME */}
-            <div className="my-3.5 sm:my-5 relative">
-              <span 
-                className="text-4xl sm:text-6xl text-[#0B192C] font-normal tracking-wide inline-block px-6 py-1"
-                style={{ fontFamily: "'Great Vibes', cursive", lineHeight: '1.2' }}
+          {/* COURSE TITLE: Beautiful Centered display */}
+          <div className="absolute left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 text-center w-full max-w-[75%] flex flex-col items-center">
+            <span className="text-[8px] sm:text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">
+              for successfully completing the course
+            </span>
+            <h2 className="text-sm sm:text-lg md:text-xl lg:text-2xl font-black text-[#1E3A8A] tracking-tight leading-snug">
+              {courseTitle}
+            </h2>
+          </div>
+
+          {/* Completed On Date (Bottom-Left) */}
+          <div className="absolute bottom-[10%] left-[8%] flex flex-col">
+            <span className="text-[7px] sm:text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none">
+              Completed On
+            </span>
+            <span className="text-[10px] sm:text-xs font-black text-[#0B192C] mt-1 bg-white/40 px-2.5 py-0.5 rounded-md border border-slate-200/50">
+              {issuedAt}
+            </span>
+          </div>
+
+          {/* Verification Badge & Live QR Code (Bottom-Right) */}
+          <div className="absolute bottom-[8%] right-[8%] flex items-center gap-2 pointer-events-auto">
+            <div className="p-1 bg-white border border-slate-200 rounded-lg shadow-sm shrink-0">
+              <QRCodeSVG
+                value={verificationUrl}
+                size={40}
+                level="M"
+                includeMargin={false}
+              />
+            </div>
+            <div className="text-left">
+              <button
+                type="button"
+                onClick={onVerifyClick}
+                className="font-black text-[#0B192C] hover:text-[#2563EB] flex items-center gap-1 transition-colors cursor-pointer text-[8px] sm:text-[9px]"
               >
-                {userName}
-              </span>
-              {/* Gold/Cyan Glow Bar underneath name */}
-              <div className="h-[2px] max-w-sm mx-auto bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent rounded-full opacity-60 mt-1" />
-            </div>
-
-            <div className="text-[11px] text-slate-500 font-bold tracking-wide mt-1">
-              for successfully completing the
-            </div>
-
-            {/* COURSE TITLE 3D GLASS BADGE */}
-            <div className="mt-2 mb-2 max-w-2xl mx-auto">
-              <div className="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-50/95 via-indigo-50/95 to-blue-50/95 border border-blue-200/80 shadow-xs flex items-center justify-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-2xs shrink-0">
-                  {/* Custom GraduationCap SVG */}
-                  <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.91a2 2 0 0 0 1.66 0z" />
-                    <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
-                  </svg>
-                </div>
-                <h2 className="text-sm sm:text-lg font-black text-[#0B192C] tracking-tight leading-snug font-sans">
-                  {courseTitle}
-                </h2>
-              </div>
-            </div>
-
-            <p className="text-[10px] sm:text-xs text-slate-500 max-w-2xl mx-auto leading-relaxed mt-1">
-              An intensive learning journey powered by <span className="font-extrabold text-[#2563EB]">CampusOS</span>, recognizing your dedication, curiosity, and commitment to continuous growth.
-            </p>
-
-          </div>
-
-          {/* MIDDLE WIDE HORIZONTAL LAYOUT: 4 PILLS IN HORIZONTAL ROW (LEFT) + QUOTE BLOCK (RIGHT) */}
-          <div className="relative z-20 grid grid-cols-1 sm:grid-cols-12 gap-3 my-3 items-center">
-            
-            {/* Left 9 Cols: Horizontal 4 Glass Pills Grid */}
-            <div className="sm:col-span-9 grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-              <div className="px-2 py-1.5 rounded-xl bg-white/95 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
-                <div className="p-0.5 rounded-md bg-blue-100/80 text-blue-600 shrink-0">
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                  </svg>
-                </div>
-                <span>Hands-on Learning</span>
-              </div>
-              <div className="px-2 py-1.5 rounded-xl bg-white/95 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
-                <div className="p-0.5 rounded-md bg-blue-100/80 text-blue-600 shrink-0">
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                    <polyline points="17 6 23 6 23 12" />
-                  </svg>
-                </div>
-                <span>Skill Development</span>
-              </div>
-              <div className="px-2 py-1.5 rounded-xl bg-white/95 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
-                <div className="p-0.5 rounded-md bg-blue-100/80 text-blue-600 shrink-0">
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
-                </div>
-                <span>Global Community</span>
-              </div>
-              <div className="px-2 py-1.5 rounded-xl bg-white/95 border border-blue-100 shadow-2xs flex items-center justify-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-800 whitespace-nowrap">
-                <div className="p-0.5 rounded-md bg-blue-100/80 text-blue-600 shrink-0">
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
-                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                  </svg>
-                </div>
-                <span>Career Opportunities</span>
-              </div>
-            </div>
-
-            {/* Right 3 Cols: Quote Block */}
-            <div className="sm:col-span-3 relative pl-4 flex flex-col justify-center border-l-2 border-[#2563EB] py-0.5">
-              <p className="text-[10px] sm:text-[11px] font-serif italic text-slate-800 font-semibold leading-tight">
-                “Keep learning, keep building, keep growing..”
-              </p>
-              <div className="text-[9px] font-extrabold text-[#2563EB] pt-0.5">
-                — Campus<span className="text-[#0B192C]">OS</span>
-              </div>
-            </div>
-
-          </div>
-
-          {/* FOOTER SECTION: 4 BALANCED COLUMNS (Date, Signature of Naman Pandey, 3D Seal, QR Code) */}
-          <div className="relative z-20 grid grid-cols-1 sm:grid-cols-4 gap-3 items-center pt-3 border-t border-slate-200">
-            
-            {/* Col 1: Completed On Glass Pill */}
-            <div className="flex items-center gap-2 justify-center sm:justify-start">
-              <div className="px-2.5 py-1.5 rounded-xl bg-white/95 border border-[#D4AF37]/35 shadow-2xs flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-[#0B1A3A] text-[#F5D061] shrink-0 flex items-center justify-center">
-                  <svg className="w-3.5 h-3.5 text-[#F5D061]" viewBox="0 0 24 24" fill="none" stroke="#F5D061" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                    <line x1="16" x2="16" y1="2" y2="6" />
-                    <line x1="8" x2="8" y1="2" y2="6" />
-                    <line x1="3" x2="21" y1="10" y2="10" />
-                  </svg>
-                </div>
-                <div className="text-left">
-                  <div className="text-[7px] font-black text-slate-500 uppercase tracking-widest leading-none">
-                    Completed On
-                  </div>
-                  <div className="text-[11px] font-extrabold text-[#0B192C] mt-0.5">
-                    {issuedAt}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Col 2: Signature of Naman Pandey (Founder, CampusOS) */}
-            <div className="text-center space-y-1">
-              <div className="relative inline-block text-center">
-                <div 
-                  className="text-2xl sm:text-3xl text-[#0B192C] font-semibold tracking-wide leading-none select-none pb-1"
-                  style={{ fontFamily: "'Great Vibes', cursive" }}
-                >
-                  N Pandey
-                </div>
-                <svg className="w-24 sm:w-28 h-1.5 mx-auto text-[#0B192C] overflow-visible" viewBox="0 0 120 6">
-                  <path 
-                    d="M 5 2 C 35 6, 75 1, 115 4 C 118 5, 119 3, 110 2 C 85 1, 40 4, 5 2" 
-                    fill="currentColor" 
-                  />
+                <span>Verify Credential</span>
+                <svg className="w-2.5 h-2.5 text-slate-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" x2="21" y1="14" y2="3" />
                 </svg>
+              </button>
+              <div className="text-[7px] sm:text-[8px] text-emerald-600 font-black flex items-center gap-0.5 mt-0.5">
+                <span>campusos.com/verify</span>
+                <span>✔</span>
               </div>
-              <div className="w-20 mx-auto border-b border-amber-500/40 my-1" />
-              <div className="text-[10px] font-black text-[#0B192C] leading-none">
-                Naman Pandey
-              </div>
-              <div className="text-[9px] font-bold text-[#2563EB] leading-none">
-                Founder, CampusOS
-              </div>
-            </div>
-
-            {/* Col 3: 3D Gold Ribbon Seal */}
-            <div className="flex justify-center">
-              <GoldRibbonSealSVG />
-            </div>
-
-            {/* Col 4: QR Code & Verify Certificate Glass Badge */}
-            <div className="flex items-center gap-2 justify-center sm:justify-end">
-              <div className="px-2.5 py-1.5 rounded-xl bg-white/95 border border-[#D4AF37]/35 shadow-2xs flex items-center gap-2">
-                <div className="p-1 bg-white border border-slate-200 rounded-lg shrink-0">
-                  <QRCodeSVG
-                    value={verificationUrl}
-                    size={36}
-                    level="M"
-                    includeMargin={false}
-                  />
-                </div>
-                <div className="text-left">
-                  <button
-                    type="button"
-                    onClick={onVerifyClick}
-                    className="font-black text-[#0B192C] hover:text-[#2563EB] flex items-center gap-1 transition-colors cursor-pointer text-[9px]"
-                  >
-                    <span>Verify Certificate</span>
-                    <svg className="w-2.5 h-2.5 text-slate-800" viewBox="0 0 24 24" fill="none" stroke="#1E293B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                      <polyline points="15 3 21 3 21 9" />
-                      <line x1="10" x2="21" y1="14" y2="3" />
-                    </svg>
-                  </button>
-                  <div className="text-[8px] text-emerald-600 font-bold flex items-center gap-0.5 mt-0.5">
-                    <span>campusos.com/verify</span>
-                    <span>✔</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* BOTTOM CENTER PILL BADGE */}
-          <div className="relative z-20 mt-3 text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-white/90 border border-blue-200/80 text-[8px] sm:text-[9px] font-extrabold uppercase tracking-widest text-slate-700 shadow-2xs">
-              <span className="text-amber-500">✦</span>
-              <span>POWERED BY CAMPUSOS</span>
-              <span className="text-slate-400">|</span>
-              <span>EMPOWERING 1M+ STUDENTS</span>
-              <span className="text-blue-500">💙</span>
             </div>
           </div>
 
