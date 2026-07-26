@@ -61,18 +61,19 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
       const isCert = targetElementId.includes('cert');
       if (isCert) {
         if (clonedDoc.body) {
-          clonedDoc.body.style.width = '1040px';
+          clonedDoc.body.style.width = '1200px';
+          clonedDoc.body.style.height = 'auto';
           clonedDoc.body.style.margin = '0';
           clonedDoc.body.style.padding = '0';
-          clonedDoc.body.style.overflow = 'hidden';
+          clonedDoc.body.style.overflow = 'visible';
           clonedDoc.body.style.backgroundColor = '#0B1220';
         }
 
         let parent = clonedElem.parentElement;
         while (parent && parent !== clonedDoc.body) {
           parent.style.maxWidth = 'none';
-          parent.style.width = '1040px';
-          parent.style.overflow = 'hidden';
+          parent.style.width = '1200px';
+          parent.style.overflow = 'visible';
           parent.style.maxHeight = 'none';
           parent.style.height = 'auto';
           parent.style.padding = '0';
@@ -83,12 +84,12 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
         clonedElem.style.width = '1160px';
         clonedElem.style.minWidth = '1160px';
         clonedElem.style.maxWidth = '1160px';
-        clonedElem.style.height = '610px';
-        clonedElem.style.minHeight = '610px';
-        clonedElem.style.maxHeight = '610px';
+        clonedElem.style.height = 'auto';
+        clonedElem.style.minHeight = 'auto';
+        clonedElem.style.maxHeight = 'none';
         clonedElem.style.boxSizing = 'border-box';
-        clonedElem.style.borderRadius = '16px';
-        clonedElem.style.overflow = 'hidden';
+        clonedElem.style.borderRadius = '24px';
+        clonedElem.style.overflow = 'visible';
       } else {
         clonedElem.style.width = '100%';
         clonedElem.style.maxWidth = '100%';
