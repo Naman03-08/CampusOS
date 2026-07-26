@@ -80,12 +80,12 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
           parent = parent.parentElement;
         }
 
-        clonedElem.style.width = '1000px';
-        clonedElem.style.minWidth = '1000px';
-        clonedElem.style.maxWidth = '1000px';
-        clonedElem.style.height = '680px';
-        clonedElem.style.minHeight = '680px';
-        clonedElem.style.maxHeight = '680px';
+        clonedElem.style.width = '1160px';
+        clonedElem.style.minWidth = '1160px';
+        clonedElem.style.maxWidth = '1160px';
+        clonedElem.style.height = '610px';
+        clonedElem.style.minHeight = '610px';
+        clonedElem.style.maxHeight = '610px';
         clonedElem.style.boxSizing = 'border-box';
         clonedElem.style.borderRadius = '16px';
         clonedElem.style.overflow = 'hidden';

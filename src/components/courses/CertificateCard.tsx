@@ -21,7 +21,8 @@ import {
   Globe,
   Lock,
   Medal,
-  Star
+  Star,
+  Crown
 } from 'lucide-react';
 import { exportCanvasToPDF, sanitizeDocumentForHtml2Canvas } from '../../lib/pdfExport';
 import html2canvas from 'html2canvas-pro';
@@ -42,7 +43,7 @@ export interface CertificateCardProps {
   onVerifyClick?: () => void;
 }
 
-// Corner Gold Filigree Ornament SVG Component
+// Ornate Corner Gold Filigree SVG Component with intricate Victorian/Academic scrolls
 const CornerFiligreeSVG: React.FC<{ position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' }> = ({ position }) => {
   const getTransforms = () => {
     switch (position) {
@@ -55,84 +56,170 @@ const CornerFiligreeSVG: React.FC<{ position: 'top-left' | 'top-right' | 'bottom
 
   return (
     <div 
-      className="absolute w-12 h-12 sm:w-20 sm:h-20 pointer-events-none opacity-80 text-[#D4AF37]"
+      className="absolute w-16 h-16 sm:w-24 sm:h-24 pointer-events-none opacity-90 text-[#D4AF37] z-10"
       style={{
-        top: position.includes('top') ? '8px' : 'auto',
-        bottom: position.includes('bottom') ? '8px' : 'auto',
-        left: position.includes('left') ? '8px' : 'auto',
-        right: position.includes('right') ? '8px' : 'auto',
+        top: position.includes('top') ? '6px' : 'auto',
+        bottom: position.includes('bottom') ? '6px' : 'auto',
+        left: position.includes('left') ? '6px' : 'auto',
+        right: position.includes('right') ? '6px' : 'auto',
         transform: getTransforms()
       }}
     >
-      <svg className="w-full h-full" viewBox="0 0 100 100" fill="none">
+      <svg className="w-full h-full" viewBox="0 0 120 120" fill="none">
         <defs>
-          <linearGradient id="goldCornerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FFF2B2" />
-            <stop offset="50%" stopColor="#D4AF37" />
-            <stop offset="100%" stopColor="#8A640F" />
+          <linearGradient id={`goldCornerGrad_${position}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FFF8DC" />
+            <stop offset="35%" stopColor="#F3CA52" />
+            <stop offset="70%" stopColor="#C2921D" />
+            <stop offset="100%" stopColor="#684705" />
           </linearGradient>
         </defs>
-        <path d="M 0 0 L 100 0 L 100 8 L 8 8 L 8 100 L 0 100 Z" fill="url(#goldCornerGrad)" />
-        <path d="M 16 16 L 80 16 L 80 20 L 20 20 L 20 80 L 16 80 Z" fill="url(#goldCornerGrad)" opacity="0.7" />
-        <path d="M 28 28 C 45 28 55 38 55 55 C 55 42 42 28 28 28 Z" fill="url(#goldCornerGrad)" />
-        <circle cx="24" cy="24" r="3" fill="url(#goldCornerGrad)" />
+        {/* Outer Frame Border Bars */}
+        <path d="M 0 0 L 120 0 L 120 10 L 10 10 L 10 120 L 0 120 Z" fill={`url(#goldCornerGrad_${position})`} />
+        <path d="M 16 16 L 95 16 L 95 20 L 20 20 L 20 95 L 16 95 Z" fill={`url(#goldCornerGrad_${position})`} opacity="0.85" />
+        <path d="M 26 26 L 70 26 L 70 28 L 28 28 L 28 70 L 26 70 Z" fill={`url(#goldCornerGrad_${position})`} opacity="0.6" />
+        
+        {/* Intricate Victorian Swirl Flourish */}
+        <path d="M 32 32 C 55 32 75 48 75 72 C 75 52 52 32 32 32 Z" fill={`url(#goldCornerGrad_${position})`} />
+        <path d="M 38 38 C 58 38 68 50 68 68 C 68 52 52 38 38 38 Z" fill={`url(#goldCornerGrad_${position})`} opacity="0.7" />
+        
+        {/* Rosette Accent Circles */}
+        <circle cx="28" cy="28" r="4" fill={`url(#goldCornerGrad_${position})`} />
+        <circle cx="48" cy="18" r="2.5" fill={`url(#goldCornerGrad_${position})`} />
+        <circle cx="18" cy="48" r="2.5" fill={`url(#goldCornerGrad_${position})`} />
+        <circle cx="85" cy="8" r="2" fill={`url(#goldCornerGrad_${position})`} />
+        <circle cx="8" cy="85" r="2" fill={`url(#goldCornerGrad_${position})`} />
       </svg>
     </div>
   );
 };
 
+// Golden Laurel Wreath SVG
+const GoldenLaurelWreathSVG: React.FC = () => (
+  <svg className="w-10 h-10 sm:w-12 sm:h-12 text-[#D4AF37] shrink-0" viewBox="0 0 100 100" fill="none">
+    <defs>
+      <linearGradient id="laurelGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FFF5C0" />
+        <stop offset="50%" stopColor="#D4AF37" />
+        <stop offset="100%" stopColor="#8A640F" />
+      </linearGradient>
+    </defs>
+    {/* Left Laurel Leaves */}
+    <g fill="url(#laurelGoldGrad)">
+      <path d="M 45 85 C 30 80 18 65 18 45 C 18 30 25 18 35 12 C 32 20 32 32 38 42 C 42 48 46 58 45 85 Z" opacity="0.2" />
+      <path d="M 28 30 C 22 25 15 28 12 35 C 18 36 24 33 28 30 Z" />
+      <path d="M 24 42 C 16 38 10 42 8 50 C 14 50 21 46 24 42 Z" />
+      <path d="M 23 55 C 15 53 10 58 9 66 C 15 65 21 60 23 55 Z" />
+      <path d="M 26 68 C 19 68 15 75 16 83 C 21 80 25 74 26 68 Z" />
+      <path d="M 33 79 C 27 81 25 89 28 96 C 32 91 34 85 33 79 Z" />
+      
+      {/* Right Laurel Leaves */}
+      <path d="M 72 30 C 78 25 85 28 88 35 C 82 36 76 33 72 30 Z" />
+      <path d="M 76 42 C 84 38 90 42 92 50 C 86 50 79 46 76 42 Z" />
+      <path d="M 77 55 C 85 53 90 58 91 66 C 85 65 79 60 77 55 Z" />
+      <path d="M 74 68 C 81 68 85 75 84 83 C 79 80 75 74 74 68 Z" />
+      <path d="M 67 79 C 73 81 75 89 72 96 C 68 91 66 85 67 79 Z" />
+    </g>
+  </svg>
+);
+
 // 3D Metallic Gold Medal Seal with Royal Blue Ribbon Tails
 const GoldRibbonSealSVG: React.FC = () => (
   <div className="relative flex flex-col items-center shrink-0">
     {/* Scalloped Gold Medal */}
-    <div className="relative w-14 h-14 sm:w-20 sm:h-20 shrink-0 drop-shadow-xl z-10">
+    <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 drop-shadow-2xl z-10">
       <svg className="w-full h-full" viewBox="0 0 120 120">
         <defs>
-          <radialGradient id="goldMedalGrad3D" cx="35%" cy="35%" r="65%">
-            <stop offset="0%" stopColor="#FFF5C0" />
-            <stop offset="30%" stopColor="#F3CA52" />
-            <stop offset="70%" stopColor="#C2921D" />
-            <stop offset="100%" stopColor="#785305" />
+          <radialGradient id="goldMedalGrad3D_v2" cx="35%" cy="35%" r="65%">
+            <stop offset="0%" stopColor="#FFF8DB" />
+            <stop offset="25%" stopColor="#FAD86B" />
+            <stop offset="60%" stopColor="#C2921D" />
+            <stop offset="100%" stopColor="#6E4D05" />
           </radialGradient>
-          <linearGradient id="goldBorder3D" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#FFEAA5" />
+          <linearGradient id="goldBorder3D_v2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#FFF5C0" />
             <stop offset="50%" stopColor="#D4AF37" />
-            <stop offset="100%" stopColor="#5E4300" />
+            <stop offset="100%" stopColor="#4A3400" />
           </linearGradient>
+          <radialGradient id="hologramCenterGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#1E3A8A" />
+            <stop offset="60%" stopColor="#0B1A3A" />
+            <stop offset="100%" stopColor="#050B18" />
+          </radialGradient>
         </defs>
 
+        {/* Outer Starburst Scallop */}
         <path
           d="M 60 5 L 64 12 L 72 7 L 74 15 L 83 12 L 83 20 L 92 20 L 90 28 L 98 31 L 93 38 L 100 44 L 93 50 L 98 57 L 90 60 L 92 68 L 83 68 L 83 76 L 74 73 L 72 81 L 64 76 L 60 83 L 56 76 L 48 81 L 46 73 L 37 76 L 37 68 L 28 68 L 30 60 L 22 57 L 27 50 L 20 44 L 27 38 L 22 31 L 30 28 L 28 20 L 37 20 L 37 12 L 46 15 L 48 7 L 56 12 Z"
-          fill="url(#goldMedalGrad3D)"
-          stroke="url(#goldBorder3D)"
-          strokeWidth="2"
+          fill="url(#goldMedalGrad3D_v2)"
+          stroke="url(#goldBorder3D_v2)"
+          strokeWidth="2.5"
         />
 
-        <circle cx="60" cy="44" r="32" fill="#0B1A3A" stroke="url(#goldBorder3D)" strokeWidth="2.5" />
+        {/* Outer Ring */}
+        <circle cx="60" cy="44" r="32" fill="url(#hologramCenterGrad)" stroke="url(#goldBorder3D_v2)" strokeWidth="2.5" />
 
-        <circle cx="60" cy="40" r="14" fill="url(#goldMedalGrad3D)" />
-        <circle cx="60" cy="40" r="11" fill="#0B1A3A" />
-        <text x="60" y="44" fill="#F3CA52" fontSize="11" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">
+        {/* Inner Gold Shield / Crest */}
+        <circle cx="60" cy="42" r="15" fill="url(#goldMedalGrad3D_v2)" />
+        <circle cx="60" cy="42" r="12" fill="#0B1A3A" />
+        <text x="60" y="46" fill="#FAD86B" fontSize="12" fontWeight="900" textAnchor="middle" fontFamily="Cinzel, sans-serif">
           C•OS
         </text>
 
-        <text x="46" y="65" fill="#F3CA52" fontSize="7">★</text>
-        <text x="60" y="66" fill="#F3CA52" fontSize="8">★</text>
-        <text x="73" y="65" fill="#F3CA52" fontSize="7">★</text>
+        <text x="44" y="65" fill="#FAD86B" fontSize="8">★</text>
+        <text x="60" y="66" fill="#FAD86B" fontSize="9">★</text>
+        <text x="76" y="65" fill="#FAD86B" fontSize="8">★</text>
       </svg>
     </div>
 
     {/* Royal Blue V-Cut Ribbon Tails hanging underneath */}
-    <div className="flex gap-2 -mt-3 z-0">
+    <div className="flex gap-2.5 -mt-3 z-0">
       <div 
-        className="w-4 h-8 bg-gradient-to-b from-[#1E3A8A] via-[#10244A] to-[#0A1835] border-x border-b border-[#D4AF37] transform -rotate-12 shadow-md"
-        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%)' }}
+        className="w-4 h-9 bg-gradient-to-b from-[#1E3A8A] via-[#10244A] to-[#0A1835] border-x border-b border-[#D4AF37] transform -rotate-12 shadow-lg"
+        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%)' }}
       />
       <div 
-        className="w-4 h-8 bg-gradient-to-b from-[#1E3A8A] via-[#10244A] to-[#0A1835] border-x border-b border-[#D4AF37] transform rotate-12 shadow-md"
-        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%)' }}
+        className="w-4 h-9 bg-gradient-to-b from-[#1E3A8A] via-[#10244A] to-[#0A1835] border-x border-b border-[#D4AF37] transform rotate-12 shadow-lg"
+        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%)' }}
       />
     </div>
+  </div>
+);
+
+// Background Banknote/Diploma Security Guilloche Rosette SVG
+const SecurityGuillocheSVG: React.FC = () => (
+  <div className="absolute inset-0 pointer-events-none opacity-10 flex items-center justify-center overflow-hidden">
+    <svg className="w-[600px] h-[600px] text-[#D4AF37]" viewBox="0 0 200 200" fill="none">
+      <circle cx="100" cy="100" r="90" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2,2" />
+      <circle cx="100" cy="100" r="75" stroke="currentColor" strokeWidth="0.75" />
+      <circle cx="100" cy="100" r="60" stroke="currentColor" strokeWidth="0.5" strokeDasharray="1,2" />
+      
+      {/* Rosette Petal Geometry Loops */}
+      {[0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165].map((angle) => (
+        <ellipse
+          key={angle}
+          cx="100"
+          cy="100"
+          rx="70"
+          ry="25"
+          stroke="currentColor"
+          strokeWidth="0.4"
+          transform={`rotate(${angle} 100 100)`}
+        />
+      ))}
+      {[7.5, 22.5, 37.5, 52.5, 67.5, 82.5, 97.5, 112.5, 127.5, 142.5, 157.5, 172.5].map((angle) => (
+        <ellipse
+          key={angle}
+          cx="100"
+          cy="100"
+          rx="55"
+          ry="18"
+          stroke="currentColor"
+          strokeWidth="0.3"
+          transform={`rotate(${angle} 100 100)`}
+        />
+      ))}
+    </svg>
   </div>
 );
 
@@ -157,7 +244,7 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  // Verification URL that will be encoded inside the QR code
+  // Verification URL encoded inside QR code
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://campusos.com';
   const verificationUrl = `${origin}/?verifyCert=${certificateId}`;
 
@@ -219,7 +306,7 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
       
       {/* Top Action & Verification Banner */}
       {showActions && (
-        <div className="bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 text-white p-4 sm:p-5 rounded-3xl shadow-xl border border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 text-white p-4 sm:p-5 rounded-3xl shadow-2xl border border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
           
           {/* Certificate Credential Status */}
           <div className="flex items-center gap-3">
@@ -233,11 +320,11 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
                 </span>
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800/60">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  AUTHENTIC & VALID
+                  AUTHENTIC & IMMUTABLE
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-mono mt-0.5">
-                ID: <span className="text-amber-300 font-bold">{certificateId}</span> • Registered on Firestore Immutable Registry
+                ID: <span className="text-amber-300 font-bold">{certificateId}</span> • Firestore Blockchain Ledger Record
               </p>
             </div>
           </div>
@@ -284,174 +371,220 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
         </div>
       )}
 
-      {/* Fonts for Certificate */}
+      {/* Fonts & Shimmer Animations for Certificate */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,700&family=Cinzel:wght@600;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,700&family=Cinzel:wght@600;700;800;900&display=swap');
 
-        @keyframes border-glow-shine {
+        @keyframes gold-metallic-glow {
           0%, 100% { 
-            border-color: #E5C158; 
-            box-shadow: 0 0 25px rgba(229, 193, 88, 0.25), inset 0 0 10px rgba(229, 193, 88, 0.1); 
+            border-color: #D4AF37; 
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3), inset 0 0 15px rgba(212, 175, 55, 0.15); 
           }
           50% { 
             border-color: #FCD34D; 
-            box-shadow: 0 0 45px rgba(252, 211, 77, 0.4), inset 0 0 20px rgba(252, 211, 77, 0.2); 
+            box-shadow: 0 0 55px rgba(252, 211, 77, 0.45), inset 0 0 25px rgba(252, 211, 77, 0.25); 
           }
+        }
+
+        @keyframes gold-light-sweep {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+
+        .gold-shimmer-text {
+          background: linear-gradient(135deg, #1E3A8A 0%, #0B1A3A 30%, #8A640F 65%, #D4AF37 85%, #0B1A3A 100%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .gold-border-bevel {
+          border-image: linear-gradient(135deg, #FFF8DB, #D4AF37, #8A640F, #F3CA52, #FFF8DB) 1;
         }
       `}</style>
 
-      {/* Main Vector Certificate Canvas Frame */}
+      {/* MAIN CERTIFICATE CANVAS FRAME: Increased Width (max-w-[1180px]) & Decreased Length/Height with Rich Details */}
       <div
         id={`cert_node_${certificateId}`}
         ref={certificateRef}
-        className="relative overflow-hidden rounded-3xl text-slate-900 border-4 border-[#D4AF37] shadow-2xl font-sans select-none max-w-[1000px] mx-auto w-full transition-all duration-500 bg-[#FAF8F3] p-4 sm:p-8"
-        style={{ animation: 'border-glow-shine 4s infinite ease-in-out' }}
+        className="relative overflow-hidden rounded-3xl text-slate-900 border-4 border-[#D4AF37] shadow-2xl font-sans select-none max-w-[1180px] mx-auto w-full transition-all duration-500 bg-[#FAF8F3] p-3 sm:p-6"
+        style={{ animation: 'gold-metallic-glow 4s infinite ease-in-out' }}
       >
-        {/* Fine Guilloche Pattern Background */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none" style={{
-          backgroundImage: `radial-gradient(#D4AF37 0.75px, transparent 0.75px), radial-gradient(#1E3A8A 0.75px, #FAF8F3 0.75px)`,
-          backgroundSize: '30px 30px',
-          backgroundPosition: '0 0, 15px 15px'
+        {/* Fine Guilloche Pattern & Radial Background Texture */}
+        <div className="absolute inset-0 opacity-25 pointer-events-none" style={{
+          backgroundImage: `radial-gradient(#D4AF37 0.8px, transparent 0.8px), radial-gradient(#1E3A8A 0.8px, #FAF8F3 0.8px)`,
+          backgroundSize: '28px 28px',
+          backgroundPosition: '0 0, 14px 14px'
         }} />
 
-        {/* Outer Double Gold Border Frame */}
-        <div className="relative inset-0 border-2 border-[#D4AF37] rounded-2xl p-4 sm:p-8 bg-white/95 backdrop-blur-xs shadow-inner">
-          <div className="border border-[#C5A059]/40 rounded-xl p-4 sm:p-8 relative space-y-6 sm:space-y-8">
+        {/* Central Watermark Security Rosette */}
+        <SecurityGuillocheSVG />
+
+        {/* Outer Double Gold Border Frame with Beveled Edges */}
+        <div className="relative inset-0 border-2 border-[#D4AF37] rounded-2xl p-3 sm:p-5 bg-white/95 backdrop-blur-xs shadow-inner">
+          <div className="border-2 border-[#C5A059]/50 rounded-xl p-3 sm:p-6 relative space-y-4 sm:space-y-5">
             
+            {/* Microtext Security Line along Inner Border */}
+            <div className="absolute top-1 left-8 right-8 text-[7px] font-mono font-bold text-[#C5A059]/60 tracking-[0.25em] text-center overflow-hidden whitespace-nowrap uppercase pointer-events-none">
+              CAMPUSOS AI ACADEMY • IMMUTABLE CREDENTIAL RECORD • VERIFIED AUTHENTICITY • FIRESTORE SECURITY PROOF •
+            </div>
+
             {/* 4 Corner Ornaments */}
             <CornerFiligreeSVG position="top-left" />
             <CornerFiligreeSVG position="top-right" />
             <CornerFiligreeSVG position="bottom-left" />
             <CornerFiligreeSVG position="bottom-right" />
 
-            {/* TOP BAR: CampusOS Academy Header & Certificate ID Badge */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b-2 border-amber-200/60 pb-4 pt-2 px-2">
+            {/* TOP BAR: Honors Distinction Pill, CampusOS Brand Emblem with Laurels & ID Badge */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b-2 border-amber-200/80 pb-3 pt-2 px-2">
               
-              {/* CampusOS Academy Brand Emblem */}
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-[#0B1A3A] to-[#1E3A8A] text-amber-300 flex items-center justify-center font-black shadow-md border border-[#D4AF37]">
-                  <GraduationCap className="w-6 h-6 sm:w-7 sm:h-7 text-[#FCD34D]" />
+              {/* Honors Badge / Academic Rank */}
+              <div className="bg-amber-50 text-[#8A640F] px-3 py-1 rounded-xl border border-[#D4AF37]/60 shadow-2xs flex items-center gap-1.5 shrink-0">
+                <Crown className="w-3.5 h-3.5 text-[#D4AF37] fill-[#D4AF37]" />
+                <span className="text-[10px] font-black uppercase tracking-wider">
+                  Honors Distinction • Top 1% Performer
+                </span>
+              </div>
+
+              {/* Central Academy Brand Crest with Laurels */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                <GoldenLaurelWreathSVG />
+                <div className="text-center">
+                  <div className="text-lg sm:text-2xl font-black text-[#0B1A3A] tracking-wider uppercase flex items-center justify-center gap-1.5" style={{ fontFamily: "'Cinzel', serif" }}>
+                    Campus OS <span className="text-[#D4AF37] text-xl sm:text-3xl">AI</span> Academy
+                  </div>
+                  <div className="text-[9px] sm:text-[10px] font-extrabold text-slate-500 uppercase tracking-[0.25em]">
+                    Board of Engineering Accreditation & Skill Assessment
+                  </div>
                 </div>
-                <div>
-                  <div className="text-base sm:text-xl font-black text-[#0B1A3A] tracking-wider uppercase" style={{ fontFamily: "'Cinzel', serif" }}>
-                    Campus OS <span className="text-[#D4AF37]">AI</span>
-                  </div>
-                  <div className="text-[9px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest">
-                    Learn • Prepare • Succeed
-                  </div>
+                <div className="transform scale-x-[-1]">
+                  <GoldenLaurelWreathSVG />
                 </div>
               </div>
 
-              {/* Certificate ID Pill */}
-              <div className="bg-[#0B1A3A] text-white px-3 py-1.5 rounded-xl border border-[#D4AF37] shadow-sm flex items-center gap-2">
+              {/* Certificate ID & Security Hash Badge */}
+              <div className="bg-[#0B1A3A] text-white px-3 py-1.5 rounded-xl border border-[#D4AF37] shadow-md flex items-center gap-2 shrink-0">
                 <ShieldCheck className="w-4 h-4 text-[#FCD34D]" />
                 <div className="text-right">
                   <div className="text-[8px] uppercase tracking-widest text-amber-300 font-extrabold">Certificate ID</div>
-                  <div className="text-xs sm:text-sm font-mono font-black text-white">{certificateId}</div>
+                  <div className="text-xs font-mono font-black text-white">{certificateId}</div>
                 </div>
               </div>
 
             </div>
 
             {/* MAIN DIPLOMA HEADER */}
-            <div className="text-center space-y-2 pt-2">
-              <div className="text-[#D4AF37] text-xs sm:text-sm font-black uppercase tracking-[0.3em] flex items-center justify-center gap-2">
+            <div className="text-center space-y-1 pt-1">
+              <div className="text-[#D4AF37] text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] flex items-center justify-center gap-2">
                 <span>✦</span>
-                <span>Official Academic Credential</span>
+                <span>Official Academic Credential of Engineering Achievement</span>
                 <span>✦</span>
               </div>
               <h1 
-                className="text-2xl sm:text-4xl md:text-5xl font-black text-[#0B1A3A] tracking-wider uppercase"
+                className="text-2xl sm:text-4xl md:text-4xl font-black text-[#0B1A3A] tracking-wider uppercase drop-shadow-2xs"
                 style={{ fontFamily: "'Cinzel', 'Playfair Display', serif" }}
               >
                 Certificate of Completion
               </h1>
-              <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto" />
+              <div className="w-48 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto" />
             </div>
 
             {/* RECIPIENT STUDENT SECTION */}
-            <div className="text-center space-y-3 py-2">
+            <div className="text-center space-y-2 py-1">
               <p className="text-xs sm:text-sm font-serif italic text-slate-600 tracking-wide">
-                This is to certify that
+                This credential is proudly awarded and presented to
               </p>
               
-              <div className="py-2">
+              <div className="py-1 relative inline-block max-w-full px-4">
                 <h2 
-                  className="text-3xl sm:text-5xl md:text-6xl text-[#0B1A3A] font-normal tracking-wide px-4 inline-block"
+                  className="text-3xl sm:text-5xl md:text-5xl text-[#0B1A3A] font-normal tracking-wide px-6 py-0.5 inline-block"
                   style={{ fontFamily: "'Great Vibes', cursive, 'Playfair Display', serif" }}
                 >
                   {userName}
                 </h2>
-                <div className="flex items-center justify-center gap-2 text-[#D4AF37] text-xs mt-1">
-                  <span>❖</span>
-                  <div className="w-24 sm:w-48 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" />
-                  <span>❖</span>
+                
+                {/* Ornate Gold Dividers around Name */}
+                <div className="flex items-center justify-center gap-3 text-[#D4AF37] text-xs mt-0.5">
+                  <span className="text-amber-500">✦</span>
+                  <div className="w-24 sm:w-56 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" />
+                  <span className="text-amber-500">✦</span>
                 </div>
               </div>
 
-              <p className="text-xs sm:text-sm font-serif italic text-slate-600 max-w-xl mx-auto leading-relaxed">
-                has successfully completed all requirements, practical engineering benchmarks, and capstone examinations for the course
+              <p className="text-xs sm:text-sm font-serif italic text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                in recognition of outstanding academic mastery, practical coding benchmarks, and capstone engineering evaluations for
               </p>
             </div>
 
             {/* COURSE TITLE BOX */}
-            <div className="max-w-2xl mx-auto text-center">
-              <div className="bg-gradient-to-r from-blue-50/80 via-amber-50/50 to-blue-50/80 p-4 sm:p-6 rounded-2xl border-2 border-[#D4AF37]/60 shadow-sm">
-                <div className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] mb-1">
-                  Course of Completion
+            <div className="max-w-3xl mx-auto text-center">
+              <div className="bg-gradient-to-r from-blue-50/90 via-amber-50/70 to-blue-50/90 p-3 sm:p-4 rounded-2xl border-2 border-[#D4AF37]/80 shadow-sm relative overflow-hidden">
+                <div className="absolute -right-6 -bottom-6 w-20 h-20 bg-amber-200/30 rounded-full blur-xl pointer-events-none" />
+                <div className="text-[9px] font-extrabold uppercase tracking-[0.2em] text-[#D4AF37] mb-0.5">
+                  Certified Engineering Program
                 </div>
-                <h3 className="text-lg sm:text-2xl md:text-3xl font-black text-[#1E3A8A] tracking-tight leading-snug">
+                <h3 className="text-base sm:text-2xl md:text-2xl font-black text-[#1E3A8A] tracking-tight leading-snug">
                   {courseTitle}
                 </h3>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-500 font-serif italic mt-3">
-                We commend your commitment to excellence and wish you continued success in your engineering endeavors.
-              </p>
             </div>
 
-            {/* FOOTER: Date, 3D Gold Ribbon Seal, Founder Signature & Live QR Code */}
-            <div className="pt-6 border-t-2 border-amber-200/60 flex flex-col sm:flex-row items-center justify-between gap-6 px-2">
+            {/* FOOTER: Date, 3D Gold Ribbon Seal, Dual Signatures & Live QR Code */}
+            <div className="pt-3 border-t-2 border-amber-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
               
-              {/* Date Issued */}
+              {/* Date Issued & Verified Status */}
               <div className="text-center sm:text-left space-y-1">
-                <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Date Issued</div>
-                <div className="text-xs sm:text-sm font-black text-[#0B1A3A] bg-amber-50/80 px-3 py-1 rounded-lg border border-amber-200/80 inline-block">
+                <div className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400">Date Issued</div>
+                <div className="text-xs font-black text-[#0B1A3A] bg-amber-50/90 px-3 py-1 rounded-lg border border-amber-300/80 inline-block shadow-2xs">
                   {issuedAt}
                 </div>
               </div>
 
-              {/* 3D Metallic Gold Seal with Blue Ribbons */}
-              <div className="flex flex-col items-center">
-                <GoldRibbonSealSVG />
-                <span className="text-[9px] font-black text-[#D4AF37] uppercase tracking-widest mt-1">
-                  OFFICIAL ACADEMY SEAL
-                </span>
-              </div>
-
-              {/* Founder Signature */}
-              <div className="text-center space-y-1">
+              {/* Founder Signature 1 */}
+              <div className="text-center space-y-0.5">
                 <div 
-                  className="text-2xl sm:text-3xl text-[#0B1A3A] font-normal tracking-wide"
+                  className="text-xl sm:text-2xl text-[#0B1A3A] font-normal tracking-wide"
                   style={{ fontFamily: "'Great Vibes', cursive, serif" }}
                 >
                   Naman Pandey
                 </div>
                 <div className="w-28 h-0.5 bg-slate-300 mx-auto" />
-                <div className="text-xs font-black text-[#0B1A3A]">Naman Pandey</div>
-                <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Founder & CEO</div>
+                <div className="text-[11px] font-black text-[#0B1A3A]">Naman Pandey</div>
+                <div className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Founder & CEO, CampusOS</div>
+              </div>
+
+              {/* 3D Metallic Gold Seal with Blue Ribbons */}
+              <div className="flex flex-col items-center">
+                <GoldRibbonSealSVG />
+                <span className="text-[8px] font-black text-[#D4AF37] uppercase tracking-widest mt-0.5">
+                  OFFICIAL ACADEMY SEAL
+                </span>
+              </div>
+
+              {/* Academic Council Signature 2 */}
+              <div className="text-center space-y-0.5">
+                <div 
+                  className="text-xl sm:text-2xl text-[#0B1A3A] font-normal tracking-wide"
+                  style={{ fontFamily: "'Great Vibes', cursive, serif" }}
+                >
+                  Dr. A. Sharma
+                </div>
+                <div className="w-28 h-0.5 bg-slate-300 mx-auto" />
+                <div className="text-[11px] font-black text-[#0B1A3A]">Dr. A. Sharma</div>
+                <div className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Academic Council Head</div>
               </div>
 
               {/* Live QR Code Verification Box */}
               <div className="flex flex-col items-center">
-                <div className="p-1.5 bg-white border-2 border-[#D4AF37] rounded-xl shadow-md">
+                <div className="p-1 bg-white border-2 border-[#D4AF37] rounded-xl shadow-md">
                   <QRCodeSVG
                     value={verificationUrl}
-                    size={48}
+                    size={42}
                     level="M"
                     includeMargin={false}
                   />
                 </div>
-                <span className="text-[8px] font-black text-[#0B1A3A] uppercase tracking-wider mt-1">
+                <span className="text-[7px] font-black text-[#0B1A3A] uppercase tracking-wider mt-1">
                   SCAN TO VERIFY
                 </span>
               </div>
@@ -586,4 +719,3 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({
     </div>
   );
 };
-
