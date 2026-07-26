@@ -22,7 +22,9 @@ import {
   MonthlyProfitRecord,
   StudentCoursePurchase,
   HabiturexData,
-  StudentMarkRecord
+  StudentMarkRecord,
+  GlobalBounty,
+  UserBountySubmission
 } from '../types';
 import { 
   getZeroAttendance, 
@@ -1230,7 +1232,172 @@ export class FirestoreService {
       console.warn("Error cancelling user subscription in Firestore:", e);
     }
   }
+
+  // -------------------------------------------------------------
+  // GLOBAL BOUNTIES & GOLD QUEST ARENA
+  // -------------------------------------------------------------
+  static async getGlobalBounties(): Promise<GlobalBounty[]> {
+    if (!db) return DEFAULT_GLOBAL_BOUNTIES;
+    try {
+      const q = query(collection(db, 'global_bounties'));
+      const snapshot = await getDocs(q);
+      const list: GlobalBounty[] = [];
+      snapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...docSnap.data() } as GlobalBounty);
+      });
+      if (list.length === 0) {
+        for (const bounty of DEFAULT_GLOBAL_BOUNTIES) {
+          await setDoc(doc(db, 'global_bounties', bounty.id), sanitizeForFirestore(bounty));
+        }
+        return DEFAULT_GLOBAL_BOUNTIES;
+      }
+      return list;
+    } catch (e) {
+      console.warn("Error fetching global bounties:", e);
+      return DEFAULT_GLOBAL_BOUNTIES;
+    }
+  }
+
+  static async saveGlobalBounty(bounty: GlobalBounty): Promise<void> {
+    if (!db) return;
+    try {
+      await setDoc(doc(db, 'global_bounties', bounty.id), sanitizeForFirestore(bounty), { merge: true });
+    } catch (e) {
+      console.warn("Error saving global bounty:", e);
+    }
+  }
+
+  static async deleteGlobalBounty(id: string): Promise<void> {
+    if (!db) return;
+    try {
+      await deleteDoc(doc(db, 'global_bounties', id));
+    } catch (e) {
+      console.warn("Error deleting global bounty:", e);
+    }
+  }
+
+  static async getUserSubmissions(userId?: string): Promise<UserBountySubmission[]> {
+    if (!db) return [];
+    try {
+      let q;
+      if (userId) {
+        q = query(collection(db, 'bounty_submissions'), where('userId', '==', userId));
+      } else {
+        q = query(collection(db, 'bounty_submissions'));
+      }
+      const snapshot = await getDocs(q);
+      const list: UserBountySubmission[] = [];
+      snapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...(docSnap.data() as object) } as UserBountySubmission);
+      });
+      return list;
+    } catch (e) {
+      console.warn("Error fetching user bounty submissions:", e);
+      return [];
+    }
+  }
+
+  static async submitBountyProof(submission: UserBountySubmission): Promise<void> {
+    if (!db) return;
+    try {
+      await setDoc(doc(db, 'bounty_submissions', submission.id), sanitizeForFirestore(submission));
+    } catch (e) {
+      console.warn("Error submitting bounty proof:", e);
+    }
+  }
+
+  static async updateBountySubmissionStatus(submissionId: string, status: 'approved' | 'rejected'): Promise<void> {
+    if (!db) return;
+    try {
+      await setDoc(doc(db, 'bounty_submissions', submissionId), { status, reviewedAt: new Date().toISOString() }, { merge: true });
+    } catch (e) {
+      console.warn("Error updating bounty submission status:", e);
+    }
+  }
 }
+
+export const DEFAULT_GLOBAL_BOUNTIES: GlobalBounty[] = [
+  {
+    id: 'bounty_leetcode_hard_marathon',
+    title: 'LeetCode Hard Marathon Challenge',
+    category: 'DSA & Algorithmic',
+    difficulty: 'Hard',
+    rewardCredits: 350,
+    description: 'Solve 3 LeetCode Hard problems in Dynamic Programming, Segment Trees, or Graph Max-Flow. Submit your code snippets or public LeetCode submission links.',
+    deliverables: ['LeetCode Profile / Solution URL', 'Brief Algorithm Explanation'],
+    verificationType: 'Link Submission',
+    expiryDate: '2026-12-31',
+    tags: ['DSA', 'LeetCode Hard', 'DP', 'Graphs'],
+    createdAt: new Date().toISOString(),
+    createdBy: 'Campus OS Academy Admin',
+    isActive: true,
+    totalCompletions: 14
+  },
+  {
+    id: 'bounty_rag_agent_vectordb',
+    title: 'Build & Deploy Full RAG AI Agent with Vector Database',
+    category: 'Full-Stack & AI',
+    difficulty: 'Extreme',
+    rewardCredits: 650,
+    description: 'Architect a retrieval-augmented generation pipeline using Pinecone/Qdrant/Chroma and Gemini API. Must feature semantic search, chunking, and live web deployment.',
+    deliverables: ['Public GitHub Repository URL', 'Live Deployed Web Application URL'],
+    verificationType: 'Link Submission',
+    expiryDate: '2026-12-31',
+    tags: ['AI', 'RAG', 'Gemini API', 'Vector DB', 'Full-Stack'],
+    createdAt: new Date().toISOString(),
+    createdBy: 'Campus OS AI Lab',
+    isActive: true,
+    totalCompletions: 8
+  },
+  {
+    id: 'bounty_distributed_kv_store',
+    title: 'Distributed Key-Value Store with Raft Consensus',
+    category: 'Cloud & Systems',
+    difficulty: 'Legendary',
+    rewardCredits: 1250,
+    description: 'Implement a distributed fault-tolerant key-value database in Go, Rust, or C++ with Raft leader election, WAL persistence, and benchmark metrics.',
+    deliverables: ['GitHub Repository', 'Architecture & Benchmark Design PDF'],
+    verificationType: 'Code Review',
+    expiryDate: '2026-12-31',
+    tags: ['Systems', 'Distributed Systems', 'Raft Consensus', 'Low Level'],
+    createdAt: new Date().toISOString(),
+    createdBy: 'Campus OS Admin',
+    isActive: true,
+    totalCompletions: 3
+  },
+  {
+    id: 'bounty_zeroday_exploit_patch',
+    title: 'Zero-Day Vulnerability Exploit & Mitigation Patch',
+    category: 'Cybersecurity',
+    difficulty: 'Extreme',
+    rewardCredits: 500,
+    description: 'Perform a deep vulnerability audit on a vulnerable web application framework. Write a proof-of-concept exploit and code patch to mitigate SQLi / SSRF / Remote Code Execution.',
+    deliverables: ['Audit Report / Writeup URL', 'Patched Code Snippet'],
+    verificationType: 'Text Reflection',
+    expiryDate: '2026-12-31',
+    tags: ['CyberSec', 'Penetration Testing', 'AppSec', 'Exploits'],
+    createdAt: new Date().toISOString(),
+    createdBy: 'Campus OS Security Team',
+    isActive: true,
+    totalCompletions: 5
+  },
+  {
+    id: 'bounty_arxiv_research_paper',
+    title: 'Publish Campus OS AI Benchmark Paper on arXiv / Hashnode',
+    category: 'Research & Dev',
+    difficulty: 'Legendary',
+    rewardCredits: 2000,
+    description: 'Author a technical paper or deep-dive article evaluating LLM performance in academic retention, task tracking, and DSA problem-solving benchmarks.',
+    deliverables: ['Published Article / Paper Link'],
+    verificationType: 'Link Submission',
+    expiryDate: '2026-12-31',
+    tags: ['AI Research', 'Academic Paper', 'LLM Benchmarks', 'Gold Tier'],
+    createdAt: new Date().toISOString(),
+    createdBy: 'Campus OS Executive Team',
+    isActive: true,
+    totalCompletions: 2
+  }
+];
 
 
 

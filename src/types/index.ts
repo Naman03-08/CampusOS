@@ -324,6 +324,38 @@ export interface StudentMarkRecord {
   createdAt?: string;
 }
 
+export interface GlobalBounty {
+  id: string;
+  title: string;
+  category: 'DSA & Algorithmic' | 'Full-Stack & AI' | 'Cloud & Systems' | 'Cybersecurity' | 'Research & Dev' | 'Open Source';
+  difficulty: 'Hard' | 'Extreme' | 'Legendary';
+  rewardCredits: number;
+  description: string;
+  deliverables: string[];
+  verificationType: 'Link Submission' | 'Code Review' | 'Text Reflection' | 'Quiz Test';
+  expiryDate?: string;
+  tags: string[];
+  createdAt: string;
+  createdBy: string;
+  isActive: boolean;
+  totalCompletions?: number;
+}
+
+export interface UserBountySubmission {
+  id: string;
+  bountyId: string;
+  bountyTitle?: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  proofUrl?: string;
+  notes?: string;
+  rewardCredits: number;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: string;
+  reviewedAt?: string;
+}
+
 export interface HabiturexData {
   userId: string;
   tasks: any[];

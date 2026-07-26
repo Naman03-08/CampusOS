@@ -34,7 +34,9 @@ import {
   Edit2,
   Brain,
   Activity,
-  Compass
+  Compass,
+  ExternalLink,
+  ShieldCheck
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -51,7 +53,7 @@ import {
   PolarRadiusAxis, 
   Radar 
 } from 'recharts';
-import { UserProfile, AttendanceSubject, StudentMarkRecord, HabiturexData } from '../../types';
+import { UserProfile, AttendanceSubject, StudentMarkRecord, HabiturexData, GlobalBounty, UserBountySubmission } from '../../types';
 import { AttendanceView } from '../attendance/AttendanceView';
 import { FirestoreService } from '../../lib/firestoreService';
 import { StreakService } from '../../lib/streakService';
@@ -386,7 +388,7 @@ interface HabiturexViewProps {
   attendance: AttendanceSubject[];
   onUpdateAttendance: (subjects: AttendanceSubject[]) => void;
   onSyncUserStats?: () => void;
-  initialInnerTab?: 'dashboard' | 'table' | 'attendance' | 'analytics' | 'missions' | 'calendar' | 'leaderboard';
+  initialInnerTab?: 'dashboard' | 'table' | 'attendance' | 'analytics' | 'missions' | 'calendar' | 'leaderboard' | 'bounties';
   focusTimerSeconds?: number;
   focusTimerInitialMinutes?: number;
   isFocusTimerRunning?: boolean;
@@ -411,7 +413,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
   onSetFocusTimerDuration
 }) => {
   // Navigation Tab State
-  const [activeInnerTab, setActiveInnerTab] = useState<'dashboard' | 'table' | 'attendance' | 'analytics' | 'missions' | 'calendar' | 'leaderboard'>(
+  const [activeInnerTab, setActiveInnerTab] = useState<'dashboard' | 'table' | 'attendance' | 'analytics' | 'missions' | 'calendar' | 'leaderboard' | 'bounties'>(
     initialInnerTab || 'dashboard'
   );
   const [innerSidebarCollapsed, setInnerSidebarCollapsed] = useState(false);
@@ -451,6 +453,79 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
   // Leaderboard Data
   const [leaderboardList, setLeaderboardList] = useState<LeaderboardEntry[]>([]);
   const [loadingLeaderboard, setLoadingLeaderboard] = useState<boolean>(false);
+
+  // Global Bounties & Proof Submissions State
+  const [bountiesList, setBountiesList] = useState<GlobalBounty[]>([]);
+  const [loadingBounties, setLoadingBounties] = useState<boolean>(false);
+  const [userSubmissionsList, setUserSubmissionsList] = useState<UserBountySubmission[]>([]);
+
+  // Bounties Filter State
+  const [bountyCategoryFilter, setBountyCategoryFilter] = useState<string>('All');
+  const [bountyDifficultyFilter, setBountyDifficultyFilter] = useState<string>('All');
+
+  // Submit Proof Modal State
+  const [selectedBountyForSubmission, setSelectedBountyForSubmission] = useState<GlobalBounty | null>(null);
+  const [proofUrl, setProofUrl] = useState<string>('');
+  const [proofNotes, setProofNotes] = useState<string>('');
+  const [submittingProof, setSubmittingProof] = useState<boolean>(false);
+  const [proofFeedback, setProofFeedback] = useState<string | null>(null);
+
+  // Load Bounties and Submissions when user opens 'bounties' tab or on mount
+  useEffect(() => {
+    async function fetchBountiesData() {
+      try {
+        setLoadingBounties(true);
+        const list = await FirestoreService.getGlobalBounties();
+        setBountiesList(list);
+
+        if (user?.uid) {
+          const subs = await FirestoreService.getUserSubmissions(user.uid);
+          setUserSubmissionsList(subs);
+        }
+      } catch (err) {
+        console.warn("Failed fetching global bounties:", err);
+      } finally {
+        setLoadingBounties(false);
+      }
+    }
+
+    fetchBountiesData();
+  }, [user?.uid, activeInnerTab]);
+
+  const handleSubmitProof = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedBountyForSubmission || !user?.uid || !proofUrl.trim()) return;
+
+    setSubmittingProof(true);
+    try {
+      const submission: UserBountySubmission = {
+        id: 'sub_' + Date.now(),
+        bountyId: selectedBountyForSubmission.id,
+        bountyTitle: selectedBountyForSubmission.title,
+        userId: user.uid,
+        userName: user.displayName || 'Campus Student',
+        userEmail: user.email || '',
+        proofUrl: proofUrl.trim(),
+        notes: proofNotes.trim(),
+        submittedAt: new Date().toISOString(),
+        status: 'pending',
+        rewardCredits: selectedBountyForSubmission.rewardCredits
+      };
+
+      await FirestoreService.submitBountyProof(submission);
+      setUserSubmissionsList(prev => [submission, ...prev]);
+
+      setProofFeedback(`🎉 Proof for '${selectedBountyForSubmission.title}' submitted! Pending admin review.`);
+      setSelectedBountyForSubmission(null);
+      setProofUrl('');
+      setProofNotes('');
+    } catch (err: any) {
+      console.error("Proof submission failed:", err);
+      setProofFeedback(`Failed to submit proof: ${err.message || err}`);
+    } finally {
+      setSubmittingProof(false);
+    }
+  };
 
   // AI Diagnostics State
   const [showAIDiagnosticsModal, setShowAIDiagnosticsModal] = useState(false);
@@ -1129,6 +1204,26 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                   <Trophy className="w-4 h-4 text-amber-500" />
                   {!innerSidebarCollapsed && <span>Campus Leaderboard</span>}
                 </div>
+              </button>
+
+              <button
+                onClick={() => setActiveInnerTab('bounties')}
+                className={`w-full p-2.5 rounded-2xl text-xs font-black flex items-center justify-between transition-all cursor-pointer ${
+                  activeInnerTab === 'bounties'
+                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/20'
+                    : 'text-amber-900 bg-amber-50/80 hover:bg-amber-100 hover:text-amber-950 border border-amber-200/60'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Award className="w-4 h-4 text-amber-600" />
+                  {!innerSidebarCollapsed && <span>Gold Quest Arena</span>}
+                </div>
+                {!innerSidebarCollapsed && (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-950 font-black text-[10px] flex items-center gap-0.5">
+                    <Sparkles className="w-2.5 h-2.5 text-amber-600" />
+                    <span>Earn Gold</span>
+                  </span>
+                )}
               </button>
             </nav>
 
@@ -2060,6 +2155,220 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
             </div>
           )}
 
+          {/* ============================================================================ */}
+          {/* TAB 8: GOLD QUEST ARENA (EARN GOLD CREDITS) */}
+          {/* ============================================================================ */}
+          {activeInnerTab === 'bounties' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              {/* Gold Hero Banner */}
+              <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-amber-950/80 to-slate-950 text-white border border-amber-500/30 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-60 h-60 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(245,158,11,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(245,158,11,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                  <div className="space-y-2 max-w-xl">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black tracking-wider uppercase">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Admin Published Gold Bounties</span>
+                    </div>
+                    <h2 className="text-2xl md:text-3xl font-black text-amber-100 tracking-tight">
+                      Gold Quest Arena & Bounties
+                    </h2>
+                    <p className="text-xs md:text-sm text-slate-300 font-medium leading-relaxed">
+                      Complete rigorous, high-difficulty engineering tasks published by Campus OS administrators to earn high-tier <strong className="text-amber-400">Gold Credits</strong>, rise on the global leaderboard, and unlock verified tech badges!
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 backdrop-blur-md shrink-0 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg shadow-amber-500/30">
+                      <Award className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase text-amber-300/80 tracking-wider">Your Balance</p>
+                      <p className="text-2xl font-black text-amber-400 font-mono">{credits} GOLD</p>
+                      <p className="text-[10px] font-semibold text-slate-400">Ready for Redemption</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Feedback Banner if submitted */}
+              {proofFeedback && (
+                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between animate-in fade-in">
+                  <span>{proofFeedback}</span>
+                  <button onClick={() => setProofFeedback(null)} className="p-1 hover:text-emerald-950 cursor-pointer">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Category & Difficulty Filter Bar */}
+              <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="text-[10px] font-black uppercase text-slate-400 mr-1">Category:</span>
+                  {['All', 'DSA & Algorithmic', 'Full-Stack & AI', 'Cloud & Systems', 'Cybersecurity', 'Research & Dev'].map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setBountyCategoryFilter(cat)}
+                      className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                        bountyCategoryFilter === cat
+                          ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-[10px] font-black uppercase text-slate-400">Difficulty:</span>
+                  <select
+                    value={bountyDifficultyFilter}
+                    onChange={(e) => setBountyDifficultyFilter(e.target.value)}
+                    className="p-1.5 rounded-xl border border-slate-200 bg-slate-50 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                  >
+                    <option value="All">All Difficulties</option>
+                    <option value="Hard">Hard (300-500 Gold)</option>
+                    <option value="Extreme">Extreme (600-900 Gold)</option>
+                    <option value="Legendary">Legendary (1000+ Gold)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Bounties Grid */}
+              {loadingBounties ? (
+                <div className="py-16 text-center text-slate-400 font-bold text-xs animate-pulse">
+                  Fetching published Gold Bounties from Campus OS Admin Hub...
+                </div>
+              ) : bountiesList.length === 0 ? (
+                <div className="p-12 text-center rounded-3xl bg-white border border-dashed border-slate-200 space-y-3">
+                  <Award className="w-10 h-10 text-amber-400 mx-auto opacity-60" />
+                  <h3 className="text-sm font-black text-slate-800">No Active Bounties Found</h3>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    Admins have not published any Gold Bounties yet or your current filters yielded no results. Check back soon!
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {bountiesList
+                    .filter(b => bountyCategoryFilter === 'All' || b.category === bountyCategoryFilter)
+                    .filter(b => bountyDifficultyFilter === 'All' || b.difficulty === bountyDifficultyFilter)
+                    .map(bounty => {
+                      const userSub = userSubmissionsList.find(s => s.bountyId === bounty.id);
+                      const isApproved = userSub?.status === 'approved';
+                      const isPending = userSub?.status === 'pending';
+                      const isRejected = userSub?.status === 'rejected';
+
+                      const isLegendary = bounty.difficulty === 'Legendary';
+                      const isExtreme = bounty.difficulty === 'Extreme';
+
+                      return (
+                        <div
+                          key={bounty.id}
+                          className={`p-6 rounded-3xl border transition-all duration-300 flex flex-col justify-between space-y-4 relative ${
+                            isApproved
+                              ? 'bg-emerald-50/40 border-emerald-300/80 shadow-xs'
+                              : isLegendary
+                              ? 'bg-gradient-to-b from-purple-50/50 to-amber-50/30 border-purple-200 shadow-sm hover:shadow-md'
+                              : 'bg-white border-slate-200/80 shadow-xs hover:border-amber-300 hover:shadow-md'
+                          }`}
+                        >
+                          <div className="space-y-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-extrabold text-[10px] border border-slate-200/60">
+                                  {bounty.category}
+                                </span>
+                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
+                                  isLegendary ? 'bg-purple-100 text-purple-900 border-purple-300' :
+                                  isExtreme ? 'bg-orange-100 text-orange-900 border-orange-300' :
+                                  'bg-amber-100 text-amber-900 border-amber-300'
+                                }`}>
+                                  {bounty.difficulty}
+                                </span>
+                              </div>
+
+                              <span className="px-3 py-1 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-xs shadow-xs border border-amber-300 flex items-center gap-1 shrink-0">
+                                <Sparkles className="w-3 h-3 text-slate-950" />
+                                <span>+{bounty.rewardCredits} GOLD</span>
+                              </span>
+                            </div>
+
+                            <div>
+                              <h3 className="text-base font-black text-slate-900 leading-snug">{bounty.title}</h3>
+                              <p className="text-xs text-slate-600 font-medium leading-relaxed mt-1.5">{bounty.description}</p>
+                            </div>
+
+                            {/* Deliverables Checklist */}
+                            {bounty.deliverables && bounty.deliverables.length > 0 && (
+                              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-1.5">
+                                <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Required Deliverables Proof:</p>
+                                <ul className="space-y-1">
+                                  {bounty.deliverables.map((deliv, idx) => (
+                                    <li key={idx} className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                                      <CheckCircle2 className="w-3 h-3 text-amber-600 shrink-0" />
+                                      <span>{deliv}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Submission Footer Actions */}
+                          <div className="pt-2 border-t border-slate-100">
+                            {isApproved ? (
+                              <div className="p-3 rounded-2xl bg-emerald-100/80 border border-emerald-300 text-emerald-900 font-black text-xs flex items-center justify-between">
+                                <span className="flex items-center gap-1.5">
+                                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                                  <span>Challenge Completed & Verified!</span>
+                                </span>
+                                <span className="text-[11px] bg-emerald-600 text-white px-2 py-0.5 rounded-lg">+ {bounty.rewardCredits} Gold Credited</span>
+                              </div>
+                            ) : isPending ? (
+                              <div className="p-3 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 font-bold text-xs flex items-center justify-between">
+                                <span className="flex items-center gap-1.5">
+                                  <Clock className="w-4 h-4 text-blue-600 animate-spin" />
+                                  <span>Proof Submitted (Pending Admin Verification)</span>
+                                </span>
+                                {userSub?.proofUrl && (
+                                  <a href={userSub.proofUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-[11px] flex items-center gap-0.5 font-bold">
+                                    <span>Link</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="space-y-2">
+                                {isRejected && (
+                                  <p className="text-[11px] font-bold text-rose-600 bg-rose-50 p-2 rounded-xl border border-rose-200">
+                                    ⚠️ Previous proof was rejected. You can resubmit revised proof below!
+                                  </p>
+                                )}
+                                <button
+                                  onClick={() => {
+                                    setSelectedBountyForSubmission(bounty);
+                                    setProofUrl('');
+                                    setProofNotes('');
+                                  }}
+                                  className="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-amber-400 font-black text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md hover:shadow-lg"
+                                >
+                                  <Zap className="w-4 h-4 text-amber-400" />
+                                  <span>Attempt Challenge & Submit Deliverables</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
+          )}
+
         </div>
       </div>
 
@@ -2565,6 +2874,82 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                 </div>
               </div>
             ) : null}
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================================ */}
+      {/* MODAL 6: SUBMIT BOUNTY PROOF */}
+      {/* ============================================================================ */}
+      {selectedBountyForSubmission && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[10px] font-black uppercase text-amber-600 tracking-wider">Gold Quest Submission</span>
+                <h3 className="text-sm font-black text-slate-900">{selectedBountyForSubmission.title}</h3>
+              </div>
+              <button
+                onClick={() => setSelectedBountyForSubmission(null)}
+                className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-xs text-amber-900 font-medium space-y-1">
+              <p className="font-black text-amber-950 flex items-center justify-between">
+                <span>Reward Pool:</span>
+                <span className="text-amber-700 font-mono font-bold">+{selectedBountyForSubmission.rewardCredits} GOLD</span>
+              </p>
+              <p className="text-[11px] text-amber-800">{selectedBountyForSubmission.description}</p>
+            </div>
+
+            <form onSubmit={handleSubmitProof} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">
+                  Deliverable Proof Link (GitHub Repo / Live URL / Drive / Writeup) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="url"
+                  required
+                  value={proofUrl}
+                  onChange={(e) => setProofUrl(e.target.value)}
+                  placeholder="https://github.com/username/project-repo"
+                  className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">
+                  Technical Explanation & Implementation Notes
+                </label>
+                <textarea
+                  rows={3}
+                  value={proofNotes}
+                  onChange={(e) => setProofNotes(e.target.value)}
+                  placeholder="Describe how you solved this challenge, architectural choices, or test steps..."
+                  className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                />
+              </div>
+
+              <div className="pt-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedBountyForSubmission(null)}
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingProof}
+                  className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black transition-colors cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  {submittingProof ? 'Submitting...' : 'Submit Proof to Admins'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
