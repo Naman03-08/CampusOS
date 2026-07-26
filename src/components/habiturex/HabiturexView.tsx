@@ -934,6 +934,13 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
     saveAllToFirestore(tasks, missions, updated);
   };
 
+  // Delete Calendar Event
+  const handleDeleteEvent = (id: string) => {
+    const updated = events.filter(e => e.id !== id);
+    setEvents(updated);
+    saveAllToFirestore(tasks, missions, updated);
+  };
+
   // Load Campus Leaderboard Data from Firestore with real-time updates
   useEffect(() => {
     if (activeInnerTab === 'leaderboard' && db) {
@@ -1257,25 +1264,25 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
             <div className="space-y-5 animate-in fade-in duration-300">
               
               {/* Hero Greeting Banner */}
-              <div className="p-6 rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-950 text-white shadow-xl relative overflow-hidden border border-indigo-500/20">
+              <div className="p-6 rounded-3xl bg-gradient-to-r from-indigo-50/90 via-blue-50/80 to-slate-100/90 text-slate-900 shadow-xs relative overflow-hidden border border-indigo-200/80">
                 {/* Background high-tech grids and circles */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,0.04)_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
-                <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,0.06)_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
+                <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-indigo-200/30 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-200/30 rounded-full blur-3xl pointer-events-none" />
 
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                   <div className="space-y-4 max-w-xl">
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 font-extrabold text-[10px] tracking-wider uppercase border border-indigo-400/30 backdrop-blur-md flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-indigo-400 animate-pulse" />
+                      <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-900 font-extrabold text-[10px] tracking-wider uppercase border border-indigo-200 backdrop-blur-md flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-indigo-600 animate-pulse" />
                         <span>AI-POWERED HABITUREX SYSTEM</span>
                       </span>
                     </div>
                     <div className="space-y-1.5">
-                      <h2 className="text-2xl font-black tracking-tight text-white leading-tight">
+                      <h2 className="text-2xl font-black tracking-tight text-slate-900 leading-tight">
                         Welcome to your Synaptic Space, {user?.displayName || 'Student'}
                       </h2>
-                      <p className="text-xs text-indigo-200/80 font-medium leading-relaxed">
+                      <p className="text-xs text-slate-600 font-medium leading-relaxed">
                         Track focus sessions, complete active targets to keep your streak alive, and deploy real-time academic analytics diagnostics.
                       </p>
                     </div>
@@ -1283,7 +1290,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                     <div className="pt-1 flex flex-wrap gap-2.5">
                       <button
                         onClick={triggerAIDiagnostics}
-                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white font-black text-xs transition-all shadow-md shadow-indigo-500/20 flex items-center gap-2 hover:scale-105 active:scale-95 cursor-pointer group"
+                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-black text-xs transition-all shadow-md shadow-indigo-500/20 flex items-center gap-2 hover:scale-105 active:scale-95 cursor-pointer group"
                       >
                         <Brain className="w-4 h-4 text-indigo-100 group-hover:animate-bounce" />
                         <span>Ask AI Academic Coach</span>
@@ -2052,16 +2059,31 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {events.map(e => (
-                    <div key={e.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-2">
-                      <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${e.color}`}>
-                        {e.type}
-                      </span>
-                      <h4 className="text-xs font-black text-slate-900">{e.title}</h4>
-                      <p className="text-[10px] font-bold text-slate-500">Date: {e.date}</p>
-                      <p className="text-[10px] font-bold text-blue-600">Subject: {e.subject}</p>
+                  {events.length === 0 ? (
+                    <div className="col-span-full py-8 text-center text-slate-400 text-xs font-semibold">
+                      No schedule events added yet. Click "Add Event" above to create one!
                     </div>
-                  ))}
+                  ) : (
+                    events.map(e => (
+                      <div key={e.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-2 relative group hover:border-slate-300 transition-all">
+                        <div className="flex items-center justify-between">
+                          <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${e.color}`}>
+                            {e.type}
+                          </span>
+                          <button
+                            onClick={() => handleDeleteEvent(e.id)}
+                            className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                            title="Delete Schedule Event"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <h4 className="text-xs font-black text-slate-900">{e.title}</h4>
+                        <p className="text-[10px] font-bold text-slate-500">Date: {e.date}</p>
+                        <p className="text-[10px] font-bold text-blue-600">Subject: {e.subject}</p>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -2161,33 +2183,33 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
           {activeInnerTab === 'bounties' && (
             <div className="space-y-6 animate-in fade-in duration-300">
               {/* Gold Hero Banner */}
-              <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-amber-950/80 to-slate-950 text-white border border-amber-500/30 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-60 h-60 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(245,158,11,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(245,158,11,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+              <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-br from-amber-500/10 via-amber-50/90 to-orange-50/60 text-slate-900 border border-amber-300 shadow-xs relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-amber-200/30 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-60 h-60 bg-yellow-200/30 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(245,158,11,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(245,158,11,0.05)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
                 <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                   <div className="space-y-2 max-w-xl">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black tracking-wider uppercase">
-                      <Sparkles className="w-3.5 h-3.5" />
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-black tracking-wider uppercase">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                       <span>Admin Published Gold Bounties</span>
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-black text-amber-100 tracking-tight">
+                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
                       Gold Quest Arena & Bounties
                     </h2>
-                    <p className="text-xs md:text-sm text-slate-300 font-medium leading-relaxed">
-                      Complete rigorous, high-difficulty engineering tasks published by Campus OS administrators to earn high-tier <strong className="text-amber-400">Gold Credits</strong>, rise on the global leaderboard, and unlock verified tech badges!
+                    <p className="text-xs md:text-sm text-slate-600 font-medium leading-relaxed">
+                      Complete rigorous, high-difficulty engineering tasks published by Campus OS administrators to earn high-tier <strong className="text-amber-800">Gold Credits</strong>, rise on the global leaderboard, and unlock verified tech badges!
                     </p>
                   </div>
 
-                  <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 backdrop-blur-md shrink-0 flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg shadow-amber-500/30">
+                  <div className="p-5 rounded-2xl bg-white/80 border border-amber-200/80 backdrop-blur-md shrink-0 flex items-center gap-4 shadow-2xs">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-black text-xl shadow-md shadow-amber-500/20">
                       <Award className="w-6 h-6" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase text-amber-300/80 tracking-wider">Your Balance</p>
-                      <p className="text-2xl font-black text-amber-400 font-mono">{credits} GOLD</p>
-                      <p className="text-[10px] font-semibold text-slate-400">Ready for Redemption</p>
+                      <p className="text-[10px] font-black uppercase text-amber-800 tracking-wider">Your Balance</p>
+                      <p className="text-2xl font-black text-amber-900 font-mono">{credits} GOLD</p>
+                      <p className="text-[10px] font-semibold text-slate-500">Ready for Redemption</p>
                     </div>
                   </div>
                 </div>
@@ -2744,26 +2766,25 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
       {/* MODAL 5: AI ACADEMIC DIAGNOSTICS & COACH */}
       {/* ============================================================================ */}
       {showAIDiagnosticsModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-300">
-          <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-6 relative overflow-hidden">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-300">
+          <div className="bg-white border border-slate-200 text-slate-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-6 relative overflow-hidden">
             {/* Ambient Background Glows */}
-            <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-100/50 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-100/50 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3 relative z-10">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 relative z-10">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 border border-indigo-200 flex items-center justify-center">
                   <Brain className="w-4.5 h-4.5 animate-pulse" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black tracking-tight text-white uppercase">AI Academic Coach & Advisor</h3>
-                  <p className="text-[10px] text-slate-400 font-semibold">Real-Time Cognitive Diagnostics</p>
+                  <h3 className="text-sm font-black tracking-tight text-slate-900 uppercase">AI Academic Coach & Advisor</h3>
+                  <p className="text-[10px] text-slate-500 font-semibold">Real-Time Cognitive Diagnostics</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowAIDiagnosticsModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all cursor-pointer"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2774,23 +2795,23 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                 {/* Custom animated radar scanner */}
                 <div className="relative w-24 h-24 flex items-center justify-center">
                   {/* Outer breathing ring */}
-                  <div className="absolute inset-0 rounded-full border-2 border-indigo-500/20 animate-ping" />
+                  <div className="absolute inset-0 rounded-full border-2 border-indigo-300 animate-ping" />
                   {/* Middle rotating dashed ring */}
-                  <div className="absolute inset-2 rounded-full border border-dashed border-indigo-400/40 animate-[spin_8s_linear_infinite]" />
+                  <div className="absolute inset-2 rounded-full border border-dashed border-indigo-400/60 animate-[spin_8s_linear_infinite]" />
                   {/* Inner glowing dot */}
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-blue-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/50 relative">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 relative">
                     <Activity className="w-5 h-5 animate-pulse" />
                   </div>
                 </div>
 
                 <div className="text-center space-y-1.5 max-w-xs">
-                  <p className="text-sm font-black text-white tracking-tight animate-pulse">
+                  <p className="text-sm font-black text-slate-900 tracking-tight animate-pulse">
                     {aiLoadingStep === 0 && 'Connecting to Cognitive Core...'}
                     {aiLoadingStep === 1 && 'Ingesting active attendance streams...'}
                     {aiLoadingStep === 2 && 'Calibrating streak trajectories...'}
                     {aiLoadingStep === 3 && 'Generating grade forecasts & advising...'}
                   </p>
-                  <p className="text-[10px] text-slate-400 font-bold">
+                  <p className="text-[10px] text-slate-500 font-bold">
                     Telemetry is calculated relative to your real-time academic logs.
                   </p>
                 </div>
@@ -2798,14 +2819,14 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
             ) : aiResult ? (
               <div className="space-y-5 relative z-10 text-xs animate-in slide-in-from-bottom-3 duration-300">
                 {/* Metric circular summary */}
-                <div className="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/20 flex items-center gap-4">
-                  <div className="relative w-16 h-16 shrink-0 flex items-center justify-center bg-indigo-500/10 rounded-full border border-indigo-500/30">
+                <div className="p-4 rounded-2xl bg-indigo-50/80 border border-indigo-200/80 flex items-center gap-4">
+                  <div className="relative w-16 h-16 shrink-0 flex items-center justify-center bg-white rounded-full border border-indigo-200 shadow-2xs">
                     <svg className="absolute inset-0 w-full h-full -rotate-90">
                       <circle
                         cx="32"
                         cy="32"
                         r="28"
-                        className="stroke-slate-800"
+                        className="stroke-slate-200"
                         strokeWidth="4"
                         fill="transparent"
                       />
@@ -2813,7 +2834,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                         cx="32"
                         cy="32"
                         r="28"
-                        className="stroke-indigo-500"
+                        className="stroke-indigo-600"
                         strokeWidth="4"
                         fill="transparent"
                         strokeDasharray={2 * Math.PI * 28}
@@ -2821,27 +2842,27 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                         strokeLinecap="round"
                       />
                     </svg>
-                    <span className="text-sm font-black text-white">{aiResult.score}</span>
+                    <span className="text-sm font-black text-indigo-950">{aiResult.score}</span>
                   </div>
 
                   <div className="min-w-0">
                     <div className="flex flex-wrap gap-1.5 items-center mb-1">
-                      <span className="px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-extrabold text-[9px] tracking-wide uppercase border border-indigo-400/20">
+                      <span className="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-900 font-extrabold text-[9px] tracking-wide uppercase border border-indigo-200">
                         {aiResult.tier}
                       </span>
                     </div>
-                    <h4 className="text-xs font-black text-white">Synaptic Academic Index</h4>
-                    <p className="text-[10px] text-slate-400 font-medium leading-relaxed mt-0.5">{aiResult.description}</p>
+                    <h4 className="text-xs font-black text-slate-900">Synaptic Academic Index</h4>
+                    <p className="text-[10px] text-slate-600 font-medium leading-relaxed mt-0.5">{aiResult.description}</p>
                   </div>
                 </div>
 
                 {/* Subject Grade Forecasts */}
                 <div className="space-y-2">
-                  <h5 className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">Semester Grade Forecasts</h5>
+                  <h5 className="text-[10px] font-black uppercase text-indigo-700 tracking-wider">Semester Grade Forecasts</h5>
                   <div className="grid grid-cols-5 gap-2">
                     {aiResult.gradeForecasts.map((f, i) => (
-                      <div key={i} className="p-2 rounded-xl bg-slate-800/60 border border-slate-700/60 text-center">
-                        <p className="text-[9px] font-bold text-slate-400 truncate">{f.subject}</p>
+                      <div key={i} className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-center">
+                        <p className="text-[9px] font-bold text-slate-500 truncate">{f.subject}</p>
                         <p className={`text-xs font-black ${f.color} mt-0.5`}>{f.grade}</p>
                       </div>
                     ))}
@@ -2850,14 +2871,14 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
 
                 {/* AI Coaching Tips */}
                 <div className="space-y-2">
-                  <h5 className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">Dynamic Coaching Prescriptions</h5>
+                  <h5 className="text-[10px] font-black uppercase text-indigo-700 tracking-wider">Dynamic Coaching Prescriptions</h5>
                   <div className="space-y-1.5">
                     {aiResult.tips.map((t, i) => (
-                      <div key={i} className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-800 flex gap-2.5 items-start">
-                        <span className="w-4 h-4 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                      <div key={i} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex gap-2.5 items-start">
+                        <span className="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
                           {i + 1}
                         </span>
-                        <p className="text-[11px] text-slate-300 font-semibold leading-relaxed">{t}</p>
+                        <p className="text-[11px] text-slate-700 font-semibold leading-relaxed">{t}</p>
                       </div>
                     ))}
                   </div>
@@ -2867,7 +2888,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowAIDiagnosticsModal(false)}
-                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white font-black transition-all cursor-pointer text-center hover:scale-102"
+                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-black transition-all cursor-pointer text-center hover:scale-102 shadow-sm"
                   >
                     Close Diagnostics
                   </button>
