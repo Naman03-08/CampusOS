@@ -61,6 +61,53 @@ async function generateContentWithFallback(options: {
   throw lastError || new Error("All Gemini models failed or quota exceeded.");
 }
 
+// Robust JSON repair helper to prevent syntax errors on truncated or unescaped model outputs
+function safeParseJSON(rawText: string): any {
+  if (!rawText) return null;
+  const cleaned = rawText.replace(/```json/gi, "").replace(/```/g, "").trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    try {
+      let fixed = cleaned;
+      let inString = false;
+      let escaped = false;
+      for (let i = 0; i < fixed.length; i++) {
+        if (fixed[i] === '\\' && !escaped) {
+          escaped = true;
+        } else {
+          if (fixed[i] === '"' && !escaped) {
+            inString = !inString;
+          }
+          escaped = false;
+        }
+      }
+      if (inString) {
+        fixed += '"';
+      }
+      let openBraces = (fixed.match(/\{/g) || []).length - (fixed.match(/\}/g) || []).length;
+      let openBrackets = (fixed.match(/\[/g) || []).length - (fixed.match(/\]/g) || []).length;
+      while (openBrackets > 0) {
+        fixed += ']';
+        openBrackets--;
+      }
+      while (openBraces > 0) {
+        fixed += '}';
+        openBraces--;
+      }
+      return JSON.parse(fixed);
+    } catch (err2) {
+      const match = cleaned.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          return JSON.parse(match[0]);
+        } catch (err3) {}
+      }
+      return null;
+    }
+  }
+}
+
 // Rich Fallback Response Generator for Chat
 function generateComprehensiveChatFallback(query: string): string {
   const qLower = query.toLowerCase();
@@ -623,15 +670,15 @@ app.post("/api/ai/summarize-notes", async (req, res) => {
 
     let lengthInstruction = "";
     if (lengthChoice === "short") {
-      lengthInstruction = "CRITICAL MANDATE: The 'structuredNotes' field MUST be STRICTLY between 600 and 700 words long. You MUST highlight all important keywords from the complete PDF using bold syntax like **Keyword Name**. Summarize the entire document into 600 to 700 words.";
+      lengthInstruction = "Highlight all core keywords using bold syntax like **Keyword Name**. Summarize the document concisely (~250-350 words).";
     } else if (lengthChoice === "medium") {
-      lengthInstruction = "CRITICAL MANDATE: The 'structuredNotes' field MUST be STRICTLY between 1000 and 1200 words long. Explicitly present all main and key words along with important definitions from the complete PDF in organized sections.";
+      lengthInstruction = "Present all main concepts and definitions from the PDF in organized sections (~400-600 words).";
     } else if (lengthChoice === "large") {
-      lengthInstruction = "CRITICAL MANDATE: The 'structuredNotes' field MUST be STRICTLY between 1500 and 2000 words long. Provide a highly interactive, exhaustive, chapter-by-chapter deep dive covering all key concepts, proofs, examples, and details from the PDF.";
+      lengthInstruction = "Provide a well-structured chapter-by-chapter deep dive covering key concepts, proofs, and examples (~600-800 words).";
     } else if (lengthChoice === "exam_ready") {
-      lengthInstruction = "CRITICAL MANDATE: The 'structuredNotes' field MUST be STRICTLY between 1500 and 1950 words long (LESS THAN 2000 words). Include all high-yield exam keywords, important definitions, core formulas, step-by-step exam proofs, common exam traps, and viva tips.";
+      lengthInstruction = "Include all high-yield exam keywords, definitions, core formulas, traps, and viva tips (~500-700 words).";
     } else {
-      lengthInstruction = "CRITICAL MANDATE: Provide a comprehensive and detailed summary.";
+      lengthInstruction = "Provide a comprehensive and detailed summary with bold key terms.";
     }
 
     const promptText = `You are CampusOS AI, an expert academic note summarizer and study coach.
@@ -651,7 +698,7 @@ Generate a high-yield, perfectly structured summary in JSON format containing:
 2. "subject": Subject name.
 3. "executiveSummary": A crisp, high-impact 3-4 sentence executive summary.
 4. "keyTakeaways": Array of 5-8 bullet-point core insights/takeaways.
-5. "structuredNotes": Well-formatted Markdown notes with headers, bullet points, code/formulas, adhering STRICTLY to the requested word length and keyword guidelines (${lengthInstruction}).
+5. "structuredNotes": Well-formatted Markdown notes with headers, bullet points, code/formulas.
 6. "keyTerminology": Array of objects with "term" and "definition".
 7. "examQuestions": Array of 5-8 high-probability exam/viva questions with "question", "answer", and "difficulty" ('Easy'|'Medium'|'Hard').
 8. "flashcards": Array of 6-10 flashcard objects with "front" and "back".
@@ -678,7 +725,7 @@ Generate a high-yield, perfectly structured summary in JSON format containing:
           contents: contentsPayload,
           config: {
             responseMimeType: "application/json",
-            maxOutputTokens: 5000,
+            maxOutputTokens: 8192,
             responseSchema: {
               type: Type.OBJECT,
               properties: {
@@ -725,13 +772,12 @@ Generate a high-yield, perfectly structured summary in JSON format containing:
           },
         });
 
-        const rawText = (response.text || "").replace(/```json/g, "").replace(/```/g, "").trim();
-        const parsed = JSON.parse(rawText || "{}");
-        if (parsed.executiveSummary || parsed.structuredNotes) {
+        const parsed = safeParseJSON(response?.text || "");
+        if (parsed && (parsed.executiveSummary || parsed.structuredNotes)) {
           return res.json(parsed);
         }
       } catch (geminiErr) {
-        console.error("Gemini notes summarizer error:", geminiErr);
+        console.warn("Gemini notes summarizer notice (falling back to local generator):", geminiErr);
       }
     }
 
