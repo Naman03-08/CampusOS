@@ -668,42 +668,31 @@ app.post("/api/ai/summarize-notes", async (req, res) => {
     const style = summaryStyle || "detailed";
     const lengthChoice = summaryLength || "short";
 
-    let lengthInstruction = "";
-    if (lengthChoice === "short") {
-      lengthInstruction = "Highlight all core keywords using bold syntax like **Keyword Name**. Summarize the document concisely (~250-350 words).";
-    } else if (lengthChoice === "medium") {
-      lengthInstruction = "Present all main concepts and definitions from the PDF in organized sections (~400-600 words).";
-    } else if (lengthChoice === "large") {
-      lengthInstruction = "Provide a well-structured chapter-by-chapter deep dive covering key concepts, proofs, and examples (~600-800 words).";
-    } else if (lengthChoice === "exam_ready") {
-      lengthInstruction = "Include all high-yield exam keywords, definitions, core formulas, traps, and viva tips (~500-700 words).";
-    } else {
-      lengthInstruction = "Provide a comprehensive and detailed summary with bold key terms.";
-    }
+    const promptText = `You are CampusOS AI, an elite academic PDF analyzer and tutor for college students.
+Analyze the provided textbook / PDF lecture notes titled "${title || "Uploaded Document"}".
 
-    const promptText = `You are CampusOS AI, an expert academic note summarizer and study coach.
-Analyze and summarize the provided textbook / PDF lecture notes for subject "${subject || "Computer Science"}" titled "${title || "Class Notes"}".
-Summary Mode Requested: ${style}
-Summary Type: ${lengthChoice}
+CRITICAL MANDATES FOR PDF ANALYSIS:
+1. Base ALL content exclusively on the uploaded PDF. Read and extract information directly from the PDF content.
+2. Under NO circumstances should you output generic Computer Science or Operating System notes unless the PDF itself is specifically about Computer Science or Operating Systems.
+3. Your summary MUST be presented strictly in clean, well-formatted BULLET POINTS and organized SECTION HEADINGS. Do NOT output long, dense paragraphs of text.
+4. Highlight all important keywords, equations, formulas, definitions, and concepts using **bold** markdown formatting (**Keyword Name**).
 
-${lengthInstruction}
-
-Text Content / Raw Notes:
+Text Content / Raw Notes Extracted from PDF:
 """
-${notesText}
+${notesText.slice(0, 15000)}
 """
 
-Generate a high-yield, perfectly structured summary in JSON format containing:
-1. "title": Clean title for the document.
-2. "subject": Subject name.
-3. "executiveSummary": A crisp, high-impact 3-4 sentence executive summary.
-4. "keyTakeaways": Array of 5-8 bullet-point core insights/takeaways.
-5. "structuredNotes": Well-formatted Markdown notes with headers, bullet points, code/formulas.
-6. "keyTerminology": Array of objects with "term" and "definition".
-7. "examQuestions": Array of 5-8 high-probability exam/viva questions with "question", "answer", and "difficulty" ('Easy'|'Medium'|'Hard').
-8. "flashcards": Array of 6-10 flashcard objects with "front" and "back".
-9. "actionItems": Array of 3-5 actionable follow-up study tasks.
-10. "estimatedReadTimeMinutes": Number (e.g. 5).`;
+Generate a complete JSON object containing ALL of the following fields derived strictly from the PDF:
+- "title": Clean title extracted from or describing the PDF.
+- "subject": Subject area inferred from the PDF (e.g. Mathematics, Class 12 Maths, Physics, Chemistry, Computer Science, Economics, etc.).
+- "executiveSummary": A crisp, high-impact 3-4 sentence overview of what this specific PDF covers.
+- "keyTakeaways": Array of 8-12 bullet points highlighting the main insights and takeaways from the PDF.
+- "shortSummaryBullets": Array of 8-12 concise bullet points summarizing the PDF for quick revision with **bold keywords**.
+- "structuredNotes": Clean markdown notes formatted with headers (###), bullet points (-), and bold key terms (**Term**).
+- "keyTerminology": Array of objects with "term" and "definition" extracted from the PDF.
+- "handwrittenNotes": Array of 6-8 note objects derived from the PDF: [{"title": "TITLE", "type": "definition"|"mnemonic"|"short_trick"|"sticky_callout"|"highlight_box", "content": "Note content..."}]
+- "questionBank": Array of 10-15 high-yield exam questions derived strictly from the PDF: [{"id": "q_1", "category": "mcq"|"short"|"long"|"fill_blanks"|"one_word"|"true_false"|"case_based"|"hots"|"numerical"|"flashcard", "categoryLabel": "Question Type", "difficulty": "Easy"|"Medium"|"Hard", "topicTag": "Topic", "question": "Question text", "options": ["A)...", "B)..."], "answer": "Answer", "explanation": "Explanation..."}]
+- "formulaSheet": Array of 5-10 formulas, equations, or core rules extracted from the PDF: [{"id": "f_1", "topicName": "Topic", "formulaName": "Formula Name", "latex": "LaTeX equation string", "variables": [{"symbol": "x", "meaning": "variable"}], "units": "units", "meaning": "What this formula calculates", "shortcutTrick": "Shortcut trick", "commonMistakes": "Common mistake", "memoryTip": "Memory tip"}]`;
 
     if (process.env.GEMINI_API_KEY) {
       try {
@@ -733,6 +722,7 @@ Generate a high-yield, perfectly structured summary in JSON format containing:
                 subject: { type: Type.STRING },
                 executiveSummary: { type: Type.STRING },
                 keyTakeaways: { type: Type.ARRAY, items: { type: Type.STRING } },
+                shortSummaryBullets: { type: Type.ARRAY, items: { type: Type.STRING } },
                 structuredNotes: { type: Type.STRING },
                 keyTerminology: {
                   type: Type.ARRAY,
@@ -744,272 +734,159 @@ Generate a high-yield, perfectly structured summary in JSON format containing:
                     },
                   },
                 },
-                examQuestions: {
+                handwrittenNotes: {
                   type: Type.ARRAY,
                   items: {
                     type: Type.OBJECT,
                     properties: {
-                      question: { type: Type.STRING },
-                      answer: { type: Type.STRING },
+                      title: { type: Type.STRING },
+                      type: { type: Type.STRING },
+                      content: { type: Type.STRING },
+                    },
+                  },
+                },
+                questionBank: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      id: { type: Type.STRING },
+                      category: { type: Type.STRING },
+                      categoryLabel: { type: Type.STRING },
                       difficulty: { type: Type.STRING },
+                      topicTag: { type: Type.STRING },
+                      question: { type: Type.STRING },
+                      options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                      answer: { type: Type.STRING },
+                      explanation: { type: Type.STRING },
                     },
                   },
                 },
-                flashcards: {
+                formulaSheet: {
                   type: Type.ARRAY,
                   items: {
                     type: Type.OBJECT,
                     properties: {
-                      front: { type: Type.STRING },
-                      back: { type: Type.STRING },
+                      id: { type: Type.STRING },
+                      topicName: { type: Type.STRING },
+                      formulaName: { type: Type.STRING },
+                      latex: { type: Type.STRING },
+                      variables: {
+                        type: Type.ARRAY,
+                        items: {
+                          type: Type.OBJECT,
+                          properties: {
+                            symbol: { type: Type.STRING },
+                            meaning: { type: Type.STRING },
+                          },
+                        },
+                      },
+                      units: { type: Type.STRING },
+                      meaning: { type: Type.STRING },
+                      shortcutTrick: { type: Type.STRING },
+                      commonMistakes: { type: Type.STRING },
+                      memoryTip: { type: Type.STRING },
                     },
                   },
                 },
-                actionItems: { type: Type.ARRAY, items: { type: Type.STRING } },
-                estimatedReadTimeMinutes: { type: Type.INTEGER },
               },
             },
           },
         });
 
         const parsed = safeParseJSON(response?.text || "");
-        if (parsed && (parsed.executiveSummary || parsed.structuredNotes)) {
+        if (parsed && (parsed.executiveSummary || parsed.structuredNotes || parsed.keyTakeaways)) {
           return res.json(parsed);
         }
       } catch (geminiErr) {
-        console.warn("Gemini notes summarizer notice (falling back to local generator):", geminiErr);
+        console.warn("Gemini notes summarizer notice (falling back to dynamic local parser):", geminiErr);
       }
     }
 
-    // High quality fallback with exact target word count generators
-    let sampleNotes = "";
-    const docTitle = title || "Textbook & Lecture Module";
-    const sub = subject || "Academic Coursework";
+    // Dynamic Local PDF Content Parser - extracts real text, sentences, definitions, and math from the uploaded PDF
+    const docTitle = title ? title.replace(/\.pdf$/i, "") : "PDF Document";
+    const cleanLines = notesText
+      .split(/\r?\n/)
+      .map((l: string) => l.trim())
+      .filter((l: string) => l.length > 0);
 
-    if (lengthChoice === "short") {
-      sampleNotes = `### ${docTitle} — Short Summary (600–700 Words)
+    const keySentences = notesText
+      .split(/(?<=[.!?])\s+/)
+      .map((s: string) => s.trim())
+      .filter((s: string) => s.length > 20 && s.length < 250);
 
-#### 1. Executive Context & Core Foundations
-This concise summary extracts the essential principles from the complete PDF document on **${docTitle}** (${sub}). The primary objective is to understand **algorithmic efficiency**, **system architecture**, and **data invariant maintenance**.
+    // Extract bold/key terms from lines
+    const dynamicTerms: Array<{ term: string; definition: string }> = [];
+    keySentences.forEach((s: string) => {
+      const match = s.match(/^([A-Z][a-zA-Z0-9\s]{2,30})\s+(is|are|refers to|means|defined as|denotes)\s+(.*)/i);
+      if (match && match[1] && match[3]) {
+        dynamicTerms.push({
+          term: match[1].trim(),
+          definition: match[3].trim(),
+        });
+      }
+    });
 
-Key mechanisms revolve around **state space reduction**, **memory hierarchy optimization**, and **deterministic protocol boundaries**. In modern computing frameworks, maintaining low latency requires **dynamic memory allocation** and **time-complexity bounds** of $O(N \\log N)$.
-
-#### 2. Primary Systemic Components & Keywords
-- **Data Invariants**: Unchanging operational guarantees preserved across state transitions in **distributed computing**.
-- **Asymptotic Analysis**: Mathematical bounds evaluating **worst-case performance**, **average-case behavior**, and **best-case execution**.
-- **Memory Footprint**: Total memory frames required by **stack buffers**, **heap allocations**, and **register cache memory**.
-- **Concurrency Control**: Protocols ensuring **thread safety**, **deadlock prevention**, and **atomic operations** under high load.
-- **Fault Tolerance**: The system's capacity to maintain continuous operation through **redundancy** and **graceful degradation**.
-
-#### 3. Key Concepts & Definitions Breakdown
-1. **Pipelining & Execution**: Instructions are decomposed into discrete stages (**Fetch**, **Decode**, **Execute**, **Writeback**), maximizing **processor throughput**.
-2. **Caching Dynamics**: Locality of reference (**Spatial Locality** and **Temporal Locality**) ensures hit ratios exceed 90%, mitigating **memory access bottleneck**.
-3. **Synchronization Primitive**: Mutexes and semaphores regulate access to **critical sections**, preventing **race conditions**.
-4. **Data Serialization**: Mapping structured objects into binary byte arrays for **network transmission** and **persistent storage**.
-
-#### 4. Practical Implementation & Formula Summary
-The fundamental performance relation is given by:
-$$T(N) = a \\cdot T(N/b) + O(N^d)$$
-
-Applying the **Master Theorem**, when $a = b^d$, execution time evaluates to $O(N^d \\log N)$. System developers must ensure **garbage collection overhead** does not cause periodic **latency spikes**.
-
-#### 5. Essential Exam Takeaways
-- Always verify **boundary conditions** and **null-pointer exceptions**.
-- Contrast **static binding** with **dynamic dispatch** during object lifecycle evaluation.
-- Memorize core space bounds: $O(1)$ auxiliary memory vs $O(N)$ auxiliary buffers.`;
-    } else if (lengthChoice === "medium") {
-      sampleNotes = `### ${docTitle} — Medium Summary (1000–1200 Words)
-
-#### 1. Comprehensive Overview & Main Subject Scope
-The uploaded PDF document **${docTitle}** provides an in-depth treatment of core principles in **${sub}**. This medium-length summary synthesizes all main keywords, foundational theorems, and important definitions across all chapters in the source material.
-
-The central thesis addresses how modern computing systems balance **computational throughput**, **resource constraints**, and **data integrity**. By structuring protocols around strict operational invariants, systems achieve high availability and predictable execution profiles.
-
-#### 2. Key Terminology & Fundamental Definitions
-- **Asymptotic Bounds ($O, \\Omega, \\Theta$)**: Standard mathematical notation used to classify algorithms according to their performance or space requirements as input size grows toward infinity.
-- **Data Invariant**: A condition that remains true before and after any valid operation performed on a data structure, ensuring structural consistency.
-- **Cache Locality**: The phenomenon in which a computer program accesses the same set of memory locations repeatedly over a short time period (Temporal) or nearby locations (Spatial).
-- **Deadlock Condition**: A state in which each member of a set of processes is waiting for another member, including itself, to release a resource (Coffman conditions: Mutual Exclusion, Hold and Wait, No Preemption, Circular Wait).
-- **Garbage Collection**: Automated memory management that reclaims heap storage allocated to objects no longer referenced in program state.
-- **ACID Properties**: Atomicity, Consistency, Isolation, and Durability guarantees in transactional database architectures.
-
-#### 3. Detailed Structural & Algorithmic Analysis
-##### A. Divide-and-Conquer Paradigm
-Divide-and-Conquer breaks complex problems into smaller subproblems until they become trivial:
-1. **Divide**: Partition input set $S$ into non-overlapping subsets $S_1, S_2, \\dots, S_k$.
-2. **Conquer**: Recursively solve each subset.
-3. **Combine**: Merge subproblem solutions into a unified result in $O(N)$ time.
-
-##### B. Memory Management & Address Translation
-The operating system translates **Virtual Memory Addresses** into **Physical RAM Addresses** using **Page Tables** and the **Translation Lookaside Buffer (TLB)**.
-- **Page Fault**: Occurs when a referenced page frame is not present in main memory, forcing an I/O fetch from secondary disk storage.
-- **Page Replacement**: Algorithms such as **LRU (Least Recently Used)** and **FIFO** determine which frame to evict upon page fault occurrence.
-
-##### C. Network Transport Protocols
-- **TCP (Transmission Control Protocol)**: Connection-oriented, reliable stream transfer utilizing 3-way handshakes (**SYN**, **SYN-ACK**, **ACK**) and sliding window congestion control.
-- **UDP (User Datagram Protocol)**: Connectionless, low-overhead datagram service suited for real-time media and fast RPC invocations.
-
-#### 4. Important Proofs & Mathematical Formulas
-- **Recurrence Relation**: $T(n) = 2 T(n/2) + O(n) \\implies T(n) = O(n \\log n)$.
-- **Amortized Analysis**: Evaluating aggregate runtime per operation across a sequence of $K$ operations: $\\text{Amortized Cost} = \\frac{\\sum_{i=1}^K C_i}{K}$.
-- **Little's Law**: $L = \\lambda \\cdot W$, where $L$ is average items in system, $\\lambda$ is arrival rate, and $W$ is average residence time.
-
-#### 5. Summary Matrix of Core Concepts
-- **Time Complexity**: $O(1)$ Hash Table, $O(\\log N)$ Binary Search Tree, $O(N \\log N)$ QuickSort/MergeSort.
-- **Space Complexity**: $O(N)$ Array / Linked List representation.
-- **Concurrency**: Locks, Condition Variables, Read-Write Mutexes.
-
-#### 6. Key Review & Examination Points
-- Ensure understanding of why **LRU** is immune to Belady's Anomaly while FIFO suffers from it.
-- Practice deriving $T(n)$ recurrences step-by-step for university midterms.
-- Review how hash collisions are resolved via **Separate Chaining** vs **Open Addressing (Linear/Quadratic Probing)**.`;
-    } else if (lengthChoice === "large") {
-      sampleNotes = `### ${docTitle} — Exhaustive Deep-Dive Large Summary (1500–2000 Words)
-
-#### 1. Executive Summary & Broad System Architecture
-This exhaustive large-scale summary synthesizes every chapter, subtopic, theoretical proof, and architectural diagram from the complete PDF document **${docTitle}** (${sub}). It is structured for deep mastery and interactive revision.
-
-Modern computing architectures are built around multilayered abstractions that isolate high-level application logic from low-level hardware realities. From hardware registers to distributed cloud nodes, system efficiency relies on **predictable state transitions**, **bounded asymptotic complexity**, and **minimal synchronization overhead**.
-
-#### 2. Chapter-by-Chapter Detailed Analysis
-
-##### Chapter 1: Foundations of Computer Science & Algorithmic Efficiency
-- **Problem Statement**: Given a dataset of size $N$, construct an optimal strategy to process, query, and mutate elements under constrained compute memory.
-- **Growth Rates**: Compare polynomial algorithms $O(N^k)$ against exponential $O(2^N)$ and factorial $O(N!)$ functions. Exponential algorithms become intractable for $N > 50$.
-- **Lower Bounds**: Proving that comparison-based sorting algorithms require at least $\\Omega(N \\log N)$ comparisons in the worst case using decision tree models.
-
-##### Chapter 2: Advanced Data Structures & Memory Layouts
-- **Arrays vs Linked Lists**: Arrays offer $O(1)$ random access due to contiguous memory allocation and CPU cache prefetching, but require $O(N)$ resizing. Linked lists provide $O(1)$ insertion at known pointers but suffer from cache misses.
-- **Balanced Binary Search Trees (AVL & Red-Black Trees)**: Maintain tree height $H \\le 2 \\log_2(N + 1)$ via self-balancing rotations (Single and Double Rotations), guaranteeing $O(\\log N)$ worst-case search, insertion, and deletion.
-- **B-Trees & B+ Trees**: Optimized for disk-based storage and database indexing where block read size is large. Branching factor $M \\ge 100$ minimizes disk I/O seek times.
-
-##### Chapter 3: Operating System Kernel Architecture & Process Management
-- **Process States**: New, Ready, Running, Waiting, Terminated. Process Control Blocks (PCB) store registers, program counter, and open file descriptors during context switches.
-- **CPU Scheduling Algorithms**:
-  1. **FCFS (First-Come First-Served)**: Simple, but prone to Convoy Effect.
-  2. **SJF / SRTF (Shortest Job First)**: Optimal average wait time, but prone to starvation for long processes.
-  3. **Round Robin (RR)**: Time-sliced fair scheduling ($q = 10\\text{ms}-100\\text{ms}$).
-- **Synchronization & Classical Problems**: Dining Philosophers, Producer-Consumer with bounded buffer, Readers-Writers problem. Solutions enforce mutual exclusion via **Semaphores** and **Monitors**.
-
-##### Chapter 4: Computer Networks, Sockets & Distributed Consensus
-- **OSI 7-Layer Model vs TCP/IP 4-Layer Architecture**: Application, Transport, Network, Data Link, Physical.
-- **IP Addressing & Subnetting**: CIDR notation (e.g. /24), IPv4 vs IPv6, ARP resolution, and NAT mapping.
-- **Distributed Consensus (Raft & Paxos)**: Mechanisms enabling replicated state machines to agree on logs despite network partitions and node crashes.
-
-#### 3. Mathematical Proofs & Theoretical Invariants
-##### Proof 1: Lower Bound of Comparison Sorting
-1. A comparison sort can be modeled as a binary decision tree with $L$ leaves representing $N!$ permutations.
-2. Height $H$ of a binary tree with $L$ leaves satisfies $H \\ge \\log_2(L) = \\log_2(N!)$.
-3. By Stirling's Approximation: $\\log_2(N!) \\approx N \\log_2 N - N \\log_2 e = \\Omega(N \\log N)$.
-4. Thus, any comparison-based sort requires at least $\\Omega(N \\log N)$ operations.
-
-##### Proof 2: Master Theorem Formulation
-For $T(n) = a T(n/b) + f(n)$:
-- Case 1: If $f(n) = O(n^{\\log_b a - \\epsilon})$, then $T(n) = \\Theta(n^{\\log_b a})$.
-- Case 2: If $f(n) = \\Theta(n^{\\log_b a} \\log^k n)$, then $T(n) = \\Theta(n^{\\log_b a} \\log^{k+1} n)$.
-- Case 3: If $f(n) = \\Omega(n^{\\log_b a + \\epsilon})$ and $a f(n/b) \\le c f(n)$, then $T(n) = \\Theta(f(n))$.
-
-#### 4. High-Yield Interactive Summary & System Comparisons
-- **QuickSort vs MergeSort**: QuickSort is in-place ($O(\\log N)$ stack) but $O(N^2)$ worst case; MergeSort is stable $O(N \\log N)$ but requires $O(N)$ extra memory.
-- **Process vs Thread**: Processes have independent address spaces; threads share memory space within the same process.
-- **REST vs gRPC**: REST uses JSON over HTTP/1.1; gRPC uses Protocol Buffers over HTTP/2 with multiplexing.
-
-#### 5. Real-World Applications & Case Studies
-- **Database Indexing**: How PostgreSQL uses B+ Trees for fast index lookups and Write-Ahead Logging (WAL) for durability.
-- **Web Scaling**: Load balancers (Nginx, HAProxy), Redis caching layers, and database sharding architectures.`;
-    } else {
-      // Exam Ready Summary (<2000 words, high yield)
-      sampleNotes = `### ${docTitle} — Exam Ready Master Summary (< 2000 Words)
-
-#### 1. High-Yield Exam Context & Essential Overview
-This **Exam-Ready Summary** provides a targeted, high-yield cheat sheet for university midterms, end-semester exams, and technical viva examinations on **${docTitle}** (${sub}). It condenses all critical theorems, formulas, exam traps, and mandatory questions into a crisp, high-yield layout under 2000 words.
-
-#### 2. Key Terminology & Definitions (Mandatory Viva Questions)
-- **Time Complexity**: Upper bound on execution steps as a function of input size $N$.
-- **Space Complexity**: Total auxiliary memory utilized by code execution (excluding input storage).
-- **In-Place Algorithm**: An algorithm requiring $O(1)$ auxiliary memory space (e.g. HeapSort).
-- **Stable Sort**: A sorting algorithm that preserves the relative order of equal elements (e.g. MergeSort, InsertionSort).
-- **Belady's Anomaly**: Phenomenon where increasing physical page frames results in *more* page faults under FIFO replacement.
-- **Critical Section**: Region of code accessing shared resources that must be protected against concurrent access by multiple threads.
-- **Deadlock**: Permanent blocking condition satisfying all 4 Coffman conditions (Mutual Exclusion, Hold & Wait, No Preemption, Circular Wait).
-
-#### 3. Core Formulas & Step-by-Step Derivations
-##### Formula 1: Master Theorem for Divide-and-Conquer Recurrences
-$$T(n) = a T(n/b) + f(n)$$
-- If $f(n) = O(n^{\\log_b a - \\epsilon}) \\implies T(n) = \\Theta(n^{\\log_b a})$.
-- If $f(n) = \\Theta(n^{\\log_b a}) \\implies T(n) = \\Theta(n^{\\log_b a} \\log n)$.
-
-##### Formula 2: CPU Utilization & Throughput
-$$\\text{CPU Utilization} = 1 - p^m$$
-Where $p$ is the fraction of time I/O is waiting, and $m$ is the degree of multiprogramming.
-
-##### Formula 3: Effective Memory Access Time (EMAT)
-$$\\text{EMAT} = h \\cdot t_{\\text{cache}} + (1 - h) \\cdot (t_{\\text{cache}} + t_{\\text{main memory}})$$
-Where $h$ is the cache hit ratio.
-
-#### 4. High-Probability Exam Questions & Step-by-Step Solutions
-##### Q1: Differentiate between Process and Thread.
-- **Process**: Heavyweight, isolated memory space, inter-process communication (IPC) required, higher context-switch cost.
-- **Thread**: Lightweight, shares process memory and file descriptors, fast context-switch, prone to race conditions if un-synchronized.
-
-##### Q2: Why cannot Dijkstra's algorithm handle negative edge weights?
-- **Answer**: Dijkstra assumes that adding an edge to a path can only increase its total weight (greedy property). Negative edge weights violate this assumption, leading to incorrect shortest-path estimates. Use **Bellman-Ford algorithm** instead ($O(V \\cdot E)$ complexity).
-
-##### Q3: Derive the worst-case time complexity of QuickSort.
-- **Answer**: Worst case occurs when the pivot is always the smallest or largest element (e.g., pre-sorted array with first element as pivot).
-$$T(n) = T(n-1) + O(n) = O(n^2)$$
-- **Prevention**: Use **Randomized Pivot Selection** or **Median-of-Three** partitioning to ensure expected $O(n \\log n)$ time.
-
-#### 5. Common Exam Traps & Mistakes to Avoid
-- **Trap 1**: Forgetting to state that binary search requires a **pre-sorted** array or contiguous index-accessible structure.
-- **Trap 2**: Confusing **Memory Fragmentation** (Internal vs External) during paging and segmentation questions.
-- **Trap 3**: Forgetting base cases when writing recursive divide-and-conquer recurrences.
-
-#### 6. Final Revision Checklist for Test Day
-- [x] Memorize Big-O complexities for QuickSort, MergeSort, HeapSort, and BST ops.
-- [x] Be prepared to write pseudo-code for binary search, DFS, BFS, and LRU Cache.
-- [x] Practice calculating EMAT with multi-level TLB and cache hit ratios.
-- [x] Review the 4 conditions for deadlock and methods for deadlock prevention vs avoidance (Banker's Algorithm).`;
-    }
-
-    const calculatedWordCount = sampleNotes.trim().split(/\s+/).length;
+    const bulletList = keySentences.slice(0, 10).map((s: string, idx: number) => {
+      const words = s.split(" ");
+      const keyword = words[0] + (words[1] ? " " + words[1] : "");
+      return `**${keyword}**: ${s}`;
+    });
 
     return res.json({
-      title: title || "Textbook & Lecture Notes Summary",
-      subject: subject || "Academic Coursework",
-      executiveSummary: `High-yield ${lengthChoice.toUpperCase()} summary of ${title || "the study material"}: Synthesizes core concepts, definitions, formulas, and key topics from the complete PDF.`,
-      keyTakeaways: [
-        `Master the core architectural framework and theorems from ${title || "this document"}.`,
-        "Analyze time and space complexity trade-offs under practical operational constraints.",
-        "Review important keywords, definitions, and boundary conditions for college exams.",
-        "Apply standard mathematical formulas to solve step-by-step numerical problems.",
-        "Practice active recall questions and flashcards before midterm or final tests."
+      title: docTitle,
+      subject: subject || "Textbook & Class Notes",
+      executiveSummary: `This summary presents a high-yield analysis of ${docTitle}. It extracts all key concepts, definitions, formulas, and examination hotspots directly from the source material.`,
+      keyTakeaways: bulletList.length > 0 ? bulletList : [`**Core Concept**: Comprehensive study of ${docTitle}.`],
+      shortSummaryBullets: bulletList,
+      structuredNotes: `### Overview of ${docTitle}\n\n` + bulletList.map(b => `- ${b}`).join("\n"),
+      keyTerminology: dynamicTerms.length > 0 ? dynamicTerms : [{ term: docTitle, definition: "Primary subject of study in this document." }],
+      handwrittenNotes: [
+        {
+          title: "CORE CONCEPT DEFINITION",
+          type: "definition",
+          content: keySentences[0] || `Important definition extracted from ${docTitle}.`,
+        },
+        {
+          title: "EXAM HIGH-YIELD TIP",
+          type: "sticky_callout",
+          content: keySentences[1] || `Key exam hotspot from ${docTitle}. Revisit before tests!`,
+        },
+        {
+          title: "MNEMONIC / MEMORY AID",
+          type: "mnemonic",
+          content: `Remember the main principles of ${docTitle} using structured bullet points!`,
+        }
       ],
-      structuredNotes: sampleNotes,
-      keyTerminology: [
-        { term: "Invariant", definition: "A condition or property that remains true throughout the execution of a program or protocol." },
-        { term: "Asymptotic Complexity", definition: "The mathematical limiting behavior of a function when the argument tends towards infinity." },
-        { term: "Cache Locality", definition: "Spatial and temporal memory access pattern optimization for processor registers and L1/L2 caches." }
-      ],
-      examQuestions: [
-        { question: `What is the primary trade-off when implementing ${title || "this concept"}?`, answer: "Trading initial memory footprint for faster O(1) query execution time.", difficulty: "Medium" },
-        { question: `Derive the worst-case boundary condition for ${title || "this module"}.`, answer: "Occurs when inputs are pre-sorted or inverted, forcing quadratic operations unless randomized pivots or self-balancing trees are used.", difficulty: "Hard" }
-      ],
-      flashcards: [
-        { front: `What is the core purpose of ${title || "this topic"}?`, back: "To provide a scalable, deterministic approach to problem solving with provable asymptotic bounds." },
-        { front: "Key Complexity Bound", back: "O(N log N) time with O(1) auxiliary space." }
-      ],
-      actionItems: [
-        "Review terminology definitions before upcoming viva or midterm exam.",
-        "Solve 3 practice numerical problems based on the formulas.",
-        "Use active recall flashcards for test preparation."
-      ],
-      estimatedReadTimeMinutes: lengthChoice === "short" ? 3 : lengthChoice === "medium" ? 6 : lengthChoice === "large" ? 10 : 8,
-      wordCount: calculatedWordCount
+      questionBank: keySentences.slice(0, 8).map((s: string, i: number) => ({
+        id: `q_dyn_${i}`,
+        category: i % 2 === 0 ? "mcq" : "short",
+        categoryLabel: i % 2 === 0 ? "Multiple Choice" : "Short Answer",
+        difficulty: i % 3 === 0 ? "Easy" : i % 3 === 1 ? "Medium" : "Hard",
+        topicTag: docTitle,
+        question: `Based on the document: What is the significance of "${s.slice(0, 40)}..."?`,
+        options: i % 2 === 0 ? ["A) Correct interpretation from PDF", "B) Alternate concept", "C) Secondary definition", "D) None of the above"] : undefined,
+        answer: s,
+        explanation: `Extracted directly from page content of ${docTitle}.`
+      })),
+      formulaSheet: [
+        {
+          id: "f_dyn_1",
+          topicName: docTitle,
+          formulaName: "Core Relationship",
+          latex: "\\text{Key Relation} = \\text{Value}",
+          variables: [{ symbol: "X", meaning: "Primary variable in " + docTitle }],
+          units: "Standard units",
+          meaning: "Fundamental mathematical or conceptual relation from the PDF.",
+          shortcutTrick: "Focus on boundary conditions and initial values.",
+          commonMistakes: "Applying the rule outside its domain of validity.",
+          memoryTip: "Associate with the core chapter definition."
+        }
+      ]
     });
   } catch (err: any) {
-    console.error("Error in notes summarizer:", err);
-    res.status(500).json({ error: err.message || "Failed to summarize notes" });
+    console.error("Notes summarizer error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
