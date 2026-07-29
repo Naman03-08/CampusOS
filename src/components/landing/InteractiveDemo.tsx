@@ -63,7 +63,7 @@ export const InteractiveDemo: React.FC = () => {
                 : 'bg-white/50 backdrop-blur-md text-slate-700 hover:bg-white/70 border border-white/60'
             }`}
           >
-            <Bot className="w-4 h-4" /> Technical Interview Evaluator
+            <Bot className="w-4 h-4" /> Interview Prep Qs
           </button>
         </div>
 

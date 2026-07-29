@@ -98,7 +98,7 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
             <h1 className="text-2xl font-black text-slate-900">Placement Hub & Technical Interview Suite</h1>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            ATS Resume optimization, custom cover letters & technical interview evaluations.
+            ATS Resume optimization, custom cover letters & company interview prep.
           </p>
         </div>
 
