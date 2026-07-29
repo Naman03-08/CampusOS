@@ -32,14 +32,12 @@ function checkApiKey() {
 
 // Multi-model Gemini Free Tier Fallback Manager
 const GEMINI_MODELS = [
-  "gemini-3.1-flash-lite",
-  "gemini-3.6-flash",
+  "gemini-2.5-flash-lite",
   "gemini-2.5-flash"
 ];
 
 const GEMINI_LOW_MODELS = [
-  "gemini-3.1-flash-lite",
-  "gemini-3.6-flash",
+  "gemini-2.5-flash-lite",
   "gemini-2.5-flash"
 ];
 
@@ -58,7 +56,7 @@ async function generateContentWithFallback(options: {
         
         // Dynamically adjust parameters for cheaper/faster models if needed
         const config = { ...options.config };
-        if (model === "gemini-3.1-flash-lite" && config.maxOutputTokens > 8192) {
+        if ((model === "gemini-2.5-flash-lite" || model === "gemini-3.1-flash-lite") && config.maxOutputTokens > 8192) {
           config.maxOutputTokens = 8192;
         }
 
@@ -582,7 +580,7 @@ Provide JSON output with:
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        console.log("[Gemini Engine] Querying low-cost gemini-3.1-flash-lite for ATS resume evaluation");
+        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite for ATS resume evaluation");
         const response = await generateContentWithFallback({
           contents: prompt,
           models: GEMINI_LOW_MODELS,
@@ -837,7 +835,7 @@ ${notesText && notesText.length > 50 ? `Extracted Full Text of the PDF Document:
           ];
         }
 
-        console.log("[Gemini Engine] Querying low-cost gemini-3.1-flash-lite for complete grounded PDF notes summary");
+        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite for complete grounded PDF notes summary");
         const response: any = await generateContentWithFallback({
           contents: contentsPayload,
           models: GEMINI_LOW_MODELS,
@@ -1111,7 +1109,7 @@ CRITICAL MANDATES:
           };
         }
 
-        console.log("[Gemini Engine] Querying low-cost gemini-3.1-flash-lite or compliant fallback models for complete grounded academic quiz");
+        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite model for complete grounded academic quiz");
         const response: any = await generateContentWithFallback({
           contents: contentsPayload,
           models: GEMINI_LOW_MODELS,
