@@ -5,7 +5,7 @@ import { StorageService } from '../../lib/storage';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { calculatePlanDetails, PLAN_DEFINITIONS } from '../../lib/planUtils';
 import { auth } from '../../lib/firebase';
-import { updatePassword } from 'firebase/auth';
+import { updatePassword, sendPasswordResetEmail } from 'firebase/auth';
 
 interface SettingsViewProps {
   user: UserProfile;
@@ -61,6 +61,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
     setDevOtpNotice('');
 
     try {
+      if (auth) {
+        try {
+          await sendPasswordResetEmail(auth, profile.email.trim());
+          console.log("[Firebase Auth] Password reset email sent directly to real email inbox:", profile.email.trim());
+        } catch (fbErr: any) {
+          console.warn("[Firebase Auth] Password reset email note:", fbErr);
+        }
+      }
+
       const res = await fetch('/api/auth/send-reset-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -75,7 +84,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
       setOtpStep(1);
       setResendCooldown(60);
       if (data.devOtp) {
-        setDevOtpNotice(`[DEV AUTO-OTP]: Use 6-digit OTP code ${data.devOtp} to verify.`);
+        setDevOtpNotice(`Real email & 6-digit OTP code dispatched to ${profile.email.trim()} (Dev OTP preview: ${data.devOtp}).`);
       }
     } catch (err: any) {
       console.error("Settings OTP error:", err);

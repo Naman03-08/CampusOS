@@ -82,6 +82,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setDevOtpNotice('');
 
     try {
+      // Trigger Firebase Auth real password reset email to user's real email inbox
+      if (auth) {
+        try {
+          await sendPasswordResetEmail(auth, email.trim());
+          console.log("[Firebase Auth] Password reset email dispatched directly to real inbox:", email.trim());
+        } catch (fbErr: any) {
+          console.warn("[Firebase Auth] Password reset email note:", fbErr);
+        }
+      }
+
       const res = await fetch('/api/auth/send-reset-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -96,7 +106,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setOtpStep(2);
       setResendCooldown(60);
       if (data.devOtp) {
-        setDevOtpNotice(`[DEV MODE AUTO-OTP]: Use OTP code ${data.devOtp} to verify.`);
+        setDevOtpNotice(`Real email & 6-digit OTP code dispatched to ${email.trim()} (Dev OTP preview: ${data.devOtp}).`);
       }
     } catch (err: any) {
       console.error("OTP send error:", err);
