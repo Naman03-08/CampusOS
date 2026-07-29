@@ -15,7 +15,7 @@ import {
   Star,
   Zap 
 } from 'lucide-react';
-import heroStudentsArt from '../../assets/images/placivo_blue_hoodie_students_1785348882031.jpg';
+import heroStudentsArt from '../../assets/images/campusos_blue_hoodies_art_1785350059169.jpg';
 
 interface HeroProps {
   onOpenAuth: (mode: 'register') => void;
