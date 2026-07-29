@@ -1,5 +1,6 @@
 import React from 'react';
-import { GraduationCap, Heart, ShieldCheck } from 'lucide-react';
+import { Heart, ShieldCheck } from 'lucide-react';
+import placivoAILogo from '../placivoAI.png';
 
 export const FooterLanding: React.FC = () => {
   return (
@@ -8,10 +9,7 @@ export const FooterLanding: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-purple-200/60">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#2563EB] text-white shadow-2xs">
-                <GraduationCap className="w-5 h-5" />
-              </div>
-              <span className="font-extrabold text-xl text-slate-900 tracking-tight">Placivo AI</span>
+              <img src={placivoAILogo} alt="Placivo AI" className="h-10 w-auto object-contain" />
             </div>
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
               The AI Operating System for College Students. Empowering academic excellence and campus placements worldwide.

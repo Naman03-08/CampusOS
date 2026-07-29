@@ -5,7 +5,7 @@ import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPass
 import { UserProfile } from '../../types';
 import { StorageService } from '../../lib/storage';
 import { FirestoreService } from '../../lib/firestoreService';
-import logoImg from '../logo.png';
+import logoImg from '../placivoAI.png';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -567,10 +567,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="md:col-span-5 bg-[#0B1736] text-white p-7 sm:p-9 flex flex-col justify-between relative overflow-hidden selection:bg-blue-500 selection:text-white">
           {/* Top Brand Logo */}
           <div className="flex items-center gap-2.5 z-10">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-blue-600 text-white shadow-lg shadow-blue-600/30 shrink-0">
-              <GraduationCap className="w-5 h-5" />
-            </div>
-            <span className="font-extrabold text-xl text-white tracking-tight">Placivo AI</span>
+            <img src={logoImg} alt="Placivo AI" className="h-10 w-auto object-contain bg-white/10 p-1.5 rounded-xl border border-white/20 shadow-md" />
           </div>
 
           {/* Main Hero Message */}

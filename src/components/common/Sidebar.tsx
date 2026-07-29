@@ -17,6 +17,7 @@ import {
   Bot
 } from 'lucide-react';
 import { UserProfile } from '../../types';
+import placivoAILogo from '../placivoAI.png';
 
 interface SidebarProps {
   activeTab: string;
@@ -57,14 +58,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }`}>
       {/* Brand Header */}
       <div>
-        <div className="flex items-center gap-2.5 px-3.5 py-3 mb-5 bg-white/80 backdrop-blur-md border border-white/90 rounded-2xl shadow-3d-sm">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/20 bg-[#2563EB] text-white">
-            <GraduationCap className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-xs font-black text-slate-900 tracking-tight">Placivo <span className="text-blue-600">AI</span></p>
-            <p className="text-[10px] text-blue-600 font-extrabold uppercase tracking-wider">Student OS v2.5</p>
-          </div>
+        <div 
+          onClick={() => onSelectTab('dashboard')}
+          className="flex items-center gap-2.5 px-3 py-2.5 mb-5 bg-white/80 backdrop-blur-md border border-white/90 rounded-2xl shadow-3d-sm cursor-pointer hover:bg-white transition-all"
+        >
+          <img src={placivoAILogo} alt="Placivo AI" className="h-9 w-auto object-contain shrink-0" />
         </div>
 
         {/* Nav list */}
