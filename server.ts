@@ -32,14 +32,44 @@ function checkApiKey() {
 
 // Multi-model Gemini Free Tier Fallback Manager
 const GEMINI_MODELS = [
-  "gemini-2.5-flash-lite",
-  "gemini-2.5-flash"
+  "gemini-2.5-flash-lite"
 ];
 
 const GEMINI_LOW_MODELS = [
-  "gemini-2.5-flash-lite",
-  "gemini-2.5-flash"
+  "gemini-2.5-flash-lite"
 ];
+
+// Options Shuffler helper so correct answer is randomly distributed (0, 1, 2, 3) and not always option 0
+function shuffleMcqOptions<T extends { options?: string[]; correctAnswer?: number }>(items: T[]): T[] {
+  if (!Array.isArray(items)) return [];
+  return items.map((item) => {
+    if (!Array.isArray(item.options) || item.options.length < 2) return item;
+    
+    // Determine current correct answer index safely
+    const currentCorrectIdx = typeof item.correctAnswer === 'number' && item.correctAnswer >= 0 && item.correctAnswer < item.options.length
+      ? item.correctAnswer
+      : 0;
+    const correctOptionText = item.options[currentCorrectIdx];
+
+    // Create a copy of options array and shuffle it using Fisher-Yates
+    const shuffled = [...item.options];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = shuffled[i];
+      shuffled[i] = shuffled[j];
+      shuffled[j] = temp;
+    }
+
+    // Find new 0-indexed position of the correct option text in shuffled array
+    const newCorrectIndex = shuffled.indexOf(correctOptionText);
+
+    return {
+      ...item,
+      options: shuffled,
+      correctAnswer: newCorrectIndex >= 0 ? newCorrectIndex : 0
+    };
+  });
+}
 
 async function generateContentWithFallback(options: {
   contents: any;
@@ -47,16 +77,16 @@ async function generateContentWithFallback(options: {
   models?: string[];
 }) {
   let lastError: any = null;
-  const modelsToTry = options.models || GEMINI_MODELS;
+  const modelsToTry = options.models || ["gemini-2.5-flash-lite"];
   for (const model of modelsToTry) {
-    // Retry up to 2 times for transient 503/429 high-demand spikes
-    for (let attempt = 0; attempt < 2; attempt++) {
+    // Retry up to 4 times for transient 503/429 high-demand spikes
+    for (let attempt = 0; attempt < 4; attempt++) {
       try {
-        console.log(`[Gemini Engine] Querying model: ${model}${attempt > 0 ? ` (retry ${attempt})` : ""}`);
+        console.log(`[Gemini Engine] Querying model: ${model}${attempt > 0 ? ` (retry attempt ${attempt + 1})` : ""}`);
         
         // Dynamically adjust parameters for cheaper/faster models if needed
         const config = { ...options.config };
-        if ((model === "gemini-2.5-flash-lite" || model === "gemini-3.1-flash-lite") && config.maxOutputTokens > 8192) {
+        if (model === "gemini-2.5-flash-lite" && config.maxOutputTokens > 8192) {
           config.maxOutputTokens = 8192;
         }
 
@@ -64,7 +94,7 @@ async function generateContentWithFallback(options: {
           model,
           contents: options.contents,
           config: config,
-          ...(model.startsWith("gemini-1.5") ? { generationConfig: options.config } : {}) // maintain back-compat if config format varies
+          ...(model.startsWith("gemini-1.5") ? { generationConfig: options.config } : {})
         });
         if (response && response.text && response.text.trim().length > 0) {
           return response;
@@ -74,16 +104,17 @@ async function generateContentWithFallback(options: {
         const errMsg = err?.message || String(err);
         console.warn(`[Gemini Fallback] Model ${model} error (attempt ${attempt + 1}):`, errMsg);
         const isTransient = errMsg.includes("503") || errMsg.includes("UNAVAILABLE") || errMsg.includes("429") || errMsg.includes("RESOURCE_EXHAUSTED") || errMsg.includes("high demand");
-        if (isTransient && attempt < 1) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+        if (isTransient && attempt < 3) {
+          // Exponential backoff delay for 503 spikes
+          await new Promise((resolve) => setTimeout(resolve, 1500 * (attempt + 1)));
           continue;
         } else {
-          break; // proceed to next lower model in list
+          break; // proceed to next attempt or throw
         }
       }
     }
   }
-  throw lastError || new Error("All requested Gemini models failed.");
+  throw lastError || new Error("Requested Gemini model (gemini-2.5-flash-lite) failed after retries.");
 }
 
 // Robust JSON repair helper to prevent syntax errors on truncated or unescaped model outputs
@@ -933,59 +964,62 @@ app.post("/api/ai/quiz-generator", async (req, res) => {
     const docTitle = title || "Uploaded PDF Document";
     const notesText = (rawNotes || "").trim();
 
-    const promptText = `You are the Placivo Premium AI Quiz Generation Engine.
-Your ABSOLUTE HIGHEST PRIORITY is to read the ENTIRE PDF document titled "${docTitle}" VERY CAREFULLY, LINE BY LINE, FROM PAGE 1 TO THE VERY END.
+    const promptText = `You are the Placivo Premium AI Quiz Generation Engine operating STRICTLY on gemini-2.5-flash-lite.
+Your ABSOLUTE HIGHEST PRIORITY is to read the ENTIRE PDF document titled "${docTitle}" VERY CAREFULLY, LINE BY LINE, PAGE BY PAGE FROM PAGE 1 TO THE VERY END.
 
 CRITICAL TOPIC BINDING & ABSOLUTE NON-CODING MANDATE:
 - READ THE COMPLETE PDF CONTENT FIRST. Every single question MUST be strictly grounded in, directly derived from, and explicitly based on the actual concepts, formulas, definitions, theorems, equations, and rules present in the uploaded material/PDF.
-- DO NOT generate generic coding, programming, or computer science questions by your own if the uploaded PDF is about another topic (e.g., if the PDF is about Mathematics, Biology, Chemistry, English, History, or general academic subjects, generate questions PURELY on those specific topics).
+- DO NOT generate generic coding, programming, or computer science questions by your own if the uploaded PDF is about another topic (e.g., if the PDF is about Mathematics, Biology, Chemistry, English, History, Physics, Management, or general academic subjects, generate questions PURELY on those specific topics).
 - If the uploaded PDF is NOT about computer science, software engineering, databases, programming, or coding, you are STRICTLY FORBIDDEN from generating coding questions. In this case, the "codingSnippets" array MUST be returned as a completely empty list: [].
 - Never hallucinate topics or inject generic programming trivia (like pointer arithmetic or SQL aggregate queries) unless those exact topics are explicitly taught in the uploaded document.
 
-You MUST generate EXACTLY 15 high-quality, comprehensive, and extremely tough questions for EACH category (except for "codingSnippets" which must be empty [] if the PDF is non-coding):
+QUANTITY & QUALITY MANDATES:
+- You MUST generate 15 to 20 high-quality, expert-level, comprehensive, and challenging questions for EACH category (except for "codingSnippets" which must be empty [] if the PDF is non-coding):
+- ANSWER RANDOMIZATION MANDATE: Do NOT place the correct answer as option A / option 0 every time. Randomly distribute the correct answer index across choices (0, 1, 2, 3) for MCQs and coding snippets!
 
+CATEGORY REQUIREMENTS:
 1. "mcqs": Rigorous Multiple Choice Questions focusing on edge-cases, calculations, non-obvious dry runs, and deep-dive analytical reasoning based on the content.
-   - Format: "question" must contain ONLY the question query (maximum 40 words). "options" must have exactly 4 choices. "correctAnswer" is 0-3 index. "explanation" must be concise (maximum 50 words) and must contain the logical breakdown of why the correct option holds.
+   - Format: "question" must contain ONLY the question query. "options" must have exactly 4 choices (randomly placed correct answer). "correctAnswer" is 0-3 index. "explanation" must be detailed and contain the logical breakdown of why the correct option holds.
 
 2. "shortAnswers": Conceptual short answers explaining tricky details, structural logic, proofs, or operational mechanics directly from the document.
-   - Format: "question" is the conceptual question (maximum 30 words), "sampleAnswer" is a concise expert-grade sample response (maximum 50 words), "explanation" is the deeper analytical background/marking criteria (maximum 40 words).
+   - Format: "question" is the conceptual question, "sampleAnswer" is a detailed expert-grade sample response, "explanation" is the deeper analytical background/marking criteria.
 
 3. "longAnswers": Comprehensive and analytical long-answer questions requiring deep discussions, structural system/process flows, comparative analysis, mathematical derivations, or full proofs based on the document text.
-   - Format: "question" is the long-form analysis query (maximum 40 words), "sampleAnswer" is an in-depth, structured, multi-paragraph model answer (at least 3-4 clear, professional sentences, 100-150 words), "explanation" is the detailed grading guidelines, key scoring keywords, or architectural tips (maximum 60 words).
+   - Format: "question" is the long-form analysis query, "sampleAnswer" is an in-depth, structured, multi-paragraph model answer (at least 4-5 clear sentences, 100-200 words), "explanation" is the detailed grading guidelines, key scoring keywords, or architectural tips.
 
 4. "fillBlanks": Fill-in-the-blanks testing exact technical terms, critical variables, specific naming conventions, and fundamental constants/equations from the text.
-   - Format: "sentence" must contain exactly one "___" blank space representing the missing word (maximum 30 words). Do NOT leak the answer in the sentence. "answer" must contain the exact, precise term to fill the blank.
+   - Format: "sentence" must contain exactly one "___" blank space representing the missing word. Do NOT leak the answer in the sentence. "answer" must contain the exact, precise term to fill the blank.
 
 5. "trueFalse": Technical statement evaluations testing common misconceptions, boundaries of theorems, and edge cases.
-   - Format: "statement" must contain ONLY the technical statement to evaluate. It MUST be a single, concise sentence (maximum 25 words).
+   - Format: "statement" must contain ONLY the technical statement to evaluate. It MUST be a single, concise sentence.
    - CRITICAL WARNING: Under no circumstances should you include any explanation, proof, reasoning, or correct answer inside the "statement" field. Put the proof and reasoning ONLY in the "explanation" field.
-   - "isTrue" is a boolean. "explanation" is a concise explanation of why it is true or false (maximum 50 words).
+   - "isTrue" is a boolean. "explanation" is a concise explanation of why it is true or false.
 
 6. "codingSnippets": Advanced code tracing.
    - If (and ONLY if) the document is about computer science, databases, software engineering, or programming, provide code snippets (C++, Java, Python, or JS) or pseudocode.
    - Otherwise (if the PDF is math, science, history, etc.), this array MUST be an empty array [].
-   - Format: "question" is the tracing question, "code" is the snippet with newlines, "options" has exactly 4 choices, "correctAnswer" is 0-3 index, "explanation" is step-by-step trace analysis (maximum 50 words).
+   - Format: "question" is the tracing question, "code" is the snippet with newlines, "options" has exactly 4 choices, "correctAnswer" is 0-3 index, "explanation" is step-by-step trace analysis.
 
 Generate a JSON object with the following fields:
 - "title": String representing the quiz name.
 - "subject": String representing the subject category.
-- "mcqs": Array of EXACTLY 15 objects.
-- "shortAnswers": Array of EXACTLY 15 objects.
-- "longAnswers": Array of EXACTLY 15 objects.
-- "fillBlanks": Array of EXACTLY 15 objects.
-- "trueFalse": Array of EXACTLY 15 objects.
-- "codingSnippets": Array of EXACTLY 15 objects (OR empty array [] if non-coding document).
+- "mcqs": Array of 15-20 objects.
+- "shortAnswers": Array of 15-20 objects.
+- "longAnswers": Array of 15-20 objects.
+- "fillBlanks": Array of 15-20 objects.
+- "trueFalse": Array of 15-20 objects.
+- "codingSnippets": Array of 15-20 objects (OR empty array [] if non-coding document).
 
 CRITICAL MANDATES:
-- Maintain an EXTREMELY high difficulty ceiling (expert-level academic standard / senior OA standard). Avoid basic or simple trivia.
-- You MUST generate at least 15 items in each of the non-empty categories. Do not omit any categories. Keep all explanations and statements short and punchy. No repeating lines or text.`;
+- Maintain an EXTREMELY high difficulty ceiling (expert-level academic standard / senior placement standard). Avoid basic or simple trivia.
+- You MUST generate at least 15 items in each of the non-empty categories. Do not omit any categories.`;
 
     if (process.env.GEMINI_API_KEY) {
       try {
         let contentsPayload: any;
         if (pdfBase64) {
           const cleanBase64 = pdfBase64.includes(",") ? pdfBase64.split(",")[1] : pdfBase64;
-          const mergedPrompt = `${promptText}\n\nExtracted PDF Text Content for reference (ground truth):\n"""\n${notesText.slice(0, 150000)}\n"""`;
+          const mergedPrompt = `${promptText}\n\nExtracted PDF Text Content for reference (ground truth):\n"""\n${notesText.slice(0, 300000)}\n"""`;
           contentsPayload = {
             parts: [
               {
@@ -1003,7 +1037,7 @@ CRITICAL MANDATES:
           contentsPayload = {
             parts: [
               {
-                text: `${promptText}\n\nExtracted PDF Content:\n"""\n${notesText.slice(0, 150000)}\n"""`
+                text: `${promptText}\n\nExtracted PDF Content:\n"""\n${notesText.slice(0, 300000)}\n"""`
               }
             ]
           };
@@ -1017,13 +1051,13 @@ CRITICAL MANDATES:
           };
         }
 
-        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite model for complete grounded academic quiz");
+        console.log("[Gemini Engine] Querying STRICTLY gemini-2.5-flash-lite model for complete grounded academic quiz");
         const response: any = await generateContentWithFallback({
           contents: contentsPayload,
-          models: GEMINI_LOW_MODELS,
+          models: ["gemini-2.5-flash-lite"], // STRICTLY gemini-2.5-flash-lite ONLY
           config: {
             responseMimeType: "application/json",
-            maxOutputTokens: 16384,
+            maxOutputTokens: 8192,
             responseSchema: {
               type: Type.OBJECT,
               properties: {
@@ -1112,19 +1146,23 @@ CRITICAL MANDATES:
 
         const parsed = safeParseJSON(response?.text || "");
         if (parsed && (parsed.mcqs || parsed.shortAnswers || parsed.fillBlanks || parsed.trueFalse || parsed.codingSnippets || parsed.longAnswers)) {
+          // Shuffle MCQ and Coding Snippet options so correct answer is randomly distributed across (0, 1, 2, 3)
+          const shuffledMcqs = shuffleMcqOptions(parsed.mcqs || []);
+          const shuffledCoding = shuffleMcqOptions(parsed.codingSnippets || []);
+
           return res.json({
             title: parsed.title || `${docTitle.replace(/\.pdf$/i, "")} Ultimate Placement Assessment`,
-            subject: parsed.subject || "Software Engineering Placement Hub",
-            mcqs: parsed.mcqs || [],
+            subject: parsed.subject || "Academic & Placement Prep",
+            mcqs: shuffledMcqs,
             shortAnswers: parsed.shortAnswers || [],
             longAnswers: parsed.longAnswers || [],
             fillBlanks: parsed.fillBlanks || [],
             trueFalse: parsed.trueFalse || [],
-            codingSnippets: parsed.codingSnippets || []
+            codingSnippets: shuffledCoding
           });
         }
       } catch (geminiErr) {
-        console.warn("Gemini quiz generation error:", geminiErr);
+        console.warn("Gemini 2.5 flash-lite quiz generation error:", geminiErr);
       }
     }
 
@@ -1733,7 +1771,7 @@ CRITICAL MANDATES:
     const fallbackQuiz = {
       title: `${topicBase} - Grounded Practice Assessment`,
       subject: "Academic Practice Hub",
-      mcqs: mcqsList,
+      mcqs: shuffleMcqOptions(mcqsList),
       shortAnswers: shortAnswersList,
       longAnswers: longAnswersList,
       fillBlanks: fillBlanksList,

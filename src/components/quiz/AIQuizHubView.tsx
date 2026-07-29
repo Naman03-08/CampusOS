@@ -37,7 +37,8 @@ async function extractPdfTextClient(file: File): Promise<string> {
     const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
     const pdf = await loadingTask.promise;
     let fullText = '';
-    for (let i = 1; i <= Math.min(pdf.numPages, 30); i++) {
+    // Read every single page of the PDF document completely
+    for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
       const pageStrings = textContent.items
@@ -202,19 +203,19 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
 
     setError(null);
     setIsLoading(true);
-    setLoadingStep('Parsing PDF pages and extracting text...');
+    setLoadingStep('Reading complete PDF document from first page to last...');
 
     try {
       let payloadNotes = rawText;
       if (activeInputMode === 'upload' && selectedFile) {
-        setLoadingStep('Extracting complete text content from PDF page by page...');
+        setLoadingStep('Extracting complete text content from all PDF pages...');
         const pdfText = await extractPdfTextClient(selectedFile);
         if (pdfText) {
           payloadNotes = pdfText;
         }
       }
 
-      setLoadingStep('Formulating high-yield MCQs, coding tracing, short answers, fill-in-blanks & True/False with Placivo AI...');
+      setLoadingStep('Analyzing document with Gemini 2.5 Flash-Lite & generating 15-20 randomized questions per category...');
 
       const response = await fetch('/api/ai/quiz-generator', {
         method: 'POST',
