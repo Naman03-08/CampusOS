@@ -36,6 +36,7 @@ import { AdminPanelView } from './components/admin/AdminPanelView';
 import { UpgradePlansView } from './components/pricing/UpgradePlansView';
 import { UpgradePromptModal } from './components/common/UpgradePromptModal';
 import { CertificateVerificationModal } from './components/courses/CertificateVerificationModal';
+import { TermsModal } from './components/common/TermsModal';
 
 import { StorageService, getZeroAttendance, getZeroDSA, getZeroResume } from './lib/storage';
 import { FirestoreService } from './lib/firestoreService';
@@ -56,6 +57,13 @@ export function App() {
   });
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
+  const [termsTab, setTermsTab] = useState<'terms' | 'privacy'>('terms');
+
+  const handleOpenTerms = (tab: 'terms' | 'privacy' = 'terms') => {
+    setTermsTab(tab);
+    setShowTermsModal(true);
+  };
 
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
@@ -654,7 +662,7 @@ export function App() {
             <FAQ />
           </main>
 
-          <FooterLanding />
+          <FooterLanding onOpenTerms={handleOpenTerms} />
         </div>
       ) : (
         /* VIEWMODE 2: APP WORKSPACE PORTAL (If logged in) */
@@ -836,6 +844,7 @@ export function App() {
                   user={user} 
                   onSaveProfile={handleUpdateProfile}
                   onNavigateTab={setActiveTab}
+                  onOpenTerms={handleOpenTerms}
                 />
               )}
 
@@ -853,6 +862,7 @@ export function App() {
         initialMode={authMode}
         onClose={() => setShowAuthModal(false)}
         onSuccess={handleAuthSuccess}
+        onOpenTerms={handleOpenTerms}
       />
 
       {/* Feature Upgrade & Free Trial Prompt Modal */}
@@ -870,6 +880,13 @@ export function App() {
         isOpen={showGlobalCertModal}
         onClose={() => setShowGlobalCertModal(false)}
         certificateId={globalVerifyCertId}
+      />
+
+      {/* Terms & Conditions / Privacy Policy Modal */}
+      <TermsModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+        initialTab={termsTab}
       />
     </div>
   );

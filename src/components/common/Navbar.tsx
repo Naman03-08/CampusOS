@@ -26,7 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <img 
             src={placivoAILogo} 
             alt="Placivo AI" 
-            className="h-9 sm:h-10 w-auto object-contain group-hover:scale-105 transition-transform" 
+            className="h-9 sm:h-10 w-auto object-contain rounded-xl overflow-hidden group-hover:scale-105 transition-transform" 
           />
         </div>
 

@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={() => onSelectTab('dashboard')}
           className="flex items-center gap-2.5 px-3 py-2.5 mb-5 bg-white/80 backdrop-blur-md border border-white/90 rounded-2xl shadow-3d-sm cursor-pointer hover:bg-white transition-all"
         >
-          <img src={placivoAILogo} alt="Placivo AI" className="h-9 w-auto object-contain shrink-0" />
+          <img src={placivoAILogo} alt="Placivo AI" className="h-9 w-auto object-contain shrink-0 rounded-xl overflow-hidden" />
         </div>
 
         {/* Nav list */}

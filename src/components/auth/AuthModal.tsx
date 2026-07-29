@@ -12,6 +12,7 @@ interface AuthModalProps {
   initialMode: 'login' | 'register';
   onClose: () => void;
   onSuccess: (user: UserProfile) => void;
+  onOpenTerms?: (tab?: 'terms' | 'privacy') => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -19,6 +20,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   initialMode,
   onClose,
   onSuccess,
+  onOpenTerms,
 }) => {
   const [mode, setMode] = useState<'login' | 'register' | 'forgot' | 'google-onboarding'>(initialMode);
   const [accountType, setAccountType] = useState<'general' | 'student'>('student');
@@ -1087,6 +1089,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </>
               )}
             </button>
+
+            {/* Terms and Privacy disclaimer note */}
+            <p className="mt-3 text-[10px] text-center text-slate-400 leading-normal">
+              By continuing, you agree to Placivo AI's{' '}
+              <button
+                type="button"
+                onClick={() => onOpenTerms?.('terms')}
+                className="font-semibold text-blue-600 hover:underline cursor-pointer"
+              >
+                Terms & Conditions
+              </button>{' '}
+              and{' '}
+              <button
+                type="button"
+                onClick={() => onOpenTerms?.('privacy')}
+                className="font-semibold text-purple-600 hover:underline cursor-pointer"
+              >
+                Privacy Policy
+              </button>.
+            </p>
           </form>
         )}
           </div>

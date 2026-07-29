@@ -1,15 +1,19 @@
 import React from 'react';
-import { Heart, ShieldCheck } from 'lucide-react';
+import { Heart, ShieldCheck, FileText, Lock } from 'lucide-react';
 import placivoAILogo from '../placivoAI.png';
 
-export const FooterLanding: React.FC = () => {
+interface FooterLandingProps {
+  onOpenTerms?: (tab?: 'terms' | 'privacy') => void;
+}
+
+export const FooterLanding: React.FC<FooterLandingProps> = ({ onOpenTerms }) => {
   return (
     <footer className="bg-gradient-to-b from-purple-50/60 to-purple-100/80 text-slate-600 py-16 border-t border-purple-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-purple-200/60">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <img src={placivoAILogo} alt="Placivo AI" className="h-10 w-auto object-contain" />
+              <img src={placivoAILogo} alt="Placivo AI" className="h-10 w-auto object-contain rounded-xl overflow-hidden" />
             </div>
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
               The AI Operating System for College Students. Empowering academic excellence and campus placements worldwide.
@@ -42,19 +46,52 @@ export const FooterLanding: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">Security & Privacy</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">Security & Legal</h4>
             <p className="text-xs text-slate-600 leading-relaxed mb-3">
               Protected by Firebase Auth, Firestore security rules, and server-side AI encryption.
             </p>
-            <div className="flex items-center gap-2 text-xs text-purple-900 font-bold">
-              <ShieldCheck className="w-4 h-4 text-purple-600" />
-              <span>100% Privacy Compliant</span>
+            <div className="space-y-2">
+              <button 
+                onClick={() => onOpenTerms?.('terms')}
+                className="w-full flex items-center justify-between text-xs text-blue-700 bg-white/80 hover:bg-white px-3 py-2 rounded-xl border border-blue-200 font-bold transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
+              >
+                <span className="flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-blue-600" />
+                  Terms & Conditions
+                </span>
+                <span className="text-[10px] text-blue-500 font-normal group-hover:translate-x-0.5 transition-transform">Read →</span>
+              </button>
+
+              <button 
+                onClick={() => onOpenTerms?.('privacy')}
+                className="w-full flex items-center justify-between text-xs text-purple-700 bg-white/80 hover:bg-white px-3 py-2 rounded-xl border border-purple-200 font-bold transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
+              >
+                <span className="flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-purple-600" />
+                  Privacy Policy
+                </span>
+                <span className="text-[10px] text-purple-500 font-normal group-hover:translate-x-0.5 transition-transform">Read →</span>
+              </button>
             </div>
           </div>
         </div>
 
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© {new Date().getFullYear()} Placivo AI Inc. All rights reserved.</p>
+          <div className="flex items-center gap-4 flex-wrap">
+            <p>© {new Date().getFullYear()} Placivo AI Inc. All rights reserved.</p>
+            <button 
+              onClick={() => onOpenTerms?.('terms')}
+              className="text-slate-600 hover:text-blue-600 font-semibold underline underline-offset-2 transition-colors cursor-pointer"
+            >
+              Terms & Conditions
+            </button>
+            <button 
+              onClick={() => onOpenTerms?.('privacy')}
+              className="text-slate-600 hover:text-purple-600 font-semibold underline underline-offset-2 transition-colors cursor-pointer"
+            >
+              Privacy Policy
+            </button>
+          </div>
           <p className="flex items-center gap-1 font-medium">
             Built with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" /> for students globally.
           </p>
@@ -63,3 +100,4 @@ export const FooterLanding: React.FC = () => {
     </footer>
   );
 };
+

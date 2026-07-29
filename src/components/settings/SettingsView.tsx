@@ -11,9 +11,10 @@ interface SettingsViewProps {
   user: UserProfile;
   onSaveProfile: (profile: UserProfile) => void;
   onNavigateTab?: (tab: string) => void;
+  onOpenTerms?: (tab?: 'terms' | 'privacy') => void;
 }
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile, onNavigateTab }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile, onNavigateTab, onOpenTerms }) => {
   const [profile, setProfile] = useState<UserProfile>(user);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
@@ -585,6 +586,36 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
               <ShieldCheck className="w-4 h-4 text-blue-600" /> Firestore & Local Backup Operational
             </p>
             <p className="text-slate-600">All user study suites, DSA progress & attendance records are stored with isolation.</p>
+          </div>
+        </div>
+
+        {/* Legal & Compliance Section */}
+        <div className="pt-4 border-t border-slate-200 space-y-3">
+          <h2 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-purple-600" /> Legal, Terms & Privacy Policy
+          </h2>
+
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div>
+              <p className="font-bold text-slate-900">Placivo AI Terms & Privacy Policies</p>
+              <p className="text-slate-500 mt-0.5">Review our terms of service, acceptable use, and student data protection standards.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => onOpenTerms?.('terms')}
+                className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-blue-700 font-bold transition-all shadow-2xs"
+              >
+                Terms & Conditions
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenTerms?.('privacy')}
+                className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-purple-700 font-bold transition-all shadow-2xs"
+              >
+                Privacy Policy
+              </button>
+            </div>
           </div>
         </div>
 
