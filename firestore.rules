@@ -81,8 +81,18 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
-    // Leaderboard
-    match /leaderboard/{docId} {
+    // Global Bounties
+    match /global_bounties/{docId} {
+      allow read, write: if true;
+    }
+
+    // Bounty Submissions
+    match /bounty_submissions/{docId} {
+      allow read, write: if true;
+    }
+
+    // Fallback rule for all other collections
+    match /{document=**} {
       allow read, write: if true;
     }
   }
