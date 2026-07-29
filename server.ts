@@ -485,81 +485,11 @@ ${documentContext ? `Document Context:\n"""${documentContext}"""` : ""}`;
   }
 });
 
-// 3. Assignment Solver Route
-app.post("/api/ai/assignment-solver", async (req, res) => {
-  try {
-    const { title, subject, questionText, problemText } = req.body;
-    const queryText = problemText || questionText || title || "Academic Problem";
-
-    const prompt = `Solve this college assignment step-by-step with rigorous academic quality.
-Title: ${title || "Assignment"}
-Subject: ${subject || "Engineering"}
-Question:
-"""
-${queryText}
-"""
-
-Provide output in JSON format with:
-- "solutionMarkdown": Complete step-by-step solution in formatted Markdown.
-- "explanation": Intuitive plain-English breakdown of why this solution works.
-- "references": Array of 2-3 standard textbook / academic reference citations.`;
-
-    if (process.env.GEMINI_API_KEY) {
-      try {
-        const response = await generateContentWithFallback({
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                solutionMarkdown: { type: Type.STRING },
-                explanation: { type: Type.STRING },
-                references: { type: Type.ARRAY, items: { type: Type.STRING } },
-              },
-            },
-          },
-        });
-        const rawText = (response.text || "").replace(/```json/g, "").replace(/```/g, "").trim();
-        const parsed = JSON.parse(rawText || "{}");
-        if (parsed.solutionMarkdown) {
-          return res.json({
-            ...parsed,
-            stepByStepSolution: parsed.solutionMarkdown,
-          });
-        }
-      } catch (geminiErr) {
-        console.error("Gemini assignment solver error:", geminiErr);
-      }
-    }
-
-    const fallbackSolution = `### Step-by-Step Academic Solution
-
-#### Problem Query
-*${queryText}* (Subject: **${subject || "Computer Science"}**)
-
-#### Step 1: Theoretical Analysis & Setup
-Identify the fundamental physical or computational laws governing this problem:
-1. Define boundary conditions and constraints.
-2. Formulate state transition functions or equations.
-
-#### Step 2: Rigorous Execution & Mathematical Derivation
-Applying the core algorithm/formula:
-$$\\text{Optimal Value} = \\lim_{n \\to \\infty} \\sum_{i=1}^n \\frac{f(x_i)}{n} = \\text{Verified Constant}$$
-
-#### Step 3: Result & Verification
-The step-by-step procedure verifies the correctness under all standard university exam criteria.`;
-
-    return res.json({
-      solutionMarkdown: fallbackSolution,
-      stepByStepSolution: fallbackSolution,
-      explanation: "This solution decomposes the query into logical sub-steps and applies standard university course formulas.",
-      references: ["Silberschatz, Galvin - Operating System Concepts (10th Ed.)", "Cormen et al. - Introduction to Algorithms (CLRS 4th Ed.)"],
-    });
-  } catch (err: any) {
-    console.error("Error in assignment solver:", err);
-    res.status(500).json({ error: err.message });
-  }
+// 3. Assignment Solver Route (Feature & AI Usage Disabled)
+app.post("/api/ai/assignment-solver", async (_req, res) => {
+  return res.status(403).json({
+    error: "AI Assignment Solver feature has been disabled and AI model usage is blocked."
+  });
 });
 
 // 4. Resume Evaluator Route (Support both aliases)
@@ -623,73 +553,11 @@ Provide JSON output with:
   }
 });
 
-// 5. AI Mock Interview Evaluator Route (Support both aliases)
-app.post(["/api/ai/mock-interview", "/api/ai/mock-interview/evaluate"], async (req, res) => {
-  try {
-    const { role, targetRole, topic, question, userAnswer, userAnswerText } = req.body;
-
-    const r = role || targetRole || "Software Engineer";
-    const q = question || "Explain how LRU Cache is implemented.";
-    const ans = userAnswer || userAnswerText || "I use a Hash Map combined with a Doubly-LinkedList.";
-
-    const prompt = `You are a Lead Hiring Manager evaluating a candidate's mock interview response.
-Target Role: ${r}
-Topic: ${topic || "Technical Interview"}
-Question: "${q}"
-Candidate Answer: "${ans}"
-
-Evaluate in JSON:
-- "technicalScore": Integer 0-100
-- "communicationScore": Integer 0-100
-- "confidenceScore": Integer 0-100
-- "overallScore": Integer 0-100
-- "strengths": Array of 2 strengths
-- "weaknesses": Array of 2 weaknesses
-- "improvedAnswer": A polished, 10/10 model candidate response.`;
-
-    if (process.env.GEMINI_API_KEY) {
-      try {
-        const response = await generateContentWithFallback({
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                technicalScore: { type: Type.INTEGER },
-                communicationScore: { type: Type.INTEGER },
-                confidenceScore: { type: Type.INTEGER },
-                overallScore: { type: Type.INTEGER },
-                strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
-                weaknesses: { type: Type.ARRAY, items: { type: Type.STRING } },
-                improvedAnswer: { type: Type.STRING },
-              },
-            },
-          },
-        });
-        const rawText = (response.text || "").replace(/```json/g, "").replace(/```/g, "").trim();
-        const parsed = JSON.parse(rawText || "{}");
-        if (parsed.overallScore !== undefined) {
-          return res.json(parsed);
-        }
-      } catch (geminiErr) {
-        console.error("Gemini mock interview error:", geminiErr);
-      }
-    }
-
-    return res.json({
-      technicalScore: 92,
-      communicationScore: 88,
-      confidenceScore: 90,
-      overallScore: 90,
-      strengths: ["Identified core data structures correctly", "Clear, logical structure"],
-      weaknesses: ["Could elaborate further on edge cases and thread safety"],
-      improvedAnswer: `When asked "${q}", I begin by explaining the O(1) performance guarantees. We combine a Hash Map for O(1) key lookups with a Doubly Linked List to maintain eviction order. When accessing or adding an item, we move or insert the node at the head. On capacity limit, we evict the tail node in O(1) time.`,
-    });
-  } catch (err: any) {
-    console.error("Mock interview error:", err);
-    res.status(500).json({ error: err.message });
-  }
+// 5. AI Mock Interview Evaluator Route (Feature & AI Usage Disabled)
+app.post(["/api/ai/mock-interview", "/api/ai/mock-interview/evaluate"], async (_req, res) => {
+  return res.status(403).json({
+    error: "AI Mock Interviewer feature has been disabled and AI model usage is blocked."
+  });
 });
 
 // Helper to count total words in summary object
@@ -2509,309 +2377,28 @@ Naman Pandey (naman03mgs@gmail.com)`;
 });
 
 // ============================================================================
-// NOTEBOOK LM API ENDPOINTS (NotebookLM RAG Chat, Audio Overview, Studio Artifacts)
+// NOTEBOOK LM API ENDPOINTS (Disabled & AI Model Usage Blocked)
 // ============================================================================
 
-// 8. NotebookLM Source Chat (Grounding & Citations)
-app.post("/api/notebook/chat", async (req, res) => {
-  try {
-    const { question, sources } = req.body;
-    const userQuery = (question || "").trim();
-    const sourceTexts = Array.isArray(sources)
-      ? sources.map((s: any) => `[Source: ${s.name || 'Document'}]\n${s.extractedText || s.content || ''}`).join("\n\n---\n\n")
-      : "";
-
-    if (process.env.GEMINI_API_KEY) {
-      try {
-        const prompt = `You are NotebookLM AI Study Assistant. Answer the student's question based strictly on the provided sources below.
-Cite specific sources using brackets like [Source: filename] when stating facts.
-If the source does not contain the answer, provide a helpful answer based on computer science/academic principles while explicitly noting which parts were derived from general knowledge.
-
-Student Question: "${userQuery}"
-
-Selected Sources:
-${sourceTexts || "No source text attached. Answer based on academic CS domain."}`;
-
-        const resp = await generateContentWithFallback({
-          contents: prompt,
-          config: {
-            temperature: 0.4,
-            maxOutputTokens: 1200,
-          },
-        });
-
-        if (resp.text) {
-          return res.json({
-            answer: resp.text,
-            sourcesUsed: Array.isArray(sources) ? sources.map((s: any) => s.name) : [],
-          });
-        }
-      } catch (geminiErr) {
-        console.warn("NotebookLM chat Gemini error, using fallback:", geminiErr);
-      }
-    }
-
-    // High quality fallback
-    const fallbackAnswer = `Based on your selected sources (${Array.isArray(sources) && sources.length > 0 ? sources.map(s => s.name).join(', ') : 'Notebook Sources'}):
-
-**Key Answer & Insights**:
-Regarding **"${userQuery}"**, the sources highlight the following core concepts:
-
-1. **Foundational Mechanism**: The primary mechanism relies on deterministic operational flow, reducing latency while preserving data invariants. [Source: ${Array.isArray(sources) && sources[0]?.name ? sources[0].name : 'Primary Source'}]
-2. **Trade-offs & Constraints**: Memory footprint and time complexity are balanced through algorithmic structure ($O(N \\log N)$ bounds).
-3. **Exam & Practical Relevance**: Ensure you remember key edge cases (e.g. empty inputs or boundary faults) during midterms.
-
-*Cited from selected notebook sources.*`;
-
-    return res.json({
-      answer: fallbackAnswer,
-      sourcesUsed: Array.isArray(sources) ? sources.map((s: any) => s.name) : []
-    });
-  } catch (err: any) {
-    console.error("NotebookLM chat error:", err);
-    res.status(500).json({ error: err.message || "Failed to process notebook chat" });
-  }
+// 8. NotebookLM Source Chat (Disabled)
+app.post("/api/notebook/chat", async (_req, res) => {
+  return res.status(403).json({
+    error: "NotebookLM AI Features have been disabled and AI model usage is blocked."
+  });
 });
 
-// 9. NotebookLM Audio Overview (Deep Dive Podcast Generator)
-app.post("/api/notebook/audio-overview", async (req, res) => {
-  try {
-    const { title, sources } = req.body;
-    const topicTitle = (title || "Notebook Study Material").trim();
-    const CombinedContent = Array.isArray(sources)
-      ? sources.map((s: any) => s.extractedText || s.content || '').join("\n")
-      : "";
-
-    if (process.env.GEMINI_API_KEY) {
-      try {
-        const prompt = `Generate a natural, engaging, 2-person "Deep Dive Podcast" discussion (Host A named Rachel - curious & analytical, Host B named David - expert & enthusiastic teacher) analyzing and discussing the notebook material below.
-
-Topic: "${topicTitle}"
-Content: ${CombinedContent.slice(0, 4000) || topicTitle}
-
-Return a JSON object with keys:
-"title": string (e.g. "Deep Dive: ${topicTitle}"),
-"durationMinutes": number (e.g. 5),
-"summary": string (a 2-sentence overview of what the podcast covers),
-"dialogue": array of objects with keys:
-  "speaker": "Host A (Rachel)" or "Host B (David)",
-  "text": string (conversational dialogue line),
-  "timestamp": string (e.g. "0:15")`;
-
-        const resp = await generateContentWithFallback({
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json",
-            temperature: 0.7,
-            maxOutputTokens: 2000,
-          }
-        });
-
-        const raw = (resp.text || "").replace(/```json/g, "").replace(/```/g, "").trim();
-        const parsed = JSON.parse(raw);
-        if (parsed && parsed.dialogue) {
-          return res.json(parsed);
-        }
-      } catch (geminiErr) {
-        console.warn("NotebookLM audio overview Gemini error, using fallback:", geminiErr);
-      }
-    }
-
-    // High quality podcast fallback
-    const fallbackPodcast = {
-      title: `Deep Dive: ${topicTitle}`,
-      durationMinutes: 4,
-      summary: `In this audio overview, Rachel and David unpack the core concepts of ${topicTitle}, covering key mechanisms, exam traps, and real-world applications.`,
-      dialogue: [
-        {
-          speaker: "Host A (Rachel)",
-          text: `Welcome back to NotebookLM Deep Dive! Today we're tackling an awesome topic from your notes: ${topicTitle}. David, where should a student start when studying this?`,
-          timestamp: "0:05"
-        },
-        {
-          speaker: "Host B (David)",
-          text: `Thanks Rachel! The most important thing to grasp first is the fundamental model. In ${topicTitle}, everything revolves around balancing efficiency with correctness. If you get that core idea, the rest falls into place.`,
-          timestamp: "0:22"
-        },
-        {
-          speaker: "Host A (Rachel)",
-          text: `That makes total sense! Looking through the source document, there's a heavy emphasis on complexity and edge cases. What's the biggest trap students fall into during exams?`,
-          timestamp: "0:45"
-        },
-        {
-          speaker: "Host B (David)",
-          text: `Great question! The number one mistake is confusing average-case execution with worst-case boundary conditions. Professors love asking about edge cases like zero inputs or page faults in viva exams!`,
-          timestamp: "1:15"
-        },
-        {
-          speaker: "Host A (Rachel)",
-          text: `So for active recall: memorize the key definitions, practice 2-3 numerical derivations, and review the flashcard deck in your Notebook Studio!`,
-          timestamp: "1:50"
-        },
-        {
-          speaker: "Host B (David)",
-          text: `Exactly! You'll be 100% exam-ready in no time. Happy studying!`,
-          timestamp: "2:15"
-        }
-      ]
-    };
-
-    return res.json(fallbackPodcast);
-  } catch (err: any) {
-    console.error("NotebookLM audio overview error:", err);
-    res.status(500).json({ error: err.message || "Failed to generate audio overview" });
-  }
+// 9. NotebookLM Audio Overview (Disabled)
+app.post("/api/notebook/audio-overview", async (_req, res) => {
+  return res.status(403).json({
+    error: "NotebookLM AI Features have been disabled and AI model usage is blocked."
+  });
 });
 
-// 10. NotebookLM Studio Artifact Generator (Study Guide, FAQ, Briefing Doc, Timeline, Concept Map)
-app.post("/api/notebook/studio-artifact", async (req, res) => {
-  try {
-    const { artifactType, title, sources } = req.body;
-    const type = (artifactType || "study_guide").toLowerCase();
-    const topicTitle = (title || "Notebook Material").trim();
-    const CombinedContent = Array.isArray(sources)
-      ? sources.map((s: any) => s.extractedText || s.content || '').join("\n")
-      : "";
-
-    if (process.env.GEMINI_API_KEY) {
-      try {
-        const prompt = `Generate a structured NotebookLM "${type}" artifact for the material below.
-
-Type: ${type} (Options: study_guide, briefing_doc, faq, timeline, concept_outline)
-Topic: "${topicTitle}"
-Content: ${CombinedContent.slice(0, 4000) || topicTitle}
-
-Return a JSON object with keys:
-"title": string,
-"artifactType": string,
-"contentMarkdown": string (formatted in markdown with clear headings, bullet points, and tables where helpful),
-"sections": array of objects with keys "heading" (string) and "body" (string)`;
-
-        const resp = await generateContentWithFallback({
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json",
-            temperature: 0.5,
-            maxOutputTokens: 2000,
-          }
-        });
-
-        const raw = (resp.text || "").replace(/```json/g, "").replace(/```/g, "").trim();
-        const parsed = JSON.parse(raw);
-        if (parsed && parsed.contentMarkdown) {
-          return res.json(parsed);
-        }
-      } catch (geminiErr) {
-        console.warn("NotebookLM studio artifact Gemini error, using fallback:", geminiErr);
-      }
-    }
-
-    // High quality fallback artifact based on type
-    let markdown = "";
-    let sections = [];
-
-    if (type === "faq") {
-      markdown = `### Frequently Asked Questions (FAQ) - ${topicTitle}
-
-#### Q1: What is the primary purpose of ${topicTitle}?
-**Answer**: It establishes a systematic framework for processing and organizing domain operations, ensuring optimal performance and predictable outcomes.
-
-#### Q2: What are the main components involved?
-**Answer**:
-1. **Core Data Structures**: Arrays, tables, or heaps storing state transitions.
-2. **Control Logic**: Algorithms governing state updates and invariant enforcement.
-3. **Error Handling**: Trap mechanisms dealing with edge cases and missing resources.
-
-#### Q3: How do time and space complexities compare?
-**Answer**: Typical implementations achieve $O(N \\log N)$ time efficiency with $O(N)$ auxiliary space for tracking state.`;
-
-      sections = [
-        { heading: "Primary Purpose", body: "Establishes a systematic framework for processing." },
-        { heading: "Key Components", body: "Data structures, control logic, and trap mechanisms." },
-        { heading: "Complexity Bounds", body: "O(N log N) time and O(N) space." }
-      ];
-    } else if (type === "briefing_doc") {
-      markdown = `### Executive Briefing Memo: ${topicTitle}
-
-**To**: Academic Course Coordinator & Students
-**From**: NotebookLM AI Analysis
-**Subject**: Comprehensive Briefing on ${topicTitle}
-
----
-
-#### 1. Executive Summary
-This document provides a high-level briefing on ${topicTitle}. The subject matter is critical for university coursework, semester examinations, and practical implementations.
-
-#### 2. Strategic Takeaways
-- **Efficiency**: Reduces operational overhead through optimized algorithmic structures.
-- **Reliability**: Eliminates data corruption by enforcing invariant constraints.
-- **Scalability**: Tested up to large-scale concurrent execution environments.
-
-#### 3. Recommended Next Steps
-- Review key terminology definitions.
-- Practice 2-3 numerical problem derivations.
-- Complete the active recall flashcard deck.`;
-
-      sections = [
-        { heading: "Executive Summary", body: "High-level briefing for academic review." },
-        { heading: "Strategic Takeaways", body: "Efficiency, reliability, and scalability benefits." }
-      ];
-    } else if (type === "timeline") {
-      markdown = `### Step-by-Step Chronology & Execution Flow: ${topicTitle}
-
-1. **Phase 1: Source Material Initialization (Time T0)**
-   - Parse input files and validate structural invariants.
-   - Initialize distance arrays, buffers, and state pointers.
-
-2. **Phase 2: Core Processing Loop (Time T1 - T2)**
-   - Execute main algorithmic loop.
-   - Resolve page faults, updates, or graph traversals step-by-step.
-
-3. **Phase 3: Verification & Output (Time T3)**
-   - Validate state integrity against expected invariants.
-   - Return formatted output or persistent storage records.`;
-
-      sections = [
-        { heading: "Phase 1: Initialization", body: "Parse inputs and set up memory structures." },
-        { heading: "Phase 2: Core Processing", body: "Execute main algorithm and resolve exceptions." },
-        { heading: "Phase 3: Output", body: "Verify state integrity and output final results." }
-      ];
-    } else {
-      // Default: Study Guide
-      markdown = `### Comprehensive Study Guide: ${topicTitle}
-
-#### 1. Overview & Learning Objectives
-By studying this module, students will understand:
-- The fundamental principles underlying ${topicTitle}.
-- Mathematical proofs and algorithmic derivations.
-- How to solve university exam questions efficiently.
-
-#### 2. Key Terminology Glossary
-- **Invariant**: A condition that holds true throughout program execution.
-- **Page Fault / Exception**: A hardware trap triggered when requested resources are absent.
-- **Asymptotic Bound**: Mathematical upper/lower limits on algorithmic growth.
-
-#### 3. Practice Viva & Exam Questions
-1. *Define the main trade-offs in ${topicTitle}.*
-2. *Derive the time complexity recurrence relation.*`;
-
-      sections = [
-        { heading: "Overview", body: "Core objectives and domain fundamentals." },
-        { heading: "Glossary", body: "Essential terminology definitions." },
-        { heading: "Exam Prep", body: "Practice questions and viva topics." }
-      ];
-    }
-
-    return res.json({
-      title: `${type.toUpperCase().replace('_', ' ')}: ${topicTitle}`,
-      artifactType: type,
-      contentMarkdown: markdown,
-      sections
-    });
-  } catch (err: any) {
-    console.error("NotebookLM studio artifact error:", err);
-    res.status(500).json({ error: err.message || "Failed to generate studio artifact" });
-  }
+// 10. NotebookLM Studio Artifact Generator (Disabled)
+app.post("/api/notebook/studio-artifact", async (_req, res) => {
+  return res.status(403).json({
+    error: "NotebookLM AI Features have been disabled and AI model usage is blocked."
+  });
 });
 
 // Helper to auto-correct and sanitize SMTP Configuration
