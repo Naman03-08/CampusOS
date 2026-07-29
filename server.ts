@@ -62,29 +62,37 @@ app.post("/api/auth/send-reset-otp", async (req, res) => {
     let emailSent = false;
     let emailPreviewUrl: string | undefined = undefined;
 
-    if (process.env.SMTP_HOST && process.env.SMTP_USER) {
+    const smtpHost = process.env.SMTP_HOST?.trim();
+    const smtpUser = process.env.SMTP_USER?.trim();
+    const smtpPass = process.env.SMTP_PASS?.trim();
+    const isConfiguredSmtp = Boolean(smtpHost && smtpUser && smtpPass && smtpHost !== "smtp.example.com");
+
+    if (isConfiguredSmtp) {
       try {
         const port = Number(process.env.SMTP_PORT || 587);
-        // If SMTP_SECURE is explicitly set, use it; otherwise auto-detect based on port (465 is secure SSL, 587/25 use STARTTLS)
+        // Direct SSL on port 465; STARTTLS on 587 or 25
         const isSecure = process.env.SMTP_SECURE !== undefined
           ? process.env.SMTP_SECURE === 'true'
           : port === 465;
 
         const transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST,
+          host: smtpHost,
           port,
           secure: isSecure,
+          requireTLS: !isSecure && (port === 587 || port === 25),
           auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
+            user: smtpUser,
+            pass: smtpPass,
           },
           tls: {
             rejectUnauthorized: false
-          }
+          },
+          connectionTimeout: 5000,
+          greetingTimeout: 5000,
         });
 
         await transporter.sendMail({
-          from: `"Placivo Security Team" <${process.env.SMTP_USER}>`,
+          from: `"Placivo Security Team" <${smtpUser}>`,
           to: cleanEmail,
           subject: "Placivo AI - Student Account Password Reset OTP",
           html: `
@@ -102,9 +110,9 @@ app.post("/api/auth/send-reset-otp", async (req, res) => {
           `,
         });
         emailSent = true;
-        console.log(`[AUTH OTP] Successfully sent OTP email via SMTP to ${cleanEmail}`);
+        console.log(`[AUTH OTP] Successfully sent OTP email via custom SMTP to ${cleanEmail}`);
       } catch (emailErr: any) {
-        console.warn(`[AUTH OTP] Custom SMTP send notice: ${emailErr?.message || emailErr}`);
+        console.log(`[AUTH OTP] Custom SMTP notice (${emailErr?.message || 'Handshake issue'}). Seamlessly switching to Ethereal Test Email fallback.`);
       }
     }
 
