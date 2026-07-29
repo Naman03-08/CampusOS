@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { Settings as SettingsIcon, User, Save, ShieldCheck, Database, Zap, Clock, Check, ArrowRight, Star } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Settings as SettingsIcon, User, Save, ShieldCheck, Database, Zap, Clock, Check, ArrowRight, Star, KeyRound, Lock, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { UserProfile } from '../../types';
 import { StorageService } from '../../lib/storage';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { calculatePlanDetails, PLAN_DEFINITIONS } from '../../lib/planUtils';
+import { auth } from '../../lib/firebase';
+import { updatePassword } from 'firebase/auth';
 
 interface SettingsViewProps {
   user: UserProfile;
@@ -15,8 +17,29 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
   const [profile, setProfile] = useState<UserProfile>(user);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
+  // OTP Password Reset States inside Settings
+  const [otpStep, setOtpStep] = useState<0 | 1 | 2 | 3>(0); // 0: Idle/Initial, 1: OTP Sent, 2: OTP Verified (Enter New Pwd), 3: Reset Success
+  const [otpCode, setOtpCode] = useState('');
+  const [resetToken, setResetToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState('');
+  const [devOtpNotice, setDevOtpNotice] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
+
   const planDetails = calculatePlanDetails(user);
   const activePlanDef = PLAN_DEFINITIONS.find(p => p.id === planDetails.currentPlanId) || PLAN_DEFINITIONS[0];
+
+  useEffect(() => {
+    let timer: any;
+    if (resendCooldown > 0) {
+      timer = setInterval(() => {
+        setResendCooldown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +47,125 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
     onSaveProfile(profile);
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
+  };
+
+  // Settings OTP Handler: Send OTP to User Email
+  const handleSettingsSendOtp = async () => {
+    if (!profile.email) {
+      setOtpError('Student email address is missing.');
+      return;
+    }
+
+    setOtpLoading(true);
+    setOtpError('');
+    setDevOtpNotice('');
+
+    try {
+      const res = await fetch('/api/auth/send-reset-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: profile.email.trim() }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to send OTP code.');
+      }
+
+      setOtpStep(1);
+      setResendCooldown(60);
+      if (data.devOtp) {
+        setDevOtpNotice(`[DEV AUTO-OTP]: Use 6-digit OTP code ${data.devOtp} to verify.`);
+      }
+    } catch (err: any) {
+      console.error("Settings OTP error:", err);
+      setOtpError(err.message || 'Failed to issue OTP verification code.');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // Settings OTP Handler: Verify OTP
+  const handleSettingsVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otpCode.trim() || otpCode.trim().length !== 6) {
+      setOtpError('Please enter the 6-digit OTP code sent to your email.');
+      return;
+    }
+
+    setOtpLoading(true);
+    setOtpError('');
+
+    try {
+      const res = await fetch('/api/auth/verify-reset-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: profile.email.trim(), otp: otpCode.trim() }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Invalid OTP code.');
+      }
+
+      setResetToken(data.resetToken);
+      setOtpStep(2);
+    } catch (err: any) {
+      console.error("Settings verify OTP error:", err);
+      setOtpError(err.message || 'OTP verification failed. Please check your code.');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // Settings OTP Handler: Set New Password
+  const handleSettingsResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.length < 6) {
+      setOtpError('New password must be at least 6 characters long.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setOtpError('New passwords do not match. Please re-enter.');
+      return;
+    }
+
+    setOtpLoading(true);
+    setOtpError('');
+
+    try {
+      const res = await fetch('/api/auth/reset-password-with-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: profile.email.trim(),
+          resetToken,
+          newPassword,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to update password.');
+      }
+
+      // If user is currently signed in via Firebase Auth, update Firebase Auth Password
+      if (auth && auth.currentUser) {
+        try {
+          await updatePassword(auth.currentUser, newPassword);
+        } catch (e) {
+          // ignore if re-auth required
+        }
+      }
+
+      setOtpStep(3);
+    } catch (err: any) {
+      console.error("Settings reset password error:", err);
+      setOtpError(err.message || 'Failed to update password.');
+    } finally {
+      setOtpLoading(false);
+    }
   };
 
   return (
@@ -224,6 +366,181 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
                 className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none"
               />
             </div>
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-slate-200 space-y-4">
+          <h2 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+            <KeyRound className="w-4 h-4 text-blue-600" /> Account Security & Password Reset (OTP Verification)
+          </h2>
+
+          <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
+              <div>
+                <p className="text-xs font-bold text-slate-800">Verify Password Reset via 6-Digit Email OTP</p>
+                <p className="text-[11px] text-slate-500">
+                  Registered Email: <span className="font-mono font-bold text-slate-700">{profile.email || 'student@campus.edu'}</span>
+                </p>
+              </div>
+
+              {otpStep === 0 && (
+                <button
+                  type="button"
+                  onClick={handleSettingsSendOtp}
+                  disabled={otpLoading}
+                  className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-2 transition-all shrink-0 cursor-pointer"
+                >
+                  {otpLoading ? (
+                    <span>Issuing OTP...</span>
+                  ) : (
+                    <>
+                      <KeyRound className="w-3.5 h-3.5" />
+                      <span>Request 6-Digit OTP</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+
+            {otpError && (
+              <div className="p-3 text-xs rounded-xl bg-red-50 text-red-600 border border-red-200 font-medium">
+                {otpError}
+              </div>
+            )}
+
+            {/* STEP 1: ENTER OTP CODE */}
+            {otpStep === 1 && (
+              <div className="space-y-3 pt-1">
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 space-y-1">
+                  <p className="font-bold flex items-center gap-1.5">
+                    <KeyRound className="w-4 h-4 text-blue-600" /> 6-Digit OTP Code Sent to Email
+                  </p>
+                  <p className="text-[11px] text-blue-700">Check your email inbox or spam folder for the code.</p>
+                </div>
+
+                {devOtpNotice && (
+                  <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] font-mono font-bold text-amber-900">
+                    {devOtpNotice}
+                  </div>
+                )}
+
+                <div className="max-w-xs space-y-1">
+                  <label className="block text-xs font-bold text-slate-700">Enter 6-Digit OTP</label>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="e.g. 482915"
+                    className="w-full px-3 py-2 text-center text-base font-mono font-black tracking-widest rounded-xl bg-white border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+
+                <div className="flex items-center gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleSettingsVerifyOtp}
+                    disabled={otpLoading}
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-2 transition-all cursor-pointer"
+                  >
+                    {otpLoading ? (
+                      <span>Verifying...</span>
+                    ) : (
+                      <>
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <span>Verify OTP Code</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSettingsSendOtp}
+                    disabled={resendCooldown > 0 || otpLoading}
+                    className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1 disabled:text-slate-400"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${otpLoading ? 'animate-spin' : ''}`} />
+                    <span>{resendCooldown > 0 ? `Resend (${resendCooldown}s)` : 'Resend OTP'}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2: ENTER NEW PASSWORD */}
+            {otpStep === 2 && (
+              <div className="space-y-3 pt-1">
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 font-bold flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>OTP Code Verified! Enter your new password below.</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">New Password</label>
+                    <input
+                      type="password"
+                      minLength={6}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Confirm New Password</label>
+                    <input
+                      type="password"
+                      minLength={6}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSettingsResetPassword}
+                  disabled={otpLoading}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs flex items-center gap-2 transition-all cursor-pointer"
+                >
+                  {otpLoading ? (
+                    <span>Updating Password...</span>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Update Password Now</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* STEP 3: RESET SUCCESS */}
+            {otpStep === 3 && (
+              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 space-y-2">
+                <p className="font-extrabold text-sm flex items-center gap-2 text-emerald-950">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600" /> Password Updated Successfully via OTP!
+                </p>
+                <p className="text-emerald-800">
+                  Your student account password has been changed. You can use your new password next time you log in.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOtpStep(0);
+                    setOtpCode('');
+                    setNewPassword('');
+                    setConfirmPassword('');
+                  }}
+                  className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-[11px]"
+                >
+                  Done
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

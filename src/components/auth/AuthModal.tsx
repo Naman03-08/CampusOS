@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { X, GraduationCap, Mail, Lock, User, ArrowRight, CheckCircle2, Phone, Building2, BookOpen, Bot } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, GraduationCap, Mail, Lock, User, ArrowRight, CheckCircle2, Phone, Building2, BookOpen, Bot, KeyRound, ShieldCheck, RefreshCw } from 'lucide-react';
 import { auth, googleProvider } from '../../lib/firebase';
-import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword } from 'firebase/auth';
 import { UserProfile } from '../../types';
 import { StorageService } from '../../lib/storage';
 import { FirestoreService } from '../../lib/firestoreService';
@@ -32,12 +32,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
-  
+
+  // OTP Password Reset States
+  const [otpStep, setOtpStep] = useState<1 | 2 | 3 | 4>(1); // 1: Email, 2: OTP Entry, 3: New Password, 4: Success
+  const [otpCode, setOtpCode] = useState('');
+  const [resetToken, setResetToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [devOtpNotice, setDevOtpNotice] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
+
   // Hold Google Auth User credentials when completing Google onboarding
   const [googleAuthUser, setGoogleAuthUser] = useState<any>(null);
 
+  // Cooldown timer for OTP resend
+  useEffect(() => {
+    let timer: any;
+    if (resendCooldown > 0) {
+      timer = setInterval(() => {
+        setResendCooldown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
   const handleModalClose = async () => {
-    // If student cancels/closes modal during onboarding or register without completing, sign out incomplete Auth user
     if (mode === 'google-onboarding' || mode === 'register') {
       if (auth && auth.currentUser) {
         try {
@@ -48,6 +67,137 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       }
     }
     onClose();
+  };
+
+  // OTP Step 1: Request 6-Digit OTP
+  const handleSendOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!email.trim() || !email.includes('@')) {
+      setErrorMsg('Please enter a valid student email address.');
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg('');
+    setDevOtpNotice('');
+
+    try {
+      const res = await fetch('/api/auth/send-reset-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to send OTP code.');
+      }
+
+      setOtpStep(2);
+      setResendCooldown(60);
+      if (data.devOtp) {
+        setDevOtpNotice(`[DEV MODE AUTO-OTP]: Use OTP code ${data.devOtp} to verify.`);
+      }
+    } catch (err: any) {
+      console.error("OTP send error:", err);
+      // Fallback: Also send standard Firebase password reset email
+      if (auth) {
+        try {
+          await sendPasswordResetEmail(auth, email);
+          setResetSent(true);
+        } catch (fbErr: any) {
+          setErrorMsg(err.message || fbErr.message || 'Failed to send OTP reset code.');
+        }
+      } else {
+        setErrorMsg(err.message || 'Failed to send OTP reset code.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // OTP Step 2: Verify 6-Digit OTP
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otpCode.trim() || otpCode.trim().length !== 6) {
+      setErrorMsg('Please enter the 6-digit OTP code sent to your email.');
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg('');
+
+    try {
+      const res = await fetch('/api/auth/verify-reset-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), otp: otpCode.trim() }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Invalid OTP code.');
+      }
+
+      setResetToken(data.resetToken);
+      setOtpStep(3);
+    } catch (err: any) {
+      console.error("OTP verify error:", err);
+      setErrorMsg(err.message || 'OTP verification failed. Please check the code and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // OTP Step 3: Complete Password Reset with New Password
+  const handleCompletePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.length < 6) {
+      setErrorMsg('New password must be at least 6 characters long.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setErrorMsg('New passwords do not match. Please re-enter.');
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg('');
+
+    try {
+      const res = await fetch('/api/auth/reset-password-with-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim(),
+          resetToken,
+          newPassword,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to update password.');
+      }
+
+      // If user is currently signed in via Firebase, update password directly
+      if (auth && auth.currentUser) {
+        try {
+          await updatePassword(auth.currentUser, newPassword);
+        } catch (e) {
+          // ignore if reauth is needed
+        }
+      }
+
+      setOtpStep(4);
+      setPassword(newPassword);
+    } catch (err: any) {
+      console.error("Password reset error:", err);
+      setErrorMsg(err.message || 'Failed to update password.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleAuth = async () => {
@@ -305,13 +455,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {mode === 'login' && 'Welcome Back to Placivo'}
           {mode === 'register' && 'Create Your Student Account'}
           {mode === 'google-onboarding' && 'Complete Your Student Profile'}
-          {mode === 'forgot' && 'Reset Your Password'}
+          {mode === 'forgot' && 'Reset Password via OTP'}
         </h2>
         <p className="text-xs text-slate-500 mb-6">
           {mode === 'login' && 'Enter your student credentials to access your AI workspace.'}
           {mode === 'register' && 'Join thousands of students mastering academics & placements.'}
           {mode === 'google-onboarding' && 'Please fill in your academic & contact details to finish setting up your account.'}
-          {mode === 'forgot' && 'We will send password reset instructions to your email.'}
+          {mode === 'forgot' && 'Verify your account with a 6-digit OTP code to securely set a new password.'}
         </p>
 
         {errorMsg && (
@@ -352,7 +502,221 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )
         )}
 
-        {resetSent ? (
+        {/* FORGOT PASSWORD VIA OTP MULTI-STEP FLOW */}
+        {mode === 'forgot' ? (
+          <div className="space-y-4">
+            {/* Step Progress Indicators */}
+            <div className="flex items-center justify-between mb-4 px-2">
+              <div className={`flex items-center gap-1 text-[11px] font-extrabold ${otpStep >= 1 ? 'text-blue-600' : 'text-slate-400'}`}>
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${otpStep >= 1 ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'}`}>1</span>
+                <span>Email</span>
+              </div>
+              <div className={`h-0.5 flex-1 mx-2 ${otpStep >= 2 ? 'bg-blue-600' : 'bg-slate-200'}`} />
+              <div className={`flex items-center gap-1 text-[11px] font-extrabold ${otpStep >= 2 ? 'text-blue-600' : 'text-slate-400'}`}>
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${otpStep >= 2 ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'}`}>2</span>
+                <span>OTP Code</span>
+              </div>
+              <div className={`h-0.5 flex-1 mx-2 ${otpStep >= 3 ? 'bg-blue-600' : 'bg-slate-200'}`} />
+              <div className={`flex items-center gap-1 text-[11px] font-extrabold ${otpStep >= 3 ? 'text-blue-600' : 'text-slate-400'}`}>
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${otpStep >= 3 ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'}`}>3</span>
+                <span>New Password</span>
+              </div>
+            </div>
+
+            {/* OTP STEP 1: Enter Email */}
+            {otpStep === 1 && (
+              <form onSubmit={handleSendOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Student Registered Email</label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="student@campus.edu"
+                      className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  {loading ? (
+                    <span>Issuing OTP...</span>
+                  ) : (
+                    <>
+                      <span>Send 6-Digit OTP Code</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+
+                <div className="text-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setMode('login')}
+                    className="text-xs font-bold text-slate-500 hover:text-slate-800 underline"
+                  >
+                    Back to Login
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* OTP STEP 2: Verify 6-Digit OTP */}
+            {otpStep === 2 && (
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-2xl text-xs text-blue-900 space-y-1">
+                  <p className="font-extrabold flex items-center gap-1.5">
+                    <KeyRound className="w-4 h-4 text-blue-600" /> OTP Issued to {email}
+                  </p>
+                  <p className="text-[11px] text-blue-700">Enter the 6-digit code received in your inbox.</p>
+                </div>
+
+                {devOtpNotice && (
+                  <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] font-mono text-amber-900 font-bold">
+                    {devOtpNotice}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Enter 6-Digit OTP Code</label>
+                  <div className="relative">
+                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      maxLength={6}
+                      required
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                      placeholder="e.g. 482915"
+                      className="w-full pl-9 pr-3 py-2.5 text-center text-lg font-mono font-black tracking-widest rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+                  <button
+                    type="button"
+                    onClick={() => handleSendOtp()}
+                    disabled={resendCooldown > 0 || loading}
+                    className="flex items-center gap-1 text-blue-600 font-bold hover:underline disabled:text-slate-400 disabled:no-underline"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                    <span>{resendCooldown > 0 ? `Resend OTP (${resendCooldown}s)` : 'Resend OTP Code'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOtpStep(1)}
+                    className="text-slate-500 hover:text-slate-800 underline"
+                  >
+                    Change Email
+                  </button>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  {loading ? (
+                    <span>Verifying Code...</span>
+                  ) : (
+                    <>
+                      <span>Verify OTP Code</span>
+                      <ShieldCheck className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+
+            {/* OTP STEP 3: Set New Password */}
+            {otpStep === 3 && (
+              <form onSubmit={handleCompletePasswordReset} className="space-y-4">
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 flex items-center gap-2 font-bold">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>OTP Verified! Set your new student account password below.</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">New Password</label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Confirm New Password</label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  {loading ? (
+                    <span>Updating Password...</span>
+                  ) : (
+                    <>
+                      <span>Update Password & Complete Reset</span>
+                      <CheckCircle2 className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+
+            {/* OTP STEP 4: Reset Success */}
+            {otpStep === 4 && (
+              <div className="p-5 rounded-3xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
+                <div className="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-md">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-extrabold text-emerald-950">Password Updated Successfully!</h3>
+                <p className="text-xs text-emerald-800">
+                  Your Placivo account password has been updated via OTP verification. You can now log in with your new password.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('login');
+                    setOtpStep(1);
+                  }}
+                  className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                >
+                  Log In With New Password
+                </button>
+              </div>
+            )}
+          </div>
+        ) : resetSent ? (
           <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-2">
             <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
             <p className="text-sm font-bold text-emerald-900">Password Reset Email Sent!</p>

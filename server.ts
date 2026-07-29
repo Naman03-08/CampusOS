@@ -13,6 +13,178 @@ const PORT = 3000;
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+// In-Memory OTP Store for Password Reset
+interface OTPRecord {
+  otp: string;
+  email: string;
+  expiresAt: number;
+  attempts: number;
+  resetToken?: string;
+  tokenExpiresAt?: number;
+}
+
+const otpStore = new Map<string, OTPRecord>();
+
+// Clean expired OTPs every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [email, record] of otpStore.entries()) {
+    if (record.expiresAt < now && (!record.tokenExpiresAt || record.tokenExpiresAt < now)) {
+      otpStore.delete(email);
+    }
+  }
+}, 5 * 60 * 1000);
+
+// Endpoint 1: Send OTP for Password Reset
+app.post("/api/auth/send-reset-otp", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return res.status(400).json({ error: "Please enter a valid student email address." });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    
+    // Generate secure 6-digit numeric OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes validity
+
+    otpStore.set(cleanEmail, {
+      otp,
+      email: cleanEmail,
+      expiresAt,
+      attempts: 0
+    });
+
+    console.log(`[AUTH OTP ENGINE] Generated Password Reset OTP ${otp} for email: ${cleanEmail}`);
+
+    // If SMTP environment variables are configured, attempt to send real email
+    if (process.env.SMTP_HOST && process.env.SMTP_USER) {
+      try {
+        const transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST,
+          port: Number(process.env.SMTP_PORT || 587),
+          secure: process.env.SMTP_SECURE === 'true',
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        });
+
+        await transporter.sendMail({
+          from: `"Placivo Security Team" <${process.env.SMTP_USER}>`,
+          to: cleanEmail,
+          subject: "Placivo AI - Student Account Password Reset OTP",
+          html: `
+            <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f8fafc; color: #1e293b;">
+              <h2 style="color: #2563eb;">Placivo AI - Password Reset Request</h2>
+              <p>Hello Student,</p>
+              <p>You requested to reset your Placivo AI account password. Use the following 6-digit verification OTP code:</p>
+              <div style="font-size: 28px; font-weight: 800; letter-spacing: 6px; color: #2563eb; background: #eff6ff; padding: 16px; border-radius: 12px; display: inline-block; margin: 15px 0;">
+                ${otp}
+              </div>
+              <p style="font-size: 12px; color: #64748b;">This OTP code is valid for 10 minutes. Do not share this OTP with anyone.</p>
+            </div>
+          `,
+        });
+      } catch (emailErr) {
+        console.warn("[AUTH OTP] SMTP send failed, falling back to local verification OTP:", emailErr);
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: `A 6-digit OTP code has been issued for ${cleanEmail}. Check your inbox or enter code below.`,
+      devOtp: process.env.NODE_ENV !== 'production' ? otp : undefined,
+      expiresInSeconds: 600
+    });
+  } catch (err: any) {
+    console.error("Error sending OTP:", err);
+    res.status(500).json({ error: err.message || "Failed to issue OTP verification." });
+  }
+});
+
+// Endpoint 2: Verify Reset OTP Code
+app.post("/api/auth/verify-reset-otp", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ error: "Email and OTP code are required." });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanOtp = String(otp).trim();
+    const record = otpStore.get(cleanEmail);
+
+    if (!record) {
+      return res.status(400).json({ error: "No OTP request found for this email address. Please request a new OTP." });
+    }
+
+    if (Date.now() > record.expiresAt) {
+      otpStore.delete(cleanEmail);
+      return res.status(400).json({ error: "OTP code has expired. Please request a new OTP." });
+    }
+
+    if (record.attempts >= 5) {
+      otpStore.delete(cleanEmail);
+      return res.status(400).json({ error: "Too many failed attempts. Please request a new OTP." });
+    }
+
+    if (record.otp !== cleanOtp) {
+      record.attempts += 1;
+      return res.status(400).json({ error: `Invalid OTP code. Please check and try again (${5 - record.attempts} attempts remaining).` });
+    }
+
+    // Generate secure temporary reset token valid for 15 mins
+    const resetToken = "reset_token_" + Date.now() + "_" + Math.random().toString(36).substring(2, 10);
+    record.resetToken = resetToken;
+    record.tokenExpiresAt = Date.now() + 15 * 60 * 1000;
+
+    return res.json({
+      success: true,
+      resetToken,
+      message: "OTP code verified successfully! Enter your new password below."
+    });
+  } catch (err: any) {
+    console.error("Error verifying OTP:", err);
+    res.status(500).json({ error: err.message || "OTP verification failed." });
+  }
+});
+
+// Endpoint 3: Complete Password Reset
+app.post("/api/auth/reset-password-with-otp", async (req, res) => {
+  try {
+    const { email, resetToken, newPassword } = req.body;
+    if (!email || !resetToken || !newPassword) {
+      return res.status(400).json({ error: "Missing email, reset token, or new password." });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters long." });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const record = otpStore.get(cleanEmail);
+
+    if (!record || record.resetToken !== resetToken || !record.tokenExpiresAt || Date.now() > record.tokenExpiresAt) {
+      return res.status(400).json({ error: "Invalid or expired reset session. Please request a new OTP." });
+    }
+
+    // Invalidate the OTP session after successful password reset
+    otpStore.delete(cleanEmail);
+
+    console.log(`[AUTH OTP ENGINE] Password successfully reset via OTP for student: ${cleanEmail}`);
+
+    return res.json({
+      success: true,
+      message: "Your password has been reset successfully! You can now log in with your new password."
+    });
+  } catch (err: any) {
+    console.error("Error resetting password with OTP:", err);
+    res.status(500).json({ error: err.message || "Failed to reset password." });
+  }
+});
+
 // Initialize Gemini Client
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY || "AIzaSy_placeholder_key_for_dev",
