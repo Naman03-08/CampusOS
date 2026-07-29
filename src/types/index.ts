@@ -30,6 +30,8 @@ export interface UserProfile {
   freeTrialStartedAt?: string;
   planStartedAt?: string;
   planExpiresAt?: string;
+  planCancelled?: boolean;
+  planCancelledAt?: string;
   university?: string;
   major?: string;
   stream?: string;
@@ -209,9 +211,10 @@ export interface AppNotification {
   userId: string;
   title: string;
   message: string;
-  type: 'attendance' | 'assignment' | 'exam' | 'placement' | 'system';
+  type: 'attendance' | 'assignment' | 'exam' | 'placement' | 'system' | 'streak' | 'alert' | 'schedule' | 'study' | string;
   read: boolean;
   createdAt: string;
+  timestamp?: string;
 }
 
 export interface CourseLesson {

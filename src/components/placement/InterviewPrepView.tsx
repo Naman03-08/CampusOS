@@ -358,7 +358,11 @@ const InteractiveQuestionCard: React.FC<{
   );
 };
 
+import { UserProfile, ResumeData } from '../../types';
+
 interface InterviewPrepViewProps {
+  user?: UserProfile;
+  resumeData?: ResumeData;
   onNavigateTab?: (tab: string) => void;
 }
 

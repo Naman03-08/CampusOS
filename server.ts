@@ -165,7 +165,7 @@ app.post("/api/auth/send-reset-otp", async (req, res) => {
         : `A 6-digit OTP code has been generated for ${cleanEmail}. Enter code below to proceed.`,
       emailSent,
       emailPreviewUrl,
-      devOtp: process.env.NODE_ENV !== 'production' ? otp : undefined,
+      devOtp: (!isConfiguredSmtp || process.env.NODE_ENV !== 'production') ? otp : undefined,
       expiresInSeconds: 600
     });
   } catch (err: any) {

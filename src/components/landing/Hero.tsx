@@ -1,5 +1,21 @@
-import React from 'react';
-import { ArrowRight, Play, BookOpen, Laptop, Bot, ShieldCheck, Zap, Search } from 'lucide-react';
+import React, { useState } from 'react';
+import { 
+  ArrowRight, 
+  Search, 
+  Sparkles, 
+  BookOpen, 
+  GraduationCap, 
+  Briefcase, 
+  Calendar, 
+  Bot, 
+  Users, 
+  Building2, 
+  Landmark, 
+  FileText, 
+  Star,
+  Zap 
+} from 'lucide-react';
+import heroStudentsArt from '../../assets/images/placivo_blue_hoodie_students_1785348882031.jpg';
 
 interface HeroProps {
   onOpenAuth: (mode: 'register') => void;
@@ -7,165 +23,284 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const trendingTags = ['IIT Bombay', 'Data Science', 'Engineering', 'MBA', 'BCA'];
+
   return (
-    <section className="relative pt-10 pb-20 md:pt-16 md:pb-28 overflow-hidden">
-      {/* Background Orbs */}
-      <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] bg-amber-200/50 rounded-full blur-[120px] opacity-70 pointer-events-none z-0"></div>
-      <div className="absolute bottom-[-50px] right-[-50px] w-[400px] h-[400px] bg-yellow-200/40 rounded-full blur-[100px] opacity-60 pointer-events-none z-0"></div>
+    <section className="relative pt-6 pb-16 md:pt-10 md:pb-20 overflow-hidden bg-gradient-to-b from-blue-50/40 via-white to-slate-50/50">
+      {/* Soft Ambient Background Orbs */}
+      <div className="absolute top-[-120px] left-[-120px] w-[550px] h-[550px] bg-blue-100/50 rounded-full blur-[140px] pointer-events-none z-0"></div>
+      <div className="absolute top-[20%] right-[-100px] w-[500px] h-[500px] bg-indigo-100/40 rounded-full blur-[130px] pointer-events-none z-0"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-bold uppercase tracking-wider mb-6 shadow-xs">
-          <span className="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
-          <span>Next-Gen Autonomous Academic Intelligence</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        {/* Main Hero Split Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-12">
+          
+          {/* Left Column: Eyebrow, Headlines, Search Bar, Trending */}
+          <div className="lg:col-span-6 text-left space-y-5">
+            
+            {/* Top Pill Tagline */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/90 border border-blue-200/80 text-blue-600 text-xs font-bold uppercase tracking-wider shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600 fill-blue-600" />
+              <span>Built for Students. Powered by Technology.</span>
+            </div>
+
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-black text-slate-900 tracking-tight leading-[1.12]">
+              The All-in-One <br />
+              Operating System <br />
+              for <span className="text-[#2563EB]">College Students</span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed max-w-xl">
+              Placivo AI brings everything a student needs into one beautiful platform. Study smarter, stay organized, and achieve more – all in one place.
+            </p>
+
+            {/* Search Bar */}
+            <div className="relative max-w-xl pt-1">
+              <div className="relative flex items-center bg-white p-2 rounded-full shadow-lg shadow-slate-200/70 border border-slate-200/80 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all">
+                <Search className="w-5 h-5 text-slate-400 ml-3.5 shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search colleges, courses, notes, tools..."
+                  className="flex-1 bg-transparent px-3 py-1.5 outline-none text-slate-800 font-medium text-sm sm:text-base placeholder:text-slate-400"
+                  onClick={onExploreDemo}
+                />
+                <button
+                  onClick={onExploreDemo}
+                  className="px-6 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-sm rounded-full shadow-md shadow-blue-500/20 transition-all shrink-0 flex items-center gap-2 cursor-pointer"
+                >
+                  <span>Explore</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Trending Tag Row */}
+              <div className="flex flex-wrap items-center gap-2 mt-3 text-xs font-semibold text-slate-500 pl-2">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[11px] mr-1">Trending Now:</span>
+                {trendingTags.map((tag, idx) => (
+                  <button
+                    key={idx}
+                    onClick={onExploreDemo}
+                    className="px-3 py-1 rounded-full bg-slate-100/90 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border border-slate-200/60 transition-colors text-xs font-medium cursor-pointer"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center gap-3.5 pt-2">
+              <button
+                onClick={() => onOpenAuth('register')}
+                className="w-full sm:w-auto px-7 py-3 bg-[#2563EB] text-white rounded-full text-sm font-bold shadow-lg shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Get Started Free</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={onExploreDemo}
+                className="w-full sm:w-auto px-7 py-3 rounded-full bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200/90 shadow-2xs hover:shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Zap className="w-4 h-4 text-blue-600 fill-blue-600" />
+                <span>Try Live Demo</span>
+              </button>
+            </div>
+
+          </div>
+
+          {/* Right Column: Clean Student Illustration encircled by Orbital Blue Ring & 6 Floating Pill Badges */}
+          <div className="lg:col-span-6 relative flex items-center justify-center pt-8 lg:pt-0">
+            
+            {/* Outer Container for Graphic & Orbit */}
+            <div className="relative z-10 w-full max-w-lg min-h-[420px] flex items-center justify-center">
+              
+              {/* Smooth Orbital Blue Line encircling characters & badges */}
+              <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center">
+                <svg viewBox="0 0 500 500" className="w-[115%] h-[115%] text-blue-400/70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Outer delicate orbit line */}
+                  <ellipse cx="250" cy="250" rx="220" ry="200" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.4" />
+                  {/* Primary orbital ring */}
+                  <ellipse cx="250" cy="250" rx="200" ry="180" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </div>
+
+              {/* Clean Isolated Students Art */}
+              <div className="relative z-10 w-full max-w-xs sm:max-w-sm flex items-center justify-center">
+                <img
+                  src={heroStudentsArt}
+                  alt="Placivo AI College Students"
+                  className="w-full h-auto object-contain mix-blend-multiply select-none pointer-events-none transform hover:scale-[1.02] transition-transform duration-500"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+
+              {/* 6 Floating Feature Badges */}
+
+              {/* Badge 1: Top Center / Left - AI Notes */}
+              <div className="absolute top-2 left-0 sm:left-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <BookOpen className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xs font-black text-slate-900 leading-tight">AI Notes</div>
+                  <div className="text-[10px] font-medium text-slate-500">Summarize & Study</div>
+                </div>
+              </div>
+
+              {/* Badge 2: Top Right - Courses */}
+              <div className="absolute top-2 right-0 sm:right-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <GraduationCap className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xs font-black text-slate-900 leading-tight">Courses</div>
+                  <div className="text-[10px] font-medium text-slate-500">Learn & Upskill</div>
+                </div>
+              </div>
+
+              {/* Badge 3: Middle Left - Placements */}
+              <div className="absolute top-1/2 -left-4 sm:-left-6 -translate-y-1/2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <Briefcase className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xs font-black text-slate-900 leading-tight">Placements</div>
+                  <div className="text-[10px] font-medium text-slate-500">Jobs & Internships</div>
+                </div>
+              </div>
+
+              {/* Badge 4: Middle Right - Planner */}
+              <div className="absolute top-1/2 -right-4 sm:-right-6 -translate-y-1/2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <Calendar className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xs font-black text-slate-900 leading-tight">Planner</div>
+                  <div className="text-[10px] font-medium text-slate-500">Organize Better</div>
+                </div>
+              </div>
+
+              {/* Badge 5: Bottom Left - AI Assistant */}
+              <div className="absolute bottom-2 left-2 sm:left-4 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <Bot className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xs font-black text-slate-900 leading-tight">AI Assistant</div>
+                  <div className="text-[10px] font-medium text-slate-500">Your Study Buddy</div>
+                </div>
+              </div>
+
+              {/* Badge 6: Bottom Right - Community */}
+              <div className="absolute bottom-2 right-2 sm:right-4 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <Users className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xs font-black text-slate-900 leading-tight">Community</div>
+                  <div className="text-[10px] font-medium text-slate-500">Connect & Grow</div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
 
-        {/* Main Headline */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-slate-900 tracking-tight leading-[1.1] max-w-5xl mx-auto mb-6">
-          The AI Operating System For <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">College</span>.
-        </h1>
-
-        {/* Subtitle / Elegant Placement & Prep Showcase */}
-        <div className="max-w-4xl mx-auto mb-10 space-y-4">
-          <p className="text-base sm:text-lg md:text-xl text-slate-600 font-medium leading-relaxed tracking-wide">
-            We help college students prepare for placements with{' '}
-            <span className="font-semibold text-blue-600 border-b-2 border-blue-100 pb-0.5 whitespace-nowrap">interview questions</span>,{' '}
-            <span className="font-semibold text-indigo-600 border-b-2 border-indigo-100 pb-0.5 whitespace-nowrap">aptitude tests</span>,{' '}
-            <span className="font-semibold text-purple-600 border-b-2 border-purple-100 pb-0.5 whitespace-nowrap">resumes</span>,{' '}
-            <span className="font-semibold text-rose-600 border-b-2 border-rose-100 pb-0.5">company-wise preparation</span>, and{' '}
-            <span className="font-semibold text-emerald-600 border-b-2 border-emerald-100 pb-0.5 whitespace-nowrap">roadmaps</span>.
+        {/* Trusted By Banner */}
+        <div className="mt-12 pt-8 border-t border-slate-200/60 text-center">
+          <p className="text-xs sm:text-sm font-semibold text-slate-500 mb-6">
+            Trusted by <span className="text-blue-600 font-extrabold">1M+</span> students from <span className="text-blue-600 font-extrabold">500+</span> colleges
           </p>
-          <p className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-[0.2em]">
-            One unified workspace for notes, assignments, attendance, and career success.
-          </p>
-        </div>
 
-        {/* AI Command Bar */}
-        <div className="relative group max-w-xl mx-auto mb-10">
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition"></div>
-          <div className="relative flex items-center bg-white p-3.5 sm:p-4 rounded-2xl shadow-xl border border-slate-100">
-            <Search className="w-5 h-5 text-slate-400 ml-2 shrink-0" />
-            <input
-              type="text"
-              placeholder="Ask Placivo... 'Solve my OS assignment' or 'Plan my week'"
-              className="flex-1 bg-transparent px-3 py-1 outline-none text-slate-700 font-medium text-xs sm:text-sm"
-              onClick={onExploreDemo}
-              readOnly
-            />
-            <div className="px-2.5 py-1 bg-slate-100 rounded-lg text-[10px] font-bold text-slate-400 border border-slate-200 shrink-0">
-              CTRL + K
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 opacity-75 grayscale hover:grayscale-0 transition-all">
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-black text-slate-800 tracking-tight">
+              <Building2 className="w-4 h-4 text-blue-600" /> IIT BOMBAY
+            </div>
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-black text-slate-800 tracking-tight">
+              <Building2 className="w-4 h-4 text-blue-600" /> DELHI UNIVERSITY
+            </div>
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-black text-slate-800 tracking-tight">
+              <Building2 className="w-4 h-4 text-blue-600" /> BITS PILANI
+            </div>
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-black text-slate-800 tracking-tight">
+              <Building2 className="w-4 h-4 text-blue-600" /> VIT CHENNAI
+            </div>
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-black text-slate-800 tracking-tight">
+              <Building2 className="w-4 h-4 text-blue-600" /> SRM UNIVERSITY
+            </div>
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-black text-slate-800 tracking-tight">
+              <Building2 className="w-4 h-4 text-blue-600" /> JNU
             </div>
           </div>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
-          <button
-            onClick={() => onOpenAuth('register')}
-            className="w-full sm:w-auto px-8 py-3.5 bg-[#2563EB] text-white rounded-full text-base font-semibold shadow-lg shadow-blue-500/40 hover:bg-blue-700 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5"
-          >
-            Launch Placivo Free
-            <ArrowRight className="w-5 h-5" />
-          </button>
-
-          <button
-            onClick={onExploreDemo}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white/80 hover:bg-white text-slate-700 font-semibold text-base border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 backdrop-blur-md"
-          >
-            <Play className="w-4 h-4 text-blue-600 fill-blue-600" />
-            Try Interactive AI Demo
-          </button>
-        </div>
-
-        {/* Quick Stats Row */}
-        <div className="flex justify-center items-center gap-8 sm:gap-16 mb-16 pt-2 border-t border-slate-200/40 max-w-2xl mx-auto">
-          <div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">120k+</div>
-            <div className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Active Students</div>
-          </div>
-          <div className="h-8 w-px bg-slate-200"></div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">98%</div>
-            <div className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Success Rate</div>
-          </div>
-          <div className="h-8 w-px bg-slate-200"></div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">4.9/5</div>
-            <div className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Rating</div>
-          </div>
-        </div>
-
-        {/* 3D Visual Stage Showcase / Glassmorphism Preview */}
-        <div className="relative max-w-5xl mx-auto rounded-[32px] bg-white/30 backdrop-blur-3xl border border-white/70 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] p-4 sm:p-8 text-left group overflow-hidden">
-          {/* Top Bar */}
-          <div className="flex items-center justify-between pb-4 border-b border-white/60 mb-6 px-2">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-red-400/80"></span>
-              <span className="w-3 h-3 rounded-full bg-amber-400/80"></span>
-              <span className="w-3 h-3 rounded-full bg-emerald-400/80"></span>
+        {/* Stats Grid Bar (1M+ Active Students, 500+ Top Colleges, 10M+ Notes, 50K+ Placements, 4.8/5 Rating) */}
+        <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+          <div className="p-4 rounded-2xl bg-white/90 backdrop-blur-md border border-slate-200/80 shadow-xs flex items-center gap-3.5 hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <Users className="w-5 h-5" />
             </div>
-            <span className="text-xs font-bold text-slate-600 bg-white/70 backdrop-blur-md px-3 py-1 rounded-full border border-white/80 shadow-2xs">
-              placivo.ai / workspace / alex
-            </span>
-            <div className="flex items-center gap-1.5 text-xs text-blue-600 font-bold bg-blue-50/80 backdrop-blur-md px-2.5 py-1 rounded-full border border-blue-100">
-              <Zap className="w-3.5 h-3.5 fill-blue-600" /> System Active
+            <div className="text-left">
+              <div className="text-base sm:text-lg font-black text-slate-900 leading-tight">1M+</div>
+              <div className="text-[11px] font-medium text-slate-500">Active Students</div>
             </div>
           </div>
 
-          {/* Widgets Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Box 1 */}
-            <div className="bg-white/60 backdrop-blur-xl p-5 rounded-2xl border border-white/70 shadow-xs hover:bg-white/75 transition-colors">
-              <div className="flex items-center gap-2 mb-2 text-blue-600 font-bold text-xs uppercase tracking-wider">
-                <BookOpen className="w-4 h-4" /> AI Study Suite
-              </div>
-              <h3 className="font-extrabold text-sm text-slate-900 mb-1">Data Structures & Algorithms</h3>
-              <p className="text-xs text-slate-500 mb-3">Generated 12 Flashcards, 5 Quizzes & Formula Cheat Sheet.</p>
-              <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 bg-emerald-50/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-emerald-100 w-fit">
-                <ShieldCheck className="w-3.5 h-3.5" /> 100% Exam Ready
-              </div>
+          <div className="p-4 rounded-2xl bg-white/90 backdrop-blur-md border border-slate-200/80 shadow-xs flex items-center gap-3.5 hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <Landmark className="w-5 h-5" />
             </div>
-
-            {/* Box 2 */}
-            <div className="bg-white/60 backdrop-blur-xl p-5 rounded-2xl border border-white/70 shadow-xs hover:bg-white/75 transition-colors">
-              <div className="flex items-center gap-2 mb-2 text-indigo-600 font-bold text-xs uppercase tracking-wider">
-                <Laptop className="w-4 h-4" /> Attendance Predictor
-              </div>
-              <div className="flex items-baseline justify-between mb-1">
-                <span className="text-xs font-bold text-slate-400 uppercase">Average</span>
-                <span className="text-lg font-extrabold text-slate-900">88.5%</span>
-              </div>
-              <div className="h-1.5 w-full bg-slate-200/60 rounded-full my-2 overflow-hidden">
-                <div className="h-full w-[88.5%] bg-gradient-to-r from-blue-600 to-indigo-500 rounded-full"></div>
-              </div>
-              <p className="text-[11px] text-slate-500 mt-2">Target: 80%. Safe to miss 3 OS lectures.</p>
-            </div>
-
-            {/* Box 3 */}
-            <div className="bg-white/60 backdrop-blur-xl p-5 rounded-2xl border border-white/70 shadow-xs hover:bg-white/75 transition-colors">
-              <div className="flex items-center gap-2 mb-2 text-purple-600 font-bold text-xs uppercase tracking-wider">
-                <Bot className="w-4 h-4" /> Placement AI
-              </div>
-              <h3 className="font-extrabold text-sm text-slate-900 mb-1">ATS Resume Score: 92/100</h3>
-              <p className="text-xs text-slate-500 mb-3">Matched for Google & Meta SWE Roles.</p>
-              <span className="text-[11px] font-bold text-purple-600 bg-purple-50/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-purple-100 inline-block">
-                Placement Interview Ready
-              </span>
+            <div className="text-left">
+              <div className="text-base sm:text-lg font-black text-slate-900 leading-tight">500+</div>
+              <div className="text-[11px] font-medium text-slate-500">Top Colleges</div>
             </div>
           </div>
 
-          {/* Smart AI Banner inside card */}
-          <div className="mt-5 p-4 bg-gradient-to-br from-[#2563EB] to-indigo-600 rounded-2xl text-white shadow-md flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0">
-              <Zap className="w-5 h-5 text-white" />
+          <div className="p-4 rounded-2xl bg-white/90 backdrop-blur-md border border-slate-200/80 shadow-xs flex items-center gap-3.5 hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <FileText className="w-5 h-5" />
             </div>
-            <div className="text-xs leading-relaxed">
-              <span className="font-bold uppercase tracking-wider text-blue-200 block text-[10px]">AI ADVISOR</span>
-              Attendance alert: You need 3 more classes in <span className="font-bold underline">Calculus II</span> to maintain 75% attendance threshold.
+            <div className="text-left">
+              <div className="text-base sm:text-lg font-black text-slate-900 leading-tight">10M+</div>
+              <div className="text-[11px] font-medium text-slate-500">Notes & Resources</div>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/90 backdrop-blur-md border border-slate-200/80 shadow-xs flex items-center gap-3.5 hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <Briefcase className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <div className="text-base sm:text-lg font-black text-slate-900 leading-tight">50K+</div>
+              <div className="text-[11px] font-medium text-slate-500">Placement Opportunities</div>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/90 backdrop-blur-md border border-slate-200/80 shadow-xs flex items-center gap-3.5 hover:shadow-md transition-shadow col-span-2 sm:col-span-1">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+            </div>
+            <div className="text-left">
+              <div className="text-base sm:text-lg font-black text-slate-900 leading-tight">4.8/5</div>
+              <div className="text-[11px] font-medium text-slate-500">Student Rating</div>
             </div>
           </div>
         </div>
+
       </div>
     </section>
   );
 };
+
+
+

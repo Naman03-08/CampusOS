@@ -66,7 +66,7 @@ export const NotificationsDrawer: React.FC<NotificationsDrawerProps> = ({
               <div>
                 <p className="text-xs font-bold text-slate-900">{n.title}</p>
                 <p className="text-xs text-slate-600 mt-0.5">{n.message}</p>
-                <span className="text-[10px] text-slate-400 mt-1 block">{n.timestamp}</span>
+                <span className="text-[10px] text-slate-400 mt-1 block">{n.timestamp || n.createdAt}</span>
               </div>
             </div>
 

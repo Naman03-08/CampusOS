@@ -70,7 +70,10 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
   };
 
   const handleExportResumePDF = () => {
-    const exportContent = `NAME: ${resume.fullName}\nEMAIL: ${resume.email}\nPHONE: ${resume.phone}\nUNIVERSITY: ${resume.university}\nMAJOR: ${resume.major}\n\nSUMMARY:\n${resume.summary}\n\nSKILLS:\n${resume.skills.join(', ')}\n\nPROJECTS:\n${resume.projects.map(p => `- ${p.title}: ${p.description} (Tech: ${p.techStack.join(', ')})`).join('\n')}`;
+    const university = user?.university || '';
+    const major = user?.major || '';
+    const skillList = resume.skills.map(s => typeof s === 'string' ? s : s.list ? s.list.join(', ') : '').filter(Boolean).join(', ');
+    const exportContent = `NAME: ${resume.fullName}\nEMAIL: ${resume.email}\nPHONE: ${resume.phone}\nUNIVERSITY: ${university}\nMAJOR: ${major}\n\nSUMMARY:\n${resume.summary}\n\nSKILLS:\n${skillList}\n\nPROJECTS:\n${resume.projects.map(p => `- ${p.name}: ${p.description} (Tech: ${p.techStack.join(', ')})`).join('\n')}`;
     exportTextToPDF(`${resume.fullName}_Resume`, exportContent, `${resume.fullName.replace(/\s+/g, '_')}_Resume.pdf`);
   };
 
@@ -174,8 +177,8 @@ export const PlacementHubView: React.FC<PlacementHubProps> = ({
               <label className="block text-xs font-bold text-slate-700 mb-1">Skills (Comma separated)</label>
               <input
                 type="text"
-                value={resume.skills.join(', ')}
-                onChange={(e) => setResume({ ...resume, skills: e.target.value.split(',').map((s) => s.trim()) })}
+                value={resume.skills.map(s => typeof s === 'string' ? s : s.list ? s.list.join(', ') : '').join(', ')}
+                onChange={(e) => setResume({ ...resume, skills: [{ category: 'Technical Skills', list: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) }] })}
                 className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none"
               />
             </div>
