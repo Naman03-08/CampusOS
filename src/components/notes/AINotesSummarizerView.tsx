@@ -8,6 +8,36 @@ if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
 }
 
+// Helper to sanitize corrupt text, font encoding artifacts, and weird unicode symbols (e.g. 𓈌, hieroglyphics, private use areas)
+function cleanCorruptText(input: string): string {
+  if (!input || typeof input !== 'string') return '';
+  let str = input;
+
+  // Remove Egyptian Hieroglyphs (\u1300-\u13FF or U+13000-U+1343F) and Astral/Private Use symbols
+  str = str.replace(/[\u1300-\u13FF]/g, '');
+  try {
+    str = str.replace(/[\u{13000}-\u{1343F}]/gu, '');
+    str = str.replace(/[\u{1F000}-\u{1FFFF}]/gu, '');
+    str = str.replace(/[\uE000-\uF8FF]/g, '');
+  } catch (e) {
+    str = str.replace(/[\uD80C][\uDC00-\uDFFF]/g, '');
+  }
+  str = str.replace(/\uFFFD/g, '');
+
+  // Remove non-printable control characters
+  str = str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+
+  // Remove repeated non-alphanumeric noise symbols (e.g., 𓈌𓈌𓈌, =====, -----)
+  str = str.replace(/([^\w\s.,;:()?!\-+/*=\[\]{}<>])\1+/g, '');
+
+  // Collapse whitespace
+  str = str.replace(/[ \t]{2,}/g, ' ');
+  str = str.replace(/ \n/g, '\n');
+  str = str.replace(/\n{3,}/g, '\n\n');
+
+  return str.trim();
+}
+
 async function extractPdfTextClient(file: File): Promise<string> {
   try {
     const arrayBuffer = await file.arrayBuffer();
@@ -18,13 +48,13 @@ async function extractPdfTextClient(file: File): Promise<string> {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
       const pageStrings = textContent.items
-        .map((item: any) => item.str)
+        .map((item: any) => cleanCorruptText(item.str))
         .filter(Boolean);
       if (pageStrings.length > 0) {
         fullText += `[Page ${i}]\n` + pageStrings.join(' ') + '\n\n';
       }
     }
-    return fullText.trim();
+    return cleanCorruptText(fullText.trim());
   } catch (err) {
     console.warn('PDF client text extraction note (sending raw base64 to server):', err);
     return '';
@@ -249,7 +279,9 @@ export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
   // Helper to format text with bold markdown
   const renderFormattedBullet = (text: string) => {
     if (!text) return null;
-    const parts = text.split(/(\*\*.*?\*\*)/g);
+    const sanitized = cleanCorruptText(text);
+    if (!sanitized) return null;
+    const parts = sanitized.split(/(\*\*.*?\*\*)/g);
     return (
       <span>
         {parts.map((part, idx) => {

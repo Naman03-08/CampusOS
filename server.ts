@@ -577,7 +577,38 @@ function calculateSummaryWords(data: any): number {
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
 
-// Sanitizes and deduplicates summary data to ensure 100% unique, non-repetitive points
+// Helper to sanitize corrupt text, font encoding artifacts, and weird unicode symbols (e.g. 𓈌, hieroglyphics, private use areas)
+function cleanCorruptText(input: string): string {
+  if (!input || typeof input !== 'string') return '';
+
+  let str = input;
+
+  // Remove Egyptian Hieroglyphs (\u1300-\u13FF or U+13000-U+1343F) and Astral/Private Use symbols
+  str = str.replace(/[\u1300-\u13FF]/g, '');
+  try {
+    str = str.replace(/[\u{13000}-\u{1343F}]/gu, '');
+    str = str.replace(/[\u{1F000}-\u{1FFFF}]/gu, '');
+    str = str.replace(/[\uE000-\uF8FF]/g, '');
+  } catch (e) {
+    str = str.replace(/[\uD80C][\uDC00-\uDFFF]/g, '');
+  }
+  str = str.replace(/\uFFFD/g, '');
+
+  // Remove non-printable control characters
+  str = str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+
+  // Remove repeated non-alphanumeric noise symbols (e.g., 𓈌𓈌𓈌, =====, -----)
+  str = str.replace(/([^\w\s.,;:()?!\-+/*=\[\]{}<>])\1+/g, '');
+
+  // Collapse whitespace
+  str = str.replace(/[ \t]{2,}/g, ' ');
+  str = str.replace(/ \n/g, '\n');
+  str = str.replace(/\n{3,}/g, '\n\n');
+
+  return str.trim();
+}
+
+// Sanitizes and deduplicates summary data to ensure 100% unique, non-repetitive, clean points
 function sanitizeSummaryData(data: any): any {
   if (!data) return null;
 
@@ -588,13 +619,17 @@ function sanitizeSummaryData(data: any): any {
     const result: string[] = [];
     for (const item of arr) {
       if (typeof item !== 'string') continue;
-      const trimmed = item.trim();
-      if (!trimmed) continue;
-      const key = trimmed.toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (key.length < 8) continue;
+      const cleaned = cleanCorruptText(item);
+      if (!cleaned || cleaned.length < 5) continue;
+      // Filter out garbage lines with too many non-alphanumeric characters
+      const alphaCount = cleaned.replace(/[^a-zA-Z0-9]/g, '').length;
+      if (cleaned.length > 10 && alphaCount / cleaned.length < 0.35) continue;
+
+      const key = cleaned.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (key.length < 6) continue;
       if (!globalSeen.has(key)) {
         globalSeen.add(key);
-        result.push(trimmed);
+        result.push(cleaned);
       }
     }
     return result;
@@ -610,18 +645,18 @@ function sanitizeSummaryData(data: any): any {
     const secTerms = dedupeStrings(sec.keyTerms || []);
     return {
       sectionNumber: sec.sectionNumber || idx + 1,
-      heading: sec.heading || `Section ${idx + 1}: Key Topic Breakdown`,
-      sectionParagraph: sec.sectionParagraph || sec.content || "",
+      heading: cleanCorruptText(sec.heading) || `Section ${idx + 1}: Key Topic Breakdown`,
+      sectionParagraph: cleanCorruptText(sec.sectionParagraph || sec.content || ""),
       bullets: secBullets,
       keyTerms: secTerms
     };
   }).filter((sec: any) => sec.bullets.length > 0 || sec.sectionParagraph);
 
   return {
-    title: data.title || "Uploaded Document Summary",
-    subject: data.subject || "Academic Study Notes",
-    pageEstimate: data.pageEstimate || "Full PDF Document",
-    executiveSummary: data.executiveSummary || "",
+    title: cleanCorruptText(data.title) || "Uploaded Document Summary",
+    subject: cleanCorruptText(data.subject) || "Academic Study Notes",
+    pageEstimate: cleanCorruptText(data.pageEstimate) || "Full PDF Document",
+    executiveSummary: cleanCorruptText(data.executiveSummary) || "",
     executiveSummaryBullets: execBullets,
     importantTopics: topics.length > 0 ? topics : ["Core Concepts", "Definitions", "Formulas", "Exam Takeaways"],
     quickReviewBullets: quickBullets,
@@ -629,23 +664,24 @@ function sanitizeSummaryData(data: any): any {
   };
 }
 
-// 6. AI Smart Notes Summarizer Route (Powered by Placivo AI)
+// 6. AI Smart Notes Summarizer Route (Powered by Placivo AI - Strictly gemini-2.5-flash-lite)
 app.post("/api/ai/summarize-notes", async (req, res) => {
   try {
     checkApiKey();
     const { title, rawNotes, pdfBase64 } = req.body;
 
-    const docTitle = title || "Uploaded PDF Document";
-    const notesText = (rawNotes || "").trim();
+    const docTitle = cleanCorruptText(title || "Uploaded PDF Document");
+    const notesText = cleanCorruptText(rawNotes || "");
 
     const promptText = `You are Placivo AI Smart Notes Summarizer Engine.
 Your ABSOLUTE HIGHEST PRIORITY is to read the ENTIRE PDF document titled "${docTitle}" VERY CAREFULLY, LINE BY LINE, FROM PAGE 1 TO THE VERY END.
 
-CRITICAL MANDATES (NO REPETITION & STRICT GROUNDING):
-1. READ THE COMPLETE PDF FIRST: Analyze every single page, line, formula, definition, theorem, step, and example in the document.
-2. ABSOLUTELY NO REPETITIVE OR TEMPLATE SENTENCES: Every single bullet point MUST be 100% unique, distinct, and contain actual factual content, formulas, definitions, proofs, or problem-solving steps derived directly from the PDF text.
-3. NEVER USE GENERIC FILLER TEXT like "Master concept #1", "Detailed examination of subsection X", "Understand the exact definition...", or "Analytical Line Breakdown...". Every bullet point must state a real, specific concept or formula from the PDF.
-4. EVERY POINT MUST BE DIFFERENT: Do not repeat any sentence structure or phrase across any section.
+CRITICAL MANDATES (STRICT GEMINI 2.5 FLASH-LITE GROUNDING, CLEAN FORMATTING & NO REPETITION):
+1. MODEL MANDATE: Use gemini-2.5-flash-lite model exclusively to analyze every single page, line, formula, definition, theorem, step, and example in the document.
+2. CLEAN MATHEMATICAL & TEXTUAL NOTATION: Filter out and ignore any corrupt PDF font glyphs, hieroglyphics (like 𓈌), unreadable unicode characters, or broken bracket symbols. Convert all matrices, equations, tables, and mathematical expressions into clean, elegant, human-readable markdown (e.g., [[a, b], [c, d]] or [x  y] or clean LaTeX/text notation). NEVER output corrupted font noise or unreadable symbol blocks.
+3. ABSOLUTELY NO REPETITIVE OR TEMPLATE SENTENCES: Every single bullet point MUST be 100% unique, distinct, and contain actual factual content, formulas, definitions, proofs, or problem-solving steps derived directly from the PDF text.
+4. NEVER USE GENERIC FILLER TEXT like "Master concept #1", "Detailed examination of subsection X", "Understand the exact definition...", or "Analytical Line Breakdown...". Every bullet point must state a real, specific concept or formula from the PDF.
+5. EVERY POINT MUST BE DIFFERENT: Do not repeat any sentence structure or phrase across any section.
 
 OUTPUT JSON SCHEMA:
 {
@@ -703,10 +739,10 @@ ${notesText && notesText.length > 50 ? `Extracted Full Text of the PDF Document:
           ];
         }
 
-        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite for complete grounded PDF notes summary");
+        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite ONLY for complete grounded PDF notes summary");
         const response: any = await generateContentWithFallback({
           contents: contentsPayload,
-          models: GEMINI_LOW_MODELS,
+          models: ["gemini-2.5-flash-lite"],
           config: {
             responseMimeType: "application/json",
             maxOutputTokens: 32768,
@@ -736,13 +772,17 @@ ${notesText && notesText.length > 50 ? `Extracted Full Text of the PDF Document:
     }
 
     // Dynamic, Non-Repetitive Fallback Generator based on actual extracted PDF text
-    const topicBase = docTitle.replace(/[-_.]/g, " ").replace(/\bpdf\b/gi, "").trim();
+    const topicBase = cleanCorruptText(docTitle.replace(/[-_.]/g, " ").replace(/\bpdf\b/gi, "").trim());
 
     // Extract actual sentences from PDF text if present
     const rawSentences = notesText
       .split(/(?<=[.!?])\s+|\n+/)
-      .map((s: string) => s.trim().replace(/^[-*•\d.]+\s*/, ""))
-      .filter((s: string) => s.length > 20);
+      .map((s: string) => cleanCorruptText(s.trim().replace(/^[-*•\d.]+\s*/, "")))
+      .filter((s: string) => {
+        if (s.length < 20) return false;
+        const alphaCount = s.replace(/[^a-zA-Z0-9]/g, "").length;
+        return (alphaCount / s.length) > 0.45;
+      });
 
     // Filter duplicates
     const uniqueSentences: string[] = [];
