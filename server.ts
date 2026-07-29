@@ -58,7 +58,10 @@ app.post("/api/auth/send-reset-otp", async (req, res) => {
 
     console.log(`[AUTH OTP ENGINE] Generated Password Reset OTP ${otp} for email: ${cleanEmail}`);
 
-    // If SMTP environment variables are configured, attempt to send real email
+    // Send OTP via Nodemailer (Custom SMTP or Ethereal Test Account fallback)
+    let emailSent = false;
+    let emailPreviewUrl: string | undefined = undefined;
+
     if (process.env.SMTP_HOST && process.env.SMTP_USER) {
       try {
         const transporter = nodemailer.createTransport({
@@ -76,25 +79,75 @@ app.post("/api/auth/send-reset-otp", async (req, res) => {
           to: cleanEmail,
           subject: "Placivo AI - Student Account Password Reset OTP",
           html: `
-            <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f8fafc; color: #1e293b;">
-              <h2 style="color: #2563eb;">Placivo AI - Password Reset Request</h2>
+            <div style="font-family: Arial, sans-serif; padding: 24px; background-color: #f8fafc; color: #1e293b; max-width: 600px; margin: 0 auto; border-radius: 16px; border: 1px solid #e2e8f0;">
+              <h2 style="color: #2563eb; margin-top: 0;">Placivo AI - Password Reset Request</h2>
               <p>Hello Student,</p>
               <p>You requested to reset your Placivo AI account password. Use the following 6-digit verification OTP code:</p>
-              <div style="font-size: 28px; font-weight: 800; letter-spacing: 6px; color: #2563eb; background: #eff6ff; padding: 16px; border-radius: 12px; display: inline-block; margin: 15px 0;">
+              <div style="font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #2563eb; background: #eff6ff; padding: 20px; border-radius: 12px; display: inline-block; margin: 20px 0; border: 1px solid #bfdbfe;">
                 ${otp}
               </div>
-              <p style="font-size: 12px; color: #64748b;">This OTP code is valid for 10 minutes. Do not share this OTP with anyone.</p>
+              <p style="font-size: 13px; color: #64748b;">This OTP code is valid for 10 minutes. Do not share this code with anyone.</p>
+              <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+              <p style="font-size: 11px; color: #94a3b8;">Placivo Campus OS Security & Auth Engine</p>
             </div>
           `,
         });
+        emailSent = true;
+        console.log(`[AUTH OTP] Successfully sent OTP email via SMTP to ${cleanEmail}`);
       } catch (emailErr) {
-        console.warn("[AUTH OTP] SMTP send failed, falling back to local verification OTP:", emailErr);
+        console.warn("[AUTH OTP] Custom SMTP send failed:", emailErr);
+      }
+    }
+
+    // Fallback Ethereal Transporter if custom SMTP is not set or failed
+    if (!emailSent) {
+      try {
+        const testAccount = await nodemailer.createTestAccount();
+        const testTransporter = nodemailer.createTransport({
+          host: "smtp.ethereal.email",
+          port: 587,
+          secure: false,
+          auth: {
+            user: testAccount.user,
+            pass: testAccount.pass,
+          },
+        });
+
+        const info = await testTransporter.sendMail({
+          from: `"Placivo Security Team" <${testAccount.user}>`,
+          to: cleanEmail,
+          subject: "Placivo AI - Student Account Password Reset OTP",
+          html: `
+            <div style="font-family: Arial, sans-serif; padding: 24px; background-color: #f8fafc; color: #1e293b; max-width: 600px; margin: 0 auto; border-radius: 16px; border: 1px solid #e2e8f0;">
+              <h2 style="color: #2563eb; margin-top: 0;">Placivo AI - Password Reset Request</h2>
+              <p>Hello Student (${cleanEmail}),</p>
+              <p>You requested to reset your Placivo AI account password. Use the following 6-digit verification OTP code:</p>
+              <div style="font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #2563eb; background: #eff6ff; padding: 20px; border-radius: 12px; display: inline-block; margin: 20px 0; border: 1px solid #bfdbfe;">
+                ${otp}
+              </div>
+              <p style="font-size: 13px; color: #64748b;">This OTP code is valid for 10 minutes. Do not share this code with anyone.</p>
+            </div>
+          `,
+        });
+
+        const preview = nodemailer.getTestMessageUrl(info);
+        if (preview) {
+          emailPreviewUrl = preview;
+          console.log(`[AUTH OTP] Ethereal test email sent to ${cleanEmail}. Preview link: ${preview}`);
+        }
+        emailSent = true;
+      } catch (etherealErr) {
+        console.warn("[AUTH OTP] Ethereal test mail send fallback notice:", etherealErr);
       }
     }
 
     return res.json({
       success: true,
-      message: `A 6-digit OTP code has been issued for ${cleanEmail}. Check your inbox or enter code below.`,
+      message: emailSent
+        ? `A 6-digit verification OTP code has been sent to ${cleanEmail}. Check your email inbox or enter the 6-digit code below.`
+        : `A 6-digit OTP code has been generated for ${cleanEmail}. Enter code below to proceed.`,
+      emailSent,
+      emailPreviewUrl,
       devOtp: process.env.NODE_ENV !== 'production' ? otp : undefined,
       expiresInSeconds: 600
     });

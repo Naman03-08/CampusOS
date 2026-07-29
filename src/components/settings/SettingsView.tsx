@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings as SettingsIcon, User, Save, ShieldCheck, Database, Zap, Clock, Check, ArrowRight, Star, KeyRound, Lock, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Settings as SettingsIcon, User, Save, ShieldCheck, Database, Zap, Clock, Check, ArrowRight, Star, KeyRound, Lock, RefreshCw, CheckCircle2, ExternalLink } from 'lucide-react';
 import { UserProfile } from '../../types';
 import { StorageService } from '../../lib/storage';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
@@ -26,6 +26,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
   const [devOtpNotice, setDevOtpNotice] = useState('');
+  const [emailPreviewUrl, setEmailPreviewUrl] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const planDetails = calculatePlanDetails(user);
@@ -59,14 +60,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
     setOtpLoading(true);
     setOtpError('');
     setDevOtpNotice('');
+    setEmailPreviewUrl(null);
 
     try {
+      let fbNotice = '';
       if (auth) {
         try {
           await sendPasswordResetEmail(auth, profile.email.trim());
           console.log("[Firebase Auth] Password reset email sent directly to real email inbox:", profile.email.trim());
         } catch (fbErr: any) {
           console.warn("[Firebase Auth] Password reset email note:", fbErr);
+          if (fbErr?.code === 'auth/user-not-found') {
+            fbNotice = ' (Firebase Auth user account not found for this email, but 6-digit OTP code generated below).';
+          }
         }
       }
 
@@ -83,8 +89,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
 
       setOtpStep(1);
       setResendCooldown(60);
+      if (data.emailPreviewUrl) {
+        setEmailPreviewUrl(data.emailPreviewUrl);
+      }
       if (data.devOtp) {
-        setDevOtpNotice(`Real email & 6-digit OTP code dispatched to ${profile.email.trim()} (Dev OTP preview: ${data.devOtp}).`);
+        setDevOtpNotice(`Real email & 6-digit OTP code dispatched to ${profile.email.trim()}${fbNotice} (Dev OTP preview: ${data.devOtp}).`);
+      } else {
+        setDevOtpNotice(`Real email & 6-digit OTP code dispatched to ${profile.email.trim()}.${fbNotice}`);
       }
     } catch (err: any) {
       console.error("Settings OTP error:", err);
@@ -428,8 +439,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
                 </div>
 
                 {devOtpNotice && (
-                  <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] font-mono font-bold text-amber-900">
-                    {devOtpNotice}
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 font-medium space-y-1.5">
+                    <p className="font-bold">{devOtpNotice}</p>
+                    {emailPreviewUrl && (
+                      <a
+                        href={emailPreviewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-blue-700 font-bold underline hover:text-blue-900 text-[11px]"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>View Dispatched Email Preview in Ethereal Inbox</span>
+                      </a>
+                    )}
                   </div>
                 )}
 

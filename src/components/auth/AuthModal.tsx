@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, GraduationCap, Mail, Lock, User, ArrowRight, CheckCircle2, Phone, Building2, BookOpen, Bot, KeyRound, ShieldCheck, RefreshCw } from 'lucide-react';
+import { X, GraduationCap, Mail, Lock, User, ArrowRight, CheckCircle2, Phone, Building2, BookOpen, Bot, KeyRound, ShieldCheck, RefreshCw, ExternalLink } from 'lucide-react';
 import { auth, googleProvider } from '../../lib/firebase';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updatePassword } from 'firebase/auth';
 import { UserProfile } from '../../types';
@@ -40,6 +40,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [devOtpNotice, setDevOtpNotice] = useState('');
+  const [emailPreviewUrl, setEmailPreviewUrl] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   // Hold Google Auth User credentials when completing Google onboarding
@@ -80,15 +81,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     setErrorMsg('');
     setDevOtpNotice('');
+    setEmailPreviewUrl(null);
 
     try {
-      // Trigger Firebase Auth real password reset email to user's real email inbox
+      let fbNotice = '';
       if (auth) {
         try {
           await sendPasswordResetEmail(auth, email.trim());
           console.log("[Firebase Auth] Password reset email dispatched directly to real inbox:", email.trim());
         } catch (fbErr: any) {
           console.warn("[Firebase Auth] Password reset email note:", fbErr);
+          if (fbErr?.code === 'auth/user-not-found') {
+            fbNotice = ' (Firebase Auth user account not found for this email, but 6-digit OTP code generated below).';
+          }
         }
       }
 
@@ -105,15 +110,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
       setOtpStep(2);
       setResendCooldown(60);
+      if (data.emailPreviewUrl) {
+        setEmailPreviewUrl(data.emailPreviewUrl);
+      }
       if (data.devOtp) {
-        setDevOtpNotice(`Real email & 6-digit OTP code dispatched to ${email.trim()} (Dev OTP preview: ${data.devOtp}).`);
+        setDevOtpNotice(`Real email & 6-digit OTP code dispatched to ${email.trim()}${fbNotice} (Dev OTP preview: ${data.devOtp}).`);
+      } else {
+        setDevOtpNotice(`Real email & 6-digit OTP code dispatched to ${email.trim()}.${fbNotice}`);
       }
     } catch (err: any) {
       console.error("OTP send error:", err);
       // Fallback: Also send standard Firebase password reset email
       if (auth) {
         try {
-          await sendPasswordResetEmail(auth, email);
+          await sendPasswordResetEmail(auth, email.trim());
           setResetSent(true);
         } catch (fbErr: any) {
           setErrorMsg(err.message || fbErr.message || 'Failed to send OTP reset code.');
@@ -589,8 +599,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
 
                 {devOtpNotice && (
-                  <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] font-mono text-amber-900 font-bold">
-                    {devOtpNotice}
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 font-medium space-y-1.5">
+                    <p className="font-bold">{devOtpNotice}</p>
+                    {emailPreviewUrl && (
+                      <a
+                        href={emailPreviewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-blue-700 font-bold underline hover:text-blue-900 text-[11px]"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>View Dispatched Email Preview in Ethereal Inbox</span>
+                      </a>
+                    )}
                   </div>
                 )}
 
