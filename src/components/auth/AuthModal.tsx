@@ -561,7 +561,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
-      <div className="bg-white rounded-[2rem] border border-slate-200/80 shadow-2xl max-w-4xl w-full grid grid-cols-1 md:grid-cols-12 relative overflow-hidden my-auto max-h-[92vh]">
+      <div className="bg-white rounded-[2rem] border border-slate-200/80 shadow-2xl max-w-4xl w-full grid grid-cols-1 md:grid-cols-12 relative overflow-hidden my-auto max-h-[92vh] sm:max-h-[90vh]">
         
         {/* Left Column - Dark Brand Panel */}
         <div className="md:col-span-5 bg-[#0B1736] text-white p-7 sm:p-9 flex flex-col justify-between relative overflow-hidden selection:bg-blue-500 selection:text-white">
@@ -624,7 +624,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* Right Column - Form Area */}
-        <div className="md:col-span-7 bg-white p-7 sm:p-9 flex flex-col justify-between relative overflow-y-auto max-h-[85vh] md:max-h-none">
+        <div className="md:col-span-7 bg-white p-7 sm:p-9 flex flex-col justify-between relative overflow-y-auto max-h-[85vh] md:max-h-[88vh]">
           {/* Close Button */}
           <button
             onClick={handleModalClose}

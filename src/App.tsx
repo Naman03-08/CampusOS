@@ -658,7 +658,7 @@ export function App() {
         </div>
       ) : (
         /* VIEWMODE 2: APP WORKSPACE PORTAL (If logged in) */
-        <div className="relative z-10 h-screen w-screen overflow-hidden flex flex-col">
+        <div className="relative z-10 h-screen w-full max-w-full overflow-hidden flex flex-col">
           <Header
             user={user}
             notifications={notifications}

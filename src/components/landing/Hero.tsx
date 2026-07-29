@@ -28,7 +28,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
   const trendingTags = ['IIT Bombay', 'Data Science', 'Engineering', 'MBA', 'BCA'];
 
   return (
-    <section className="relative pt-6 pb-16 md:pt-10 md:pb-20 overflow-hidden bg-gradient-to-b from-blue-50/40 via-white to-slate-50/50">
+    <section className="relative pt-6 pb-16 md:pt-10 md:pb-20 overflow-x-clip bg-gradient-to-b from-blue-50/40 via-white to-slate-50/50">
       {/* Soft Ambient Background Orbs */}
       <div className="absolute top-[-120px] left-[-120px] w-[550px] h-[550px] bg-blue-100/50 rounded-full blur-[140px] pointer-events-none z-0"></div>
       <div className="absolute top-[20%] right-[-100px] w-[500px] h-[500px] bg-indigo-100/40 rounded-full blur-[130px] pointer-events-none z-0"></div>
@@ -117,101 +117,100 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
           </div>
 
           {/* Right Column: Clean Student Illustration encircled by Orbital Blue Ring & 6 Floating Pill Badges */}
-          <div className="lg:col-span-6 relative flex items-center justify-center pt-8 lg:pt-0">
+          <div className="lg:col-span-6 relative flex items-center justify-center pt-8 lg:pt-0 px-2 sm:px-4">
             
             {/* Outer Container for Graphic & Orbit */}
-            <div className="relative z-10 w-full max-w-xl sm:max-w-2xl min-h-[460px] sm:min-h-[520px] flex items-center justify-center">
+            <div className="relative z-10 w-full max-w-xl sm:max-w-2xl min-h-[440px] sm:min-h-[500px] flex items-center justify-center">
               
               {/* Smooth Orbital Blue Line encircling characters & badges */}
               <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center">
-                <svg viewBox="0 0 500 500" className="w-[110%] h-[110%] sm:w-[120%] sm:h-[120%] text-blue-400/70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 500 500" className="w-[105%] h-[105%] sm:w-[115%] sm:h-[115%] text-blue-400/70 max-w-full max-h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
                   {/* Outer delicate orbit line */}
-                  <ellipse cx="250" cy="250" rx="230" ry="210" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.4" />
+                  <ellipse cx="250" cy="250" rx="220" ry="200" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.4" />
                   {/* Primary orbital ring */}
-                  <ellipse cx="250" cy="250" rx="210" ry="190" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  <ellipse cx="250" cy="250" rx="200" ry="180" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </div>
 
-              {/* Clean Isolated Students Art - Significantly Bigger */}
-              <div className="relative z-10 w-full max-w-md sm:max-w-lg lg:max-w-xl flex items-center justify-center px-4">
+              {/* Clean Isolated Students Art - Bigger & Zoom-Responsive */}
+              <div className="relative z-10 w-full max-w-sm sm:max-w-md lg:max-w-lg flex items-center justify-center px-2">
                 <img
                   src={heroStudentsArt}
                   alt="Placivo AI College Students"
-                  className="w-full h-auto object-contain mix-blend-multiply select-none pointer-events-none transform hover:scale-[1.02] transition-transform duration-500 scale-110 sm:scale-115"
+                  className="w-full h-auto object-contain mix-blend-multiply select-none pointer-events-none transform hover:scale-[1.02] transition-transform duration-500 scale-105 sm:scale-110"
                   referrerPolicy="no-referrer"
                 />
               </div>
 
               {/* 6 Floating Feature Badges */}
 
-              {/* Badge 1: Top Center / Left - AI Notes */}
-              <div className="absolute top-0 -left-2 sm:left-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <BookOpen className="w-5 h-5 text-blue-600" />
+              {/* Badge 1: Top Left - AI Notes */}
+              <div className="absolute top-0 left-0 sm:left-1 lg:-left-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[140px] sm:max-w-none" onClick={onExploreDemo}>
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
-                <div className="text-left">
-                  <div className="text-xs font-black text-slate-900 leading-tight">AI Notes</div>
-                  <div className="text-[10px] font-medium text-slate-500">Summarize & Study</div>
+                <div className="text-left min-w-0">
+                  <div className="text-xs font-black text-slate-900 leading-tight truncate">AI Notes</div>
+                  <div className="text-[10px] font-medium text-slate-500 truncate">Summarize & Study</div>
                 </div>
               </div>
 
               {/* Badge 2: Top Right - Courses */}
-              <div className="absolute top-0 -right-2 sm:right-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <GraduationCap className="w-5 h-5 text-blue-600" />
+              <div className="absolute top-0 right-0 sm:right-1 lg:-right-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[140px] sm:max-w-none" onClick={onExploreDemo}>
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
-                <div className="text-left">
-                  <div className="text-xs font-black text-slate-900 leading-tight">Courses</div>
-                  <div className="text-[10px] font-medium text-slate-500">Learn & Upskill</div>
+                <div className="text-left min-w-0">
+                  <div className="text-xs font-black text-slate-900 leading-tight truncate">Courses</div>
+                  <div className="text-[10px] font-medium text-slate-500 truncate">Learn & Upskill</div>
                 </div>
               </div>
 
               {/* Badge 3: Middle Left - Placements */}
-              <div className="absolute top-1/2 -left-6 sm:-left-10 -translate-y-1/2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <Briefcase className="w-5 h-5 text-blue-600" />
+              <div className="absolute top-1/2 left-0 sm:-left-3 lg:-left-6 -translate-y-1/2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[150px] sm:max-w-none" onClick={onExploreDemo}>
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
-                <div className="text-left">
-                  <div className="text-xs font-black text-slate-900 leading-tight">Placements</div>
-                  <div className="text-[10px] font-medium text-slate-500">Jobs & Internships</div>
+                <div className="text-left min-w-0">
+                  <div className="text-xs font-black text-slate-900 leading-tight truncate">Placements</div>
+                  <div className="text-[10px] font-medium text-slate-500 truncate">Jobs & Internships</div>
                 </div>
               </div>
 
               {/* Badge 4: Middle Right - Planner */}
-              <div className="absolute top-1/2 -right-6 sm:-right-10 -translate-y-1/2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <Calendar className="w-5 h-5 text-blue-600" />
+              <div className="absolute top-1/2 right-0 sm:-right-3 lg:-right-6 -translate-y-1/2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[140px] sm:max-w-none" onClick={onExploreDemo}>
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
-                <div className="text-left">
-                  <div className="text-xs font-black text-slate-900 leading-tight">Planner</div>
-                  <div className="text-[10px] font-medium text-slate-500">Organize Better</div>
+                <div className="text-left min-w-0">
+                  <div className="text-xs font-black text-slate-900 leading-tight truncate">Planner</div>
+                  <div className="text-[10px] font-medium text-slate-500 truncate">Organize Better</div>
                 </div>
               </div>
 
               {/* Badge 5: Bottom Left - AI Assistant */}
-              <div className="absolute bottom-0 left-0 sm:left-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <Bot className="w-5 h-5 text-blue-600" />
+              <div className="absolute bottom-0 left-0 sm:left-1 lg:-left-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[145px] sm:max-w-none" onClick={onExploreDemo}>
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
-                <div className="text-left">
-                  <div className="text-xs font-black text-slate-900 leading-tight">AI Assistant</div>
-                  <div className="text-[10px] font-medium text-slate-500">Your Study Buddy</div>
+                <div className="text-left min-w-0">
+                  <div className="text-xs font-black text-slate-900 leading-tight truncate">AI Assistant</div>
+                  <div className="text-[10px] font-medium text-slate-500 truncate">Your Study Buddy</div>
                 </div>
               </div>
 
               {/* Badge 6: Bottom Right - Community */}
-              <div className="absolute bottom-0 right-0 sm:right-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2.5 sm:p-3 flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer" onClick={onExploreDemo}>
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <Users className="w-5 h-5 text-blue-600" />
+              <div className="absolute bottom-0 right-0 sm:right-1 lg:-right-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[140px] sm:max-w-none" onClick={onExploreDemo}>
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
-                <div className="text-left">
-                  <div className="text-xs font-black text-slate-900 leading-tight">Community</div>
-                  <div className="text-[10px] font-medium text-slate-500">Connect & Grow</div>
+                <div className="text-left min-w-0">
+                  <div className="text-xs font-black text-slate-900 leading-tight truncate">Community</div>
+                  <div className="text-[10px] font-medium text-slate-500 truncate">Connect & Grow</div>
                 </div>
               </div>
 
             </div>
-
           </div>
 
         </div>
