@@ -29,7 +29,6 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Flame, 
-  Sparkles,
   Medal,
   Edit2,
   Brain,
@@ -1227,7 +1226,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                 </div>
                 {!innerSidebarCollapsed && (
                   <span className="px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-950 font-black text-[10px] flex items-center gap-0.5">
-                    <Sparkles className="w-2.5 h-2.5 text-amber-600" />
+                    <Zap className="w-2.5 h-2.5 text-amber-600" />
                     <span>Earn Gold</span>
                   </span>
                 )}
@@ -1274,7 +1273,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                   <div className="space-y-4 max-w-xl">
                     <div className="flex items-center gap-2">
                       <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-900 font-extrabold text-[10px] tracking-wider uppercase border border-indigo-200 backdrop-blur-md flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-indigo-600 animate-pulse" />
+                        <Zap className="w-3 h-3 text-indigo-600 animate-pulse" />
                         <span>AI-POWERED HABITUREX SYSTEM</span>
                       </span>
                     </div>
@@ -1294,7 +1293,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                       >
                         <Brain className="w-4 h-4 text-indigo-100 group-hover:animate-bounce" />
                         <span>Ask AI Academic Coach</span>
-                        <Sparkles className="w-3 h-3 text-indigo-200 animate-pulse" />
+                        <Zap className="w-3 h-3 text-indigo-200 animate-pulse" />
                       </button>
                     </div>
                   </div>
@@ -2191,14 +2190,14 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                 <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                   <div className="space-y-2 max-w-xl">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-black tracking-wider uppercase">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                      <Medal className="w-3.5 h-3.5 text-amber-600" />
                       <span>Admin Published Gold Bounties</span>
                     </div>
                     <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
                       Gold Quest Arena & Bounties
                     </h2>
                     <p className="text-xs md:text-sm text-slate-600 font-medium leading-relaxed">
-                      Complete rigorous, high-difficulty engineering tasks published by Campus OS administrators to earn high-tier <strong className="text-amber-800">Gold Credits</strong>, rise on the global leaderboard, and unlock verified tech badges!
+                      Complete rigorous, high-difficulty engineering tasks published by Placivo administrators to earn high-tier <strong className="text-amber-800">Gold Credits</strong>, rise on the global leaderboard, and unlock verified tech badges!
                     </p>
                   </div>
 
@@ -2262,7 +2261,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
               {/* Bounties Grid */}
               {loadingBounties ? (
                 <div className="py-16 text-center text-slate-400 font-bold text-xs animate-pulse">
-                  Fetching published Gold Bounties from Campus OS Admin Hub...
+                  Fetching published Gold Bounties from Placivo Admin Hub...
                 </div>
               ) : bountiesList.length === 0 ? (
                 <div className="p-12 text-center rounded-3xl bg-white border border-dashed border-slate-200 space-y-3">
@@ -2313,7 +2312,7 @@ export const HabiturexView: React.FC<HabiturexViewProps> = ({
                               </div>
 
                               <span className="px-3 py-1 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-xs shadow-xs border border-amber-300 flex items-center gap-1 shrink-0">
-                                <Sparkles className="w-3 h-3 text-slate-950" />
+                                <Medal className="w-3 h-3 text-slate-950" />
                                 <span>+{bounty.rewardCredits} GOLD</span>
                               </span>
                             </div>

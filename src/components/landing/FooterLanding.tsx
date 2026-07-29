@@ -1,6 +1,5 @@
 import React from 'react';
 import { GraduationCap, Heart, ShieldCheck } from 'lucide-react';
-import logoImg from '../logo.png';
 
 export const FooterLanding: React.FC = () => {
   return (
@@ -9,10 +8,10 @@ export const FooterLanding: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-purple-200/60">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center bg-white border border-slate-100 shadow-2xs">
-                <img src={logoImg} alt="CampusOS Logo" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#2563EB] text-white shadow-2xs">
+                <GraduationCap className="w-5 h-5" />
               </div>
-              <span className="font-extrabold text-xl text-slate-900 tracking-tight">CampusOS AI</span>
+              <span className="font-extrabold text-xl text-slate-900 tracking-tight">Placivo AI</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
               The AI Operating System for College Students. Empowering academic excellence and campus placements worldwide.
@@ -57,7 +56,7 @@ export const FooterLanding: React.FC = () => {
         </div>
 
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© {new Date().getFullYear()} CampusOS AI Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Placivo AI Inc. All rights reserved.</p>
           <p className="flex items-center gap-1 font-medium">
             Built with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" /> for students globally.
           </p>

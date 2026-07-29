@@ -24,7 +24,6 @@ import {
   X,
   ExternalLink,
   Clock,
-  Sparkles,
   BarChart3,
   Award,
   DollarSign,
@@ -58,7 +57,7 @@ const SECURITY_KEY = 'Naman@#2008';
 
 export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigateTab }) => {
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
-    return sessionStorage.getItem('campusos_admin_unlocked') === 'true';
+    return sessionStorage.getItem('placivo_admin_unlocked') === 'true' || sessionStorage.getItem('campusos_admin_unlocked') === 'true';
   });
   const [securityInput, setSecurityInput] = useState('');
   const [showKey, setShowKey] = useState(false);
@@ -200,7 +199,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       expiryDate: bountyForm.expiryDate,
       tags: tags.length > 0 ? tags : ['Academic'],
       createdAt: new Date().toISOString(),
-      createdBy: user?.email || 'Campus OS Admin',
+      createdBy: user?.email || 'Placivo Admin',
       isActive: true,
       totalCompletions: 0
     };
@@ -298,7 +297,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
 
     if (securityInput === SECURITY_KEY) {
       setIsUnlocked(true);
-      sessionStorage.setItem('campusos_admin_unlocked', 'true');
+      sessionStorage.setItem('placivo_admin_unlocked', 'true');
       setSecurityInput('');
       setErrorMsg('');
     } else {
@@ -310,6 +309,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
 
   const handleLockPanel = () => {
     setIsUnlocked(false);
+    sessionStorage.removeItem('placivo_admin_unlocked');
     sessionStorage.removeItem('campusos_admin_unlocked');
     setSecurityInput('');
     setErrorMsg('');
@@ -1231,7 +1231,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-500">Total Reward Pool</span>
                 <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
-                  <Sparkles className="w-4 h-4" />
+                  <Award className="w-4 h-4" />
                 </div>
               </div>
               <p className="text-2xl font-black text-slate-900 mt-2">
@@ -1323,7 +1323,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
 
                     <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
                       <div className="px-3 py-1 rounded-xl bg-amber-100 text-amber-900 font-black text-xs flex items-center gap-1.5 border border-amber-200">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                        <Award className="w-3.5 h-3.5 text-amber-600" />
                         <span>+{bounty.rewardCredits} GOLD CREDITS</span>
                       </div>
 
@@ -1508,7 +1508,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
               <div>
                 <label className="block mb-1">Gold Credits Reward Amount</label>
                 <div className="relative">
-                  <Sparkles className="w-4 h-4 text-amber-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Award className="w-4 h-4 text-amber-500 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="number"
                     required

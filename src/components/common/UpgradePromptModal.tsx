@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, Clock, Lock, ArrowRight, X, Sparkles, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Zap, Clock, Lock, ArrowRight, X, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { UserProfile } from '../../types';
 import { calculatePlanDetails } from '../../lib/planUtils';
 
@@ -70,7 +70,7 @@ export const UpgradePromptModal: React.FC<UpgradePromptModalProps> = ({
               <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-emerald-600" />
+                    <Zap className="w-4 h-4 text-emerald-600" />
                     <span className="text-xs font-black text-emerald-950">4-Day Free Trial Available</span>
                   </div>
                   <p className="text-[11px] text-emerald-800 font-medium mt-0.5">
@@ -127,7 +127,7 @@ export const UpgradePromptModal: React.FC<UpgradePromptModalProps> = ({
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>CampusOS 375 DSA Roadmap</span>
+                <span>Placivo 375 DSA Roadmap</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />

@@ -46,7 +46,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
     features: [
       '4 Days Full Access to basic features',
       '5 AI Study Suite generations (Notes, Flashcards, Quiz)',
-      '3 CampusOS 375 DSA question AI solutions / day',
+      '3 Placivo 375 DSA question AI solutions / day',
       '5 AI Academic Tutor Sessions',
       '2 ATS Resume Audit Scans & PDF Export',
       '256 Subjects Technical Interview Question Bank',
@@ -54,7 +54,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
     ],
     notIncluded: [
       'Unlimited High-Score ATS Resume Scans',
-      'Unlimited CampusOS 375 DSA Code Coach',
+      'Unlimited Placivo 375 DSA Code Coach',
       'Priority High-Speed Processing Engine'
     ]
   },
@@ -80,7 +80,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
     features: [
       'Everything in Free Trial, PLUS:',
       'UNLIMITED AI Academic Tutor with step-by-step logic',
-      'Complete CampusOS 375 DSA Roadmap Sheet access',
+      'Complete Placivo 375 DSA Roadmap Sheet access',
       '15 High-Score ATS Resume Scans & Keyword Scans / month',
       '50 AI Study Suites & Flashcard Generators / month',
       'Full Access to 256 Technical Interview Subjects & Questions',
@@ -94,7 +94,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
   },
   {
     id: 'plan_349',
-    name: 'Campus Pro Ultimate',
+    name: 'Placivo Pro Ultimate',
     tagline: 'Complete Placement & Academic Acceleration Pass',
     priceMonthly: '₹399',
     priceYearly: '₹3,799',
@@ -115,11 +115,11 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
       'Everything in ₹199 Plan, PLUS:',
       'UNLIMITED Technical Interview Question Bank (All 256 Subjects)',
       'UNLIMITED High-Score ATS Resume Builder & Job Matcher',
-      'UNLIMITED Instant CampusOS 375 DSA Code Coach (C++, Java, Python, TS)',
+      'UNLIMITED Instant Placivo 375 DSA Code Coach (C++, Java, Python, TS)',
       'UNLIMITED AI Cover Letter Generators for Target Companies',
       '1-on-1 AI Placement Mentor & Company Technical Interview Prep',
       'Priority Ultra-Fast AI Reasoning Engine',
-      'Verified CampusOS Completion Certificate'
+      'Verified Placivo Completion Certificate'
     ],
     notIncluded: []
   }
@@ -200,7 +200,7 @@ export function calculatePlanDetails(user: UserProfile) {
   } else {
     if (currentPlanId === 'free_trial') planName = 'Free Trial (4 Days)';
     if (currentPlanId === 'plan_199') planName = 'Pro Scholar (₹199)';
-    if (currentPlanId === 'plan_349') planName = 'Campus Pro Ultimate (₹399)';
+    if (currentPlanId === 'plan_349') planName = 'Placivo Pro Ultimate (₹399)';
   }
 
   const formattedStartedAt = startedAtMs > 0 ? new Date(startedAtMs).toLocaleDateString('en-IN', {

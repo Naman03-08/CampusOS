@@ -1329,7 +1329,7 @@ export const DEFAULT_GLOBAL_BOUNTIES: GlobalBounty[] = [
     expiryDate: '2026-12-31',
     tags: ['DSA', 'LeetCode Hard', 'DP', 'Graphs'],
     createdAt: new Date().toISOString(),
-    createdBy: 'Campus OS Academy Admin',
+    createdBy: 'Placivo Academy Admin',
     isActive: true,
     totalCompletions: 14
   },
@@ -1345,7 +1345,7 @@ export const DEFAULT_GLOBAL_BOUNTIES: GlobalBounty[] = [
     expiryDate: '2026-12-31',
     tags: ['AI', 'RAG', 'Gemini API', 'Vector DB', 'Full-Stack'],
     createdAt: new Date().toISOString(),
-    createdBy: 'Campus OS AI Lab',
+    createdBy: 'Placivo AI Lab',
     isActive: true,
     totalCompletions: 8
   },
@@ -1361,7 +1361,7 @@ export const DEFAULT_GLOBAL_BOUNTIES: GlobalBounty[] = [
     expiryDate: '2026-12-31',
     tags: ['Systems', 'Distributed Systems', 'Raft Consensus', 'Low Level'],
     createdAt: new Date().toISOString(),
-    createdBy: 'Campus OS Admin',
+    createdBy: 'Placivo Admin',
     isActive: true,
     totalCompletions: 3
   },
@@ -1377,13 +1377,13 @@ export const DEFAULT_GLOBAL_BOUNTIES: GlobalBounty[] = [
     expiryDate: '2026-12-31',
     tags: ['CyberSec', 'Penetration Testing', 'AppSec', 'Exploits'],
     createdAt: new Date().toISOString(),
-    createdBy: 'Campus OS Security Team',
+    createdBy: 'Placivo Security Team',
     isActive: true,
     totalCompletions: 5
   },
   {
     id: 'bounty_arxiv_research_paper',
-    title: 'Publish Campus OS AI Benchmark Paper on arXiv / Hashnode',
+    title: 'Publish Placivo AI Benchmark Paper on arXiv / Hashnode',
     category: 'Research & Dev',
     difficulty: 'Legendary',
     rewardCredits: 2000,
@@ -1393,7 +1393,7 @@ export const DEFAULT_GLOBAL_BOUNTIES: GlobalBounty[] = [
     expiryDate: '2026-12-31',
     tags: ['AI Research', 'Academic Paper', 'LLM Benchmarks', 'Gold Tier'],
     createdAt: new Date().toISOString(),
-    createdBy: 'Campus OS Executive Team',
+    createdBy: 'Placivo Executive Team',
     isActive: true,
     totalCompletions: 2
   }

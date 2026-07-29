@@ -8,7 +8,6 @@ import {
   CheckCircle2, 
   ArrowRight,
   BookOpen,
-  Sparkles,
   HelpCircle,
   FileCode,
   ListOrdered
@@ -344,7 +343,7 @@ export const StructuredResponseFormatter: React.FC<StructuredResponseFormatterPr
                     className="p-5.5 rounded-3xl border border-blue-100 bg-blue-50/25 shadow-xs space-y-3.5"
                   >
                     <div className="flex items-center gap-2.5 border-b border-blue-100/80 pb-2.5">
-                      <Sparkles className="w-4.5 h-4.5 text-blue-600 shrink-0" />
+                      <BookOpen className="w-4.5 h-4.5 text-blue-600 shrink-0" />
                       <h3 className="font-black text-sm tracking-tight text-blue-900 uppercase">
                         {cleanTitle || 'Executive Overview'}
                       </h3>

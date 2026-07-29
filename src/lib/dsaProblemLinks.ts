@@ -1,4 +1,4 @@
-// Direct GeeksforGeeks and LeetCode problem link mappings for CampusOS 375 DSA Questions
+// Direct GeeksforGeeks and LeetCode problem link mappings for Placivo 375 DSA Questions
 
 export function getCleanTitle(title: string): string {
   return title
@@ -19,7 +19,7 @@ export function titleToLeetcodeSlug(title: string): string {
     .replace(/\s+/g, '-');
 }
 
-// Direct GeeksforGeeks Practice or Article URLs for CampusOS 375 questions
+// Direct GeeksforGeeks Practice or Article URLs for Placivo 375 questions
 const GFG_DIRECT_URLS: Record<string, string> = {
   // Arrays
   'Maximum and Minimum Element in an Array': 'https://www.geeksforgeeks.org/problems/find-minimum-and-maximum-element-in-an-array4428/1',
@@ -417,7 +417,7 @@ const GFG_DIRECT_URLS: Record<string, string> = {
   'Count of Smaller Numbers After Self': 'https://www.geeksforgeeks.org/problems/count-smaller-elements2214/1',
 };
 
-// Exact LeetCode problem slugs for CampusOS 375 questions
+// Exact LeetCode problem slugs for Placivo 375 questions
 const LEETCODE_DIRECT_SLUGS: Record<string, string> = {
   // Arrays
   'Maximum and Minimum Element in an Array': 'number-of-senior-citizens',

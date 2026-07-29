@@ -10,33 +10,33 @@ import {
   UserProfile,
   UserStats
 } from '../types';
-import { getCampusOSDSASheet } from '../data/dsaSheet375';
+import { getPlacivoDSASheet } from '../data/dsaSheet375';
 
 const STORAGE_KEYS = {
-  LOGGED_IN: 'campusos_is_logged_in',
-  PROFILE: 'campusos_user_profile',
-  STUDY_SUITES: 'campusos_study_suites',
-  ASSIGNMENTS: 'campusos_assignments',
-  ATTENDANCE: 'campusos_attendance',
-  SCHEDULE: 'campusos_schedule',
-  DSA: 'campusos_dsa',
-  RESUME: 'campusos_resume',
-  MOCK_INTERVIEWS: 'campusos_mock_interviews',
-  NOTIFICATIONS: 'campusos_notifications',
-  CHAT_MESSAGES: 'campusos_chat_messages',
-  COURSE_PROGRESS: 'campusos_course_progress',
+  LOGGED_IN: 'placivo_is_logged_in',
+  PROFILE: 'placivo_user_profile',
+  STUDY_SUITES: 'placivo_study_suites',
+  ASSIGNMENTS: 'placivo_assignments',
+  ATTENDANCE: 'placivo_attendance',
+  SCHEDULE: 'placivo_schedule',
+  DSA: 'placivo_dsa',
+  RESUME: 'placivo_resume',
+  MOCK_INTERVIEWS: 'placivo_mock_interviews',
+  NOTIFICATIONS: 'placivo_notifications',
+  CHAT_MESSAGES: 'placivo_chat_messages',
+  COURSE_PROGRESS: 'placivo_course_progress',
 };
 
 // ZERO BASELINE GENERATORS FOR NEW REGISTERED USERS
 export const getZeroAttendance = (userId: string = 'new_user'): AttendanceSubject[] => [];
 
-export const getZeroDSA = (userId: string = 'new_user'): DSAProblem[] => getCampusOSDSASheet(userId);
+export const getZeroDSA = (userId: string = 'new_user'): DSAProblem[] => getPlacivoDSASheet(userId);
 
 export const getZeroNotifications = (userId: string = 'new_user'): AppNotification[] => [
   { 
     id: `notif-welcome-${userId}`, 
     userId, 
-    title: 'Welcome to CampusOS AI', 
+    title: 'Welcome to Placivo AI', 
     message: 'Your student workspace is initialized with 0% initial metrics. Start logging attendance, solving DSA, and uploading assignments!', 
     type: 'system', 
     read: false, 
@@ -79,10 +79,14 @@ export const getZeroStats = (): UserStats => ({
 });
 
 export class StorageService {
-  // Helper to load/save
+  // Helper to load/save with backward compatibility
   private static get<T>(key: string, defaultValue: T): T {
     try {
-      const item = localStorage.getItem(key);
+      let item = localStorage.getItem(key);
+      if (!item && key.startsWith('placivo_')) {
+        const legacyKey = key.replace('placivo_', 'campusos_');
+        item = localStorage.getItem(legacyKey);
+      }
       return item ? JSON.parse(item) : defaultValue;
     } catch {
       return defaultValue;
@@ -110,6 +114,8 @@ export class StorageService {
     try {
       localStorage.removeItem(STORAGE_KEYS.LOGGED_IN);
       localStorage.removeItem(STORAGE_KEYS.PROFILE);
+      localStorage.removeItem('campusos_is_logged_in');
+      localStorage.removeItem('campusos_user_profile');
     } catch (e) {
       console.error("Storage clear error:", e);
     }

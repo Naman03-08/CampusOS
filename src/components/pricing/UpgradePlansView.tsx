@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { 
   Zap, 
   Check, 
-  Sparkles, 
   ShieldCheck, 
   CreditCard, 
   ArrowRight, 
@@ -156,9 +155,9 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
     <div className="space-y-6 animate-in fade-in duration-300 pb-12">
       {/* Banner */}
       <SectionUsageBanner
-        title="CampusOS Upgrade & Subscription Plans"
+        title="Placivo Upgrade & Subscription Plans"
         subtitle="Choose the ideal plan to accelerate your academic grades, DSA mastery, and placement success"
-        purpose="Upgrade to unlock unlimited AI Academic Tutor Chat, full CampusOS 375 DSA Roadmap Code Coach, unlimited ATS Resume Scans, and Technical Interview Prep."
+        purpose="Upgrade to unlock unlimited AI Academic Tutor Chat, full Placivo 375 DSA Roadmap Code Coach, unlimited ATS Resume Scans, and Technical Interview Prep."
         keyFeatures={[
           '3 Plans: 4-Day Free Trial (1x Lifetime, Choose When to Start), ₹199 & ₹399 Plans',
           '30-Day Auto Renewal Cycles for Pro Scholar & Ultimate Plans',
@@ -432,7 +431,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
       {/* Feature Comparison Matrix Table */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
         <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-blue-600" /> Detailed Plan Comparison Matrix
+          <Star className="w-5 h-5 text-blue-600 fill-blue-600" /> Detailed Plan Comparison Matrix
         </h3>
 
         <div className="overflow-x-auto">
@@ -442,7 +441,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                 <th className="py-3 px-4 w-2/5">Feature / Capability</th>
                 <th className="py-3 px-4 text-center">Free Trial (4 Days 1x)</th>
                 <th className="py-3 px-4 text-center text-blue-600">Pro Scholar (₹199 / 30 Days)</th>
-                <th className="py-3 px-4 text-center text-indigo-600">Campus Pro Ultimate (₹399 / 30 Days)</th>
+                <th className="py-3 px-4 text-center text-indigo-600">Placivo Pro Ultimate (₹399 / 30 Days)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
@@ -456,7 +455,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
               </tr>
               <tr>
                 <td className="py-3.5 px-4 font-bold flex items-center gap-2">
-                  <Code2 className="w-4 h-4 text-cyan-600" /> CampusOS 375 DSA Roadmap Sheet
+                  <Code2 className="w-4 h-4 text-cyan-600" /> Placivo 375 DSA Roadmap Sheet
                 </td>
                 <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">3 Solutions / day</td>
                 <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">UNLIMITED Sheet AI</td>
@@ -597,7 +596,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                     <QrCode className="w-24 h-24 text-slate-900" />
                   </div>
                   <p className="text-xs text-slate-300 font-bold">Scan with Google Pay, PhonePe, or Paytm</p>
-                  <p className="text-[10px] text-slate-400">Merchant: CampusOS AI Student Services</p>
+                  <p className="text-[10px] text-slate-400">Merchant: Placivo AI Student Services</p>
                 </div>
               )}
 

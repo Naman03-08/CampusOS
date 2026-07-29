@@ -14,7 +14,6 @@ import {
   Award, 
   TrendingUp, 
   CheckCircle2,
-  Sparkles,
   Zap,
   ShieldAlert,
   AlertTriangle,
@@ -360,9 +359,9 @@ const Dashboard3DStudySuiteCard: React.FC<Dashboard3DStudySuiteCardProps> = ({ s
         style={{ transform: 'translateZ(8px)' }}
         className="flex items-center gap-3 text-[11px] font-bold text-slate-400 mt-4 pt-2 border-t border-slate-100"
       >
-        <span>{suite.flashcards.length} Flashcards</span>
+        <span>{suite.flashcards?.length || 0} Flashcards</span>
         <span>•</span>
-        <span>{suite.quiz.length} Quiz Qs</span>
+        <span>{suite.quiz?.length || 0} Quiz Qs</span>
       </div>
     </motion.div>
   );
@@ -425,7 +424,7 @@ const DashboardCareerAssistantWidget: React.FC<DashboardCareerAssistantWidgetPro
           </div>
           <h3 className="text-sm font-black tracking-tight text-white uppercase flex items-center gap-1.5">
             <span>Placement AI Core</span>
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
+            <Zap className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
           </h3>
         </div>
 
@@ -465,11 +464,11 @@ interface DashboardViewProps {
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
   user,
-  attendance,
-  schedule,
-  dsa,
-  studySuites,
-  assignments,
+  attendance = [],
+  schedule = [],
+  dsa = [],
+  studySuites = [],
+  assignments = [],
   onNavigateTab,
   onOpenStudyHubUpload,
   onStartTrial
@@ -477,16 +476,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const planDetails = calculatePlanDetails(user);
 
   // Calculate statistics
-  const totalClasses = attendance.reduce((acc, a) => acc + a.totalClasses, 0);
-  const totalAttended = attendance.reduce((acc, a) => acc + a.attendedClasses, 0);
+  const safeAttendance = attendance || [];
+  const safeDsa = dsa || [];
+  const safeSchedule = schedule || [];
+  const safeStudySuites = studySuites || [];
+
+  const totalClasses = safeAttendance.reduce((acc, a) => acc + (a.totalClasses || 0), 0);
+  const totalAttended = safeAttendance.reduce((acc, a) => acc + (a.attendedClasses || 0), 0);
   const overallAttendance = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 85;
 
-  const solvedDSA = dsa.filter(d => d.solved).length;
-  const totalDSA = dsa.length;
-  const dsaProgressPct = Math.round((solvedDSA / totalDSA) * 100);
+  const solvedDSA = safeDsa.filter(d => d && d.solved).length;
+  const totalDSA = safeDsa.length;
+  const dsaProgressPct = totalDSA > 0 ? Math.round((solvedDSA / totalDSA) * 100) : 0;
 
   const todayStr = new Date().toISOString().split('T')[0];
-  const todayEvents = schedule.filter(s => s.date === todayStr);
+  const todayEvents = safeSchedule.filter(s => s && s.date === todayStr);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -524,7 +528,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </h3>
               <p className="text-xs text-slate-300 mt-0.5 max-w-xl">
                 {planDetails.isExpired 
-                  ? 'Please upgrade to Pro Scholar (₹199) or Campus Pro Ultimate (₹399) to continue using AI tools.'
+                  ? 'Please upgrade to Pro Scholar (₹199) or Placivo Pro Ultimate (₹399) to continue using AI tools.'
                   : 'You are currently browsing in website preview mode. Activate your 4-day free trial whenever you are ready!'}
               </p>
             </div>
@@ -536,7 +540,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 onClick={onStartTrial}
                 className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs shadow-md btn-3d-emerald flex items-center gap-1.5 cursor-pointer transition-all"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-amber-200" />
                 <span>Start 4-Day Free Trial</span>
               </button>
             )}
@@ -619,7 +623,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 onClick={() => onNavigateTab('notes')}
                 className="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm shadow-xl hover:scale-105 cursor-pointer transition-all flex items-center gap-2"
               >
-                <Sparkles className="w-4 h-4 fill-slate-950 text-slate-950" />
+                <BookOpen className="w-4 h-4 text-slate-950" />
                 AI Notes Summarizer
               </button>
               <button

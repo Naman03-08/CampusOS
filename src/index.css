@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Caveat:wght@500;600;700&family=Kalam:wght@400;700&display=swap');
 
 @layer base {
   body {
@@ -6,6 +7,59 @@
     background-color: #F7F2FD;
     color: #0f172a;
   }
+}
+
+/* Handwritten Notebook Fonts */
+.font-handwriting {
+  font-family: 'Caveat', cursive, sans-serif;
+}
+
+.font-kalam {
+  font-family: 'Kalam', cursive, sans-serif;
+}
+
+.font-architect {
+  font-family: 'Architects Daughter', cursive, sans-serif;
+}
+
+/* Realistic Notebook Paper Backgrounds */
+.notebook-ruled-paper {
+  background-color: #fffef8;
+  background-image: 
+    linear-gradient(90deg, transparent 58px, #fca5a5 58px, #fca5a5 60px, transparent 60px),
+    linear-gradient(#e0f2fe 1px, transparent 1px);
+  background-size: 100% 100%, 100% 32px;
+  line-height: 32px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1), inset 0 0 20px rgba(0, 0, 0, 0.02);
+}
+
+.notebook-grid-paper {
+  background-color: #fcfbf7;
+  background-image: 
+    linear-gradient(#e2e8f0 1px, transparent 1px),
+    linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+  background-size: 24px 24px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Highlighter Markers */
+.highlight-yellow {
+  background: linear-gradient(100deg, rgba(254, 240, 138, 0.85) 0%, rgba(253, 224, 71, 0.9) 100%);
+  padding: 2px 6px;
+  border-radius: 4px;
+  box-shadow: 1px 2px 4px rgba(234, 179, 8, 0.15);
+}
+
+.highlight-cyan {
+  background: linear-gradient(100deg, rgba(186, 230, 253, 0.85) 0%, rgba(125, 211, 252, 0.9) 100%);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.highlight-pink {
+  background: linear-gradient(100deg, rgba(251, 207, 232, 0.85) 0%, rgba(244, 114, 182, 0.85) 100%);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 /* Custom Scrollbar for Sleek Interface */

@@ -44,7 +44,7 @@ export const PlacementTimeline: React.FC = () => {
             Your 4-Year Placement Journey
           </h2>
           <p className="text-base text-slate-600 mt-3">
-            CampusOS AI guides you every semester from freshman orientation to your final offer letter.
+            Placivo AI guides you every semester from freshman orientation to your final offer letter.
           </p>
         </div>
 
@@ -78,7 +78,7 @@ export const PlacementTimeline: React.FC = () => {
               <MessageSquarePlus className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm font-extrabold text-slate-900">Preparing for placements with CampusOS?</p>
+              <p className="text-sm font-extrabold text-slate-900">Preparing for placements with Placivo?</p>
               <p className="text-xs text-slate-500 font-medium">Leave a review about your interview prep and placement journey!</p>
             </div>
           </div>

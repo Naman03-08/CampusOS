@@ -12,7 +12,6 @@ import {
   RotateCcw,
   BookOpenCheck,
   Trophy,
-  Sparkles,
   AlertTriangle,
   Award,
   ShieldCheck,
@@ -23,11 +22,11 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { DSAProblem } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
-import { getCampusOSDSASheet } from '../../data/dsaSheet375';
+import { getPlacivoDSASheet } from '../../data/dsaSheet375';
 import { StreakService } from '../../lib/streakService';
 import { getGfgUrl, getLeetcodeUrl, getPracticeUrl } from '../../lib/dsaProblemLinks';
 
-// Bespoke CampusOS Coding Hub 3D Orbiting Logo Component
+// Bespoke Placivo Coding Hub 3D Orbiting Logo Component
 const CodingHubLogo: React.FC = () => {
   return (
     <motion.div 
@@ -141,82 +140,82 @@ const SECTION_RESOURCES: Record<string, { gfg: string; leetcode: string; youtube
   'Arrays': {
     gfg: 'https://www.geeksforgeeks.org/array-data-structure/',
     leetcode: 'https://leetcode.com/tag/array/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Arrays+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Arrays+DSA'
   },
   'Strings': {
     gfg: 'https://www.geeksforgeeks.org/string-data-structure/',
     leetcode: 'https://leetcode.com/tag/string/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Strings+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Strings+DSA'
   },
   '2D Arrays': {
     gfg: 'https://www.geeksforgeeks.org/matrix/',
     leetcode: 'https://leetcode.com/tag/matrix/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+2D+Arrays+Matrix+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+2D+Arrays+Matrix+DSA'
   },
   'Searching & Sorting': {
     gfg: 'https://www.geeksforgeeks.org/sorting-algorithms/',
     leetcode: 'https://leetcode.com/tag/sorting/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Searching+and+Sorting+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Searching+and+Sorting+DSA'
   },
   'Backtracking': {
     gfg: 'https://www.geeksforgeeks.org/backtracking-algorithms/',
     leetcode: 'https://leetcode.com/tag/backtracking/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Backtracking+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Backtracking+DSA'
   },
   'Linked List': {
     gfg: 'https://www.geeksforgeeks.org/data-structures/linked-list/',
     leetcode: 'https://leetcode.com/tag/linked-list/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Linked+List+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Linked+List+DSA'
   },
   'Stacks & Queues': {
     gfg: 'https://www.geeksforgeeks.org/stack-data-structure/',
     leetcode: 'https://leetcode.com/tag/stack/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Stacks+Queues+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Stacks+Queues+DSA'
   },
   'Greedy': {
     gfg: 'https://www.geeksforgeeks.org/greedy-algorithms/',
     leetcode: 'https://leetcode.com/tag/greedy/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Greedy+Algorithms+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Greedy+Algorithms+DSA'
   },
   'Binary Trees': {
     gfg: 'https://www.geeksforgeeks.org/binary-tree-data-structure/',
     leetcode: 'https://leetcode.com/tag/tree/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Binary+Trees+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Binary+Trees+DSA'
   },
   'Binary Search Trees': {
     gfg: 'https://www.geeksforgeeks.org/binary-search-tree-data-structure/',
     leetcode: 'https://leetcode.com/tag/binary-search-tree/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Binary+Search+Trees+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Binary+Search+Trees+DSA'
   },
   'Heaps & Hashing': {
     gfg: 'https://www.geeksforgeeks.org/heap-data-structure/',
     leetcode: 'https://leetcode.com/tag/heap-priority-queue/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Heaps+Hashing+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Heaps+Hashing+DSA'
   },
   'Graphs': {
     gfg: 'https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/',
     leetcode: 'https://leetcode.com/tag/graph/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Graphs+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Graphs+DSA'
   },
   'Tries': {
     gfg: 'https://www.geeksforgeeks.org/trie-insert-and-search/',
     leetcode: 'https://leetcode.com/tag/trie/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Trie+Data+Structure+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Trie+Data+Structure+DSA'
   },
   'Dynamic Programming': {
     gfg: 'https://www.geeksforgeeks.org/dynamic-programming/',
     leetcode: 'https://leetcode.com/tag/dynamic-programming/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Dynamic+Programming+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Dynamic+Programming+DSA'
   },
   'Bit Manipulation': {
     gfg: 'https://www.geeksforgeeks.org/bit-manipulation-data-structure/',
     leetcode: 'https://leetcode.com/tag/bit-manipulation/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Bit+Manipulation+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Bit+Manipulation+DSA'
   },
   'Segment Trees': {
     gfg: 'https://www.geeksforgeeks.org/segment-tree-data-structure/',
     leetcode: 'https://leetcode.com/tag/segment-tree/',
-    youtube: 'https://www.youtube.com/results?search_query=CampusOS+Segment+Trees+DSA'
+    youtube: 'https://www.youtube.com/results?search_query=Placivo+Segment+Trees+DSA'
   }
 };
 
@@ -285,9 +284,9 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
     onToggleSolved(id);
   };
 
-  const handleResetToCampusOS375 = () => {
-    if (window.confirm('Reset DSA tracker to the complete CampusOS 375 DSA Roadmap Sheet?')) {
-      const freshSheet = getCampusOSDSASheet('user');
+  const handleResetToPlacivo375 = () => {
+    if (window.confirm('Reset DSA tracker to the complete Placivo 375 DSA Roadmap Sheet?')) {
+      const freshSheet = getPlacivoDSASheet('user');
       setProblems(freshSheet);
       if (onResetDSASheet) {
         onResetDSASheet(freshSheet);
@@ -359,8 +358,8 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                   transition={{ duration: 0.5, type: 'spring' }}
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-700 text-xs font-bold"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-600 animate-spin" style={{ animationDuration: '4s' }} />
-                  <span>CAMPUS CODE COPILOT</span>
+                  <Zap className="w-3.5 h-3.5 text-cyan-600 animate-pulse" />
+                  <span>PLACIVO CODE COPILOT</span>
                 </motion.div>
 
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
@@ -375,7 +374,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                 
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                    CampusOS 375 <br/>
+                    Placivo 375 <br/>
                     <span className="bg-gradient-to-r from-cyan-600 via-indigo-600 to-indigo-700 bg-clip-text text-transparent font-black">
                       DSA Coding Hub
                     </span>
@@ -430,7 +429,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                       <div className="p-1.5 rounded-lg bg-cyan-50 text-cyan-600">
                         <ShieldCheck className="w-4 h-4" />
                       </div>
-                      <h4 className="text-sm font-bold text-slate-800">CampusOS 375 DSA Roadmap Syllabus</h4>
+                      <h4 className="text-sm font-bold text-slate-800">Placivo 375 DSA Roadmap Syllabus</h4>
                     </div>
                     <p className="text-xs text-slate-500 leading-relaxed font-medium">
                       Curated rigorously across 17 categories including Arrays, DP, Graphs, Segment Trees, and Tries. Fully mapped to high-yield engineering interview rounds at product-first firms.
@@ -493,7 +492,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                       <h4 className="text-sm font-bold text-slate-800">Vetted Platform Integrations</h4>
                     </div>
                     <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                      Every DSA question is directly integrated to external practice hosts and official CampusOS visual step-by-step video solutions. Focus on learning rather than search loop waste.
+                      Every DSA question is directly integrated to external practice hosts and official Placivo visual step-by-step video solutions. Focus on learning rather than search loop waste.
                     </p>
                     <div className="space-y-2">
                       <div className="flex items-start gap-2.5">
@@ -569,7 +568,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                 </p>
                 <div className="flex items-center justify-between mt-3">
                   <span className="text-[9px] text-slate-400 font-mono">sheet.completion.eval</span>
-                  <Sparkles className="w-3 h-3 text-cyan-500 animate-pulse" />
+                  <Zap className="w-3 h-3 text-cyan-500 animate-pulse" />
                 </div>
               </motion.div>
 
@@ -691,9 +690,9 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
               <Trophy className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-black text-slate-900">CampusOS 375 DSA Roadmap Sheet</h1>
+              <h1 className="text-2xl font-black text-slate-900">Placivo 375 DSA Roadmap Sheet</h1>
               <p className="text-xs text-slate-500 mt-0.5 font-medium">
-                Comprehensive 375 DSA Question Bank (By CampusOS) • Solved {solvedCount} of {totalCount} Questions
+                Comprehensive 375 DSA Question Bank (By Placivo) • Solved {solvedCount} of {totalCount} Questions
               </p>
             </div>
           </div>
@@ -705,8 +704,8 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                 onClick={() => onNavigateTab('courses')}
                 className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>Learn from CampusOS courses</span>
+                <Trophy className="w-3.5 h-3.5 text-amber-300" />
+                <span>Learn from Placivo courses</span>
               </button>
             )}
 
@@ -716,7 +715,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                 className="px-2.5 py-1.5 rounded-xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-cyan-800 text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <ExternalLink className="w-3 h-3 text-cyan-600" />
-                <span>CampusOS Portal</span>
+                <span>Placivo Portal</span>
               </button>
             )}
           </div>
@@ -747,9 +746,9 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
           </div>
 
           <button
-            onClick={handleResetToCampusOS375}
+            onClick={handleResetToPlacivo375}
             className="px-3 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors"
-            title="Reset to CampusOS 375 Questions"
+            title="Reset to Placivo 375 Questions"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Reset 375 Sheet</span>
@@ -913,7 +912,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                 const gfgUrl = getGfgUrl(prob);
                 const leetcodeUrl = getLeetcodeUrl(prob);
                 const linkUrl = getPracticeUrl(prob);
-                const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent('CampusOS ' + prob.title + ' solution')}`;
+                const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent('Placivo ' + prob.title + ' solution')}`;
 
                 return (
                   <motion.div
@@ -975,7 +974,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                         <h3 className={`font-bold text-xs sm:text-sm mt-1 truncate flex items-center gap-1.5 ${prob.solved ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
                           <span>{prob.title}</span>
                           {!prob.solved && (
-                            <Sparkles className="w-3.5 h-3.5 text-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse" />
+                            <Zap className="w-3.5 h-3.5 text-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse" />
                           )}
                         </h3>
                       </div>
@@ -1028,7 +1027,7 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-2.5 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold text-[11px] transition-all flex items-center gap-1 hover:scale-[1.03]"
-                          title="Search CampusOS Video Solution"
+                          title="Search Placivo Video Solution"
                         >
                           <span>Video Solution</span>
                           <ExternalLink className="w-3 h-3 text-red-500" />

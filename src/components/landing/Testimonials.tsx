@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, MessageSquarePlus, CheckCircle2, Sparkles, Send, Filter, UserCheck, HeartHandshake } from 'lucide-react';
+import { Star, MessageSquarePlus, CheckCircle2, Send, Filter, UserCheck, HeartHandshake } from 'lucide-react';
 
 export interface ReviewItem {
   id: string;
@@ -29,7 +29,7 @@ const INITIAL_REVIEWS: ReviewItem[] = [
     role: 'Verified Student • IIT Bombay',
     badge: '375 DSA ROADMAP',
     date: '06/07/2026',
-    review: 'CampusOS 375 DSA Roadmap keeps me accountable every single day for practice. The topic-wise tracking, solution links, and YouTube guide integrations are clean and don\'t lag at all.',
+    review: 'Placivo 375 DSA Roadmap keeps me accountable every single day for practice. The topic-wise tracking, solution links, and YouTube guide integrations are clean and don\'t lag at all.',
     rating: 5,
     initials: 'PR',
   },
@@ -49,7 +49,7 @@ const INITIAL_REVIEWS: ReviewItem[] = [
     role: 'Verified Aspirant • NIT Trichy',
     badge: 'PLACEMENT & INTERVIEWS',
     date: '02/07/2026',
-    review: 'Tier-3 college student here. CampusOS placement prep and AI technical interview practice accurately pointed out gaps in my system design answers. Cleared the Razorpay rounds thanks to this!',
+    review: 'Tier-3 college student here. Placivo placement prep and AI technical interview practice accurately pointed out gaps in my system design answers. Cleared the Razorpay rounds thanks to this!',
     rating: 5,
     initials: 'RO',
   },
@@ -79,7 +79,7 @@ const INITIAL_REVIEWS: ReviewItem[] = [
     role: 'Verified Aspirant • IGDTUW Delhi',
     badge: 'AI STUDY HUB',
     date: '21/06/2026',
-    review: 'I use CampusOS Study Hub to log my coding, reading, and problem-solving daily. The 7-day revision calendar and instant quiz generator fit right into my daily schedule. Highly recommended!',
+    review: 'I use Placivo Study Hub to log my coding, reading, and problem-solving daily. The 7-day revision calendar and instant quiz generator fit right into my daily schedule. Highly recommended!',
     rating: 5,
     initials: 'DI',
   },
@@ -109,7 +109,7 @@ const INITIAL_REVIEWS: ReviewItem[] = [
     role: 'Verified Student • RVCE Bengaluru',
     badge: 'CODING COURSES',
     date: '12/06/2026',
-    review: 'Mastered Java DSA and OOP mechanics through the CampusOS course. The step-by-step dry-run code explanations and certificate verification ID feature made my LinkedIn profile stand out.',
+    review: 'Mastered Java DSA and OOP mechanics through the Placivo course. The step-by-step dry-run code explanations and certificate verification ID feature made my LinkedIn profile stand out.',
     rating: 5,
     initials: 'AD',
   },
@@ -129,14 +129,14 @@ const INITIAL_REVIEWS: ReviewItem[] = [
     role: 'Verified Aspirant • IIT Madras',
     badge: 'GENERAL PLATFORM',
     date: '05/06/2026',
-    review: 'CampusOS is literally the operating system every college student in India needs. Combining notes, resume, DSA, interview prep, and attendance in one platform is pure genius.',
+    review: 'Placivo is literally the operating system every college student in India needs. Combining notes, resume, DSA, interview prep, and attendance in one platform is pure genius.',
     rating: 5,
     initials: 'VR',
   },
 ];
 
 const MODULE_OPTIONS = [
-  'General CampusOS Platform',
+  'General Placivo Platform',
   'AI PDF SUMMARIZER',
   'AI STUDY HUB',
   '375 DSA ROADMAP',
@@ -163,7 +163,7 @@ export const Testimonials: React.FC = () => {
   // Load custom reviews from localStorage
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('campusos_user_reviews');
+      const saved = localStorage.getItem('placivo_user_reviews') || localStorage.getItem('campusos_user_reviews');
       if (saved) {
         const parsed: ReviewItem[] = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -203,7 +203,7 @@ export const Testimonials: React.FC = () => {
     const newRev: ReviewItem = {
       id: Date.now().toString(),
       name: reviewerName.trim(),
-      role: reviewerRole.trim() ? `Verified Student • ${reviewerRole.trim()}` : 'Verified CampusOS Student',
+      role: reviewerRole.trim() ? `Verified Student • ${reviewerRole.trim()}` : 'Verified Placivo Student',
       badge: selectedModule.toUpperCase(),
       date: new Date().toLocaleDateString('en-GB'),
       review: reviewText.trim(),
@@ -215,9 +215,9 @@ export const Testimonials: React.FC = () => {
       const updated = [newRev, ...reviewsList];
       setReviewsList(updated);
       try {
-        const existingCustomSaved = localStorage.getItem('campusos_user_reviews');
+        const existingCustomSaved = localStorage.getItem('placivo_user_reviews');
         const customArr = existingCustomSaved ? JSON.parse(existingCustomSaved) : [];
-        localStorage.setItem('campusos_user_reviews', JSON.stringify([newRev, ...customArr]));
+        localStorage.setItem('placivo_user_reviews', JSON.stringify([newRev, ...customArr]));
       } catch (err) {
         console.error('Failed to save review:', err);
       }
@@ -301,11 +301,11 @@ export const Testimonials: React.FC = () => {
         {/* Header Title */}
         <div className="text-center max-w-3xl mx-auto mb-10">
           <span className="text-xs font-extrabold uppercase tracking-widest text-blue-600 bg-blue-50/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-blue-200 inline-flex items-center gap-1.5 shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
             Student Reviews & Feedback
           </span>
           <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight mt-3">
-            See What Students Say About <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">CampusOS AI</span>
+            See What Students Say About <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Placivo AI</span>
           </h2>
           <p className="text-sm sm:text-base text-slate-600 mt-3 font-medium">
             Real-time dynamic comments and verified feedback from engineering and university students across campuses in India!
@@ -372,17 +372,17 @@ export const Testimonials: React.FC = () => {
                 Community Feedback
               </span>
               <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
-                Write a Review About CampusOS
+                Write a Review About Placivo
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 font-medium">
-                Have you used any module of CampusOS AI? Share your review and rate your experience! Your review will appear live in our student marquee above.
+                Have you used any module of Placivo AI? Share your review and rate your experience! Your review will appear live in our student marquee above.
               </p>
             </div>
 
             {submitSuccess && (
               <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-bold flex items-center gap-3 animate-in fade-in zoom-in-95 duration-200">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                <span>Thank you! Your review has been submitted and added to the CampusOS live marquee above.</span>
+                <span>Thank you! Your review has been submitted and added to the Placivo live marquee above.</span>
               </div>
             )}
 
@@ -469,7 +469,7 @@ export const Testimonials: React.FC = () => {
                 <textarea
                   required
                   rows={3}
-                  placeholder="Tell other students what you loved about this feature in CampusOS..."
+                  placeholder="Tell other students what you loved about this feature in Placivo..."
                   value={reviewText}
                   onChange={(e) => setReviewText(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-800 text-xs sm:text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all resize-none"

@@ -14,17 +14,16 @@ import {
   ShieldAlert, 
   Zap, 
   GraduationCap,
-  Sparkles,
   Bot
 } from 'lucide-react';
 import { UserProfile } from '../../types';
-import logoImg from '../logo.png';
 
 interface SidebarProps {
   activeTab: string;
   onSelectTab: (tab: string) => void;
   unreadNotificationsCount: number;
   user?: UserProfile;
+  isMobile?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -32,34 +31,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectTab,
   unreadNotificationsCount,
   user,
+  isMobile = false,
 }) => {
   const isAdminUser = user?.email?.trim().toLowerCase() === 'naman03mgs@gmail.com';
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'notes', label: 'AI Notes Summarizer', icon: Sparkles, badge: 'AI' },
+    { id: 'notes', label: 'AI Notes Summarizer', icon: BookOpen, badge: 'AI' },
+    { id: 'quiz', label: 'AI Quiz Practice', icon: FileCheck, badge: 'NEW' },
     { id: 'studyhub', label: 'Personal Assistant', icon: Bot, badge: 'AI' },
     { id: 'resumebuilder', label: 'AI Resume Builder', icon: FileText, badge: 'ATS' },
     { id: 'coding', label: 'Coding Hub', icon: Code2, badge: 'DSA' },
     { id: 'courses', label: 'Coding Courses', icon: GraduationCap, badge: 'NEW' },
     { id: 'interviewprep', label: 'Interview Prep', icon: BookOpen, badge: '256 Qs' },
     { id: 'placement', label: 'Startup Jobs & Internship Hub', icon: Briefcase, badge: 'Jobs' },
-    { id: 'habiturex', label: 'Habiturex', icon: Sparkles, badge: 'v3.5' },
+    { id: 'habiturex', label: 'Habiturex', icon: CheckSquare, badge: 'v3.5' },
     { id: 'pricing', label: 'Upgrade Plans', icon: Zap, badge: 'Plans' },
     { id: 'settings', label: 'Settings', icon: Settings },
     ...(isAdminUser ? [{ id: 'admin', label: 'Admin Panel', icon: ShieldAlert, badge: 'Lock' }] : []),
   ];
 
   return (
-    <aside className="w-64 h-full overflow-y-auto bg-white/50 backdrop-blur-2xl border-r border-white/80 flex flex-col justify-between p-4 shrink-0 shadow-lg z-20 scrollbar-thin hidden md:flex">
+    <aside className={`h-full overflow-y-auto bg-white/50 backdrop-blur-2xl flex flex-col justify-between p-4 shrink-0 shadow-lg z-20 scrollbar-thin ${
+      isMobile ? 'w-full' : 'w-64 border-r border-white/80 hidden md:flex'
+    }`}>
       {/* Brand Header */}
       <div>
         <div className="flex items-center gap-2.5 px-3.5 py-3 mb-5 bg-white/80 backdrop-blur-md border border-white/90 rounded-2xl shadow-3d-sm">
-          <div className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center shadow-md shadow-blue-500/20 bg-white border border-slate-100">
-            <img src={logoImg} alt="CampusOS Logo" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/20 bg-[#2563EB] text-white">
+            <GraduationCap className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-black text-slate-900 tracking-tight">CampusOS <span className="text-blue-600">AI</span></p>
+            <p className="text-xs font-black text-slate-900 tracking-tight">Placivo <span className="text-blue-600">AI</span></p>
             <p className="text-[10px] text-blue-600 font-extrabold uppercase tracking-wider">Student OS v2.5</p>
           </div>
         </div>

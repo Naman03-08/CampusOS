@@ -7,7 +7,6 @@ import {
   Lock, 
   Send, 
   ArrowLeft, 
-  Sparkles, 
   BookOpen, 
   Video, 
   Users, 
@@ -45,7 +44,7 @@ import { FirestoreService } from '../../lib/firestoreService';
 import { StreakService } from '../../lib/streakService';
 import { motion, AnimatePresence } from 'motion/react';
 
-// Bespoke CampusOS Academy Hub 3D Orbiting Logo Component
+// Bespoke Placivo Academy Hub 3D Orbiting Logo Component
 const AcademyHubLogo: React.FC = () => {
   return (
     <motion.div 
@@ -810,7 +809,7 @@ const INLINE_COURSES = [
     bgGradient: 'from-rose-600 via-purple-700 to-indigo-800',
     accentColor: 'rose',
     badgeBg: 'bg-rose-100 text-rose-800 border-rose-200',
-    icon: Sparkles,
+    icon: Brain,
     level: 'Beginner to Advanced',
     duration: '8 Weeks Batch',
     description: 'Master Generative AI with Hitesh Choudhary! Learn API integrations, prompt engineering techniques, fine-tuning open-source models, vector databases (Chroma/Pinecone), LangChain frameworks, and building real-world AI applications from concept to production deployment. Join the official Telegram channel after payment to start learning.',
@@ -1130,7 +1129,7 @@ const INLINE_COURSES = [
     bgGradient: 'from-purple-700 via-fuchsia-700 to-pink-600',
     accentColor: 'purple',
     badgeBg: 'bg-purple-100 text-purple-800 border-purple-200',
-    icon: Sparkles,
+    icon: Brain,
     level: 'Beginner to Advanced',
     duration: '12 Weeks Batch',
     description: 'Combine cutting-edge Data Science with Generative AI! Master Python data analytics (Pandas, NumPy, Matplotlib), Machine Learning models, Deep Neural Networks, Large Language Models (LLMs), Prompt Engineering, Retrieval-Augmented Generation (RAG) with Vector Databases (Pinecone/Chroma), and build custom AI autonomous agents with LangChain & OpenAI/Gemini APIs. Access the official Telegram channel for course materials and live batch sessions.',
@@ -4719,7 +4718,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-purple-200/60 pb-6">
             <div className="space-y-2 max-w-2xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-200 text-xs font-black uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-purple-600" /> Official Resource Access
+                <Zap className="w-3.5 h-3.5 text-purple-600" /> Official Resource Access
               </div>
               <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 flex items-center gap-2">
                 Start Learning & Stream Lectures
@@ -4995,7 +4994,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
           {/* Bottom CTA & Progress Summary */}
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">
             <div className="text-xs text-slate-500 font-bold flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-600" />
+              <Award className="w-4 h-4 text-purple-600" />
               <span>Overall Course Completion: {stats.completedCount} of {stats.totalTopics} Topics ({stats.percentage}%)</span>
             </div>
 
@@ -5044,7 +5043,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
                 <div className="p-4 sm:p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-purple-950 text-white shadow-xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="space-y-1 text-center sm:text-left">
                     <h4 className="font-black text-base sm:text-lg text-amber-300 flex items-center justify-center sm:justify-start gap-2">
-                      <Sparkles className="w-5 h-5 text-amber-400" />
+                      <Award className="w-5 h-5 text-amber-400" />
                       Congratulations, {studentDisplayName}!
                     </h4>
                     <p className="text-xs sm:text-sm text-slate-300">
@@ -5094,7 +5093,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
                     Certificate Locked ({stats.completedCount} / {stats.totalTopics} Topics Completed)
                   </h4>
                   <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-                    To earn and download your official CampusOS Certificate for <span className="font-bold text-slate-800">{activeCourse.title}</span>, you must complete all topic checkboxes in the syllabus above.
+                    To earn and download your official Placivo Certificate for <span className="font-bold text-slate-800">{activeCourse.title}</span>, you must complete all topic checkboxes in the syllabus above.
                   </p>
                   
                   {/* Progress bar */}
@@ -5142,7 +5141,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
 
         <div className="relative z-10 max-w-2xl space-y-5">
           <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/10 backdrop-blur-md text-purple-300 text-xs font-black uppercase tracking-wider shadow-inner">
-            <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" /> Interactive CampusOS Academy Hub
+            <Zap className="w-4 h-4 text-purple-400 animate-pulse" /> Interactive Placivo Academy Hub
           </div>
           <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
             Level Up Your Code & Track Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">Syllabus Progress</span>
@@ -5292,7 +5291,7 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
                 <div className="relative z-10 mt-4" style={{ transform: 'translateZ(25px)' }}>
                   <h3 className="text-base sm:text-lg font-black text-white tracking-tight leading-snug mb-1 drop-shadow-sm flex items-center gap-1.5">
                     <span>{course.title}</span>
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <Award className="w-3.5 h-3.5 text-amber-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </h3>
                   
                   <p className="text-[11px] text-white/90 line-clamp-2 font-medium leading-relaxed">

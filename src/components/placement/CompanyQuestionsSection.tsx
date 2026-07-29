@@ -13,7 +13,6 @@ import {
   Star, 
   Tag, 
   Code2, 
-  Sparkles,
   Layers,
   Flame,
   Award
@@ -347,7 +346,7 @@ export const CompanyQuestionsSection: React.FC<CompanyQuestionsSectionProps> = (
                   <div className="bg-slate-50 p-5 border-t border-slate-200 space-y-4 animate-in fade-in duration-200">
                     <div>
                       <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Detailed Explanation & Concept:
+                        <Award className="w-3.5 h-3.5 text-amber-500" /> Detailed Explanation & Concept:
                       </h4>
                       <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-line font-medium">
                         {q.answer}

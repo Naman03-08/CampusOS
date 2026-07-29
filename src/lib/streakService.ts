@@ -13,11 +13,12 @@ export interface StreakInfo {
 }
 
 export class StreakService {
-  private static STORAGE_KEY = 'campus_os_user_streak';
+  private static STORAGE_KEY = 'placivo_user_streak';
+  private static LEGACY_STORAGE_KEY = 'campus_os_user_streak';
 
   static getStreakData(): { streak: number; lastActivityDate?: string } {
     try {
-      const raw = localStorage.getItem(this.STORAGE_KEY);
+      const raw = localStorage.getItem(this.STORAGE_KEY) || localStorage.getItem(this.LEGACY_STORAGE_KEY);
       if (raw) {
         return JSON.parse(raw);
       }

@@ -17,7 +17,7 @@ export const Pricing: React.FC<PricingProps> = ({ onOpenAuth }) => {
       features: [
         '4 Days Full Access to basic tools',
         '5 AI Study Suite generations/month',
-        '3 CampusOS 375 DSA question AI solutions / day',
+        '3 Placivo 375 DSA question AI solutions / day',
         'Attendance Manager & Timetable Scheduler',
         'Basic AI Academic Tutor & Standard Resume Builder',
       ],
@@ -31,7 +31,7 @@ export const Pricing: React.FC<PricingProps> = ({ onOpenAuth }) => {
       desc: 'Unlimited AI study tutoring, DSA sheet solutions & full study suites for active students.',
       features: [
         'Unlimited AI Academic Tutor Chat with step-by-step logic',
-        'Complete CampusOS 375 DSA Roadmap Sheet access',
+        'Complete Placivo 375 DSA Roadmap Sheet access',
         '15 High-Score ATS Resume Scans per month',
         'Unlimited AI Study Suites & Flashcard Generators',
         'Smart Calendar Auto-Scheduler with exam alerts',
@@ -41,7 +41,7 @@ export const Pricing: React.FC<PricingProps> = ({ onOpenAuth }) => {
       cta: 'Upgrade to ₹199 Plan',
     },
     {
-      name: 'Campus Pro Ultimate',
+      name: 'Placivo Pro Ultimate',
       price: isAnnual ? '₹319' : '₹399',
       period: 'per month',
       desc: 'Complete placement & technical interview preparation pass with 1-on-1 AI placement coaching.',
@@ -51,7 +51,7 @@ export const Pricing: React.FC<PricingProps> = ({ onOpenAuth }) => {
         'Unlimited High-Score ATS Resume Builder & Job Matcher',
         'Instant 375 DSA Code Coach (C++, Java, Python, TS)',
         '1-on-1 AI Placement Mentor & Company Interview Insights',
-        'Verified CampusOS Completion Certificate',
+        'Verified Placivo Completion Certificate',
       ],
       popular: false,
       cta: 'Upgrade to ₹399 Plan',

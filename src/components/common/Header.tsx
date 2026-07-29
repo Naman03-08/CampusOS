@@ -17,7 +17,8 @@ import {
   AlertTriangle,
   Clock,
   Play,
-  Pause
+  Pause,
+  Menu
 } from 'lucide-react';
 import { UserProfile, AppNotification } from '../../types';
 import { StreakService } from '../../lib/streakService';
@@ -43,6 +44,7 @@ interface HeaderProps {
   onToggleAIChat: () => void;
   onLogout: () => void;
   onNavigateTab: (tab: string) => void;
+  onToggleMobileSidebar?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -56,6 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleAIChat,
   onLogout,
   onNavigateTab,
+  onToggleMobileSidebar,
 }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotificationsMenu, setShowNotificationsMenu] = useState(false);
@@ -72,60 +75,54 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      {streakInfo.isAtRisk && (
-        <div className="w-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white px-4 py-2 text-xs font-bold flex items-center justify-between gap-3 shadow-md animate-pulse z-40 sticky top-0">
-          <div className="flex items-center gap-2 max-w-5xl mx-auto">
-            <AlertTriangle className="w-4 h-4 text-amber-300 shrink-0" />
-            <span>
-              <strong>STREAK AT RISK! ⚠️</strong> You haven't done any activity today. Complete 1 coding question or course topic today to save your <strong>{streakInfo.streak}-day streak</strong>, or it will reset to 0 tomorrow!
-            </span>
-          </div>
-          <button 
-            onClick={() => onNavigateTab('coding')}
-            className="px-3 py-1 bg-white text-red-600 font-extrabold rounded-lg text-[11px] shrink-0 hover:bg-red-50 cursor-pointer shadow-xs"
-          >
-            Solve Task Now &rarr;
-          </button>
-        </div>
+      <header className="sticky top-0 z-30 w-full h-16 bg-white/50 backdrop-blur-2xl border-b border-white/80 px-4 sm:px-6 py-3 flex items-center justify-between shadow-md">
+      {/* Mobile Hamburger Toggle */}
+      {onToggleMobileSidebar && (
+        <button
+          onClick={onToggleMobileSidebar}
+          className="mr-1.5 p-1.5 sm:mr-2 sm:p-2 rounded-xl text-slate-600 hover:bg-slate-100/80 transition-colors cursor-pointer md:hidden shrink-0"
+          aria-label="Open navigation menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
       )}
 
-      <header className="sticky top-0 z-30 w-full h-16 bg-white/50 backdrop-blur-2xl border-b border-white/80 px-4 sm:px-6 py-3 flex items-center justify-between shadow-md">
       {/* Search Command Input */}
-      <div className="flex items-center gap-3 flex-1 max-w-md">
+      <div className="flex items-center gap-3 flex-1 max-w-[120px] xs:max-w-[180px] sm:max-w-md">
         <div className="relative w-full group">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-blue-600 transition-colors" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-blue-600 transition-colors" />
           <input
             type="text"
-            placeholder="Ask CampusOS AI... 'Explain dynamic programming' or 'Check attendance'"
-            className="w-full pl-10 pr-12 py-2 text-xs sm:text-sm rounded-xl bg-white/80 backdrop-blur-md border border-white/90 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 shadow-3d-sm transition-all font-semibold text-slate-800 placeholder:text-slate-400"
+            placeholder="Ask Placivo AI..."
+            className="w-full pl-8 sm:pl-10 pr-4 sm:pr-12 py-2 text-xs sm:text-sm rounded-xl bg-white/80 backdrop-blur-md border border-white/90 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 shadow-3d-sm transition-all font-semibold text-slate-800 placeholder:text-slate-400"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 onToggleAIChat();
               }
             }}
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500 bg-slate-100/90 border border-slate-200/80 px-1.5 py-0.5 rounded shadow-2xs">
+          <span className="hidden sm:inline absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500 bg-slate-100/90 border border-slate-200/80 px-1.5 py-0.5 rounded shadow-2xs">
             ⌘K
           </span>
         </div>
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-2.5 sm:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-3">
         {/* Persistent Focus Time Watch (If active / running or when user leaves Habiturex) */}
         {focusTimer && (focusTimer.active || focusTimer.isRunning) && (
           <div 
             onClick={() => onNavigateTab('habiturex')}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-black shadow-md cursor-pointer transition-all ${
+            className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border text-xs font-black shadow-md cursor-pointer transition-all ${
               focusTimer.isRunning
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-400 animate-pulse'
                 : 'bg-amber-50 text-amber-800 border-amber-300'
             }`}
             title="Focus Time Watch - Click to open Habiturex"
           >
-            <Clock className={`w-3.5 h-3.5 shrink-0 ${focusTimer.isRunning ? 'text-amber-300 animate-spin' : 'text-amber-600'}`} />
-            <span className="tabular-nums font-mono text-[11px] sm:text-xs">
-              Focus: {String(focusTimer.minutes).padStart(2, '0')}:{String(focusTimer.seconds).padStart(2, '0')}
+            <Clock className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${focusTimer.isRunning ? 'text-amber-300 animate-spin' : 'text-amber-600'}`} />
+            <span className="tabular-nums font-mono text-[10px] sm:text-xs">
+              {String(focusTimer.minutes).padStart(2, '0')}:{String(focusTimer.seconds).padStart(2, '0')}
             </span>
 
             {focusTimer.onTogglePlay && (
@@ -134,14 +131,14 @@ export const Header: React.FC<HeaderProps> = ({
                   e.stopPropagation();
                   focusTimer.onTogglePlay?.();
                 }}
-                className={`p-1 rounded-full transition-colors ${
+                className={`p-0.5 rounded-full transition-colors ${
                   focusTimer.isRunning 
                     ? 'bg-white/20 hover:bg-white/30 text-white' 
                     : 'bg-amber-200 hover:bg-amber-300 text-amber-900'
                 }`}
                 title={focusTimer.isRunning ? 'Pause Focus Session' : 'Resume Focus Session'}
               >
-                {focusTimer.isRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                {focusTimer.isRunning ? <Pause className="w-2.5 h-2.5" /> : <Play className="w-2.5 h-2.5" />}
               </button>
             )}
           </div>
@@ -153,25 +150,27 @@ export const Header: React.FC<HeaderProps> = ({
             return (
               <div 
                 title="Streak at Risk! Complete 1 task today or your streak breaks tomorrow!"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-red-600 to-rose-600 border border-red-400 text-white text-xs font-black shadow-md shadow-red-500/20 cursor-pointer hover:scale-105 transition-all animate-pulse"
+                className="flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full bg-gradient-to-r from-red-600 to-rose-600 border border-red-400 text-white text-[10px] sm:text-xs font-black shadow-md shadow-red-500/20 cursor-pointer hover:scale-105 transition-all animate-pulse"
                 onClick={() => onNavigateTab('coding')}
               >
-                <AlertTriangle className="w-4 h-4 text-amber-300 fill-amber-300 animate-bounce shrink-0" />
-                <span>{streak} Day{streak === 1 ? '' : 's'} Streak (At Risk! ⚠️)</span>
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-300 fill-amber-300 animate-bounce shrink-0" />
+                <span className="hidden xs:inline">{streak} Day{streak === 1 ? '' : 's'} (Risk! ⚠️)</span>
+                <span className="xs:hidden">{streak}⚠️</span>
               </div>
             );
           }
           return (
             <div 
               title="Daily Study Streak"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-black shadow-3d-sm cursor-pointer hover:scale-105 transition-all ${
+              className={`flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full border text-[10px] sm:text-xs font-black shadow-3d-sm cursor-pointer hover:scale-105 transition-all ${
                 streak > 0 
                   ? 'bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200 text-orange-600' 
                   : 'bg-slate-100 border-slate-200 text-slate-500'
               }`}
             >
-              <Flame className={`w-4 h-4 ${streak > 0 ? 'text-orange-500 fill-orange-500 animate-bounce' : 'text-slate-400'}`} />
-              <span>{streak} Day{streak === 1 ? '' : 's'} Streak</span>
+              <Flame className={`w-3.5 h-3.5 ${streak > 0 ? 'text-orange-500 fill-orange-500 animate-bounce' : 'text-slate-400'}`} />
+              <span className="hidden xs:inline">{streak} Day{streak === 1 ? '' : 's'} Streak</span>
+              <span className="xs:hidden">{streak}🔥</span>
             </div>
           );
         })()}

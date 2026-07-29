@@ -6,7 +6,6 @@ import {
   Bookmark, 
   Check, 
   Copy, 
-  Sparkles, 
   ShieldCheck, 
   Grid, 
   List, 
@@ -96,7 +95,7 @@ const InteractiveJobCard: React.FC<InteractiveJobCardProps> = ({ p, isSaved, onT
           <div className="flex items-center gap-1.5">
             {p.badge && (
               <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 text-[9px] font-extrabold uppercase tracking-wide border border-purple-200 flex items-center gap-0.5">
-                <Sparkles className="w-2.5 h-2.5 text-purple-600 animate-pulse" />
+                <Star className="w-2.5 h-2.5 text-purple-600 animate-pulse fill-purple-600" />
                 <span>{p.badge.split(' ')[0]}</span>
               </span>
             )}
@@ -118,7 +117,7 @@ const InteractiveJobCard: React.FC<InteractiveJobCardProps> = ({ p, isSaved, onT
         <div style={{ transform: 'translateZ(20px)' }}>
           <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug flex items-center gap-1">
             <span>{p.name}</span>
-            <Sparkles className="w-3.5 h-3.5 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse" />
+            <Star className="w-3.5 h-3.5 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse fill-blue-500" />
           </h3>
           <p className="text-xs text-slate-500 font-normal leading-relaxed line-clamp-2 mt-1.5 min-h-[36px]">
             {p.description}
@@ -876,7 +875,7 @@ export const StartupJobsHubView: React.FC<StartupJobsHubViewProps> = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [savedPlatformIds, setSavedPlatformIds] = useState<string[]>(() => {
     try {
-      const stored = localStorage.getItem('campusos_saved_job_platforms');
+      const stored = localStorage.getItem('placivo_saved_job_platforms') || localStorage.getItem('campusos_saved_job_platforms');
       return stored ? JSON.parse(stored) : ['wellfound', 'yc_jobs', 'remotive', 'remoteok', 'internshala', 'linkedin_jobs'];
     } catch {
       return ['wellfound', 'yc_jobs', 'remotive', 'remoteok', 'internshala', 'linkedin_jobs'];
@@ -891,7 +890,7 @@ export const StartupJobsHubView: React.FC<StartupJobsHubViewProps> = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem('campusos_saved_job_platforms', JSON.stringify(savedPlatformIds));
+      localStorage.setItem('placivo_saved_job_platforms', JSON.stringify(savedPlatformIds));
     } catch (e) {
       console.warn("Failed to persist saved platforms:", e);
     }
@@ -964,7 +963,7 @@ export const StartupJobsHubView: React.FC<StartupJobsHubViewProps> = () => {
                 transition={{ duration: 0.5, type: 'spring' }}
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold"
               >
-                <Sparkles className="w-3.5 h-3.5 text-blue-600 animate-spin" style={{ animationDuration: '3s' }} />
+                <Compass className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
                 <span>INTELLIGENT HUB DIRECTORY</span>
               </motion.div>
               
@@ -1154,7 +1153,7 @@ export const StartupJobsHubView: React.FC<StartupJobsHubViewProps> = () => {
                 </p>
                 <div className="flex items-center justify-between mt-3">
                   <span className="text-[9px] text-slate-400 font-mono">yc.com/jobs</span>
-                  <Sparkles className="w-3 h-3 text-amber-500 animate-pulse" />
+                  <Star className="w-3 h-3 text-amber-500 animate-pulse fill-amber-500" />
                 </div>
               </motion.div>
 

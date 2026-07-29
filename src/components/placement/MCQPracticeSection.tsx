@@ -9,7 +9,6 @@ import {
   Shuffle, 
   Award, 
   Flame, 
-  Sparkles, 
   Search, 
   Filter, 
   Bookmark, 
@@ -349,7 +348,7 @@ export const MCQPracticeSection: React.FC<MCQPracticeSectionProps> = ({
             {userAnswers[activeQuestion.id] !== undefined && (
               <div className="p-5 rounded-xl bg-purple-50 border border-purple-200 space-y-2 animate-in fade-in duration-300">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-800">
-                  <Sparkles className="w-4 h-4 text-purple-600" />
+                  <Award className="w-4 h-4 text-purple-600" />
                   Explanation & Learning Note:
                 </div>
                 <p className="text-sm text-slate-800 leading-relaxed font-medium">

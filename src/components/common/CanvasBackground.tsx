@@ -67,7 +67,7 @@ export const CanvasBackground: React.FC = () => {
     window.addEventListener('resize', handleResize, { passive: true });
 
     // 1. Particle Constellation Network (180 nodes forming edge-to-edge full-screen triangular web)
-    const particleCount = 180;
+    const particleCount = window.innerWidth < 768 ? 35 : 65;
     const particles: Point3D[] = Array.from({ length: particleCount }, () => ({
       x: (Math.random() - 0.5) * width * 2.8,
       y: (Math.random() - 0.5) * height * 2.8,
@@ -301,7 +301,13 @@ export const CanvasBackground: React.FC = () => {
       const centerY = height / 2 + mouseY;
 
       // --- 3D WIREFRAME POLYHEDRA RENDERING ---
-      wireframeMeshes.forEach((mesh) => {
+      const visibleMeshes = width < 768 
+        ? [wireframeMeshes[1], wireframeMeshes[2]] 
+        : width < 1024
+          ? [wireframeMeshes[0], wireframeMeshes[1], wireframeMeshes[2]] 
+          : wireframeMeshes;
+
+      visibleMeshes.forEach((mesh) => {
         // Continuous rotation & translation drifting
         mesh.rotX += mesh.rotSpeedX;
         mesh.rotY += mesh.rotSpeedY;
@@ -407,11 +413,18 @@ export const CanvasBackground: React.FC = () => {
 
       // Draw constellation links
       for (let i = 0; i < projectedParticles.length; i++) {
+        const p1 = projectedParticles[i];
+        // Performance Guard: If the first particle is off-screen, skip link calculation
+        if (p1.projX < -50 || p1.projX > width + 50 || p1.projY < -50 || p1.projY > height + 50) continue;
+
         for (let j = i + 1; j < projectedParticles.length; j++) {
-          const p1 = projectedParticles[i];
           const p2 = projectedParticles[j];
           const dx = p1.projX - p2.projX;
+          // Math Guard: Skip expensive squares and square roots if coordinates are far apart
+          if (Math.abs(dx) > 134) continue;
           const dy = p1.projY - p2.projY;
+          if (Math.abs(dy) > 134) continue;
+          
           const distSq = dx * dx + dy * dy;
 
           if (distSq < 18000) {

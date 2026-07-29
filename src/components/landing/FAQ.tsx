@@ -7,7 +7,7 @@ export const FAQ: React.FC = () => {
   const faqs = [
     {
       q: 'What file formats are supported in the AI Study Hub?',
-      a: 'CampusOS AI supports PDF, DOCX, PPTX, TXT, images (PNG, JPG), and direct YouTube or syllabus text pastes. Our AI engine processes up to 1M context tokens seamlessly.',
+      a: 'Placivo AI supports PDF, DOCX, PPTX, TXT, images (PNG, JPG), and direct YouTube or syllabus text pastes. Our AI engine processes up to 1M context tokens seamlessly.',
     },
     {
       q: 'How does the AI Academic Tutor maintain study quality?',
@@ -15,7 +15,7 @@ export const FAQ: React.FC = () => {
     },
     {
       q: 'How does the Attendance Predictor work?',
-      a: 'You enter your weekly course schedule and target percentage (e.g., 75% or 80%). CampusOS calculates your current percentage and computes exact mathematical thresholds for how many classes you can skip or MUST attend.',
+      a: 'You enter your weekly course schedule and target percentage (e.g., 75% or 80%). Placivo calculates your current percentage and computes exact mathematical thresholds for how many classes you can skip or MUST attend.',
     },
     {
       q: 'Can I export generated study suites and resumes to PDF?',

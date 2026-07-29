@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, CheckCircle2, Info } from 'lucide-react';
+import { Bot, CheckCircle2, Info } from 'lucide-react';
 
 interface SectionUsageBannerProps {
   title: string;
@@ -37,7 +37,7 @@ export const SectionUsageBanner: React.FC<SectionUsageBannerProps> = ({
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">{title}</h1>
                 <span className="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200 font-extrabold text-[10px] uppercase tracking-wider flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-purple-600" />
+                  <Bot className="w-3 h-3 text-purple-600" />
                   {badge}
                 </span>
               </div>

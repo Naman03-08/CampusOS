@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Check, Sparkles, Zap, ArrowRight } from 'lucide-react';
+import { X, Check, Zap, ArrowRight } from 'lucide-react';
 
 interface WhyChooseUsProps {
   onOpenAuth?: (mode: 'register') => void;
@@ -29,7 +29,7 @@ export const WhyChooseUs: React.FC<WhyChooseUsProps> = ({ onOpenAuth }) => {
     },
   ];
 
-  const campusosPoints = [
+  const placivoPoints = [
     {
       title: 'AI-Powered Resume Compiles',
       desc: 'Instantly compile flawless, ATS-optimized PDFs styled strictly with single-column layouts and target keywords.',
@@ -58,11 +58,11 @@ export const WhyChooseUs: React.FC<WhyChooseUsProps> = ({ onOpenAuth }) => {
         {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-[11px] font-extrabold uppercase tracking-widest text-emerald-700 bg-emerald-50/90 backdrop-blur-md px-3.5 py-1 rounded-full border border-emerald-200/90 inline-flex items-center gap-1.5 shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            <Zap className="w-3.5 h-3.5 text-emerald-600" />
             Visual Contrast
           </span>
           <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight mt-3">
-            Why Choose CampusOS AI?
+            Why Choose Placivo AI?
           </h2>
           <p className="text-sm sm:text-base text-slate-600 font-medium mt-3 max-w-2xl mx-auto">
             See how our stateful AI ecosystem elevates your preparation standards above traditional manual methods.
@@ -115,7 +115,7 @@ export const WhyChooseUs: React.FC<WhyChooseUsProps> = ({ onOpenAuth }) => {
 
             <div className="relative z-10">
               <span className="text-[11px] font-extrabold uppercase tracking-wider text-blue-400 bg-blue-950/90 px-3 py-1 rounded-full border border-blue-800/80 inline-block mb-3 shadow-xs">
-                CampusOS AI Ecosystem
+                Placivo AI Ecosystem
               </span>
               <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
                 The Unified Canvas
@@ -126,7 +126,7 @@ export const WhyChooseUs: React.FC<WhyChooseUsProps> = ({ onOpenAuth }) => {
 
               {/* Items List */}
               <div className="space-y-6">
-                {campusosPoints.map((item, idx) => (
+                {placivoPoints.map((item, idx) => (
                   <div key={idx} className="flex items-start gap-4">
                     <div className="w-8 h-8 rounded-xl bg-blue-900/60 border border-blue-700/60 text-blue-400 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
                       <Check className="w-4 h-4 text-blue-400 stroke-[2.5]" />

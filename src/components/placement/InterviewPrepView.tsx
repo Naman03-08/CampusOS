@@ -6,7 +6,6 @@ import {
   CheckCircle2, 
   Bookmark, 
   BookmarkCheck, 
-  Sparkles, 
   Building2, 
   Tag, 
   Code2, 
@@ -86,7 +85,7 @@ const AIAnimationMatrix: React.FC = () => {
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         className="absolute w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 border border-blue-400/20"
       >
-        <Sparkles className="w-5 h-5 text-white animate-pulse" />
+        <Zap className="w-5 h-5 text-white animate-pulse" />
       </motion.div>
 
       {/* Orbiting AI Nodes */}
@@ -511,7 +510,7 @@ export const InterviewPrepView: React.FC<InterviewPrepViewProps> = ({ onNavigate
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-none flex items-center gap-2">
               Technical Interview Preparation Hub
-              <Sparkles className="w-5 h-5 text-blue-600 animate-bounce" />
+              <Zap className="w-5 h-5 text-blue-600 animate-bounce" />
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 font-medium mt-2.5 max-w-2xl leading-relaxed">
               All-in-one interview toolkit: 256 subject technical Q&As, company-specific question vaults, rapid cheat sheet reference cards, and interactive MCQ practice with live scoring.

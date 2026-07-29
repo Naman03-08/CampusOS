@@ -11,8 +11,7 @@ import {
   CreditCard, 
   ExternalLink, 
   X, 
-  Search, 
-  Sparkles 
+  Search 
 } from 'lucide-react';
 import { CertificateCard } from './CertificateCard';
 import { CertificateRecord } from '../../types';
@@ -53,7 +52,7 @@ export const CertificateVerificationModal: React.FC<CertificateVerificationModal
       if (fetched) {
         setCert(fetched);
       } else {
-        setErrorMsg(`Certificate with ID "${code}" was not found in the official CampusOS registry.`);
+        setErrorMsg(`Certificate with ID "${code}" was not found in the official Placivo registry.`);
         setCert(null);
       }
     } catch (e) {
@@ -90,13 +89,13 @@ export const CertificateVerificationModal: React.FC<CertificateVerificationModal
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-black uppercase tracking-wider">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>CampusOS Official Verification System</span>
+              <span>Placivo Official Verification System</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
               Certificate & Student Record Verification
             </h2>
             <p className="text-xs text-slate-300">
-              Verify credentials, enrollment history, attendance records, and DSA progress for any issued CampusOS Certificate.
+              Verify credentials, enrollment history, attendance records, and DSA progress for any issued Placivo Certificate.
             </p>
           </div>
 
@@ -191,13 +190,13 @@ export const CertificateVerificationModal: React.FC<CertificateVerificationModal
             <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6">
               <div className="border-b border-slate-200 pb-4">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-black uppercase tracking-wider mb-1">
-                  <Sparkles className="w-3.5 h-3.5 text-purple-600" /> Student Verification Registry
+                  <ShieldCheck className="w-3.5 h-3.5 text-purple-600" /> Student Verification Registry
                 </div>
                 <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
                   Verified Student Profile & Performance Details
                 </h3>
                 <p className="text-xs text-slate-500 font-medium">
-                  Verified system analytics retrieved live from CampusOS Firebase Firestore Database.
+                  Verified system analytics retrieved live from Placivo Firebase Firestore Database.
                 </p>
               </div>
 
@@ -212,7 +211,7 @@ export const CertificateVerificationModal: React.FC<CertificateVerificationModal
                     {cert.userName}
                   </div>
                   <div className="text-[11px] text-slate-500 font-medium">
-                    {cert.userEmail || 'Registered CampusOS Student'}
+                    {cert.userEmail || 'Registered Placivo Student'}
                   </div>
                 </div>
 

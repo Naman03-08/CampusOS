@@ -8,7 +8,6 @@ import {
   CheckCircle2, 
   Copy, 
   Check, 
-  Sparkles, 
   Tag, 
   Code2, 
   ChevronDown, 

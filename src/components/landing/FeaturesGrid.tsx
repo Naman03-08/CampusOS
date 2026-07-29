@@ -77,7 +77,7 @@ export const FeaturesGrid: React.FC = () => {
             Everything You Need To <span className="text-blue-600">Ace College</span>
           </h2>
           <p className="text-base sm:text-lg text-slate-600 mt-4">
-            No fragmented tools. CampusOS AI combines your complete academic workflow and career preparation into a unified, high-speed operating system.
+            No fragmented tools. Placivo AI combines your complete academic workflow and career preparation into a unified, high-speed operating system.
           </p>
         </div>
 
@@ -112,7 +112,7 @@ export const FeaturesGrid: React.FC = () => {
               <MessageSquarePlus className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm font-extrabold text-slate-900">Loved these CampusOS features?</p>
+              <p className="text-sm font-extrabold text-slate-900">Loved these Placivo features?</p>
               <p className="text-xs text-slate-500 font-medium">Write a quick review about your favorite module to help fellow students.</p>
             </div>
           </div>

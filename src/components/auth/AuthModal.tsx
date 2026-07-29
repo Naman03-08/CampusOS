@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, GraduationCap, Mail, Lock, User, ArrowRight, CheckCircle2, Phone, Building2, BookOpen, Sparkles } from 'lucide-react';
+import { X, GraduationCap, Mail, Lock, User, ArrowRight, CheckCircle2, Phone, Building2, BookOpen, Bot } from 'lucide-react';
 import { auth, googleProvider } from '../../lib/firebase';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { UserProfile } from '../../types';
@@ -295,14 +295,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center bg-white border border-slate-100 shadow-xs">
-            <img src={logoImg} alt="CampusOS AI Logo" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-[#2563EB] text-white shadow-xs">
+            <GraduationCap className="w-5 h-5" />
           </div>
-          <span className="font-extrabold text-lg text-slate-900">CampusOS AI</span>
+          <span className="font-extrabold text-lg text-slate-900">Placivo AI</span>
         </div>
 
         <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
-          {mode === 'login' && 'Welcome Back to CampusOS'}
+          {mode === 'login' && 'Welcome Back to Placivo'}
           {mode === 'register' && 'Create Your Student Account'}
           {mode === 'google-onboarding' && 'Complete Your Student Profile'}
           {mode === 'forgot' && 'Reset Your Password'}
@@ -396,7 +396,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {mode === 'google-onboarding' && (
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-2xl flex items-center gap-3 mb-2">
                 <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-xs shrink-0 shadow-xs">
-                  <Sparkles className="w-4 h-4 text-blue-200" />
+                  <Bot className="w-4 h-4 text-blue-200" />
                 </div>
                 <div className="text-xs">
                   <p className="font-extrabold text-blue-900">Google Auth Verified</p>
@@ -533,7 +533,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               ) : (
                 <>
                   <span>
-                    {mode === 'login' && 'Sign In To CampusOS'}
+                    {mode === 'login' && 'Sign In To Placivo'}
                     {mode === 'register' && 'Create Account'}
                     {mode === 'google-onboarding' && 'Complete Registration'}
                     {mode === 'forgot' && 'Send Reset Email'}

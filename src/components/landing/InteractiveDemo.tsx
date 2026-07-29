@@ -33,7 +33,7 @@ export const InteractiveDemo: React.FC = () => {
             Interactive Playground
           </span>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mt-3">
-            Experience CampusOS AI Live
+            Experience Placivo AI Live
           </h2>
           <p className="text-base text-slate-600 mt-3">
             Try out our core AI modules right now without logging in.

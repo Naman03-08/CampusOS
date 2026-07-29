@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   BookOpen,
-  Sparkles,
   Cpu,
   Activity,
   Compass,
@@ -13,7 +12,6 @@ import {
   Bot,
   Brain,
   Zap,
-  TrendingUp,
   Layers,
   MessageSquare,
   Globe
@@ -21,7 +19,7 @@ import {
 import { StudySuite } from '../../types';
 import { AIChatView } from '../chat/AIChatView';
 
-// Bespoke CampusOS Assistant Core Logo Component
+// Bespoke Placivo Assistant Core Logo Component
 const PersonalAssistantLogo: React.FC = () => {
   return (
     <motion.div 
@@ -144,8 +142,8 @@ export const StudyHubView: React.FC<StudyHubViewProps> = () => {
                   transition={{ duration: 0.5, type: 'spring' }}
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-blue-600 animate-spin" style={{ animationDuration: '4s' }} />
-                  <span>CAMPUS COGNITIVE ENGINE</span>
+                  <Brain className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
+                  <span>PLACIVO COGNITIVE ENGINE</span>
                 </motion.div>
 
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
@@ -160,7 +158,7 @@ export const StudyHubView: React.FC<StudyHubViewProps> = () => {
                 
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                    CampusOS <br/>
+                    Placivo <br/>
                     <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 bg-clip-text text-transparent font-black">
                       Personal Assistant
                     </span>
@@ -348,7 +346,7 @@ export const StudyHubView: React.FC<StudyHubViewProps> = () => {
                 </p>
                 <div className="flex items-center justify-between mt-3">
                   <span className="text-[9px] text-slate-400 font-mono">academic.dissect</span>
-                  <Sparkles className="w-3 h-3 text-blue-500 animate-pulse" />
+                  <Brain className="w-3 h-3 text-blue-500 animate-pulse" />
                 </div>
               </motion.div>
 
@@ -387,7 +385,7 @@ export const StudyHubView: React.FC<StudyHubViewProps> = () => {
                 </p>
                 <div className="flex items-center justify-between mt-3">
                   <span className="text-[9px] text-slate-400 font-mono">reasoning.core</span>
-                  <TrendingUp className="w-3 h-3 text-purple-500" />
+                  <Activity className="w-3 h-3 text-purple-500" />
                 </div>
               </motion.div>
 

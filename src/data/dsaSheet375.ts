@@ -1,7 +1,7 @@
 import { DSAProblem } from '../types';
 import { getGfgUrl, getLeetcodeUrl, getPracticeUrl } from '../lib/dsaProblemLinks';
 
-export const CAMPUS_OS_375_DSA_PROBLEMS: Omit<DSAProblem, 'id' | 'userId'>[] = [
+export const PLACIVO_375_DSA_PROBLEMS: Omit<DSAProblem, 'id' | 'userId'>[] = [
   // ==================== ARRAYS (26) ====================
   { title: 'Maximum and Minimum Element in an Array', category: 'Arrays', difficulty: 'Easy', solved: false, platformUrl: 'https://www.google.com/search?q=geeksforgeeks+Maximum+and+Minimum+Element+in+an+Array' },
   { title: 'Reverse the Array', category: 'Arrays', difficulty: 'Easy', solved: false, platformUrl: 'https://www.google.com/search?q=geeksforgeeks+Reverse+the+Array' },
@@ -409,8 +409,10 @@ export const CAMPUS_OS_375_DSA_PROBLEMS: Omit<DSAProblem, 'id' | 'userId'>[] = [
   { title: 'Fenwick Tree / Binary Indexed Tree (BIT) Construction', category: 'Segment Trees', difficulty: 'Medium', solved: false, platformUrl: 'https://www.google.com/search?q=geeksforgeeks+Binary+Indexed+Tree' }
 ];
 
-export const getCampusOSDSASheet = (userId: string = 'user'): DSAProblem[] => {
-  return CAMPUS_OS_375_DSA_PROBLEMS.map((prob, index) => {
+export const CAMPUS_OS_375_DSA_PROBLEMS = PLACIVO_375_DSA_PROBLEMS;
+
+export const getPlacivoDSASheet = (userId: string = 'user'): DSAProblem[] => {
+  return PLACIVO_375_DSA_PROBLEMS.map((prob, index) => {
     const gfgUrl = getGfgUrl(prob);
     const leetcodeUrl = getLeetcodeUrl(prob);
     const platformUrl = getPracticeUrl(prob);
@@ -420,8 +422,10 @@ export const getCampusOSDSASheet = (userId: string = 'user'): DSAProblem[] => {
       platformUrl,
       gfgUrl,
       leetcodeUrl,
-      id: `campusos-dsa-${index + 1}-${userId}`,
+      id: `placivo-dsa-${index + 1}-${userId}`,
       userId,
     };
   });
 };
+
+export const getCampusOSDSASheet = getPlacivoDSASheet;

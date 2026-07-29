@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Trash2, Copy, Check, BookOpen, RefreshCw, Zap, Sparkles } from 'lucide-react';
+import { Send, Bot, User, Trash2, Copy, Check, BookOpen, RefreshCw, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChatMessage } from '../../types';
 import { StructuredResponseFormatter } from './StructuredResponseFormatter';
@@ -23,7 +23,7 @@ const PersonalAssistantMiniLogo: React.FC = () => {
       
       {/* Mini Core */}
       <div className="absolute inset-2 bg-gradient-to-tr from-blue-600 via-indigo-600 to-indigo-700 rounded-xl shadow-md flex items-center justify-center text-white">
-        <Sparkles className="w-4.5 h-4.5 text-white animate-pulse" />
+        <Bot className="w-4.5 h-4.5 text-white" />
       </div>
     </div>
   );
@@ -149,7 +149,7 @@ export const AIChatView: React.FC = () => {
           <PersonalAssistantMiniLogo />
           <div>
             <h2 className="font-extrabold text-sm sm:text-base text-white tracking-tight flex items-center gap-1.5">
-              CampusOS Personal Assistant
+              Placivo Personal Assistant
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             </h2>
             <p className="text-[11px] text-blue-300 font-bold">Your Autonomous Personal AI Assistant & Tutor</p>
@@ -179,7 +179,7 @@ export const AIChatView: React.FC = () => {
               onChange={(e) => setLimitWords(e.target.checked)}
               className="w-3.5 h-3.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
             />
-            <span className="font-semibold text-slate-600 hover:text-slate-800 transition-colors">Strict Word Cap (&lt;1000 Words)</span>
+            <span className="font-semibold text-slate-600 hover:text-slate-800 transition-colors">Strict Word Cap (&lt;2000 Words)</span>
           </label>
         </div>
       </div>
@@ -187,9 +187,9 @@ export const AIChatView: React.FC = () => {
       {/* Messages Scroll Area */}
       <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-slate-50/60 relative">
         
-        {/* Subtle Watermark of the CampusOS Synthesis Logo */}
+        {/* Subtle Watermark of the Placivo Synthesis Logo */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none">
-          <Sparkles className="w-96 h-96 text-slate-900" />
+          <Bot className="w-96 h-96 text-slate-900" />
         </div>
 
         <AnimatePresence initial={false}>
@@ -249,7 +249,7 @@ export const AIChatView: React.FC = () => {
             <PersonalAssistantMiniLogo />
             <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm text-xs font-bold text-slate-600 flex items-center gap-2.5">
               <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />
-              <span className="animate-pulse">CampusOS AI is thinking and formulating step-by-step solution...</span>
+              <span className="animate-pulse">Placivo AI is thinking and formulating step-by-step solution...</span>
             </div>
           </motion.div>
         )}
@@ -260,7 +260,7 @@ export const AIChatView: React.FC = () => {
       {/* Quick Prompt Chips */}
       <div className="p-3 px-6 bg-slate-100/95 border-t border-slate-200/80 flex items-center gap-2 overflow-x-auto text-[11px] font-extrabold text-slate-600">
         <span className="text-slate-400 shrink-0 uppercase tracking-wider font-black flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-indigo-500 animate-pulse" /> Try Prompts:
+          <Bot className="w-3 h-3 text-indigo-500" /> Try Prompts:
         </span>
         {quickPrompts.map((qp, i) => (
           <button

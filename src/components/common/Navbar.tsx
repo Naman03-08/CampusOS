@@ -1,6 +1,5 @@
 import React from 'react';
-import { GraduationCap, Zap, ArrowRight, BookOpen, Code, Award, Calendar, CheckSquare, Sparkles } from 'lucide-react';
-import logoImg from '../logo.png';
+import { GraduationCap, Zap, ArrowRight, BookOpen, Code, Award, Calendar, CheckSquare, Bot } from 'lucide-react';
 
 interface NavbarProps {
   onNavigateLandingSection: (sectionId: string) => void;
@@ -23,12 +22,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => onNavigateLandingSection('hero')} 
           className="flex items-center gap-3 cursor-pointer group"
         >
-          <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform bg-white border border-slate-100">
-            <img src={logoImg} alt="CampusOS AI" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform bg-[#2563EB] text-white">
+            <GraduationCap className="w-6 h-6" />
           </div>
           <div className="flex flex-col">
             <span className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
-              CampusOS <span className="text-blue-600">AI</span>
+              Placivo <span className="text-blue-600">AI</span>
             </span>
             <span className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase -mt-1">Student Intelligence</span>
           </div>
@@ -38,13 +37,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-500">
           <button onClick={() => onNavigateLandingSection('features')} className="hover:text-blue-600 transition-colors">Features</button>
           <button onClick={() => onNavigateLandingSection('sandboxes')} className="hover:text-blue-600 transition-colors flex items-center gap-1.5 text-indigo-600 font-bold">
-            <Sparkles className="w-4 h-4 text-indigo-600" /> AI Sandboxes
+            <Bot className="w-4 h-4 text-indigo-600" /> AI Sandboxes
           </button>
           <button onClick={() => onNavigateLandingSection('demo')} className="hover:text-blue-600 transition-colors flex items-center gap-1.5 text-blue-600 font-bold">
             <Zap className="w-4 h-4 text-blue-600" /> Interactive AI Demo
           </button>
           <button onClick={() => onNavigateLandingSection('placement')} className="hover:text-blue-600 transition-colors">Placement</button>
-          <button onClick={() => onNavigateLandingSection('why-us')} className="hover:text-blue-600 transition-colors">Why CampusOS</button>
+          <button onClick={() => onNavigateLandingSection('why-us')} className="hover:text-blue-600 transition-colors">Why Placivo</button>
           <button onClick={() => onNavigateLandingSection('faq')} className="hover:text-blue-600 transition-colors">FAQ</button>
         </nav>
 

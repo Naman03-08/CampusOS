@@ -11,7 +11,6 @@ import {
   BookOpen, 
   ChevronLeft, 
   ChevronRight, 
-  Sparkles, 
   ArrowUpRight 
 } from 'lucide-react';
 
@@ -234,11 +233,11 @@ export const AgentSandboxesCarousel: React.FC<AgentSandboxesCarouselProps> = ({ 
         {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="text-[11px] font-extrabold uppercase tracking-widest text-indigo-700 bg-indigo-50/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-indigo-200/90 inline-flex items-center gap-1.5 shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <Bot className="w-3.5 h-3.5 text-indigo-600" />
             IMMERSIVE 3D EXPLORATION
           </span>
           <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight mt-3">
-            Explore the CampusOS Modules
+            Explore the Placivo Modules
           </h2>
           <p className="text-sm sm:text-base text-slate-600 font-medium mt-3 max-w-2xl mx-auto">
             Interact with our stateful 3D carousel to see how each module elevates your college & placement preparation.

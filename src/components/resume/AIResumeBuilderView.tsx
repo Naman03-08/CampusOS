@@ -7,7 +7,6 @@ import {
   RefreshCw, 
   Plus, 
   Trash2, 
-  Sparkles, 
   CheckCircle2, 
   AlertTriangle,
   Briefcase,
@@ -49,7 +48,7 @@ import { exportTextToPDF, exportCanvasToPDF } from '../../lib/pdfExport';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { motion, AnimatePresence } from 'motion/react';
 
-// Bespoke CampusOS Resume Builder Core Logo Component
+// Bespoke Placivo Resume Builder Core Logo Component
 const ResumeBuilderLogo: React.FC = () => {
   return (
     <motion.div 
@@ -1317,8 +1316,8 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                   transition={{ duration: 0.5, type: 'spring' }}
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-purple-600 animate-spin" style={{ animationDuration: '4s' }} />
-                  <span>CAMPUS RESUME COPILOT</span>
+                  <Zap className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
+                  <span>PLACIVO RESUME COPILOT</span>
                 </motion.div>
 
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
@@ -1524,7 +1523,7 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                 </p>
                 <div className="flex items-center justify-between mt-3">
                   <span className="text-[9px] text-slate-400 font-mono">system.score.eval</span>
-                  <Sparkles className="w-3 h-3 text-purple-500 animate-pulse" />
+                  <Zap className="w-3 h-3 text-purple-500 animate-pulse" />
                 </div>
               </motion.div>
 
@@ -1764,7 +1763,7 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                {tab.id === 'copilot' && <Sparkles className="w-3.5 h-3.5 text-amber-300" />}
+                {tab.id === 'copilot' && <Wand2 className="w-3.5 h-3.5 text-amber-300" />}
                 <span>{tab.label}</span>
               </button>
             ))}
@@ -2962,7 +2961,7 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
               <div className="space-y-2.5 border-b border-slate-100 pb-4">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-black text-slate-900 flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-amber-500" /> Honors & Awards
+                    <Award className="w-4 h-4 text-amber-500" /> Honors & Awards
                   </h4>
                   <label className="flex items-center gap-1 text-[11px] font-bold text-slate-500 cursor-pointer">
                     <input
@@ -3138,7 +3137,7 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                   {loadingEval ? (
                     <RefreshCw className="w-4 h-4 animate-spin" />
                   ) : (
-                    <Sparkles className="w-4 h-4 text-amber-300 fill-amber-300" />
+                    <Wand2 className="w-4 h-4 text-amber-300 animate-pulse" />
                   )}
                   <span>{loadingEval ? 'Scanning Resume ATS...' : 'Deep AI ATS Audit'}</span>
                 </button>
@@ -3188,7 +3187,7 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
               {/* AI EXPERIENCE & SUMMARY OPTIMIZER CARD */}
               <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-3.5">
                 <div className="flex items-center gap-2 text-xs font-black text-purple-900">
-                  <Sparkles className="w-4 h-4 text-purple-600" />
+                  <Wand2 className="w-4 h-4 text-purple-600 animate-pulse" />
                   <span className="uppercase tracking-wider text-[11px]">AI Experience & Summary Optimizer</span>
                 </div>
 
@@ -3685,7 +3684,7 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                     <div className="text-xs text-purple-100 font-normal">Vector-crisp A4 format (Best for printing)</div>
                   </div>
                 </div>
-                <Sparkles className="w-4 h-4 text-amber-300" />
+                <Star className="w-4 h-4 text-amber-300 fill-amber-300 animate-pulse" />
               </button>
 
               {/* Action 2: Trigger Native Browser Print */}
