@@ -64,14 +64,23 @@ app.post("/api/auth/send-reset-otp", async (req, res) => {
 
     if (process.env.SMTP_HOST && process.env.SMTP_USER) {
       try {
+        const port = Number(process.env.SMTP_PORT || 587);
+        // If SMTP_SECURE is explicitly set, use it; otherwise auto-detect based on port (465 is secure SSL, 587/25 use STARTTLS)
+        const isSecure = process.env.SMTP_SECURE !== undefined
+          ? process.env.SMTP_SECURE === 'true'
+          : port === 465;
+
         const transporter = nodemailer.createTransport({
           host: process.env.SMTP_HOST,
-          port: Number(process.env.SMTP_PORT || 587),
-          secure: process.env.SMTP_SECURE === 'true',
+          port,
+          secure: isSecure,
           auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
           },
+          tls: {
+            rejectUnauthorized: false
+          }
         });
 
         await transporter.sendMail({
@@ -94,8 +103,8 @@ app.post("/api/auth/send-reset-otp", async (req, res) => {
         });
         emailSent = true;
         console.log(`[AUTH OTP] Successfully sent OTP email via SMTP to ${cleanEmail}`);
-      } catch (emailErr) {
-        console.warn("[AUTH OTP] Custom SMTP send failed:", emailErr);
+      } catch (emailErr: any) {
+        console.warn(`[AUTH OTP] Custom SMTP send notice: ${emailErr?.message || emailErr}`);
       }
     }
 
