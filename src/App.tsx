@@ -16,7 +16,9 @@ import { PlacementTimeline } from './components/landing/PlacementTimeline';
 import { Testimonials } from './components/landing/Testimonials';
 import { WhyChooseUs } from './components/landing/WhyChooseUs';
 import { FAQ } from './components/landing/FAQ';
+import { AIGEOSection } from './components/landing/AIGEOSection';
 import { FooterLanding } from './components/landing/FooterLanding';
+import { SEOHead } from './components/common/SEOHead';
 
 // App Portal Views
 import { DashboardView } from './components/dashboard/DashboardView';
@@ -636,6 +638,8 @@ export function App() {
         </div>
       )}
 
+      <SEOHead activeTab={isLoggedIn ? activeTab : 'landing'} />
+
       {/* VIEWMODE 1: LANDING PAGE (If not logged in) */}
       {!isLoggedIn ? (
         <div className="relative z-10 flex flex-col min-h-screen">
@@ -658,6 +662,7 @@ export function App() {
             <PlacementTimeline />
             <Testimonials />
             <WhyChooseUs onOpenAuth={() => handleOpenAuth('register')} />
+            <AIGEOSection />
             <FAQ />
           </main>
 

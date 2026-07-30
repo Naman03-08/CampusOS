@@ -1957,6 +1957,113 @@ app.post("/api/admin/send-email", async (req, res) => {
   }
 });
 
+// Security & SEO Response Headers Middleware
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  next();
+});
+
+// Technical SEO: robots.txt
+app.get("/robots.txt", (req, res) => {
+  const host = req.headers.host || "placivo.ai";
+  const protocol = req.protocol === "https" || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
+  const content = `User-agent: *
+Allow: /
+Disallow: /api/
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+Sitemap: ${protocol}://${host}/sitemap.xml
+`;
+  res.header("Content-Type", "text/plain");
+  res.send(content);
+});
+
+// Technical SEO: sitemap.xml
+app.get("/sitemap.xml", (req, res) => {
+  const host = req.headers.host || "placivo.ai";
+  const protocol = req.protocol === "https" || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
+  const baseUrl = `${protocol}://${host}`;
+  const now = new Date().toISOString().split("T")[0];
+
+  const routes = [
+    { path: "/", priority: "1.0", changefreq: "daily" },
+    { path: "/ai-quiz-generator", priority: "0.9", changefreq: "daily" },
+    { path: "/ai-notes", priority: "0.9", changefreq: "daily" },
+    { path: "/pdf-summarizer", priority: "0.9", changefreq: "daily" },
+    { path: "/flashcards", priority: "0.8", changefreq: "weekly" },
+    { path: "/mind-maps", priority: "0.8", changefreq: "weekly" },
+    { path: "/interview-preparation", priority: "0.9", changefreq: "daily" },
+    { path: "/ai-resume-builder", priority: "0.9", changefreq: "daily" },
+    { path: "/coding-hub", priority: "0.8", changefreq: "daily" },
+    { path: "/placement-prep", priority: "0.8", changefreq: "daily" },
+    { path: "/courses", priority: "0.8", changefreq: "weekly" },
+    { path: "/attendance-tracker", priority: "0.7", changefreq: "weekly" }
+  ];
+
+  const urls = routes.map(r => `  <url>
+    <loc>${baseUrl}${r.path}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>${r.changefreq}</changefreq>
+    <priority>${r.priority}</priority>
+  </url>`).join("\n");
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+
+  res.header("Content-Type", "application/xml");
+  res.send(sitemap);
+});
+
+// Technical SEO: manifest.json
+app.get("/manifest.json", (req, res) => {
+  const manifest = {
+    short_name: "Placivo AI",
+    name: "Placivo AI — Student Academic Operating System",
+    icons: [
+      {
+        src: "/src/components/placivoAI.png",
+        type: "image/png",
+        sizes: "192x192 512x512"
+      }
+    ],
+    start_url: "/",
+    background_color: "#FAF6EE",
+    theme_color: "#2563EB",
+    display: "standalone",
+    orientation: "any",
+    description: "AI-First Academic Operating System for College Students: AI Quiz Generator, PDF Notes Summarizer, ATS Resume Builder, and Interview Preparation."
+  };
+  res.header("Content-Type", "application/json");
+  res.json(manifest);
+});
+
 // Vite & Static file serving setup
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
