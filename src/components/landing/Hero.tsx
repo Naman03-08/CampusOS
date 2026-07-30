@@ -22,16 +22,209 @@ interface HeroProps {
   onExploreDemo: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+const LipSyncMouth: React.FC<{ isSpeaking: boolean }> = ({ isSpeaking }) => {
+  const [mouthState, setMouthState] = useState(0);
 
-  const trendingTags = ['IIT Bombay', 'Data Science', 'Engineering', 'MBA', 'BCA'];
+  React.useEffect(() => {
+    if (!isSpeaking) {
+      setMouthState(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setMouthState(Math.floor(Math.random() * 4));
+    }, 110);
+
+    return () => clearInterval(interval);
+  }, [isSpeaking]);
+
+  if (!isSpeaking) {
+    return (
+      <svg width="18" height="10" viewBox="0 0 18 10" fill="none" className="transition-all duration-300">
+        {/* Clear subtle smile outline */}
+        <path d="M3 4 C6 7, 12 7, 15 4" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  // Generate talking paths
+  let dPath = "M3 4 C6 7, 12 7, 15 4";
+  let fill = "none";
+  if (mouthState === 1) {
+    dPath = "M3 4 C5 8, 13 8, 15 4 C13 5, 5 5, 3 4"; // slight open
+    fill = "#EF4444";
+  } else if (mouthState === 2) {
+    dPath = "M2 4 C4 11, 14 11, 16 4 C13 6, 5 6, 2 4"; // wide open
+    fill = "#DC2626";
+  } else if (mouthState === 3) {
+    dPath = "M5 4 C6 10, 12 10, 13 4 C12 5, 6 5, 5 4"; // tall rounded shape
+    fill = "#B91C1C";
+  }
 
   return (
-    <section className="relative pt-6 pb-16 md:pt-10 md:pb-20 overflow-x-clip bg-gradient-to-b from-blue-50/40 via-white to-slate-50/50">
-      {/* Soft Ambient Background Orbs */}
-      <div className="absolute top-[-120px] left-[-120px] w-[550px] h-[550px] bg-blue-100/50 rounded-full blur-[140px] pointer-events-none z-0"></div>
-      <div className="absolute top-[20%] right-[-100px] w-[500px] h-[500px] bg-indigo-100/40 rounded-full blur-[130px] pointer-events-none z-0"></div>
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="none" className="transition-all duration-100">
+      <path d={dPath} fill={fill} stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      {(mouthState === 2 || mouthState === 3) && (
+        <path d="M6 5.5 Q 9 6.5 12 5.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" />
+      )}
+    </svg>
+  );
+};
+
+export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+
+  // Silent visual conversation between the boy (Naman) and girl (Riya) characters
+  const [dialogueIndex, setDialogueIndex] = useState(0);
+  const dialogues = [
+    // 0. AI Notes (Top Left)
+    { 
+      speaker: 'boy', 
+      name: 'Naman', 
+      text: "Look over there on the top left! The AI Notes Summarizer reads heavy PDFs in seconds! 👈",
+      action: 'point_left_up'
+    },
+    { 
+      speaker: 'girl', 
+      name: 'Riya', 
+      text: "Yes! It generates detailed summaries, interactive flashcards, and quick-quiz sheets automatically! ✨",
+      action: 'explain'
+    },
+    // 1. Courses (Top Right)
+    { 
+      speaker: 'boy', 
+      name: 'Naman', 
+      text: "And up on the top right, check out the Courses hub! It has step-by-step guidance! 👉",
+      action: 'point_right_up'
+    },
+    { 
+      speaker: 'girl', 
+      name: 'Riya', 
+      text: "It covers full DSA roadmaps, code notebooks, and grants verified completion certificates! 🎓",
+      action: 'explain'
+    },
+    // 2. Placements (Middle Left)
+    { 
+      speaker: 'boy', 
+      name: 'Naman', 
+      text: "On our left, the Placement Hub is packed with startup jobs and resume builders! 👈",
+      action: 'point_left_mid'
+    },
+    { 
+      speaker: 'girl', 
+      name: 'Riya', 
+      text: "The ATS resume builder is amazing! It validates single-column resumes for modern HR criteria! 💼",
+      action: 'explain'
+    },
+    // 3. Planner (Middle Right)
+    { 
+      speaker: 'boy', 
+      name: 'Naman', 
+      text: "Look at the Academic Planner on our right! It keeps messy student routines sorted! 👉",
+      action: 'point_right_mid'
+    },
+    { 
+      speaker: 'girl', 
+      name: 'Riya', 
+      text: "It manages class timetables, tracks upcoming exams, and logs daily task priorities! 📅",
+      action: 'explain'
+    },
+    // 4. AI Assistant (Bottom Left)
+    { 
+      speaker: 'boy', 
+      name: 'Naman', 
+      text: "And down on the bottom left, our AI Assistant is online 24/7 to solve coding doubts! 👈",
+      action: 'point_left_down'
+    },
+    { 
+      speaker: 'girl', 
+      name: 'Riya', 
+      text: "He is a super smart study buddy. Ask him any question and get instant visual flowcharts! 🤖",
+      action: 'explain'
+    },
+    // 5. Community (Bottom Right)
+    { 
+      speaker: 'boy', 
+      name: 'Naman', 
+      text: "Finally, the Community badge on the bottom right connects peers across colleges! 👉",
+      action: 'point_right_down'
+    },
+    { 
+      speaker: 'girl', 
+      name: 'Riya', 
+      text: "We can share lecture notes, discuss interview questions, and collaborate on cool code! 👥",
+      action: 'explain'
+    }
+  ];
+
+  // The active highlight index is mathematically coupled to the current dialogue step
+  const activeHighlightIndex = Math.floor(dialogueIndex / 2);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setDialogueIndex((prev) => (prev + 1) % dialogues.length);
+    }, 5000); // Switch dialogue and section every 5 seconds for clear reading pacing
+    return () => clearInterval(interval);
+  }, [dialogues.length]);
+
+  // Automatic gentle floating/orbiting animation (simulates continuous video-like live motion, no hover required)
+  React.useEffect(() => {
+    let frameId: number;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const elapsed = (Date.now() - startTime) / 1000; // in seconds
+      // Dual-harmonic sinusoidal waves for highly natural continuous 3D orbiting
+      const x = Math.sin(elapsed * 0.7) * 0.6;
+      const y = Math.cos(elapsed * 0.5) * 0.5;
+      setCoords({ x, y });
+      frameId = requestAnimationFrame(animate);
+    };
+
+    frameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameId);
+  }, []);
+
+  const trendingTags = ['Generative AI', 'AI/ML', 'DSA', 'Python', 'App Dev'];
+
+  return (
+    <section className="relative pt-4 pb-12 md:pt-6 md:pb-14 overflow-x-clip bg-slate-50/30">
+      {/* Premium Professional Architectural Blueprint Grid Background Overlay */}
+      <div className="absolute inset-0 bg-transparent pointer-events-none z-0 overflow-hidden opacity-[0.45]">
+        {/* Sleek light indigo network grid lines */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px)
+            `,
+            backgroundSize: '44px 44px',
+          }}
+        />
+        {/* Bold secondary alignment layout markers */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(37, 99, 235, 0.07) 1.5px, transparent 1.5px),
+              linear-gradient(to bottom, rgba(37, 99, 235, 0.07) 1.5px, transparent 1.5px)
+            `,
+            backgroundSize: '220px 220px',
+          }}
+        />
+        {/* Subtle geometric structural crosshairs in the corners to create an advanced workspace aesthetic */}
+        <div className="absolute top-12 left-12 w-6 h-6 border-l border-t border-blue-500/20 pointer-events-none" />
+        <div className="absolute top-12 right-12 w-6 h-6 border-r border-t border-blue-500/20 pointer-events-none" />
+        <div className="absolute bottom-12 left-12 w-6 h-6 border-l border-b border-blue-500/20 pointer-events-none" />
+        <div className="absolute bottom-12 right-12 w-6 h-6 border-r border-b border-blue-500/20 pointer-events-none" />
+
+        {/* Soft Ambient Depth Lighting Orbs */}
+        <div className="absolute top-[-100px] left-[-100px] w-[580px] h-[580px] bg-blue-100/40 rounded-full blur-[130px] pointer-events-none z-0"></div>
+        <div className="absolute top-[20%] right-[-80px] w-[550px] h-[550px] bg-indigo-100/35 rounded-full blur-[125px] pointer-events-none z-0"></div>
+        <div className="absolute bottom-[-100px] left-[25%] w-[480px] h-[480px] bg-violet-100/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
@@ -43,7 +236,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
             
             {/* Top Pill Tagline */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/90 border border-blue-200/80 text-blue-600 text-xs font-bold uppercase tracking-wider shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600 fill-blue-600" />
+              <GraduationCap className="w-3.5 h-3.5 text-blue-600" />
               <span>Built for Students. Powered by Technology.</span>
             </div>
 
@@ -116,38 +309,78 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
 
           </div>
 
-          {/* Right Column: Clean Student Illustration encircled by Orbital Blue Ring & 6 Floating Pill Badges */}
-          <div className="lg:col-span-6 relative flex items-center justify-center pt-8 lg:pt-0 px-2 sm:px-4">
+          {/* Right Column: Clean Student Illustration encircled by Orbital Blue Ring & 6 Floating Pill Badges with Interactive 3D Parallax */}
+          <div className="lg:col-span-6 relative flex items-center justify-center py-10 lg:py-12 px-2 sm:px-4">
             
-            {/* Outer Container for Graphic & Orbit */}
-            <div className="relative z-10 w-full max-w-xl sm:max-w-2xl min-h-[440px] sm:min-h-[500px] flex items-center justify-center">
+            {/* Inline keyframe definitions for lip-sync & laser pointers */}
+            <style dangerouslySetInnerHTML={{ __html: `
+              @keyframes soundBar {
+                0%, 100% { transform: scaleY(0.4); }
+                50% { transform: scaleY(1.3); }
+              }
+              @keyframes laserPulse {
+                from { stroke-dashoffset: 40; }
+                to { stroke-dashoffset: 0; }
+              }
+              @keyframes lipsPulse {
+                0%, 100% { transform: scale(0.9); opacity: 0.8; }
+                50% { transform: scale(1.15); opacity: 1; }
+              }
+            `}} />
+
+            {/* Outer Container for Graphic & Orbit with 3D Perspective moving purely by itself */}
+            <div 
+              className="relative z-10 w-full max-w-2xl sm:max-w-3xl min-h-[440px] sm:min-h-[500px] flex items-center justify-center select-none"
+              style={{
+                transformStyle: 'preserve-3d',
+                perspective: '1200px',
+                transform: `perspective(1200px) rotateX(${-coords.y * 10}deg) rotateY(${coords.x * 10}deg) scale(1.02)`,
+                transition: 'transform 1.8s cubic-bezier(0.1, 0.6, 0.1, 1)',
+              }}
+            >
               
-              {/* Smooth Orbital Blue Line encircling characters & badges */}
-              <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center">
-                <svg viewBox="0 0 500 500" className="w-[105%] h-[105%] sm:w-[115%] sm:h-[115%] text-blue-400/70 max-w-full max-h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Outer delicate orbit line */}
-                  <ellipse cx="250" cy="250" rx="220" ry="200" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.4" />
-                  {/* Primary orbital ring */}
-                  <ellipse cx="250" cy="250" rx="200" ry="180" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
+              {/* Clean Isolated Students Art - Floating in mid-depth 3D */}
+              <div 
+                className="relative z-10 w-full max-w-[360px] sm:max-w-[470px] lg:max-w-[510px] flex items-center justify-center px-2 transition-transform duration-500 scale-110 sm:scale-115"
+                style={{
+                  transform: 'translateZ(30px)',
+                  transformStyle: 'preserve-3d',
+                }}
+              >
+                <div className="relative w-full">
+                  <img
+                    src={heroStudentsArt}
+                    alt="Placivo AI College Students"
+                    className="w-full h-auto object-contain mix-blend-multiply select-none pointer-events-none"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
               </div>
 
-              {/* Clean Isolated Students Art - Bigger & Zoom-Responsive */}
-              <div className="relative z-10 w-full max-w-sm sm:max-w-md lg:max-w-lg flex items-center justify-center px-2">
-                <img
-                  src={heroStudentsArt}
-                  alt="Placivo AI College Students"
-                  className="w-full h-auto object-contain mix-blend-multiply select-none pointer-events-none transform hover:scale-[1.02] transition-transform duration-500 scale-105 sm:scale-110"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
+              {/* 6 Floating Feature Badges highlighted with beautiful customized colors inside the loop */}
 
-              {/* 6 Floating Feature Badges */}
-
-              {/* Badge 1: Top Left - AI Notes */}
-              <div className="absolute top-0 left-0 sm:left-1 lg:-left-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[140px] sm:max-w-none" onClick={onExploreDemo}>
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              {/* Badge 1: Top Left - AI Notes (High depth) */}
+              <div 
+                className={`absolute top-0 left-0 sm:left-1 lg:-left-2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[140px] sm:max-w-none ${
+                  activeHighlightIndex === 0 
+                    ? 'bg-blue-50/95 border-2 border-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.65)] scale-112 ring-4 ring-blue-100/70' 
+                    : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
+                }`} 
+                onClick={onExploreDemo}
+                style={{
+                  transform: `translateZ(${activeHighlightIndex === 0 ? '115px' : '90px'})`,
+                  transformStyle: 'preserve-3d',
+                  transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s, border-color 0.3s',
+                }}
+              >
+                {activeHighlightIndex === 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                  </span>
+                )}
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 ${activeHighlightIndex === 0 ? 'bg-blue-600 text-white animate-pulse' : 'bg-blue-50 text-blue-600'}`}>
+                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="text-left min-w-0">
                   <div className="text-xs font-black text-slate-900 leading-tight truncate">AI Notes</div>
@@ -155,10 +388,28 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
                 </div>
               </div>
 
-              {/* Badge 2: Top Right - Courses */}
-              <div className="absolute top-0 right-0 sm:right-1 lg:-right-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[140px] sm:max-w-none" onClick={onExploreDemo}>
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              {/* Badge 2: Top Right - Courses (Very high depth) */}
+              <div 
+                className={`absolute top-0 right-0 sm:right-1 lg:-right-2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[140px] sm:max-w-none ${
+                  activeHighlightIndex === 1 
+                    ? 'bg-violet-50/95 border-2 border-violet-500 shadow-[0_0_25px_rgba(139,92,246,0.65)] scale-112 ring-4 ring-violet-100/70' 
+                    : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
+                }`} 
+                onClick={onExploreDemo}
+                style={{
+                  transform: `translateZ(${activeHighlightIndex === 1 ? '130px' : '105px'})`,
+                  transformStyle: 'preserve-3d',
+                  transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s, border-color 0.3s',
+                }}
+              >
+                {activeHighlightIndex === 1 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-violet-500"></span>
+                  </span>
+                )}
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 ${activeHighlightIndex === 1 ? 'bg-violet-600 text-white animate-pulse' : 'bg-blue-50 text-blue-600'}`}>
+                  <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="text-left min-w-0">
                   <div className="text-xs font-black text-slate-900 leading-tight truncate">Courses</div>
@@ -166,10 +417,28 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
                 </div>
               </div>
 
-              {/* Badge 3: Middle Left - Placements */}
-              <div className="absolute top-1/2 left-0 sm:-left-3 lg:-left-6 -translate-y-1/2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[150px] sm:max-w-none" onClick={onExploreDemo}>
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              {/* Badge 3: Middle Left - Placements (Medium-High depth) */}
+              <div 
+                className={`absolute top-1/2 left-0 sm:-left-3 lg:-left-6 -translate-y-1/2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[150px] sm:max-w-none ${
+                  activeHighlightIndex === 2 
+                    ? 'bg-emerald-50/95 border-2 border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.65)] scale-112 ring-4 ring-emerald-100/70' 
+                    : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
+                }`} 
+                onClick={onExploreDemo}
+                style={{
+                  transform: `translateZ(${activeHighlightIndex === 2 ? '110px' : '85px'}) translateY(-50%)`,
+                  transformStyle: 'preserve-3d',
+                  transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s, border-color 0.3s',
+                }}
+              >
+                {activeHighlightIndex === 2 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                  </span>
+                )}
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 ${activeHighlightIndex === 2 ? 'bg-emerald-600 text-white animate-pulse' : 'bg-blue-50 text-[#2563EB]'}`}>
+                  <Briefcase className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="text-left min-w-0">
                   <div className="text-xs font-black text-slate-900 leading-tight truncate">Placements</div>
@@ -177,10 +446,28 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
                 </div>
               </div>
 
-              {/* Badge 4: Middle Right - Planner */}
-              <div className="absolute top-1/2 right-0 sm:-right-3 lg:-right-6 -translate-y-1/2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[140px] sm:max-w-none" onClick={onExploreDemo}>
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              {/* Badge 4: Middle Right - Planner (Medium-High depth) */}
+              <div 
+                className={`absolute top-1/2 right-0 sm:-right-3 lg:-right-6 -translate-y-1/2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[140px] sm:max-w-none ${
+                  activeHighlightIndex === 3 
+                    ? 'bg-amber-50/95 border-2 border-amber-500 shadow-[0_0_25px_rgba(245,158,11,0.65)] scale-112 ring-4 ring-amber-100/70' 
+                    : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
+                }`} 
+                onClick={onExploreDemo}
+                style={{
+                  transform: `translateZ(${activeHighlightIndex === 3 ? '120px' : '95px'}) translateY(-50%)`,
+                  transformStyle: 'preserve-3d',
+                  transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s, border-color 0.3s',
+                }}
+              >
+                {activeHighlightIndex === 3 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                  </span>
+                )}
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 ${activeHighlightIndex === 3 ? 'bg-amber-600 text-white animate-pulse' : 'bg-blue-50 text-blue-600'}`}>
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="text-left min-w-0">
                   <div className="text-xs font-black text-slate-900 leading-tight truncate">Planner</div>
@@ -188,10 +475,28 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
                 </div>
               </div>
 
-              {/* Badge 5: Bottom Left - AI Assistant */}
-              <div className="absolute bottom-0 left-0 sm:left-1 lg:-left-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[145px] sm:max-w-none" onClick={onExploreDemo}>
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              {/* Badge 5: Bottom Left - AI Assistant (Maximum depth) */}
+              <div 
+                className={`absolute bottom-0 left-0 sm:left-1 lg:-left-2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[145px] sm:max-w-none ${
+                  activeHighlightIndex === 4 
+                    ? 'bg-cyan-50/95 border-2 border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.65)] scale-112 ring-4 ring-cyan-100/70' 
+                    : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
+                }`} 
+                onClick={onExploreDemo}
+                style={{
+                  transform: `translateZ(${activeHighlightIndex === 4 ? '135px' : '115px'})`,
+                  transformStyle: 'preserve-3d',
+                  transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s, border-color 0.3s',
+                }}
+              >
+                {activeHighlightIndex === 4 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+                  </span>
+                )}
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 ${activeHighlightIndex === 4 ? 'bg-cyan-600 text-white animate-pulse' : 'bg-blue-50 text-[#2563EB]'}`}>
+                  <Bot className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="text-left min-w-0">
                   <div className="text-xs font-black text-slate-900 leading-tight truncate">AI Assistant</div>
@@ -199,10 +504,28 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
                 </div>
               </div>
 
-              {/* Badge 6: Bottom Right - Community */}
-              <div className="absolute bottom-0 right-0 sm:right-1 lg:-right-2 z-20 shadow-lg shadow-slate-200/90 rounded-2xl bg-white border border-slate-100 p-2 sm:p-2.5 flex items-center gap-2.5 transition-transform hover:scale-105 cursor-pointer max-w-[140px] sm:max-w-none" onClick={onExploreDemo}>
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              {/* Badge 6: Bottom Right - Community (Medium depth) */}
+              <div 
+                className={`absolute bottom-0 right-0 sm:right-1 lg:-right-2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[140px] sm:max-w-none ${
+                  activeHighlightIndex === 5 
+                    ? 'bg-rose-50/95 border-2 border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.65)] scale-112 ring-4 ring-rose-100/70' 
+                    : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
+                }`} 
+                onClick={onExploreDemo}
+                style={{
+                  transform: `translateZ(${activeHighlightIndex === 5 ? '100px' : '75px'})`,
+                  transformStyle: 'preserve-3d',
+                  transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s, border-color 0.3s',
+                }}
+              >
+                {activeHighlightIndex === 5 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                  </span>
+                )}
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 ${activeHighlightIndex === 5 ? 'bg-rose-600 text-white animate-pulse' : 'bg-blue-50 text-blue-600'}`}>
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="text-left min-w-0">
                   <div className="text-xs font-black text-slate-900 leading-tight truncate">Community</div>

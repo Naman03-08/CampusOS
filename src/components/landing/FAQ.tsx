@@ -25,6 +25,14 @@ export const FAQ: React.FC = () => {
       q: 'Is my uploaded data private and secure?',
       a: 'Absolutely. All user documents and profiles are stored securely with strict user isolation and Firestore security rules.',
     },
+    {
+      q: 'What is the refund policy for Placivo AI subscriptions?',
+      a: 'All subscription payments are final and non-refundable (no money-back guarantee). Please pay at your own discretion. We invite you to place your trust in Placivo AI to empower your academic journey and placement career!',
+    },
+    {
+      q: 'What is the official support contact info for Placivo AI?',
+      a: 'You can reach our official support team via email at placivofficial@gmail.com or call/WhatsApp us at +91 9621783559 for instant query resolution.',
+    },
   ];
 
   return (

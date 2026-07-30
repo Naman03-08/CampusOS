@@ -1,9 +1,9 @@
 import React from 'react';
-import { Heart, ShieldCheck, FileText, Lock } from 'lucide-react';
+import { Heart, ShieldCheck, FileText, Lock, RefreshCw, Mail, Phone, Headphones } from 'lucide-react';
 import placivoAILogo from '../placivoAI.png';
 
 interface FooterLandingProps {
-  onOpenTerms?: (tab?: 'terms' | 'privacy') => void;
+  onOpenTerms?: (tab?: 'terms' | 'privacy' | 'cancellation') => void;
 }
 
 export const FooterLanding: React.FC<FooterLandingProps> = ({ onOpenTerms }) => {
@@ -11,13 +11,37 @@ export const FooterLanding: React.FC<FooterLandingProps> = ({ onOpenTerms }) => 
     <footer className="bg-gradient-to-b from-purple-50/60 to-purple-100/80 text-slate-600 py-16 border-t border-purple-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-purple-200/60">
-          <div>
-            <div className="flex items-center gap-2.5 mb-4">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2.5">
               <img src={placivoAILogo} alt="Placivo AI" className="h-10 w-auto object-contain rounded-xl overflow-hidden" />
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed mb-4">
+            <p className="text-xs text-slate-600 leading-relaxed">
               The AI Operating System for College Students. Empowering academic excellence and campus placements worldwide.
             </p>
+
+            <div className="p-3 bg-white/80 rounded-2xl border border-purple-200/90 shadow-2xs space-y-2">
+              <div className="flex items-center gap-2 text-xs text-purple-900 font-extrabold">
+                <Headphones className="w-3.5 h-3.5 text-purple-600" />
+                <span>24/7 Official Support Contact</span>
+              </div>
+              <div className="space-y-1 text-xs">
+                <a 
+                  href="mailto:placivofficial@gmail.com" 
+                  className="flex items-center gap-2 text-slate-700 hover:text-blue-600 font-semibold transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <span className="truncate">placivofficial@gmail.com</span>
+                </a>
+                <a 
+                  href="tel:9621783559" 
+                  className="flex items-center gap-2 text-slate-700 hover:text-emerald-600 font-semibold transition-colors"
+                >
+                  <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>+91 9621783559</span>
+                </a>
+              </div>
+            </div>
+
             <div className="flex items-center gap-2 text-xs text-emerald-800 font-bold bg-emerald-100/80 px-3 py-1.5 rounded-lg border border-emerald-200 w-fit">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               All Systems Operational
@@ -72,6 +96,17 @@ export const FooterLanding: React.FC<FooterLandingProps> = ({ onOpenTerms }) => 
                 </span>
                 <span className="text-[10px] text-purple-500 font-normal group-hover:translate-x-0.5 transition-transform">Read →</span>
               </button>
+
+              <button 
+                onClick={() => onOpenTerms?.('cancellation')}
+                className="w-full flex items-center justify-between text-xs text-emerald-700 bg-white/80 hover:bg-white px-3 py-2 rounded-xl border border-emerald-200 font-bold transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
+              >
+                <span className="flex items-center gap-1.5">
+                  <RefreshCw className="w-3.5 h-3.5 text-emerald-600" />
+                  Refund & Cancellation
+                </span>
+                <span className="text-[10px] text-emerald-500 font-normal group-hover:translate-x-0.5 transition-transform">Read →</span>
+              </button>
             </div>
           </div>
         </div>
@@ -90,6 +125,12 @@ export const FooterLanding: React.FC<FooterLandingProps> = ({ onOpenTerms }) => 
               className="text-slate-600 hover:text-purple-600 font-semibold underline underline-offset-2 transition-colors cursor-pointer"
             >
               Privacy Policy
+            </button>
+            <button 
+              onClick={() => onOpenTerms?.('cancellation')}
+              className="text-slate-600 hover:text-emerald-600 font-semibold underline underline-offset-2 transition-colors cursor-pointer"
+            >
+              Refund Policy
             </button>
           </div>
           <p className="flex items-center gap-1 font-medium">

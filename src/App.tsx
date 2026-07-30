@@ -58,9 +58,9 @@ export function App() {
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
-  const [termsTab, setTermsTab] = useState<'terms' | 'privacy'>('terms');
+  const [termsTab, setTermsTab] = useState<'terms' | 'privacy' | 'cancellation'>('terms');
 
-  const handleOpenTerms = (tab: 'terms' | 'privacy' = 'terms') => {
+  const handleOpenTerms = (tab: 'terms' | 'privacy' | 'cancellation' = 'terms') => {
     setTermsTab(tab);
     setShowTermsModal(true);
   };

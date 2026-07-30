@@ -12,7 +12,7 @@ interface AuthModalProps {
   initialMode: 'login' | 'register';
   onClose: () => void;
   onSuccess: (user: UserProfile) => void;
-  onOpenTerms?: (tab?: 'terms' | 'privacy') => void;
+  onOpenTerms?: (tab?: 'terms' | 'privacy' | 'cancellation') => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -1098,15 +1098,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 onClick={() => onOpenTerms?.('terms')}
                 className="font-semibold text-blue-600 hover:underline cursor-pointer"
               >
-                Terms & Conditions
-              </button>{' '}
-              and{' '}
+                Terms
+              </button>,{' '}
               <button
                 type="button"
                 onClick={() => onOpenTerms?.('privacy')}
                 className="font-semibold text-purple-600 hover:underline cursor-pointer"
               >
-                Privacy Policy
+                Privacy
+              </button>{' '}
+              &{' '}
+              <button
+                type="button"
+                onClick={() => onOpenTerms?.('cancellation')}
+                className="font-semibold text-emerald-600 hover:underline cursor-pointer"
+              >
+                Refund Policies
               </button>.
             </p>
           </form>

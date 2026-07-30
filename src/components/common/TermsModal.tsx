@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, FileText, Scale, ExternalLink, CheckCircle, Search, Mail, Building2, Lock, Sparkles } from 'lucide-react';
+import { X, ShieldCheck, FileText, Scale, ExternalLink, CheckCircle, Search, Mail, Phone, Building2, Lock, Sparkles } from 'lucide-react';
 import placivoAILogo from '../placivoAI.png';
 
 interface TermsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: 'terms' | 'privacy';
+  initialTab?: 'terms' | 'privacy' | 'cancellation';
 }
 
 export const TermsModal: React.FC<TermsModalProps> = ({ isOpen, onClose, initialTab = 'terms' }) => {
-  const [activeTab, setActiveTab] = useState<'terms' | 'privacy'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'terms' | 'privacy' | 'cancellation'>(initialTab);
   const [searchQuery, setSearchQuery] = useState('');
 
   if (!isOpen) return null;
@@ -225,9 +225,10 @@ Any dispute arising out of or relating to these Terms or the use of Placivo AI s
     {
       id: 'contact',
       title: '22. Contact Information',
-      content: `If you have any questions, feedback, or concerns regarding these Terms & Conditions or Privacy Policy, please contact us:
+      content: `If you have any questions, feedback, or concerns regarding these Terms & Conditions, Privacy Policy, or Subscription Billing, please contact us:
 
-• Email: support@placivo.ai
+• Official Email: placivofficial@gmail.com
+• Phone / Helpline: +91 9621783559
 • Official Portal: https://placivo.ai
 • Platform: Placivo AI Student Intelligence Services`
     }
@@ -277,11 +278,54 @@ By using Placivo AI, you consent to the data practices described in this policy.
 • Delete your account and associated cloud data at any time upon request.
 • Export or download your created resumes, notes, and certificates.
 
-For privacy requests, email support@placivo.ai.`
+For privacy requests, email placivofficial@gmail.com or call +91 9621783559.`
     }
   ];
 
-  const currentSections = activeTab === 'terms' ? termsSections : privacySections;
+  const cancellationSections = [
+    {
+      id: 'cancellation-policy',
+      title: '1. Subscription Cancellation Policy',
+      content: `At Placivo AI, you can cancel your paid subscription (such as Pro Scholar or Pro Ultimate) at any time through your Account Settings or by contacting placivofficial@gmail.com or calling +91 9621783559.
+
+Key details regarding subscription cancellation:
+• Instant Processing: When you disable auto-renewal, your account remains active with full premium benefits until the end of your current active billing cycle.
+• No Unexpected Automatic Charges: Cancelling auto-renewal prevents any future automatic debits or recurring billings.
+• Simple Account Control: You can manage your subscription status anytime under Settings -> Upgrade Plans & Billing.`
+    },
+    {
+      id: 'refund-policy',
+      title: '2. Strict No-Refund Policy & Terms of Payment',
+      content: `Please review our refund terms carefully before completing any transaction:
+
+• Strict No Money-Back Guarantee: All payments made to Placivo AI for subscriptions, course roadmaps, or premium AI feature unlocks are strictly final and non-refundable. There is no money-back guarantee provided upon subscription purchase.
+• Pay At Your Discretion: By proceeding with payment, you acknowledge that fees are non-refundable and agree to complete transactions at your own discretion.
+• Dedicated to Your Success: We build Placivo AI with absolute dedication to empowering your academic and campus placement journey. Place your trust in Placivo AI, and let our AI tools, 375 DSA roadmap, ATS resume builder, and mock interview engines accelerate your career!`
+    },
+    {
+      id: 'refund-request-process',
+      title: '3. Duplicate Charge & Payment Reconciliation',
+      content: `In the rare event of a technical payment failure, duplicate transaction, or if funds were debited from your account without activating your subscription:
+
+1. Contact Support Immediately: Email placivofficial@gmail.com or call +91 9621783559 with your payment receipt or UPI reference ID.
+2. Direct Verification: Our financial reconciliation team will verify transaction logs with Razorpay/Stripe payment gateways.
+3. Fast Resolution: Verified duplicate charges will be refunded 100% to your original payment method within 24 to 48 hours.`
+    },
+    {
+      id: 'non-refundable-conditions',
+      title: '4. Summary & Contact Assistance',
+      content: `If you have any questions before purchasing a subscription or need guidance choosing the right plan for your placement preparation:
+
+• Email Support: placivofficial@gmail.com
+• Phone / WhatsApp Helpline: +91 9621783559
+• Official Website: https://placivo.ai`
+    }
+  ];
+
+  const currentSections = 
+    activeTab === 'terms' ? termsSections : 
+    activeTab === 'privacy' ? privacySections : 
+    cancellationSections;
   const filteredSections = currentSections.filter(s => 
     s.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
     s.content.toLowerCase().includes(searchQuery.toLowerCase())
@@ -308,10 +352,10 @@ For privacy requests, email support@placivo.ai.`
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
             {/* Tab Switcher */}
-            <div className="bg-slate-800/90 p-1 rounded-xl flex items-center border border-slate-700">
+            <div className="bg-slate-800/90 p-1 rounded-xl flex items-center gap-1 border border-slate-700 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('terms')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                   activeTab === 'terms' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -319,11 +363,19 @@ For privacy requests, email support@placivo.ai.`
               </button>
               <button
                 onClick={() => setActiveTab('privacy')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                   activeTab === 'privacy' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 Privacy Policy
+              </button>
+              <button
+                onClick={() => setActiveTab('cancellation')}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                  activeTab === 'cancellation' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Refund & Cancellation
               </button>
             </div>
 
@@ -344,7 +396,7 @@ For privacy requests, email support@placivo.ai.`
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={`Search in ${activeTab === 'terms' ? 'Terms & Conditions' : 'Privacy Policy'}...`}
+              placeholder={`Search in ${activeTab === 'terms' ? 'Terms & Conditions' : activeTab === 'privacy' ? 'Privacy Policy' : 'Refund & Cancellation Policy'}...`}
               className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
@@ -384,17 +436,24 @@ For privacy requests, email support@placivo.ai.`
             <span>Protected by Placivo AI Legal & Compliance Standards</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
             <a
-              href="mailto:support@placivo.ai"
-              className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5"
+              href="mailto:placivofficial@gmail.com"
+              className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5"
             >
               <Mail className="w-3.5 h-3.5 text-blue-600" />
-              Contact Legal
+              Email Us
+            </a>
+            <a
+              href="tel:9621783559"
+              className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5"
+            >
+              <Phone className="w-3.5 h-3.5 text-emerald-600" />
+              Call Support
             </a>
             <button
               onClick={onClose}
-              className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+              className="px-5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all cursor-pointer"
             >
               I Understand & Accept
             </button>

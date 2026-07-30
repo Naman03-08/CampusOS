@@ -11,7 +11,7 @@ interface SettingsViewProps {
   user: UserProfile;
   onSaveProfile: (profile: UserProfile) => void;
   onNavigateTab?: (tab: string) => void;
-  onOpenTerms?: (tab?: 'terms' | 'privacy') => void;
+  onOpenTerms?: (tab?: 'terms' | 'privacy' | 'cancellation') => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile, onNavigateTab, onOpenTerms }) => {
@@ -600,7 +600,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
               <p className="font-bold text-slate-900">Placivo AI Terms & Privacy Policies</p>
               <p className="text-slate-500 mt-0.5">Review our terms of service, acceptable use, and student data protection standards.</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 type="button"
                 onClick={() => onOpenTerms?.('terms')}
@@ -614,6 +614,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
                 className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-purple-700 font-bold transition-all shadow-2xs"
               >
                 Privacy Policy
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenTerms?.('cancellation')}
+                className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-emerald-700 font-bold transition-all shadow-2xs"
+              >
+                Refund Policy
               </button>
             </div>
           </div>

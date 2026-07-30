@@ -665,7 +665,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                 ⚠️ Warning: The amount which has been paid will not be refunded any more so please cancel the subscription on your own risk.
               </p>
               <p className="text-[11px] text-rose-700 font-medium leading-normal">
-                Once cancelled, your plan will revert to Free Tier, premium AI feature access will be revoked, and this action will be logged in the admin financial dashboard.
+                Once cancelled, your plan will revert to Free Tier and premium AI access will be revoked. Please note that subscription payments are strictly non-refundable and there is no money-back guarantee, so proceed at your own discretion. Trust Placivo AI to make your career better!
               </p>
             </div>
 
