@@ -1,6 +1,6 @@
 import React from 'react';
 import { Zap, ArrowRight, BookOpen, Code, Award, Calendar, CheckSquare, Bot, GraduationCap } from 'lucide-react';
-import placivoAILogo from '../placivoAI.png';
+import placivoAILogo from '../landing/placivoAI.png';
 
 interface NavbarProps {
   onNavigateLandingSection: (sectionId: string) => void;
@@ -17,18 +17,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/70 border-b border-slate-200/50 transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 h-20 flex items-center justify-between">
+      <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
         {/* Logo */}
         <div 
           onClick={() => onNavigateLandingSection('hero')} 
           className="flex items-center gap-2.5 cursor-pointer group"
         >
-          <div className="w-9.5 h-9.5 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/15 group-hover:scale-105 transition-all">
-            <GraduationCap className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
-          </div>
-          <span className="text-lg sm:text-xl font-black tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
-            Placivo<span className="text-blue-600">AI</span>
-          </span>
+          <img 
+            src={placivoAILogo} 
+            alt="Placivo AI" 
+            className="h-10 w-auto max-h-10 object-contain rounded-2xl group-hover:scale-105 transition-all" 
+          />
         </div>
 
         {/* Nav Links */}

@@ -32,7 +32,6 @@ import { InterviewPrepView } from './components/placement/InterviewPrepView';
 import { StartupJobsHubView } from './components/placement/StartupJobsHubView';
 import { AIResumeBuilderView } from './components/resume/AIResumeBuilderView';
 import { SettingsView } from './components/settings/SettingsView';
-import { AdminPanelView } from './components/admin/AdminPanelView';
 import { UpgradePlansView } from './components/pricing/UpgradePlansView';
 import { UpgradePromptModal } from './components/common/UpgradePromptModal';
 import { CertificateVerificationModal } from './components/courses/CertificateVerificationModal';
@@ -738,7 +737,7 @@ export function App() {
                   studySuites={studySuites}
                   assignments={assignments}
                   onNavigateTab={handleNavigateTabWithGuard}
-                  onOpenStudyHubUpload={() => handleNavigateTabWithGuard('studyhub', 'AI Study Hub Upload')}
+                  onOpenStudyHubUpload={() => handleNavigateTabWithGuard('studyhub', 'AI Personal Assistant Upload')}
                   onStartTrial={handleStartFreeTrial}
                 />
               )}
@@ -846,10 +845,6 @@ export function App() {
                   onNavigateTab={setActiveTab}
                   onOpenTerms={handleOpenTerms}
                 />
-              )}
-
-              {activeTab === 'admin' && (
-                <AdminPanelView user={user} onNavigateTab={setActiveTab} />
               )}
             </main>
           </div>

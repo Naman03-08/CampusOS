@@ -201,12 +201,8 @@ export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
 
   // Submit Summarize
   const handleSummarize = async () => {
-    if (activeInputMode === 'upload' && !selectedFile && !fileBase64) {
+    if (!selectedFile && !fileBase64) {
       setError('Please upload a PDF document to summarize.');
-      return;
-    }
-    if (activeInputMode === 'text' && !rawText.trim()) {
-      setError('Please paste or type text to summarize.');
       return;
     }
 
@@ -215,8 +211,8 @@ export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
     setLoadingStep('Parsing PDF pages and extracting text...');
 
     try {
-      let payloadNotes = rawText;
-      if (activeInputMode === 'upload' && selectedFile) {
+      let payloadNotes = '';
+      if (selectedFile) {
         setLoadingStep('Extracting complete text content from PDF page by page...');
         const pdfText = await extractPdfTextClient(selectedFile);
         if (pdfText) {
@@ -474,32 +470,6 @@ ${s.sectionParagraph ? s.sectionParagraph + '\n' : ''}${(s.bullets || []).map(b 
         {!summaryData && (
           <div className="bg-white/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-2xl shadow-slate-200/60 transform transition-all hover:shadow-amber-100/50">
             
-            {/* Input Method Toggle */}
-            <div className="flex items-center gap-2 p-1.5 bg-slate-100/80 rounded-2xl w-fit mb-6 border border-slate-200/60">
-              <button
-                onClick={() => setActiveInputMode('upload')}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer flex items-center gap-2 ${
-                  activeInputMode === 'upload'
-                    ? 'bg-white text-slate-900 shadow-md shadow-slate-200'
-                    : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                <Upload className="w-4 h-4 text-amber-500" />
-                Upload PDF Document
-              </button>
-              <button
-                onClick={() => setActiveInputMode('text')}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer flex items-center gap-2 ${
-                  activeInputMode === 'text'
-                    ? 'bg-white text-slate-900 shadow-md shadow-slate-200'
-                    : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                <FileText className="w-4 h-4 text-sky-500" />
-                Paste Raw Notes Text
-              </button>
-            </div>
-
             {/* Custom Title Input */}
             <div className="mb-6 space-y-2">
               <label className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
@@ -515,83 +485,68 @@ ${s.sectionParagraph ? s.sectionParagraph + '\n' : ''}${(s.bullets || []).map(b 
               />
             </div>
 
-            {/* Mode 1: PDF File Drag & Drop */}
-            {activeInputMode === 'upload' && (
-              <div
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center transition-all cursor-pointer group ${
-                  selectedFile
-                    ? 'border-emerald-400 bg-emerald-50/40'
-                    : 'border-slate-300 hover:border-amber-400 bg-slate-50/50 hover:bg-amber-50/30'
-                }`}
-              >
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  accept="application/pdf"
-                  className="hidden"
-                />
+            {/* PDF File Drag & Drop */}
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onClick={() => fileInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center transition-all cursor-pointer group ${
+                selectedFile
+                  ? 'border-emerald-400 bg-emerald-50/40'
+                  : 'border-slate-300 hover:border-amber-400 bg-slate-50/50 hover:bg-amber-50/30'
+              }`}
+            >
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="application/pdf"
+                className="hidden"
+              />
 
-                {selectedFile ? (
-                  <div className="space-y-4">
-                    <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-lg shadow-emerald-100">
-                      <FileCheck className="w-8 h-8 animate-bounce" />
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-black text-slate-900">{selectedFile.name}</h4>
-                      <p className="text-xs text-slate-500 font-bold mt-1">
-                        {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Ready for AI Line-by-Line Summarization
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveFile();
-                      }}
-                      className="px-3.5 py-1.5 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 font-extrabold text-xs transition-all inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      Remove File
-                    </button>
+              {selectedFile ? (
+                <div className="space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-lg shadow-emerald-100">
+                    <FileCheck className="w-8 h-8 animate-bounce" />
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-lg shadow-amber-100">
-                      <Upload className="w-8 h-8" />
-                    </div>
-                    <div>
-                      <h4 className="text-base sm:text-lg font-black text-slate-900">
-                        Drop your PDF document here, or <span className="text-amber-600 underline">browse</span>
-                      </h4>
-                      <p className="text-xs text-slate-500 font-semibold mt-1">
-                        Upload textbook chapters, research papers, or lecture slide PDFs up to 50MB
-                      </p>
-                    </div>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-extrabold">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                      Line 1 to End Complete PDF Extraction
-                    </div>
+                  <div>
+                    <h4 className="text-lg font-black text-slate-900">{selectedFile.name}</h4>
+                    <p className="text-xs text-slate-500 font-bold mt-1">
+                      {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Ready for AI Line-by-Line Summarization
+                    </p>
                   </div>
-                )}
-              </div>
-            )}
-
-            {/* Mode 2: Paste Raw Text */}
-            {activeInputMode === 'text' && (
-              <div>
-                <textarea
-                  rows={10}
-                  placeholder="Paste your raw lecture notes, article, or document text here..."
-                  value={rawText}
-                  onChange={(e) => setRawText(e.target.value)}
-                  className="w-full p-4 rounded-2xl bg-slate-50/80 border border-slate-200 text-slate-900 placeholder-slate-400 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white transition-all shadow-inner"
-                />
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFile();
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 font-extrabold text-xs transition-all inline-flex items-center gap-1 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Remove File
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-lg shadow-amber-100">
+                    <Upload className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h4 className="text-base sm:text-lg font-black text-slate-900">
+                      Drop your PDF document here, or <span className="text-amber-600 underline">browse</span>
+                    </h4>
+                    <p className="text-xs text-slate-500 font-semibold mt-1">
+                      Upload textbook chapters, research papers, or lecture slide PDFs up to 50MB
+                    </p>
+                  </div>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-extrabold">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                    Line 1 to End Complete PDF Extraction
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Error Message */}
             {error && (

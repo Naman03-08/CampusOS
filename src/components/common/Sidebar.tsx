@@ -17,7 +17,7 @@ import {
   Bot
 } from 'lucide-react';
 import { UserProfile } from '../../types';
-import placivoAILogo from '../placivoAI.png';
+import placivoAILogo from '../landing/placivoAI.png';
 
 interface SidebarProps {
   activeTab: string;
@@ -49,7 +49,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'habiturex', label: 'Habiturex', icon: CheckSquare, badge: 'v3.5' },
     { id: 'pricing', label: 'Upgrade Plans', icon: Zap, badge: 'Plans' },
     { id: 'settings', label: 'Settings', icon: Settings },
-    ...(isAdminUser ? [{ id: 'admin', label: 'Admin Panel', icon: ShieldAlert, badge: 'Lock' }] : []),
   ];
 
   return (
@@ -62,12 +61,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={() => onSelectTab('dashboard')}
           className="flex items-center gap-2.5 px-3 py-2.5 mb-5 bg-white/80 backdrop-blur-md border border-white/90 rounded-2xl shadow-3d-sm cursor-pointer hover:bg-white transition-all group"
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-sm shadow-blue-500/10 group-hover:scale-105 transition-transform shrink-0">
-            <GraduationCap className="w-4.5 h-4.5 text-white" />
-          </div>
-          <span className="text-sm font-black tracking-tight text-slate-800">
-            Placivo<span className="text-blue-600">AI</span>
-          </span>
+          <img 
+            src={placivoAILogo} 
+            alt="Placivo AI" 
+            className="h-8 w-auto max-h-8 object-contain rounded-2xl group-hover:scale-105 transition-transform shrink-0" 
+          />
         </div>
 
         {/* Nav list */}

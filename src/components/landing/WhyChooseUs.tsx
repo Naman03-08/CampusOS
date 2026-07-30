@@ -54,7 +54,7 @@ export const WhyChooseUs: React.FC<WhyChooseUsProps> = ({ onOpenAuth }) => {
 
   return (
     <section id="why-us" className="py-20 bg-transparent border-t border-white/40 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-8 lg:px-12">
         {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-[11px] font-extrabold uppercase tracking-widest text-emerald-700 bg-emerald-50/90 backdrop-blur-md px-3.5 py-1 rounded-full border border-emerald-200/90 inline-flex items-center gap-1.5 shadow-xs">

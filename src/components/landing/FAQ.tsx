@@ -37,7 +37,7 @@ export const FAQ: React.FC = () => {
 
   return (
     <section id="faq" className="py-20 bg-transparent border-t border-white/40">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-xs font-extrabold uppercase tracking-widest text-blue-600 bg-blue-50/80 backdrop-blur-md px-3 py-1 rounded-full border border-blue-200">
             Frequently Asked Questions

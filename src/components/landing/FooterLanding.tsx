@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart, ShieldCheck, FileText, Lock, RefreshCw, Mail, Phone, Headphones, GraduationCap } from 'lucide-react';
-import placivoAILogo from '../placivoAI.png';
+import placivoAILogo from './placivoAI.png';
 
 interface FooterLandingProps {
   onOpenTerms?: (tab?: 'terms' | 'privacy' | 'cancellation') => void;
@@ -9,16 +9,15 @@ interface FooterLandingProps {
 export const FooterLanding: React.FC<FooterLandingProps> = ({ onOpenTerms }) => {
   return (
     <footer className="bg-gradient-to-b from-purple-50/60 to-purple-100/80 text-slate-600 py-16 border-t border-purple-200/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-purple-200/60">
           <div className="space-y-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/10">
-                <GraduationCap className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-black tracking-tight text-slate-950">
-                Placivo<span className="text-blue-600">AI</span>
-              </span>
+            <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              <img 
+                src={placivoAILogo} 
+                alt="Placivo AI" 
+                className="h-9 w-auto max-h-9 object-contain rounded-2xl" 
+              />
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
               The AI Operating System for College Students. Empowering academic excellence and campus placements worldwide.

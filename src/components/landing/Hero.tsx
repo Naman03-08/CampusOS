@@ -16,6 +16,7 @@ import {
   Zap 
 } from 'lucide-react';
 import heroStudentsArt from '../../assets/images/campusos_blue_hoodies_art_1785350059169.jpg';
+import { ProfessionalWorkspaceScene } from './ProfessionalWorkspaceScene';
 
 interface HeroProps {
   onOpenAuth: (mode: 'register') => void;
@@ -206,7 +207,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
         }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
         
         {/* Main Hero Split Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-12">
@@ -310,136 +311,38 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
 
             {/* Outer Container for Graphic & Orbit with 3D Perspective moving purely by itself */}
             <div 
-              className="relative z-10 w-full max-w-2xl sm:max-w-3xl min-h-[440px] sm:min-h-[500px] flex items-center justify-center select-none"
+              className="relative z-10 w-full min-h-[460px] sm:min-h-[520px] flex items-center justify-center select-none"
               style={{
                 transformStyle: 'preserve-3d',
                 perspective: '1200px',
-                transform: `perspective(1200px) rotateX(${-coords.y * 10}deg) rotateY(${coords.x * 10}deg) scale(1.02)`,
+                transform: `perspective(1200px) rotateX(${-coords.y * 4}deg) rotateY(${coords.x * 4}deg) scale(1.01)`,
                 transition: 'transform 1.8s cubic-bezier(0.1, 0.6, 0.1, 1)',
               }}
             >
               
               {/* Professional technical orbital glow & slow-spinning background rings */}
-              <div className="absolute w-[440px] h-[440px] rounded-full bg-gradient-to-tr from-blue-500/5 via-indigo-500/5 to-transparent blur-3xl pointer-events-none z-0" />
+              <div className="absolute w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-blue-500/5 via-indigo-500/5 to-transparent blur-3xl pointer-events-none z-0" />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                <div className="w-[360px] h-[360px] sm:w-[420px] sm:h-[420px] rounded-full border border-blue-500/10 animate-[spin_50s_linear_infinite]" />
-                <div className="w-[480px] h-[480px] sm:w-[540px] sm:h-[540px] rounded-full border border-dashed border-indigo-500/8 absolute animate-[spin_80s_linear_infinite]" />
+                <div className="w-[420px] h-[420px] sm:w-[520px] sm:h-[520px] rounded-full border border-blue-500/10 animate-[spin_50s_linear_infinite]" />
+                <div className="w-[560px] h-[560px] sm:w-[680px] sm:h-[680px] rounded-full border border-dashed border-indigo-500/8 absolute animate-[spin_80s_linear_infinite]" />
               </div>
 
-              {/* Clean Isolated Students Art - Floating in mid-depth 3D and beautifully framed in a premium workspace window mockup */}
+              {/* Professional Student Workspace Scene */}
               <div 
-                className="relative z-10 w-full max-w-[340px] sm:max-w-[430px] lg:max-w-[460px] bg-white border border-slate-200/90 rounded-2xl shadow-[0_25px_60px_rgba(15,23,42,0.08)] p-3.5 sm:p-5 transition-all duration-300 hover:shadow-[0_30px_70px_rgba(15,23,42,0.12)]"
+                className="relative z-10 w-full px-4 sm:px-8"
                 style={{
                   transform: 'translateZ(30px)',
                   transformStyle: 'preserve-3d',
                 }}
               >
-                {/* Mockup Window Top Bar Controls */}
-                <div className="flex items-center justify-between pb-3 sm:pb-4 mb-2 border-b border-slate-100">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-400/85 shadow-sm shadow-rose-400/20"></span>
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400/85 shadow-sm shadow-amber-400/20"></span>
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/85 shadow-sm shadow-emerald-400/20"></span>
-                  </div>
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                    Interactive Campus Hub
-                  </div>
-                </div>
-
-                {/* Inner Canvas with photorealistic minimalist architectural studio interior background */}
-                <div className="relative w-full rounded-xl overflow-hidden bg-[#FAFBFD] flex items-center justify-center p-4 sm:p-6 border border-slate-200/90 shadow-inner min-h-[230px] sm:min-h-[290px]">
-                  
-                  {/* Soft Warm Studio Ambient Wall Base */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-[#FDFEFF] via-[#F4F6FA] to-[#E9EEF5] pointer-events-none z-0" />
-
-                  {/* Soft Radial Backlight behind Students for clean foreground separation */}
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.98)_0%,rgba(244,246,250,0.5)_65%,transparent_100%)] pointer-events-none z-0" />
-
-                  {/* Realistic Golden Sunlight Stream from Top-Left Window */}
-                  <div className="absolute top-[-35%] left-[-25%] w-[140%] h-[170%] opacity-55 bg-gradient-to-br from-amber-100/95 via-orange-50/40 to-transparent blur-2xl transform -rotate-12 pointer-events-none z-0" />
-
-                  {/* Architectural Window Pane Light Beams & Geometric Window Grid Shadow */}
-                  <div 
-                    className="absolute top-0 left-[-15%] w-[95%] h-[115%] opacity-[0.24] pointer-events-none z-0 transform -rotate-6"
-                    style={{
-                      backgroundImage: `
-                        linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.2) 50%, transparent 100%),
-                        linear-gradient(to right, rgba(15,23,42,0.1) 12px, transparent 12px),
-                        linear-gradient(to bottom, rgba(15,23,42,0.1) 12px, transparent 12px)
-                      `,
-                      backgroundSize: '100% 100%, 120px 120px, 120px 120px',
-                    }}
-                  />
-
-                  {/* Left Side: Elegant Tall Rose Gold & Ceramic Architectural Floor Vase */}
-                  <div className="absolute bottom-2.5 left-2.5 sm:left-4 flex flex-col items-center pointer-events-none z-0 opacity-90 scale-85 sm:scale-95 origin-bottom-left">
-                    <div className="w-12 sm:w-16 h-28 sm:h-36 rounded-b-3xl rounded-t-full bg-gradient-to-tr from-rose-300 via-rose-200 to-amber-100 border border-white/90 shadow-md relative overflow-hidden">
-                      <div className="absolute inset-0 bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:5px_5px] opacity-40" />
-                      <div className="absolute top-0 inset-x-0 h-3 bg-white/80 rounded-full border-b border-rose-300/40 shadow-xs" />
-                      <div className="absolute inset-y-0 left-1.5 w-2 bg-white/50 blur-[1px]" />
-                    </div>
-                  </div>
-
-                  {/* Right Side: Architectural Modern Floating Wall Shelves with Minimalist Decor */}
-                  <div className="absolute top-3.5 right-2 sm:right-3.5 flex flex-col gap-6 sm:gap-7 pointer-events-none z-0 w-[100px] sm:w-[125px] opacity-95 scale-85 sm:scale-100 origin-top-right">
-                    
-                    {/* Floating Shelf 1 (Top) - Glowing Golden AI Award & Sculpture */}
-                    <div className="relative">
-                      <div className="absolute bottom-1 right-2 flex items-end gap-1.5">
-                        <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-amber-300 via-amber-200 to-yellow-100 border border-white shadow-xs flex items-center justify-center">
-                          <span className="text-[10px]">✨</span>
-                        </div>
-                        <div className="w-4 h-8 rounded-t-full bg-gradient-to-b from-indigo-200 to-blue-300 border border-white/80 shadow-2xs" />
-                      </div>
-                      {/* Floating Shelf Board */}
-                      <div className="w-full h-2.5 bg-white border-t border-b border-slate-200/90 shadow-[0_4px_8px_rgba(15,23,42,0.06)] rounded-xs" />
-                    </div>
-
-                    {/* Floating Shelf 2 (Middle) - Stacked Hardcover Books & Cylinder */}
-                    <div className="relative">
-                      <div className="absolute bottom-1 left-2 flex items-end gap-1.5">
-                        <div className="flex flex-col gap-[2px]">
-                          <div className="w-10 h-2 bg-slate-100 border border-slate-300/80 rounded-3xs shadow-2xs" />
-                          <div className="w-12 h-2.5 bg-blue-100/90 border border-blue-200/80 rounded-3xs shadow-2xs" />
-                        </div>
-                        <div className="w-4.5 h-6 rounded-t-xl rounded-b-xs bg-gradient-to-b from-rose-200 via-rose-300 to-amber-200 border border-white/90 shadow-2xs" />
-                      </div>
-                      {/* Floating Shelf Board */}
-                      <div className="w-full h-2.5 bg-white border-t border-b border-slate-200/90 shadow-[0_4px_8px_rgba(15,23,42,0.06)] rounded-xs" />
-                    </div>
-
-                    {/* Floating Shelf 3 (Bottom) - Ceramic Sphere & Tall Amphora */}
-                    <div className="relative">
-                      <div className="absolute bottom-1 left-2 right-1.5 flex items-end justify-between">
-                        <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-slate-200 to-white border border-slate-300/60 shadow-2xs" />
-                        <div className="w-4 h-9 rounded-t-full bg-gradient-to-tr from-amber-200 via-rose-300 to-rose-200 border border-white/90 shadow-2xs" />
-                      </div>
-                      {/* Floating Shelf Board */}
-                      <div className="w-full h-2.5 bg-white border-t border-b border-slate-200/90 shadow-[0_4px_8px_rgba(15,23,42,0.06)] rounded-xs" />
-                    </div>
-                  </div>
-
-                  {/* Floor Platform Ledge at Bottom */}
-                  <div className="absolute bottom-0 inset-x-0 h-4 bg-gradient-to-b from-white via-slate-50 to-slate-100/90 border-t border-slate-200/80 pointer-events-none z-0 shadow-[inset_0_1px_3px_rgba(255,255,255,0.9)]" />
-
-                  {/* Main Student Artwork Image */}
-                  <img
-                    src={heroStudentsArt}
-                    alt="Placivo AI College Students"
-                    className="w-full h-auto object-contain select-none pointer-events-none mix-blend-multiply relative z-10"
-                    referrerPolicy="no-referrer"
-                  />
-                  {/* Soft bottom fade blend */}
-                  <div className="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-white/90 to-transparent pointer-events-none z-10" />
-                </div>
+                <ProfessionalWorkspaceScene imageSrc={heroStudentsArt} onExploreDemo={onExploreDemo} />
               </div>
 
               {/* 6 Floating Feature Badges highlighted with beautiful customized colors inside the loop */}
 
               {/* Badge 1: Top Left - AI Notes (High depth) */}
               <div 
-                className={`absolute top-0 left-0 sm:left-1 lg:-left-2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[140px] sm:max-w-none ${
+                className={`absolute top-0 left-2 sm:left-6 lg:left-8 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer ${
                   activeHighlightIndex === 0 
                     ? 'bg-blue-50/95 border-2 border-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.65)] scale-112 ring-4 ring-blue-100/70' 
                     : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
@@ -468,7 +371,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
 
               {/* Badge 2: Top Right - Courses (Very high depth) */}
               <div 
-                className={`absolute top-0 right-0 sm:right-1 lg:-right-2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[140px] sm:max-w-none ${
+                className={`absolute top-0 right-2 sm:right-6 lg:right-8 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer ${
                   activeHighlightIndex === 1 
                     ? 'bg-violet-50/95 border-2 border-violet-500 shadow-[0_0_25px_rgba(139,92,246,0.65)] scale-112 ring-4 ring-violet-100/70' 
                     : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
@@ -497,7 +400,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
 
               {/* Badge 3: Middle Left - Placements (Medium-High depth) */}
               <div 
-                className={`absolute top-1/2 left-0 sm:-left-3 lg:-left-6 -translate-y-1/2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[150px] sm:max-w-none ${
+                className={`absolute top-1/2 left-1 sm:left-4 lg:left-6 -translate-y-1/2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer ${
                   activeHighlightIndex === 2 
                     ? 'bg-emerald-50/95 border-2 border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.65)] scale-112 ring-4 ring-emerald-100/70' 
                     : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
@@ -526,7 +429,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
 
               {/* Badge 4: Middle Right - Planner (Medium-High depth) */}
               <div 
-                className={`absolute top-1/2 right-0 sm:-right-3 lg:-right-6 -translate-y-1/2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[140px] sm:max-w-none ${
+                className={`absolute top-1/2 right-1 sm:right-4 lg:right-6 -translate-y-1/2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer ${
                   activeHighlightIndex === 3 
                     ? 'bg-amber-50/95 border-2 border-amber-500 shadow-[0_0_25px_rgba(245,158,11,0.65)] scale-112 ring-4 ring-amber-100/70' 
                     : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
@@ -555,7 +458,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
 
               {/* Badge 5: Bottom Left - AI Assistant (Maximum depth) */}
               <div 
-                className={`absolute bottom-0 left-0 sm:left-1 lg:-left-2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[145px] sm:max-w-none ${
+                className={`absolute bottom-0 left-2 sm:left-6 lg:left-8 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer ${
                   activeHighlightIndex === 4 
                     ? 'bg-cyan-50/95 border-2 border-cyan-500 shadow-[0_0_25px_rgba(6,182,212,0.65)] scale-112 ring-4 ring-cyan-100/70' 
                     : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
@@ -584,7 +487,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
 
               {/* Badge 6: Bottom Right - Community (Medium depth) */}
               <div 
-                className={`absolute bottom-0 right-0 sm:right-1 lg:-right-2 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer max-w-[140px] sm:max-w-none ${
+                className={`absolute bottom-0 right-2 sm:right-6 lg:right-8 z-20 shadow-lg rounded-2xl p-2 sm:p-2.5 flex items-center gap-2.5 transition-all cursor-pointer ${
                   activeHighlightIndex === 5 
                     ? 'bg-rose-50/95 border-2 border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.65)] scale-112 ring-4 ring-rose-100/70' 
                     : 'bg-white border border-slate-100 hover:bg-slate-50 opacity-90'
