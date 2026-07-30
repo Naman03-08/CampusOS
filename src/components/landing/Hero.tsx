@@ -354,104 +354,68 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
                   <div className="absolute inset-0 bg-gradient-to-b from-[#FDFEFF] via-[#F4F6FA] to-[#E9EEF5] pointer-events-none z-0" />
 
                   {/* Soft Radial Backlight behind Students for clean foreground separation */}
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.95)_0%,rgba(244,246,250,0.4)_65%,transparent_100%)] pointer-events-none z-0" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.98)_0%,rgba(244,246,250,0.5)_65%,transparent_100%)] pointer-events-none z-0" />
 
-                  {/* Realistic Diagonal Golden Sunlight Stream from Top-Left Window */}
-                  <div className="absolute top-[-35%] left-[-25%] w-[140%] h-[170%] opacity-50 bg-gradient-to-br from-amber-100/90 via-orange-50/30 to-transparent blur-2xl transform -rotate-12 pointer-events-none z-0" />
+                  {/* Realistic Golden Sunlight Stream from Top-Left Window */}
+                  <div className="absolute top-[-35%] left-[-25%] w-[140%] h-[170%] opacity-55 bg-gradient-to-br from-amber-100/95 via-orange-50/40 to-transparent blur-2xl transform -rotate-12 pointer-events-none z-0" />
 
-                  {/* Architectural Window Pane Light Beams & Grid Shadow */}
+                  {/* Architectural Window Pane Light Beams & Geometric Window Grid Shadow */}
                   <div 
-                    className="absolute top-0 left-[-15%] w-[95%] h-[115%] opacity-[0.22] pointer-events-none z-0 transform -rotate-6"
+                    className="absolute top-0 left-[-15%] w-[95%] h-[115%] opacity-[0.24] pointer-events-none z-0 transform -rotate-6"
                     style={{
                       backgroundImage: `
-                        linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.15) 50%, transparent 100%),
-                        linear-gradient(to right, rgba(15,23,42,0.09) 12px, transparent 12px),
-                        linear-gradient(to bottom, rgba(15,23,42,0.09) 12px, transparent 12px)
+                        linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.2) 50%, transparent 100%),
+                        linear-gradient(to right, rgba(15,23,42,0.1) 12px, transparent 12px),
+                        linear-gradient(to bottom, rgba(15,23,42,0.1) 12px, transparent 12px)
                       `,
                       backgroundSize: '100% 100%, 120px 120px, 120px 120px',
                     }}
                   />
 
-                  {/* Organic Palm Leaf Shadow Silhouette Overlay on the Left Wall */}
-                  <div className="absolute top-[0%] left-[-2%] w-[200px] sm:w-[260px] h-[240px] sm:h-[320px] opacity-[0.16] pointer-events-none blur-[2px] transform -rotate-12 select-none z-0">
-                    <svg viewBox="0 0 200 200" className="w-full h-full fill-slate-900">
-                      <path d="M10,190 Q60,120 130,70 Q110,95 85,130 Q150,60 190,30 Q135,75 105,120 Q170,80 200,70 Q135,105 95,150 Q120,125 170,115 C125,138 85,170 10,190 Z" />
-                      <path d="M5,195 Q80,130 160,50 Q125,85 92,125 Q168,70 200,40 Q145,95 110,138 Q178,100 198,98 C145,122 92,160 5,195 Z" />
-                    </svg>
-                  </div>
-
-                  {/* Left Side: Real Architectural Potted Palm Plant & Rose Gold Ceramic Pot */}
-                  <div className="absolute bottom-2.5 left-2 sm:left-3 flex flex-col items-center pointer-events-none z-0 opacity-90 scale-80 sm:scale-90 origin-bottom-left">
-                    {/* Lush Detailed Palm Leaves */}
-                    <div className="w-28 sm:w-32 h-32 sm:h-38 relative -mb-5">
-                      <svg viewBox="0 0 100 120" className="w-full h-full drop-shadow-sm">
-                        {/* Back darker leaves */}
-                        <path d="M50 110 Q25 50 2 25 Q30 40 48 100" fill="#047857" opacity="0.8" />
-                        <path d="M50 110 Q75 45 98 20 Q70 38 52 100" fill="#065F46" opacity="0.8" />
-                        {/* Middle emerald leaves */}
-                        <path d="M50 110 Q15 65 0 45 Q28 55 47 102" fill="#10B981" />
-                        <path d="M50 110 Q85 60 100 40 Q72 52 53 102" fill="#059669" />
-                        {/* Front vibrant leaves */}
-                        <path d="M50 110 Q35 30 18 10 Q42 28 49 98" fill="#34D399" />
-                        <path d="M50 110 Q65 25 82 8 Q58 26 51 98" fill="#10B981" />
-                      </svg>
-                    </div>
-                    {/* Rose Gold Textured Ceramic Pot */}
-                    <div className="w-14 sm:w-16 h-20 sm:h-24 rounded-b-3xl rounded-t-full bg-gradient-to-tr from-rose-300 via-rose-200 to-amber-100 border border-white/90 shadow-md relative overflow-hidden">
+                  {/* Left Side: Elegant Tall Rose Gold & Ceramic Architectural Floor Vase */}
+                  <div className="absolute bottom-2.5 left-2.5 sm:left-4 flex flex-col items-center pointer-events-none z-0 opacity-90 scale-85 sm:scale-95 origin-bottom-left">
+                    <div className="w-12 sm:w-16 h-28 sm:h-36 rounded-b-3xl rounded-t-full bg-gradient-to-tr from-rose-300 via-rose-200 to-amber-100 border border-white/90 shadow-md relative overflow-hidden">
                       <div className="absolute inset-0 bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:5px_5px] opacity-40" />
-                      <div className="absolute top-0 inset-x-0 h-2.5 bg-white/70 rounded-full border-b border-rose-300/30" />
-                      {/* Pot Highlight Rim */}
-                      <div className="absolute inset-y-0 left-1 w-2 bg-white/40 blur-[1px]" />
+                      <div className="absolute top-0 inset-x-0 h-3 bg-white/80 rounded-full border-b border-rose-300/40 shadow-xs" />
+                      <div className="absolute inset-y-0 left-1.5 w-2 bg-white/50 blur-[1px]" />
                     </div>
                   </div>
 
-                  {/* Right Side: Architectural Modern Floating Wall Shelves with Decor */}
-                  <div className="absolute top-3 right-2 sm:right-3 flex flex-col gap-6 sm:gap-7 pointer-events-none z-0 w-[100px] sm:w-[125px] opacity-95 scale-85 sm:scale-100 origin-top-right">
+                  {/* Right Side: Architectural Modern Floating Wall Shelves with Minimalist Decor */}
+                  <div className="absolute top-3.5 right-2 sm:right-3.5 flex flex-col gap-6 sm:gap-7 pointer-events-none z-0 w-[100px] sm:w-[125px] opacity-95 scale-85 sm:scale-100 origin-top-right">
                     
-                    {/* Floating Shelf 1 (Top) */}
+                    {/* Floating Shelf 1 (Top) - Glowing Golden AI Award & Sculpture */}
                     <div className="relative">
-                      {/* Trailing Fern Plant in Rose Gold Vessel */}
-                      <div className="absolute bottom-1 right-1.5 flex items-end gap-1">
-                        <div className="w-6.5 h-5.5 rounded-md bg-gradient-to-tr from-rose-300 to-amber-200 border border-white/80 shadow-2xs relative flex justify-center">
-                          <div className="w-4 h-4 rounded-full bg-emerald-600/80 -top-2 absolute" />
+                      <div className="absolute bottom-1 right-2 flex items-end gap-1.5">
+                        <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-amber-300 via-amber-200 to-yellow-100 border border-white shadow-xs flex items-center justify-center">
+                          <span className="text-[10px]">✨</span>
                         </div>
-                        <div className="w-7 h-9 text-emerald-600/85 -mb-3.5">
-                          <svg viewBox="0 0 50 90" className="w-full h-full">
-                            <path d="M25 0 Q10 25 5 45 Q20 35 25 10 Q30 40 45 65 Q30 50 25 90" stroke="currentColor" strokeWidth="2.5" fill="none" />
-                            <circle cx="8" cy="42" r="4" fill="#059669" />
-                            <circle cx="42" cy="60" r="4.5" fill="#10B981" />
-                            <circle cx="25" cy="82" r="3.5" fill="#34D399" />
-                          </svg>
-                        </div>
+                        <div className="w-4 h-8 rounded-t-full bg-gradient-to-b from-indigo-200 to-blue-300 border border-white/80 shadow-2xs" />
                       </div>
-                      {/* White Floating Shelf Board */}
+                      {/* Floating Shelf Board */}
                       <div className="w-full h-2.5 bg-white border-t border-b border-slate-200/90 shadow-[0_4px_8px_rgba(15,23,42,0.06)] rounded-xs" />
                     </div>
 
-                    {/* Floating Shelf 2 (Middle) */}
+                    {/* Floating Shelf 2 (Middle) - Stacked Hardcover Books & Cylinder */}
                     <div className="relative">
-                      {/* Stacked Hardcover Books + Rose Gold Vessel */}
                       <div className="absolute bottom-1 left-2 flex items-end gap-1.5">
                         <div className="flex flex-col gap-[2px]">
                           <div className="w-10 h-2 bg-slate-100 border border-slate-300/80 rounded-3xs shadow-2xs" />
-                          <div className="w-12 h-2.5 bg-slate-200/90 border border-slate-300/80 rounded-3xs shadow-2xs" />
+                          <div className="w-12 h-2.5 bg-blue-100/90 border border-blue-200/80 rounded-3xs shadow-2xs" />
                         </div>
-                        <div className="w-4.5 h-5.5 rounded-t-xl rounded-b-xs bg-gradient-to-b from-rose-200 via-rose-300 to-amber-200 border border-white/90 shadow-2xs" />
+                        <div className="w-4.5 h-6 rounded-t-xl rounded-b-xs bg-gradient-to-b from-rose-200 via-rose-300 to-amber-200 border border-white/90 shadow-2xs" />
                       </div>
-                      {/* White Floating Shelf Board */}
+                      {/* Floating Shelf Board */}
                       <div className="w-full h-2.5 bg-white border-t border-b border-slate-200/90 shadow-[0_4px_8px_rgba(15,23,42,0.06)] rounded-xs" />
                     </div>
 
-                    {/* Floating Shelf 3 (Bottom) */}
+                    {/* Floating Shelf 3 (Bottom) - Ceramic Sphere & Tall Amphora */}
                     <div className="relative">
-                      {/* Succulent Dish & Tall Rose Gold Amphora Vase */}
                       <div className="absolute bottom-1 left-2 right-1.5 flex items-end justify-between">
-                        <div className="w-5.5 h-4.5 rounded-md bg-gradient-to-r from-rose-200 to-rose-300 border border-white/80 flex items-center justify-center">
-                          <div className="w-3.5 h-3.5 rounded-full bg-emerald-600/80 -top-2 relative" />
-                        </div>
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-slate-200 to-white border border-slate-300/60 shadow-2xs" />
                         <div className="w-4 h-9 rounded-t-full bg-gradient-to-tr from-amber-200 via-rose-300 to-rose-200 border border-white/90 shadow-2xs" />
                       </div>
-                      {/* White Floating Shelf Board */}
+                      {/* Floating Shelf Board */}
                       <div className="w-full h-2.5 bg-white border-t border-b border-slate-200/90 shadow-[0_4px_8px_rgba(15,23,42,0.06)] rounded-xs" />
                     </div>
                   </div>
