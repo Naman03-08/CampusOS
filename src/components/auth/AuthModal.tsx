@@ -569,7 +569,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="md:col-span-5 bg-[#0B1736] text-white p-7 sm:p-9 flex flex-col justify-between relative overflow-hidden selection:bg-blue-500 selection:text-white">
           {/* Top Brand Logo */}
           <div className="flex items-center gap-2.5 z-10">
-            <img src={logoImg} alt="Placivo AI" className="h-10 w-auto object-contain bg-white/10 p-1.5 rounded-xl border border-white/20 shadow-md" />
+            <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 shadow-md">
+              <GraduationCap className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-lg font-black tracking-tight text-white">
+              Placivo<span className="text-blue-400">AI</span>
+            </span>
           </div>
 
           {/* Main Hero Message */}

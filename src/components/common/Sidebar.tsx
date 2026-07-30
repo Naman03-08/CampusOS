@@ -60,9 +60,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div>
         <div 
           onClick={() => onSelectTab('dashboard')}
-          className="flex items-center gap-2.5 px-3 py-2.5 mb-5 bg-white/80 backdrop-blur-md border border-white/90 rounded-2xl shadow-3d-sm cursor-pointer hover:bg-white transition-all"
+          className="flex items-center gap-2.5 px-3 py-2.5 mb-5 bg-white/80 backdrop-blur-md border border-white/90 rounded-2xl shadow-3d-sm cursor-pointer hover:bg-white transition-all group"
         >
-          <img src={placivoAILogo} alt="Placivo AI" className="h-9 w-auto object-contain shrink-0 rounded-xl overflow-hidden" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-sm shadow-blue-500/10 group-hover:scale-105 transition-transform shrink-0">
+            <GraduationCap className="w-4.5 h-4.5 text-white" />
+          </div>
+          <span className="text-sm font-black tracking-tight text-slate-800">
+            Placivo<span className="text-blue-600">AI</span>
+          </span>
         </div>
 
         {/* Nav list */}

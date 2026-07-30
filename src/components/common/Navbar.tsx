@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, ArrowRight, BookOpen, Code, Award, Calendar, CheckSquare, Bot } from 'lucide-react';
+import { Zap, ArrowRight, BookOpen, Code, Award, Calendar, CheckSquare, Bot, GraduationCap } from 'lucide-react';
 import placivoAILogo from '../placivoAI.png';
 
 interface NavbarProps {
@@ -21,13 +21,14 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Logo */}
         <div 
           onClick={() => onNavigateLandingSection('hero')} 
-          className="flex items-center gap-3 cursor-pointer group"
+          className="flex items-center gap-2.5 cursor-pointer group"
         >
-          <img 
-            src={placivoAILogo} 
-            alt="Placivo AI" 
-            className="h-9 sm:h-10 w-auto object-contain rounded-xl overflow-hidden group-hover:scale-105 transition-transform" 
-          />
+          <div className="w-9.5 h-9.5 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/15 group-hover:scale-105 transition-all">
+            <GraduationCap className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
+          </div>
+          <span className="text-lg sm:text-xl font-black tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+            Placivo<span className="text-blue-600">AI</span>
+          </span>
         </div>
 
         {/* Nav Links */}

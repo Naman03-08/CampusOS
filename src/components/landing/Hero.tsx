@@ -339,21 +339,50 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
               }}
             >
               
-              {/* Clean Isolated Students Art - Floating in mid-depth 3D */}
+              {/* Professional technical orbital glow & slow-spinning background rings */}
+              <div className="absolute w-[440px] h-[440px] rounded-full bg-gradient-to-tr from-blue-500/5 via-indigo-500/5 to-transparent blur-3xl pointer-events-none z-0" />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                <div className="w-[360px] h-[360px] sm:w-[420px] sm:h-[420px] rounded-full border border-blue-500/10 animate-[spin_50s_linear_infinite]" />
+                <div className="w-[480px] h-[480px] sm:w-[540px] sm:h-[540px] rounded-full border border-dashed border-indigo-500/8 absolute animate-[spin_80s_linear_infinite]" />
+              </div>
+
+              {/* Clean Isolated Students Art - Floating in mid-depth 3D and beautifully framed in a premium workspace window mockup */}
               <div 
-                className="relative z-10 w-full max-w-[360px] sm:max-w-[470px] lg:max-w-[510px] flex items-center justify-center px-2 transition-transform duration-500 scale-110 sm:scale-115"
+                className="relative z-10 w-full max-w-[340px] sm:max-w-[430px] lg:max-w-[460px] bg-white border border-slate-200/90 rounded-2xl shadow-[0_25px_60px_rgba(15,23,42,0.08)] p-3.5 sm:p-5 transition-all duration-300 hover:shadow-[0_30px_70px_rgba(15,23,42,0.12)]"
                 style={{
                   transform: 'translateZ(30px)',
                   transformStyle: 'preserve-3d',
                 }}
               >
-                <div className="relative w-full">
+                {/* Mockup Window Top Bar Controls */}
+                <div className="flex items-center justify-between pb-3 sm:pb-4 mb-2 border-b border-slate-100">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-400/85 shadow-sm shadow-rose-400/20"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400/85 shadow-sm shadow-amber-400/20"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/85 shadow-sm shadow-emerald-400/20"></span>
+                  </div>
+                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                    Interactive Campus Hub
+                  </div>
+                </div>
+
+                {/* Inner Canvas with subtle professional dotted tech grid pattern */}
+                <div 
+                  className="relative w-full rounded-xl overflow-hidden bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-3.5 border border-slate-100 shadow-inner"
+                  style={{
+                    backgroundImage: 'radial-gradient(rgba(37, 99, 235, 0.08) 1.5px, transparent 1.5px)',
+                    backgroundSize: '16px 16px'
+                  }}
+                >
                   <img
                     src={heroStudentsArt}
                     alt="Placivo AI College Students"
-                    className="w-full h-auto object-contain mix-blend-multiply select-none pointer-events-none"
+                    className="w-full h-auto object-contain select-none pointer-events-none mix-blend-multiply"
                     referrerPolicy="no-referrer"
                   />
+                  {/* Subtle fade overlay at the bottom of the canvas */}
+                  <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/95 to-transparent pointer-events-none" />
                 </div>
               </div>
 
