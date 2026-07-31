@@ -834,13 +834,13 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
         <div className="space-y-6">
           {/* Top Gross Profit Banner Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-5 rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg space-y-1">
-              <div className="flex items-center justify-between opacity-80">
-                <p className="text-xs font-bold uppercase tracking-wider">All-Time Gross Profit</p>
-                <DollarSign className="w-5 h-5" />
+            <div className="p-5 rounded-3xl bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100/60 border border-emerald-200/90 text-slate-900 shadow-xs space-y-1">
+              <div className="flex items-center justify-between text-emerald-700">
+                <p className="text-xs font-black uppercase tracking-wider">All-Time Gross Profit</p>
+                <DollarSign className="w-5 h-5 text-emerald-600" />
               </div>
-              <p className="text-3xl font-black">₹ {totalGrossProfitAllTime.toLocaleString()}</p>
-              <p className="text-[11px] font-medium opacity-90">Subscriptions + Course Sales Combined</p>
+              <p className="text-3xl font-black text-emerald-950">₹ {totalGrossProfitAllTime.toLocaleString()}</p>
+              <p className="text-[11px] font-bold text-emerald-800">Subscriptions + Course Sales Combined</p>
             </div>
 
             <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-1">
@@ -1187,26 +1187,26 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       {activeAdminTab === 'bounties' && (
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* Top Banner */}
-          <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-950 via-slate-900 to-indigo-950 text-white shadow-xl relative overflow-hidden border border-amber-500/20">
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 via-amber-100/40 to-indigo-50/60 border border-amber-200/90 text-slate-900 shadow-xs relative overflow-hidden">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-black text-[10px] tracking-wider uppercase border border-amber-400/30 flex items-center gap-1">
-                    <Award className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-black text-[10px] tracking-wider uppercase border border-amber-300 flex items-center gap-1">
+                    <Award className="w-3.5 h-3.5 text-amber-600" />
                     Global Gold Bounties Arena Manager
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
                   Publish Gold Credit Bounties for Students
                 </h2>
-                <p className="text-xs text-amber-200/80 font-medium max-w-xl">
+                <p className="text-xs text-slate-600 font-medium max-w-xl">
                   Create high-hardness tasks, algorithm marathons, AI agent projects, and research challenges. Set custom Gold Credit rewards that students earn upon proof verification.
                 </p>
               </div>
 
               <button
                 onClick={() => setShowCreateBountyModal(true)}
-                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 flex items-center gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                className="px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 flex items-center gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 <span>Publish New Gold Bounty</span>
