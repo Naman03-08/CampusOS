@@ -66,6 +66,7 @@ const PersonalAssistantLogo: React.FC = () => {
           src={aiLogoImg} 
           alt="Personal AI Assistant Logo" 
           className="w-full h-full object-cover rounded-xl shadow-2xs"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/AILogo.jpeg'; }}
         />
       </div>
     </motion.div>

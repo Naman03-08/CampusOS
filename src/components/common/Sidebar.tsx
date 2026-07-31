@@ -103,6 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       src={aiLogoImg} 
                       alt="Personal Assistant" 
                       className={`w-4.5 h-4.5 object-cover rounded-md shrink-0 shadow-2xs transition-transform ${isActive ? 'scale-110 ring-1 ring-white/80' : 'border border-blue-200/80'}`} 
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/AILogo.jpeg'; }}
                     />
                   ) : (
                     <Icon className={`w-4 h-4 transition-transform ${isActive ? 'text-white scale-110' : 'text-slate-400'}`} />

@@ -478,7 +478,12 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
                   </span>
                 )}
                 <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${activeHighlightIndex === 4 ? 'ring-2 ring-cyan-500 shadow-md' : 'border border-slate-200'}`}>
-                  <img src={aiLogoImg} alt="AI Assistant" className="w-full h-full object-cover" />
+                  <img 
+                    src={aiLogoImg} 
+                    alt="AI Assistant" 
+                    className="w-full h-full object-cover" 
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/AILogo.jpeg'; }}
+                  />
                 </div>
                 <div className="text-left min-w-0">
                   <div className="text-xs font-black text-slate-900 leading-tight truncate">AI Assistant</div>

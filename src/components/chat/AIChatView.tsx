@@ -142,6 +142,7 @@ const PersonalAssistantMiniLogo: React.FC = () => {
           src={aiLogoImg} 
           alt="Personal AI Assistant Logo" 
           className="w-full h-full object-cover rounded-lg"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/AILogo.jpeg'; }}
         />
       </div>
     </div>
@@ -386,7 +387,12 @@ export const AIChatView: React.FC<AIChatViewProps> = ({ user }) => {
         
         {/* Subtle Watermark */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
-          <img src={aiLogoImg} alt="" className="w-80 h-80 object-contain rounded-full" />
+          <img 
+            src={aiLogoImg} 
+            alt="" 
+            className="w-80 h-80 object-contain rounded-full" 
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/AILogo.jpeg'; }}
+          />
         </div>
 
         <AnimatePresence initial={false}>
