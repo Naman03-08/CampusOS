@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { UserProfile } from '../../types';
 import placivoAILogo from '../landing/placivoAI.png';
+import aiLogoImg from '../../assets/AILogo.jpeg';
 
 interface SidebarProps {
   activeTab: string;
@@ -59,13 +60,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div>
         <div 
           onClick={() => onSelectTab('dashboard')}
-          className="flex items-center gap-2.5 px-3 py-2.5 mb-5 bg-white/80 backdrop-blur-md border border-white/90 rounded-2xl shadow-3d-sm cursor-pointer hover:bg-white transition-all group"
+          className="flex items-center gap-3 px-3.5 py-2.5 mb-5 bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-xs cursor-pointer hover:bg-white hover:border-blue-200/80 transition-all group"
         >
           <img 
             src={placivoAILogo} 
             alt="Placivo AI" 
-            className="h-8 w-auto max-h-8 object-contain rounded-2xl group-hover:scale-105 transition-transform shrink-0" 
+            className="h-8 w-auto max-h-8 object-contain rounded-xl group-hover:scale-105 transition-transform shrink-0" 
           />
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="font-black text-base text-slate-900 tracking-tight leading-none group-hover:text-blue-600 transition-colors" style={{ fontFamily: "'Playfair Display', serif" }}>
+                Placivo<span className="text-blue-600">.ai</span>
+              </span>
+              <span className="text-[9px] font-black uppercase tracking-wider text-blue-700 bg-blue-100/90 px-1.5 py-0.5 rounded-md border border-blue-200 shadow-2xs">
+                PRO
+              </span>
+            </div>
+            <span className="text-[10px] font-semibold text-slate-500 truncate mt-0.5">
+              Academic Operating System
+            </span>
+          </div>
         </div>
 
         {/* Nav list */}
@@ -84,7 +98,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Icon className={`w-4 h-4 transition-transform ${isActive ? 'text-white scale-110' : 'text-slate-400'}`} />
+                  {item.id === 'studyhub' ? (
+                    <img 
+                      src={aiLogoImg} 
+                      alt="Personal Assistant" 
+                      className={`w-4.5 h-4.5 object-cover rounded-md shrink-0 shadow-2xs transition-transform ${isActive ? 'scale-110 ring-1 ring-white/80' : 'border border-blue-200/80'}`} 
+                    />
+                  ) : (
+                    <Icon className={`w-4 h-4 transition-transform ${isActive ? 'text-white scale-110' : 'text-slate-400'}`} />
+                  )}
                   <span>{item.label}</span>
                 </div>
 

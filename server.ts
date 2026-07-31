@@ -323,12 +323,13 @@ async function generateContentWithFallback(options: {
   models?: string[];
 }) {
   let lastError: any = null;
-  const modelsToTry = options.models || ["gemini-3.6-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash"];
+  const modelsToTry = options.models || ["gemini-2.5-flash-lite"];
   for (const model of modelsToTry) {
-    // Retry up to 4 times for transient 503/429 high-demand spikes
-    for (let attempt = 0; attempt < 4; attempt++) {
+    // Retry up to 6 times with exponential backoff for transient 503/429 high-demand spikes
+    const maxAttempts = 6;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
       try {
-        console.log(`[Gemini Engine] Querying model: ${model}${attempt > 0 ? ` (retry attempt ${attempt + 1})` : ""}`);
+        console.log(`[Gemini Engine] Querying model: ${model}${attempt > 0 ? ` (retry attempt ${attempt + 1}/${maxAttempts})` : ""}`);
         
         // Dynamically adjust parameters if needed
         const config = { ...options.config };
@@ -348,11 +349,13 @@ async function generateContentWithFallback(options: {
       } catch (err: any) {
         lastError = err;
         const errMsg = err?.message || String(err);
-        console.warn(`[Gemini Fallback] Model ${model} error (attempt ${attempt + 1}):`, errMsg);
-        const isTransient = errMsg.includes("503") || errMsg.includes("UNAVAILABLE") || errMsg.includes("429") || errMsg.includes("RESOURCE_EXHAUSTED") || errMsg.includes("high demand");
-        if (isTransient && attempt < 3) {
-          // Exponential backoff delay for 503 spikes
-          await new Promise((resolve) => setTimeout(resolve, 1500 * (attempt + 1)));
+        console.warn(`[Gemini Engine] Model ${model} error (attempt ${attempt + 1}/${maxAttempts}):`, errMsg);
+        const isTransient = errMsg.includes("503") || errMsg.includes("UNAVAILABLE") || errMsg.includes("429") || errMsg.includes("RESOURCE_EXHAUSTED") || errMsg.includes("high demand") || errMsg.includes("overloaded");
+        if (isTransient && attempt < maxAttempts - 1) {
+          // Exponential backoff delay with jitter (1.5s, 3s, 4.5s, 6s, 8s, 10s)
+          const delayMs = (1500 * Math.pow(1.4, attempt)) + Math.floor(Math.random() * 600);
+          console.log(`[Gemini Engine] Transient 503/Demand spike on ${model}. Retrying in ${Math.round(delayMs)}ms...`);
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
           continue;
         } else {
           break; // proceed to next attempt or model
@@ -360,7 +363,7 @@ async function generateContentWithFallback(options: {
       }
     }
   }
-  throw lastError || new Error("Requested Gemini models failed after retries.");
+  throw lastError || new Error("Requested Gemini model failed after retries.");
 }
 
 // Robust JSON repair helper to prevent syntax errors on truncated or unescaped model outputs
@@ -953,12 +956,13 @@ app.post("/api/ai/summarize-notes", async (req, res) => {
     const promptText = `You are Placivo AI Smart Notes Summarizer Engine.
 Your ABSOLUTE HIGHEST PRIORITY is to read the ENTIRE PDF document titled "${docTitle}" VERY CAREFULLY, LINE BY LINE, FROM PAGE 1 TO THE VERY END.
 
-CRITICAL MANDATES (STRICT GEMINI 2.5 FLASH-LITE GROUNDING, CLEAN FORMATTING & NO REPETITION):
-1. MODEL MANDATE: Use gemini-2.5-flash-lite model exclusively to analyze every single page, line, formula, definition, theorem, step, and example in the document.
+CRITICAL MANDATES (STRICT GEMINI 2.5 FLASH-LITE ENGINE — MAXIMUM 100% DEPTH & QUALITY EQUIVALENT TO GEMINI 3.6 FLASH):
+1. MODEL EXCLUSIVITY: You are executing on gemini-2.5-flash-lite. You MUST deliver 100% full, rich, rigorous, and exhaustive academic analysis with zero quality degradation or abbreviation.
 2. CLEAN MATHEMATICAL & TEXTUAL NOTATION: Filter out and ignore any corrupt PDF font glyphs, hieroglyphics (like 𓈌), unreadable unicode characters, or broken bracket symbols. Convert all matrices, equations, tables, and mathematical expressions into clean, elegant, human-readable markdown (e.g., [[a, b], [c, d]] or [x  y] or clean LaTeX/text notation). NEVER output corrupted font noise or unreadable symbol blocks.
 3. ABSOLUTELY NO REPETITIVE OR TEMPLATE SENTENCES: Every single bullet point MUST be 100% unique, distinct, and contain actual factual content, formulas, definitions, proofs, or problem-solving steps derived directly from the PDF text.
 4. NEVER USE GENERIC FILLER TEXT like "Master concept #1", "Detailed examination of subsection X", "Understand the exact definition...", or "Analytical Line Breakdown...". Every bullet point must state a real, specific concept or formula from the PDF.
-5. EVERY POINT MUST BE DIFFERENT: Do not repeat any sentence structure or phrase across any section.
+5. MAXIMUM EXAM & REASONING RIGOR: Provide exhaustive derivations, complete equations with parameter definitions, step-by-step proofs, theorem statements with exact conditions, and real worked textbook examples.
+6. EVERY POINT MUST BE DIFFERENT: Do not repeat any sentence structure or phrase across any section.
 
 OUTPUT JSON SCHEMA:
 {
@@ -1016,10 +1020,10 @@ ${notesText && notesText.length > 50 ? `Extracted Full Text of the PDF Document:
           ];
         }
 
-        console.log("[Gemini Engine] Querying Gemini 3.6 Flash / 3.1 Flash-Lite for complete grounded PDF notes summary");
+        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite model EXCLUSIVELY for 100% full grounded PDF notes summary");
         const response: any = await generateContentWithFallback({
           contents: contentsPayload,
-          models: ["gemini-3.6-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash"],
+          models: ["gemini-2.5-flash-lite"],
           config: {
             responseMimeType: "application/json",
             maxOutputTokens: 8192,

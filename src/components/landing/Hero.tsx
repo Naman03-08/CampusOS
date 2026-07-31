@@ -16,6 +16,7 @@ import {
   Zap 
 } from 'lucide-react';
 import heroStudentsArt from '../../assets/images/campusos_blue_hoodies_art_1785350059169.jpg';
+import aiLogoImg from '../../assets/AILogo.jpeg';
 import { ProfessionalWorkspaceScene } from './ProfessionalWorkspaceScene';
 
 interface HeroProps {
@@ -476,8 +477,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
                   </span>
                 )}
-                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 ${activeHighlightIndex === 4 ? 'bg-cyan-600 text-white animate-pulse' : 'bg-blue-50 text-[#2563EB]'}`}>
-                  <Bot className="w-4 h-4 sm:w-5 sm:h-5" />
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${activeHighlightIndex === 4 ? 'ring-2 ring-cyan-500 shadow-md' : 'border border-slate-200'}`}>
+                  <img src={aiLogoImg} alt="AI Assistant" className="w-full h-full object-cover" />
                 </div>
                 <div className="text-left min-w-0">
                   <div className="text-xs font-black text-slate-900 leading-tight truncate">AI Assistant</div>

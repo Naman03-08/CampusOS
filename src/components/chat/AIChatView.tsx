@@ -117,6 +117,8 @@ const renderStepIcon = (type: string) => {
   }
 };
 
+import aiLogoImg from '../../assets/AILogo.jpeg';
+
 // Custom Personalized Mini Assistant Logo in Light Theme
 const PersonalAssistantMiniLogo: React.FC = () => {
   return (
@@ -134,9 +136,13 @@ const PersonalAssistantMiniLogo: React.FC = () => {
         className="absolute inset-1 rounded-2xl border border-indigo-300/40"
       />
       
-      {/* Core Badge */}
-      <div className="absolute inset-1.5 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl shadow-xs flex items-center justify-center text-white">
-        <Bot className="w-4.5 h-4.5 text-white" />
+      {/* Core Badge with AILogo.jpeg */}
+      <div className="absolute inset-1 bg-white rounded-xl shadow-xs border border-blue-100 p-0.5 flex items-center justify-center overflow-hidden">
+        <img 
+          src={aiLogoImg} 
+          alt="Personal AI Assistant Logo" 
+          className="w-full h-full object-cover rounded-lg"
+        />
       </div>
     </div>
   );
@@ -379,8 +385,8 @@ export const AIChatView: React.FC<AIChatViewProps> = ({ user }) => {
       <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-5 bg-gradient-to-b from-slate-50/50 via-white to-slate-50/30 relative">
         
         {/* Subtle Watermark */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.015] pointer-events-none select-none">
-          <Bot className="w-80 h-80 text-slate-900" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
+          <img src={aiLogoImg} alt="" className="w-80 h-80 object-contain rounded-full" />
         </div>
 
         <AnimatePresence initial={false}>

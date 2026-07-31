@@ -18,29 +18,30 @@ import {
 } from 'lucide-react';
 import { StudySuite } from '../../types';
 import { AIChatView } from '../chat/AIChatView';
+import aiLogoImg from '../../assets/AILogo.jpeg';
 
 // Bespoke Placivo Assistant Core Logo Component
 const PersonalAssistantLogo: React.FC = () => {
   return (
     <motion.div 
       className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center shrink-0"
-      whileHover={{ scale: 1.08, rotate: -5 }}
+      whileHover={{ scale: 1.08, rotate: -3 }}
       transition={{ type: 'spring', stiffness: 400, damping: 15 }}
     >
       {/* Light glow aura */}
-      <div className="absolute inset-0 bg-blue-200/40 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '3.5s' }} />
-      <div className="absolute inset-3 bg-indigo-100/40 rounded-full blur-lg" />
+      <div className="absolute inset-0 bg-blue-300/40 rounded-3xl blur-xl animate-pulse" style={{ animationDuration: '3.5s' }} />
+      <div className="absolute inset-2 bg-indigo-200/40 rounded-3xl blur-lg" />
 
       {/* Outer rotating orbit ring with dash spacing */}
       <motion.div 
         animate={{ rotate: 360 }}
         transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-        className="absolute inset-0 rounded-full border border-dashed border-blue-400/80"
+        className="absolute inset-0 rounded-3xl border border-dashed border-blue-400/80"
       />
       <motion.div 
         animate={{ rotate: -360 }}
         transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-        className="absolute inset-2 rounded-full border border-indigo-200/60"
+        className="absolute inset-2 rounded-2xl border border-indigo-300/60"
       />
 
       {/* Orbiting sub-nodes */}
@@ -49,53 +50,23 @@ const PersonalAssistantLogo: React.FC = () => {
         transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
         className="absolute inset-0"
       >
-        <span className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-blue-500 shadow-md" />
+        <span className="absolute top-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-blue-600 shadow-md ring-2 ring-white" />
       </motion.div>
       <motion.div 
         animate={{ rotate: -360 }}
         transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
         className="absolute inset-2"
       >
-        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-sm" />
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-indigo-500 shadow-sm ring-2 ring-white" />
       </motion.div>
 
-      {/* Solid Tech Core */}
-      <div className="absolute inset-4 bg-gradient-to-br from-white to-slate-50 rounded-2xl border border-slate-200/95 shadow-md flex items-center justify-center overflow-hidden">
-        <svg viewBox="0 0 100 100" className="w-10/12 h-10/12 text-blue-600">
-          <path d="M 20,50 L 80,50" stroke="#E2E8F0" strokeWidth="1.5" />
-          <path d="M 50,20 L 50,80" stroke="#E2E8F0" strokeWidth="1.5" />
-          
-          {/* Concentric rotating logic core */}
-          <motion.rect
-            x="30"
-            y="30"
-            width="40"
-            height="40"
-            rx="10"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            animate={{ rotate: [0, 90, 180, 270, 360] }}
-            transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-            className="text-blue-500"
-          />
-          <motion.circle 
-            cx="50" 
-            cy="50" 
-            r="8" 
-            className="fill-indigo-50 text-indigo-500" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-          />
-          <motion.circle 
-            cx="50" 
-            cy="50" 
-            r="3.5" 
-            className="fill-blue-500"
-            animate={{ scale: [1, 1.3, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </svg>
+      {/* Solid Tech Frame housing AILogo */}
+      <div className="absolute inset-3 bg-white rounded-2xl border-2 border-blue-100 shadow-md p-1 flex items-center justify-center overflow-hidden">
+        <img 
+          src={aiLogoImg} 
+          alt="Personal AI Assistant Logo" 
+          className="w-full h-full object-cover rounded-xl shadow-2xs"
+        />
       </div>
     </motion.div>
   );

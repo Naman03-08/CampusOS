@@ -21,13 +21,21 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Logo */}
         <div 
           onClick={() => onNavigateLandingSection('hero')} 
-          className="flex items-center gap-2.5 cursor-pointer group"
+          className="flex items-center gap-3 cursor-pointer group"
         >
           <img 
             src={placivoAILogo} 
             alt="Placivo AI" 
-            className="h-10 w-auto max-h-10 object-contain rounded-2xl group-hover:scale-105 transition-all" 
+            className="h-10 w-auto max-h-10 object-contain rounded-2xl group-hover:scale-105 transition-all shrink-0" 
           />
+          <div className="flex flex-col">
+            <span className="font-black text-xl text-slate-900 tracking-tight leading-none group-hover:text-blue-600 transition-colors" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Placivo<span className="text-blue-600">.ai</span>
+            </span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
+              Academic Operating System
+            </span>
+          </div>
         </div>
 
         {/* Nav Links */}
