@@ -747,20 +747,20 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       )}
 
       <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 card-3d">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-500/20 shrink-0">
-            <ShieldAlert className="w-6 h-6" />
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-500/20 shrink-0">
+            <ShieldCheck className="w-6 h-6 text-white" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900">Admin Control & Platform Operations</h1>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] uppercase border border-emerald-200 flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                Firestore Connected
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Admin Command & Operations Hub</h1>
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[10px] uppercase border border-emerald-200 flex items-center gap-1.5 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Firestore Live
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-0.5 font-medium">
-              Logged in as <strong className="text-slate-800">{ADMIN_EMAIL}</strong> • Synchronized with live database collections.
+              Administrator: <strong className="text-slate-800">{ADMIN_EMAIL}</strong> • Real-time revenue, telemetry & global task synchronization.
             </p>
           </div>
         </div>
@@ -769,15 +769,15 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
           <button
             onClick={fetchAllData}
             disabled={loadingUsers}
-            className="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs border border-blue-200 flex items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100/80 text-blue-700 font-extrabold text-xs border border-blue-200/80 flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-2xs"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers ? 'animate-spin text-blue-600' : ''}`} />
             <span>Sync Firestore</span>
           </button>
 
           <button
             onClick={handleLockPanel}
-            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 font-extrabold text-xs border border-slate-200/80 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-2xs"
           >
             <Lock className="w-3.5 h-3.5 text-slate-500" />
             <span>Lock Panel</span>
@@ -786,31 +786,39 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       </div>
 
       {/* Main Admin Section Nav Tabs */}
-      <div className="flex items-center gap-1.5 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 text-xs font-bold overflow-x-auto">
-        <button
-          onClick={() => setActiveAdminTab('financials')}
-          className={`px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
-            activeAdminTab === 'financials'
-              ? 'bg-blue-600 text-white shadow-md'
-              : 'text-slate-700 hover:bg-white hover:text-slate-900'
-          }`}
-        >
-          <DollarSign className="w-4 h-4" />
-          <span>Financials, Gross Profits & Subscriptions</span>
-          <span className="ml-1 px-2 py-0.5 rounded-full bg-white/20 text-[10px]">₹ {totalGrossProfitAllTime.toLocaleString()}</span>
-        </button>
-
+      <div className="flex items-center gap-2 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 text-xs font-bold overflow-x-auto">
         <button
           onClick={() => setActiveAdminTab('telemetry')}
           className={`px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
             activeAdminTab === 'telemetry'
-              ? 'bg-blue-600 text-white shadow-md'
-              : 'text-slate-700 hover:bg-white hover:text-slate-900'
+              ? 'bg-blue-600 text-white shadow-md font-black'
+              : 'text-slate-600 hover:bg-white/80 hover:text-slate-900'
           }`}
         >
           <Users className="w-4 h-4" />
           <span>Student Directory & Progress Inspector</span>
-          <span className="ml-1 px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 text-[10px]">{allUsers.length}</span>
+          <span className={`ml-1 px-2 py-0.5 rounded-full text-[10px] font-black ${
+            activeAdminTab === 'telemetry' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+          }`}>
+            {allUsers.length}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveAdminTab('financials')}
+          className={`px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
+            activeAdminTab === 'financials'
+              ? 'bg-blue-600 text-white shadow-md font-black'
+              : 'text-slate-600 hover:bg-white/80 hover:text-slate-900'
+          }`}
+        >
+          <DollarSign className="w-4 h-4" />
+          <span>Financials, Gross Profits & Subscriptions</span>
+          <span className={`ml-1 px-2.5 py-0.5 rounded-full text-[10px] font-black ${
+            activeAdminTab === 'financials' ? 'bg-emerald-400 text-slate-950' : 'bg-emerald-100 text-emerald-800'
+          }`}>
+            ₹ {totalGrossProfitAllTime.toLocaleString()}
+          </span>
         </button>
 
         <button
@@ -818,12 +826,16 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
           className={`px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
             activeAdminTab === 'bounties'
               ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-              : 'text-slate-700 hover:bg-white hover:text-slate-900'
+              : 'text-slate-600 hover:bg-white/80 hover:text-slate-900'
           }`}
         >
           <Award className="w-4 h-4 text-amber-600" />
           <span>Gold Bounties & Tasks</span>
-          <span className="ml-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black">{globalBounties.length}</span>
+          <span className={`ml-1 px-2 py-0.5 rounded-full text-[10px] font-black ${
+            activeAdminTab === 'bounties' ? 'bg-slate-950 text-amber-300' : 'bg-amber-100 text-amber-900'
+          }`}>
+            {globalBounties.length}
+          </span>
         </button>
       </div>
 
@@ -1083,91 +1095,182 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
 
 
       {/* ======================================================================== */}
-      {/* SECTION 3 TAB: ORIGINAL TELEMETRY & STUDENT PROGRESS INSPECTOR */}
+      {/* SECTION 2 TAB: TELEMETRY & STUDENT PROGRESS INSPECTOR */}
       {/* ======================================================================== */}
       {activeAdminTab === 'telemetry' && (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-in fade-in duration-300">
+          {/* Quick Metrics Summary Bar */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Total Students</p>
+                <p className="text-2xl font-black text-slate-900 mt-0.5">{allUsers.length}</p>
+                <p className="text-[11px] text-blue-600 font-bold mt-0.5">Registered on Platform</p>
+              </div>
+              <div className="p-3 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100">
+                <Users className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Pro Subscribers</p>
+                <p className="text-2xl font-black text-emerald-600 mt-0.5">
+                  {allUsers.filter(u => u.plan && u.plan !== 'free').length}
+                </p>
+                <p className="text-[11px] text-emerald-700 font-bold mt-0.5">Active Premium Members</p>
+              </div>
+              <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Avg Attendance</p>
+                <p className="text-2xl font-black text-slate-900 mt-0.5">
+                  {Math.round(allUsers.reduce((s, u) => s + (u.stats?.attendancePercentage || 0), 0) / (allUsers.length || 1))}%
+                </p>
+                <p className="text-[11px] text-indigo-600 font-bold mt-0.5">Across All Courses</p>
+              </div>
+              <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+                <GraduationCap className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Total DSA Solves</p>
+                <p className="text-2xl font-black text-purple-600 mt-0.5">
+                  {allUsers.reduce((s, u) => s + (u.stats?.dsaSolvedCount || 0), 0)}
+                </p>
+                <p className="text-[11px] text-purple-700 font-bold mt-0.5">Problems Verified</p>
+              </div>
+              <div className="p-3 rounded-2xl bg-purple-50 text-purple-600 border border-purple-100">
+                <Code2 className="w-5 h-5" />
+              </div>
+            </div>
+          </div>
+
           {/* User Search & Monitoring Directory */}
-          <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4 card-3d">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-5 card-3d">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
               <div>
                 <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
                   <Users className="w-5 h-5 text-blue-600" />
                   Registered Student Directory & Progress Tracker
                 </h2>
-                <p className="text-xs text-slate-500">
-                  Inspect student attendance, DSA coding solves, AI study suites, and interview prep performance.
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Inspect student attendance logs, DSA coding problem solves, AI study suites, and exam performance.
                 </p>
               </div>
 
-              <div className="relative w-full sm:w-72">
+              <div className="relative w-full sm:w-80">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search user name or email..."
-                  className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  placeholder="Search student name, email, or major..."
+                  className="w-full pl-10 pr-9 py-2.5 text-xs font-medium rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                 />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
 
             {loadingUsers ? (
-              <div className="py-12 text-center text-slate-400 space-y-2">
-                <RefreshCw className="w-6 h-6 animate-spin mx-auto text-blue-500" />
-                <p className="text-xs font-semibold">Loading registered users from Firestore...</p>
+              <div className="py-16 text-center text-slate-400 space-y-2">
+                <RefreshCw className="w-7 h-7 animate-spin mx-auto text-blue-500" />
+                <p className="text-xs font-bold text-slate-600">Syncing registered student profiles from Firestore...</p>
               </div>
             ) : filteredUsers.length === 0 ? (
-              <div className="py-12 text-center text-slate-400 space-y-2 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                <Users className="w-8 h-8 mx-auto text-slate-300" />
-                <p className="text-xs font-bold text-slate-600">No matching user records found</p>
+              <div className="py-16 text-center text-slate-400 space-y-2 bg-slate-50/80 rounded-2xl border border-dashed border-slate-200">
+                <Users className="w-10 h-10 mx-auto text-slate-300" />
+                <p className="text-sm font-bold text-slate-700">No matching student records found</p>
+                <p className="text-xs text-slate-400">Try searching for a different name or clear your search filter.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredUsers.map((u) => {
                   const sub = getSubscriptionInfo(u);
+                  const attPct = u.stats?.attendancePercentage || 0;
                   return (
                     <div
                       key={u.uid}
-                      className="p-5 rounded-3xl bg-slate-50/80 border border-slate-200/80 hover:bg-white hover:border-blue-300 transition-all space-y-3 flex flex-col justify-between group"
+                      className="p-5 rounded-3xl bg-slate-50/70 border border-slate-200/80 hover:bg-white hover:border-blue-300/80 hover:shadow-md transition-all space-y-3.5 flex flex-col justify-between group"
                     >
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 font-extrabold flex items-center justify-center text-sm">
-                              {u.displayName.charAt(0).toUpperCase()}
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black flex items-center justify-center text-sm shadow-xs shrink-0">
+                              {u.displayName ? u.displayName.charAt(0).toUpperCase() : 'S'}
                             </div>
                             <div className="min-w-0">
-                              <h3 className="font-extrabold text-slate-900 text-sm truncate">{u.displayName}</h3>
+                              <h3 className="font-extrabold text-slate-900 text-sm truncate group-hover:text-blue-600 transition-colors">
+                                {u.displayName}
+                              </h3>
                               <p className="text-[11px] text-slate-500 font-mono truncate">{u.email}</p>
                             </div>
                           </div>
-                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
-                            sub.isFree ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
+                          <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full shrink-0 ${
+                            sub.isFree ? 'bg-amber-100 text-amber-900 border border-amber-200/80' : 'bg-blue-100 text-blue-900 border border-blue-200/80'
                           }`}>
                             {sub.planName}
                           </span>
                         </div>
 
+                        {/* Extra User Metadata */}
+                        <div className="flex items-center gap-2 text-[11px] text-slate-500 font-semibold truncate">
+                          <span className="truncate bg-slate-200/60 px-2 py-0.5 rounded-md text-slate-700">
+                            {u.major || u.university || 'CS & AI'}
+                          </span>
+                          <span>•</span>
+                          <span className="text-slate-600">{u.targetRole || 'Software Engineer'}</span>
+                        </div>
+
+                        {/* Attendance Mini Bar */}
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[10px] font-extrabold">
+                            <span className="text-slate-500 uppercase">Attendance Rate</span>
+                            <span className={attPct >= 75 ? 'text-emerald-600' : 'text-amber-600'}>{attPct}%</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${
+                                attPct >= 75 ? 'bg-emerald-500' : attPct >= 50 ? 'bg-amber-500' : 'bg-rose-500'
+                              }`}
+                              style={{ width: `${Math.min(100, Math.max(0, attPct))}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Telemetry Numbers */}
                         <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200/60 text-center">
                           <div className="bg-white p-2 rounded-xl border border-slate-100">
-                            <p className="text-[10px] text-slate-400 font-bold uppercase">Attendance</p>
-                            <p className="text-xs font-black text-emerald-600">{u.stats?.attendancePercentage || 0}%</p>
-                          </div>
-                          <div className="bg-white p-2 rounded-xl border border-slate-100">
-                            <p className="text-[10px] text-slate-400 font-bold uppercase">DSA Solved</p>
+                            <p className="text-[9px] text-slate-400 font-bold uppercase">DSA Solved</p>
                             <p className="text-xs font-black text-indigo-600">{u.stats?.dsaSolvedCount || 0}</p>
                           </div>
                           <div className="bg-white p-2 rounded-xl border border-slate-100">
-                            <p className="text-[10px] text-slate-400 font-bold uppercase">Suites</p>
+                            <p className="text-[9px] text-slate-400 font-bold uppercase">Suites</p>
                             <p className="text-xs font-black text-purple-600">{u.stats?.studySuitesCount || 0}</p>
+                          </div>
+                          <div className="bg-white p-2 rounded-xl border border-slate-100">
+                            <p className="text-[9px] text-slate-400 font-bold uppercase">GPA Goal</p>
+                            <p className="text-xs font-black text-emerald-600">{u.gpaGoal || 4.0}</p>
                           </div>
                         </div>
                       </div>
 
                       <button
                         onClick={() => handleInspectUser(u.uid)}
-                        className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                        className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer mt-1"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>Inspect Full Student Progress</span>
