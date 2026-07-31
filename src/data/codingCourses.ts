@@ -296,7 +296,7 @@ int knapsack(int W, const vector<int>& wt, const vector<int>& val, int n) {
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 async function generateStudyNotes(topic: string) {
-  // TODO: Call gemini-2.5-flash with structured prompt
+  // TODO: Call gemini-2.5-flash-lite with structured prompt
 }`,
               solutionCode: `import { GoogleGenAI } from '@google/genai';
 
@@ -304,7 +304,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 async function generateStudyNotes(topic: string) {
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-flash-lite',
     contents: \`Generate 3 bullet points summary for \${topic} in clean JSON format.\`,
     config: { responseMimeType: 'application/json' }
   });

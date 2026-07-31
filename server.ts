@@ -272,19 +272,15 @@ function checkApiKey() {
   }
 }
 
-// Multi-model Gemini Free Tier Fallback Manager (Prioritizing gemini-2.5-flash-lite)
+// Multi-model Gemini Fallback Manager (Strictly using gemini-2.5-flash-lite and gemini-1.5-flash)
 const GEMINI_MODELS = [
   "gemini-2.5-flash-lite",
-  "gemini-2.5-flash",
-  "gemini-3.1-flash-lite",
-  "gemini-3.6-flash"
+  "gemini-1.5-flash"
 ];
 
 const GEMINI_LOW_MODELS = [
   "gemini-2.5-flash-lite",
-  "gemini-2.5-flash",
-  "gemini-3.1-flash-lite",
-  "gemini-3.6-flash"
+  "gemini-1.5-flash"
 ];
 
 // Options Shuffler helper so correct answer is randomly distributed (0, 1, 2, 3) and not always option 0
@@ -327,7 +323,7 @@ async function generateContentWithFallback(options: {
   let lastError: any = null;
   const modelsToTry = options.models && options.models.length > 0 
     ? options.models 
-    : ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-3.1-flash-lite", "gemini-3.6-flash"];
+    : ["gemini-2.5-flash-lite", "gemini-1.5-flash"];
 
   for (const model of modelsToTry) {
     // Retry up to 2 attempts per model before trying next model in fallback list if high demand / 503 occurs
@@ -1026,10 +1022,10 @@ ${notesText && notesText.length > 50 ? `Extracted Full Text of the PDF Document:
           ];
         }
 
-        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite model (with seamless high-demand fallback) for 100% full grounded PDF notes summary");
+        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite (with gemini-1.5-flash fallback) for 100% full grounded PDF notes summary");
         const response: any = await generateContentWithFallback({
           contents: contentsPayload,
-          models: ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-3.1-flash-lite", "gemini-3.6-flash"],
+          models: ["gemini-2.5-flash-lite", "gemini-1.5-flash"],
           config: {
             responseMimeType: "application/json",
             maxOutputTokens: 8192,
@@ -1295,10 +1291,10 @@ Return a JSON object with:
           };
         }
 
-        console.log("[Gemini Engine] Querying Gemini 3.1 Flash-Lite for grounded quiz generation");
+        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite for grounded quiz generation");
         const response: any = await generateContentWithFallback({
           contents: contentsPayload,
-          models: ["gemini-3.1-flash-lite", "gemini-2.5-flash"],
+          models: ["gemini-2.5-flash-lite", "gemini-1.5-flash"],
           config: {
             responseMimeType: "application/json",
             maxOutputTokens: 8192,
