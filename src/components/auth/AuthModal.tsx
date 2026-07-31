@@ -404,6 +404,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     onSuccess(profile);
   };
 
+  const handleAdminInstantLogin = () => {
+    const profile: UserProfile = {
+      uid: 'admin_naman03mgs',
+      email: 'naman03mgs@gmail.com',
+      displayName: 'Naman Pandey (Admin)',
+      role: 'admin',
+      university: 'Zenith School Of AI',
+      major: 'Artificial Intelligence & Engineering',
+      stream: 'Artificial Intelligence & Engineering',
+      contactDetails: '+91 9876543210',
+      phone: '+91 9876543210',
+      year: '4th Year',
+      gpaGoal: 4.0,
+      targetRole: 'Platform Administrator',
+      plan: 'pro_monthly',
+      createdAt: new Date().toISOString(),
+    };
+    StorageService.saveProfile(profile);
+    StorageService.setIsLoggedIn(true);
+    onSuccess(profile);
+  };
+
   const handleGoogleOnboardingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // STRICT VALIDATION: If any form field is missing, fail registration and do NOT store user in Firebase
@@ -1128,7 +1150,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
           <button
             type="button"
-            onClick={handleInstantGuestLogin}
+            onClick={handleAdminInstantLogin}
             className="text-slate-500 font-semibold hover:text-slate-800 transition-colors cursor-pointer"
           >
             Admin? Sign in here →

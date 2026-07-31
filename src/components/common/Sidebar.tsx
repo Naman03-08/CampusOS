@@ -12,6 +12,7 @@ import {
   Bell, 
   Settings, 
   ShieldAlert, 
+  ShieldCheck,
   Zap, 
   GraduationCap,
   Bot
@@ -39,6 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    ...(isAdminUser ? [{ id: 'admin', label: 'Admin Control Hub', icon: ShieldCheck, badge: 'ADMIN' }] : []),
     { id: 'notes', label: 'AI Notes Summarizer', icon: BookOpen, badge: 'AI' },
     { id: 'quiz', label: 'AI Quiz Practice', icon: FileCheck, badge: 'NEW' },
     { id: 'studyhub', label: 'Personal Assistant', icon: Bot, badge: 'AI' },

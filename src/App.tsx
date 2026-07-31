@@ -34,6 +34,7 @@ import { InterviewPrepView } from './components/placement/InterviewPrepView';
 import { StartupJobsHubView } from './components/placement/StartupJobsHubView';
 import { AIResumeBuilderView } from './components/resume/AIResumeBuilderView';
 import { SettingsView } from './components/settings/SettingsView';
+import { AdminPanelView } from './components/admin/AdminPanelView';
 import { UpgradePlansView } from './components/pricing/UpgradePlansView';
 import { UpgradePromptModal } from './components/common/UpgradePromptModal';
 import { CertificateVerificationModal } from './components/courses/CertificateVerificationModal';
@@ -211,6 +212,7 @@ export function App() {
       case 'courses': return 'Interactive Coding Courses & Academies';
       case 'interviewprep': return 'Technical Interview Prep & Question Bank';
       case 'placement': return 'Startup Jobs & Internship Hub';
+      case 'admin': return 'Admin Control Hub';
       default: return 'this AI feature';
     }
   };
@@ -849,6 +851,13 @@ export function App() {
                   onSaveProfile={handleUpdateProfile}
                   onNavigateTab={setActiveTab}
                   onOpenTerms={handleOpenTerms}
+                />
+              )}
+
+              {activeTab === 'admin' && (
+                <AdminPanelView
+                  user={user}
+                  onNavigateTab={handleNavigateTabWithGuard}
                 />
               )}
             </main>
