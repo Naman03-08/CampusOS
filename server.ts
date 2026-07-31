@@ -272,17 +272,19 @@ function checkApiKey() {
   }
 }
 
-// Multi-model Gemini Free Tier Fallback Manager
+// Multi-model Gemini Free Tier Fallback Manager (Prioritizing gemini-2.5-flash-lite)
 const GEMINI_MODELS = [
-  "gemini-3.6-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-2.5-flash",
   "gemini-3.1-flash-lite",
-  "gemini-2.5-flash"
+  "gemini-3.6-flash"
 ];
 
 const GEMINI_LOW_MODELS = [
-  "gemini-3.6-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-2.5-flash",
   "gemini-3.1-flash-lite",
-  "gemini-2.5-flash"
+  "gemini-3.6-flash"
 ];
 
 // Options Shuffler helper so correct answer is randomly distributed (0, 1, 2, 3) and not always option 0
@@ -323,10 +325,13 @@ async function generateContentWithFallback(options: {
   models?: string[];
 }) {
   let lastError: any = null;
-  const modelsToTry = options.models || ["gemini-2.5-flash-lite"];
+  const modelsToTry = options.models && options.models.length > 0 
+    ? options.models 
+    : ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-3.1-flash-lite", "gemini-3.6-flash"];
+
   for (const model of modelsToTry) {
-    // Retry up to 6 times with exponential backoff for transient 503/429 high-demand spikes
-    const maxAttempts = 6;
+    // Retry up to 2 attempts per model before trying next model in fallback list if high demand / 503 occurs
+    const maxAttempts = 2;
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       try {
         console.log(`[Gemini Engine] Querying model: ${model}${attempt > 0 ? ` (retry attempt ${attempt + 1}/${maxAttempts})` : ""}`);
@@ -349,21 +354,22 @@ async function generateContentWithFallback(options: {
       } catch (err: any) {
         lastError = err;
         const errMsg = err?.message || String(err);
-        console.warn(`[Gemini Engine] Model ${model} error (attempt ${attempt + 1}/${maxAttempts}):`, errMsg);
+        console.warn(`[Gemini Engine] Model ${model} returned notice (attempt ${attempt + 1}/${maxAttempts}):`, errMsg);
         const isTransient = errMsg.includes("503") || errMsg.includes("UNAVAILABLE") || errMsg.includes("429") || errMsg.includes("RESOURCE_EXHAUSTED") || errMsg.includes("high demand") || errMsg.includes("overloaded");
         if (isTransient && attempt < maxAttempts - 1) {
-          // Exponential backoff delay with jitter (1.5s, 3s, 4.5s, 6s, 8s, 10s)
-          const delayMs = (1500 * Math.pow(1.4, attempt)) + Math.floor(Math.random() * 600);
-          console.log(`[Gemini Engine] Transient 503/Demand spike on ${model}. Retrying in ${Math.round(delayMs)}ms...`);
+          const delayMs = 1200 + Math.floor(Math.random() * 500);
+          console.log(`[Gemini Engine] Transient demand spike on ${model}. Retrying in ${delayMs}ms...`);
           await new Promise((resolve) => setTimeout(resolve, delayMs));
           continue;
         } else {
-          break; // proceed to next attempt or model
+          // If 503 persists after attempt, switch to next fallback model immediately
+          console.log(`[Gemini Engine] Model ${model} unavailable due to demand spikes. Falling back to next model...`);
+          break;
         }
       }
     }
   }
-  throw lastError || new Error("Requested Gemini model failed after retries.");
+  throw lastError || new Error("Requested Gemini models failed after retries.");
 }
 
 // Robust JSON repair helper to prevent syntax errors on truncated or unescaped model outputs
@@ -1020,10 +1026,10 @@ ${notesText && notesText.length > 50 ? `Extracted Full Text of the PDF Document:
           ];
         }
 
-        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite model EXCLUSIVELY for 100% full grounded PDF notes summary");
+        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite model (with seamless high-demand fallback) for 100% full grounded PDF notes summary");
         const response: any = await generateContentWithFallback({
           contents: contentsPayload,
-          models: ["gemini-2.5-flash-lite"],
+          models: ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-3.1-flash-lite", "gemini-3.6-flash"],
           config: {
             responseMimeType: "application/json",
             maxOutputTokens: 8192,
