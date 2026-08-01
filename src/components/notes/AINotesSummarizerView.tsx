@@ -99,6 +99,7 @@ import {
   Clock
 } from 'lucide-react';
 import { UserProfile, StudySuite } from '../../types';
+import { checkStudySuiteLimit } from '../../lib/planUtils';
 
 interface AINotesSummarizerViewProps {
   user: UserProfile | null;
@@ -204,6 +205,14 @@ export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
     if (!selectedFile && !fileBase64) {
       setError('Please upload a PDF document to summarize.');
       return;
+    }
+
+    if (user) {
+      const limitCheck = checkStudySuiteLimit(user, user.stats?.studySuitesCount || 0);
+      if (!limitCheck.allowed) {
+        setError(limitCheck.message);
+        return;
+      }
     }
 
     setError(null);

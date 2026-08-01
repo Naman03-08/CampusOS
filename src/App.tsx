@@ -37,6 +37,7 @@ import { SettingsView } from './components/settings/SettingsView';
 import { AdminPanelView } from './components/admin/AdminPanelView';
 import { UpgradePlansView } from './components/pricing/UpgradePlansView';
 import { UpgradePromptModal } from './components/common/UpgradePromptModal';
+import { PlanReloadModal } from './components/common/PlanReloadModal';
 import { CertificateVerificationModal } from './components/courses/CertificateVerificationModal';
 import { TermsModal } from './components/common/TermsModal';
 
@@ -72,6 +73,15 @@ export function App() {
   const [showUpgradeModal, setShowUpgradeModal] = useState<boolean>(false);
   const [upgradeFeatureName, setUpgradeFeatureName] = useState<string>('this feature');
   const [pendingTabAfterTrial, setPendingTabAfterTrial] = useState<string | null>(null);
+
+  // Plan Reload Modal State (10-second timer on purchase/activation)
+  const [showPlanReloadModal, setShowPlanReloadModal] = useState<boolean>(false);
+  const [purchasedPlanName, setPurchasedPlanName] = useState<string>('');
+
+  const handlePlanPurchased = (planName: string) => {
+    setPurchasedPlanName(planName);
+    setShowPlanReloadModal(true);
+  };
 
   // Global Focus Timer State for Navbar Watch & Habiturex (Backed by Local Storage to prevent reset bugs)
   const [focusTimerInitialMinutes, setFocusTimerInitialMinutes] = useState<number>(() => {
@@ -261,6 +271,7 @@ export function App() {
       setActiveTab(pendingTabAfterTrial);
       setPendingTabAfterTrial(null);
     }
+    handlePlanPurchased('4-Day Free Trial Pass');
   };
 
   // Core Data State
@@ -805,6 +816,7 @@ export function App() {
                 <UpgradePlansView
                   user={user}
                   onUpdateProfile={handleUpdateProfile}
+                  onPlanPurchased={handlePlanPurchased}
                 />
               )}
 
@@ -859,6 +871,12 @@ export function App() {
         isOpen={showTermsModal}
         onClose={() => setShowTermsModal(false)}
         initialTab={termsTab}
+      />
+
+      {/* 10-Second Website Reload & Refresh Overlay Modal on Plan Purchase */}
+      <PlanReloadModal
+        isOpen={showPlanReloadModal}
+        planName={purchasedPlanName}
       />
     </div>
   );

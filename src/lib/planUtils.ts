@@ -126,20 +126,54 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
 ];
 
 export function calculatePlanDetails(user: UserProfile) {
-  const rawPlan = user.plan;
-  const isCancelled = Boolean(user.planCancelled);
+  const rawPlan = user?.plan ? String(user.plan).trim() : '';
+  const rawPlanLower = rawPlan.toLowerCase();
+
+  // Normalize Plan ID across all possible name representations
+  let currentPlanId = 'none';
+  if (
+    rawPlanLower === 'plan_199' ||
+    rawPlanLower === 'pro_199' ||
+    rawPlanLower === '199' ||
+    rawPlanLower.includes('scholar')
+  ) {
+    currentPlanId = 'plan_199';
+  } else if (
+    rawPlanLower === 'plan_349' ||
+    rawPlanLower === 'plan_399' ||
+    rawPlanLower === 'pro_349' ||
+    rawPlanLower === 'pro_399' ||
+    rawPlanLower === '349' ||
+    rawPlanLower === '399' ||
+    rawPlanLower.includes('ultimate')
+  ) {
+    currentPlanId = 'plan_349';
+  } else if (rawPlanLower.includes('pro')) {
+    // Default any generic 'pro' setting to plan_349 (Ultimate)
+    currentPlanId = 'plan_349';
+  } else if (rawPlanLower === 'free_trial' || rawPlanLower.includes('trial')) {
+    currentPlanId = 'free_trial';
+  }
+
+  const isPaid = currentPlanId === 'plan_199' || currentPlanId === 'plan_349';
 
   // Check if trial was explicitly started by user action
-  const hasStartedTrial = Boolean(user.freeTrialStartedAt || (rawPlan === 'free_trial' && user.planStartedAt));
+  const hasStartedTrial = Boolean(user.freeTrialStartedAt || (currentPlanId === 'free_trial' && user.planStartedAt));
   const freeTrialUsed = Boolean(user.freeTrialUsed || hasStartedTrial);
 
-  let currentPlanId = rawPlan || 'none';
   if (currentPlanId === 'free_trial' && !hasStartedTrial) {
     currentPlanId = 'none'; // Not active yet
   }
 
-  // If user cancelled or is explicitly on Free Tier / none:
-  if (isCancelled || rawPlan === 'Free Tier' || rawPlan === 'none' || !rawPlan) {
+  // Check cancellation flag:
+  // Note: An active paid plan string (plan_199 / plan_349) takes precedence over an old stale planCancelled flag.
+  const isCancelled = Boolean(user.planCancelled);
+
+  if (
+    (!isPaid && (isCancelled || rawPlanLower === 'free tier' || rawPlanLower === 'none' || !rawPlanLower)) ||
+    rawPlanLower === 'free tier' ||
+    rawPlanLower === 'none'
+  ) {
     return {
       currentPlanId: 'none',
       planName: isCancelled ? 'Subscription Cancelled' : 'Free Tier',
@@ -158,35 +192,47 @@ export function calculatePlanDetails(user: UserProfile) {
   }
 
   const isFreeTrial = currentPlanId === 'free_trial';
-  const isPaid = rawPlan === 'plan_199' || rawPlan === 'plan_349';
 
   let startedAtMs = 0;
   let expiresAtMs = 0;
+  const nowMs = Date.now();
 
   if (isPaid) {
     if (user.planStartedAt) {
       startedAtMs = new Date(user.planStartedAt).getTime();
+      if (isNaN(startedAtMs)) startedAtMs = nowMs;
     } else {
-      startedAtMs = user.createdAt ? new Date(user.createdAt).getTime() : Date.now();
+      startedAtMs = user.createdAt ? new Date(user.createdAt).getTime() : nowMs;
+      if (isNaN(startedAtMs)) startedAtMs = nowMs;
     }
 
     if (user.planExpiresAt) {
       expiresAtMs = new Date(user.planExpiresAt).getTime();
+      if (isNaN(expiresAtMs) || expiresAtMs <= startedAtMs) {
+        expiresAtMs = startedAtMs + 30 * 24 * 60 * 60 * 1000;
+      }
     } else {
       expiresAtMs = startedAtMs + 30 * 24 * 60 * 60 * 1000;
     }
+
+    // Safety guarantee for active paid plans: ensure expiration is at least 30 days from purchase start date or now
+    if (expiresAtMs <= nowMs) {
+      // If user is set to a paid plan but expiresAt was in the past, reset it to 30 days from now
+      expiresAtMs = nowMs + 30 * 24 * 60 * 60 * 1000;
+    }
   } else if (hasStartedTrial) {
     const trialStartIso = user.freeTrialStartedAt || user.planStartedAt;
-    startedAtMs = trialStartIso ? new Date(trialStartIso).getTime() : Date.now();
-    
+    startedAtMs = trialStartIso ? new Date(trialStartIso).getTime() : nowMs;
+    if (isNaN(startedAtMs)) startedAtMs = nowMs;
+
     if (user.planExpiresAt) {
       expiresAtMs = new Date(user.planExpiresAt).getTime();
+      if (isNaN(expiresAtMs)) expiresAtMs = startedAtMs + 4 * 24 * 60 * 60 * 1000;
     } else {
       expiresAtMs = startedAtMs + 4 * 24 * 60 * 60 * 1000; // 4 Days
     }
   }
 
-  const nowMs = Date.now();
   let hasActiveAccess = false;
   let isExpired = false;
   let daysRemaining = 0;
@@ -202,7 +248,6 @@ export function calculatePlanDetails(user: UserProfile) {
       hasActiveAccess = true;
     }
   } else {
-    // Trial NOT started yet and no paid plan!
     hasActiveAccess = false;
     isExpired = false;
     daysRemaining = 0;
@@ -251,3 +296,231 @@ export function calculatePlanDetails(user: UserProfile) {
     startedAtIso: startedAtMs > 0 ? new Date(startedAtMs).toISOString() : ''
   };
 }
+
+export interface LimitCheckResult {
+  allowed: boolean;
+  maxLimit: number; // -1 for unlimited
+  currentCount: number;
+  featureName: string;
+  message: string;
+}
+
+export function checkStudySuiteLimit(user: UserProfile, currentCount: number): LimitCheckResult {
+  const details = calculatePlanDetails(user);
+  if (!details.hasActiveAccess) {
+    return {
+      allowed: false,
+      maxLimit: 0,
+      currentCount,
+      featureName: 'AI Study Suites',
+      message: 'Please start your 4-Day Free Trial or upgrade to a Pro Plan to generate AI Study Suites.'
+    };
+  }
+
+  if (details.currentPlanId === 'free_trial') {
+    const maxLimit = 5;
+    const allowed = currentCount < maxLimit;
+    return {
+      allowed,
+      maxLimit,
+      currentCount,
+      featureName: 'AI Study Suites',
+      message: allowed
+        ? `Free Trial Pass: ${currentCount}/${maxLimit} Study Suites generated.`
+        : `Free Trial limit reached (${maxLimit} Study Suites total). Upgrade to Pro Scholar (₹199) or Pro Ultimate (₹399) for 50 or UNLIMITED generations!`
+    };
+  }
+
+  if (details.currentPlanId === 'plan_199') {
+    const maxLimit = 50;
+    const allowed = currentCount < maxLimit;
+    return {
+      allowed,
+      maxLimit,
+      currentCount,
+      featureName: 'AI Study Suites',
+      message: allowed
+        ? `Pro Scholar Plan: ${currentCount}/${maxLimit} Study Suites generated this month.`
+        : `Pro Scholar monthly limit reached (${maxLimit} Generations/month). Upgrade to Placivo Pro Ultimate (₹399) for UNLIMITED generations!`
+    };
+  }
+
+  // plan_349 or higher: UNLIMITED
+  return {
+    allowed: true,
+    maxLimit: -1,
+    currentCount,
+    featureName: 'AI Study Suites',
+    message: 'Placivo Pro Ultimate: UNLIMITED AI Study Suite generations active.'
+  };
+}
+
+export function checkDSASolutionLimit(user: UserProfile, todayCount: number): LimitCheckResult {
+  const details = calculatePlanDetails(user);
+  if (!details.hasActiveAccess) {
+    return {
+      allowed: false,
+      maxLimit: 0,
+      currentCount: todayCount,
+      featureName: '375 DSA AI Code Coach',
+      message: 'Please start your 4-Day Free Trial or upgrade to a Pro Plan to access 375 DSA AI solutions.'
+    };
+  }
+
+  if (details.currentPlanId === 'free_trial') {
+    const maxLimit = 3;
+    const allowed = todayCount < maxLimit;
+    return {
+      allowed,
+      maxLimit,
+      currentCount: todayCount,
+      featureName: '375 DSA AI Code Coach',
+      message: allowed
+        ? `Free Trial Pass: ${todayCount}/${maxLimit} DSA AI Solutions used today.`
+        : `Free Trial daily limit reached (${maxLimit} DSA Solutions / day). Upgrade to Pro Scholar (₹199) or Pro Ultimate (₹399) for UNLIMITED 375 DSA Sheet Solutions!`
+    };
+  }
+
+  // plan_199 and plan_349: UNLIMITED
+  return {
+    allowed: true,
+    maxLimit: -1,
+    currentCount: todayCount,
+    featureName: '375 DSA AI Code Coach',
+    message: 'Pro Plan: UNLIMITED 375 DSA Roadmap Code Coach active.'
+  };
+}
+
+export function checkAIChatLimit(user: UserProfile, currentChatCount: number): LimitCheckResult {
+  const details = calculatePlanDetails(user);
+  if (!details.hasActiveAccess) {
+    return {
+      allowed: false,
+      maxLimit: 0,
+      currentCount: currentChatCount,
+      featureName: '24/7 AI Academic Tutor Chat',
+      message: 'Please start your 4-Day Free Trial or upgrade to a Pro Plan to chat with the AI Academic Tutor.'
+    };
+  }
+
+  if (details.currentPlanId === 'free_trial') {
+    const maxLimit = 20;
+    const allowed = currentChatCount < maxLimit;
+    return {
+      allowed,
+      maxLimit,
+      currentCount: currentChatCount,
+      featureName: '24/7 AI Academic Tutor Chat',
+      message: allowed
+        ? `Free Trial Pass: ${currentChatCount}/${maxLimit} AI Tutor messages used.`
+        : `Free Trial chat limit reached (${maxLimit} Messages total). Upgrade to Pro Scholar (₹199) for UNLIMITED 24/7 AI Tutor Chat Assistant!`
+    };
+  }
+
+  return {
+    allowed: true,
+    maxLimit: -1,
+    currentCount: currentChatCount,
+    featureName: '24/7 AI Academic Tutor Chat',
+    message: 'Pro Plan: UNLIMITED 24/7 AI Academic Tutor Chat active.'
+  };
+}
+
+export function checkResumeScanLimit(user: UserProfile, currentScanCount: number): LimitCheckResult {
+  const details = calculatePlanDetails(user);
+  if (!details.hasActiveAccess) {
+    return {
+      allowed: false,
+      maxLimit: 0,
+      currentCount: currentScanCount,
+      featureName: 'ATS Resume Scans',
+      message: 'Please start your 4-Day Free Trial or upgrade to a Pro Plan to run ATS Resume Audits.'
+    };
+  }
+
+  if (details.currentPlanId === 'free_trial') {
+    const maxLimit = 2;
+    const allowed = currentScanCount < maxLimit;
+    return {
+      allowed,
+      maxLimit,
+      currentCount: currentScanCount,
+      featureName: 'ATS Resume Scans',
+      message: allowed
+        ? `Free Trial Pass: ${currentScanCount}/${maxLimit} ATS Resume Audits completed.`
+        : `Free Trial ATS scan limit reached (${maxLimit} Audits total). Upgrade to Pro Scholar (15 Scans/month) or Pro Ultimate (UNLIMITED Scans & Resume Builder)!`
+    };
+  }
+
+  if (details.currentPlanId === 'plan_199') {
+    const maxLimit = 15;
+    const allowed = currentScanCount < maxLimit;
+    return {
+      allowed,
+      maxLimit,
+      currentCount: currentScanCount,
+      featureName: 'ATS Resume Scans',
+      message: allowed
+        ? `Pro Scholar Plan: ${currentScanCount}/${maxLimit} ATS Resume Scans used this month.`
+        : `Pro Scholar monthly limit reached (${maxLimit} Scans/month). Upgrade to Placivo Pro Ultimate (₹399) for UNLIMITED ATS Scans & Resume Builder!`
+    };
+  }
+
+  return {
+    allowed: true,
+    maxLimit: -1,
+    currentCount: currentScanCount,
+    featureName: 'ATS Resume Scans',
+    message: 'Placivo Pro Ultimate: UNLIMITED High-Score ATS Resume Builder & Scans active.'
+  };
+}
+
+export function checkInterviewPrepLimit(user: UserProfile, currentSessionCount: number): LimitCheckResult {
+  const details = calculatePlanDetails(user);
+  if (!details.hasActiveAccess) {
+    return {
+      allowed: false,
+      maxLimit: 0,
+      currentCount: currentSessionCount,
+      featureName: 'Technical Interview Prep',
+      message: 'Please start your 4-Day Free Trial or upgrade to a Pro Plan to access Technical Interview Prep.'
+    };
+  }
+
+  if (details.currentPlanId === 'free_trial') {
+    const maxLimit = 1;
+    const allowed = currentSessionCount < maxLimit;
+    return {
+      allowed,
+      maxLimit,
+      currentCount: currentSessionCount,
+      featureName: 'Technical Interview Prep',
+      message: allowed
+        ? `Free Trial Pass: ${currentSessionCount}/${maxLimit} Technical Interview practice session completed.`
+        : `Free Trial interview prep limit reached (${maxLimit} Session total). Upgrade to Pro Scholar (5/month) or Pro Ultimate (UNLIMITED 1-on-1 Practice)!`
+    };
+  }
+
+  if (details.currentPlanId === 'plan_199') {
+    const maxLimit = 5;
+    const allowed = currentSessionCount < maxLimit;
+    return {
+      allowed,
+      maxLimit,
+      currentCount: currentSessionCount,
+      featureName: 'Technical Interview Prep',
+      message: allowed
+        ? `Pro Scholar Plan: ${currentSessionCount}/${maxLimit} Technical Interview practice sessions used this month.`
+        : `Pro Scholar monthly interview limit reached (${maxLimit} Sessions/month). Upgrade to Placivo Pro Ultimate (₹399) for UNLIMITED 1-on-1 Practice & Question Bank!`
+    };
+  }
+
+  return {
+    allowed: true,
+    maxLimit: -1,
+    currentCount: currentSessionCount,
+    featureName: 'Technical Interview Prep',
+    message: 'Placivo Pro Ultimate: UNLIMITED 1-on-1 Technical Interview Prep & Question Bank active.'
+  };
+}
+

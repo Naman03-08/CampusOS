@@ -26,9 +26,10 @@ import { FirestoreService } from '../../lib/firestoreService';
 interface UpgradePlansProps {
   user: UserProfile;
   onUpdateProfile?: (updated: Partial<UserProfile>) => void;
+  onPlanPurchased?: (planName: string) => void;
 }
 
-export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdateProfile }) => {
+export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdateProfile, onPlanPurchased }) => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState<{
     id: string;
@@ -101,7 +102,9 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
 
       setToastMessage('4-Day Free Trial activated successfully!');
       setShowSuccessToast(true);
-      setTimeout(() => setShowSuccessToast(false), 5000);
+      if (onPlanPurchased) {
+        onPlanPurchased('4-Day Free Trial Pass');
+      }
       return;
     }
 
@@ -124,15 +127,25 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 Days Renewal
 
+      const updatedData: Partial<UserProfile> = {
+        plan: selectedPlanForCheckout.id,
+        planStartedAt: now.toISOString(),
+        planExpiresAt: expiresAt.toISOString(),
+        planCancelled: false,
+        planCancelledAt: undefined
+      };
+
       if (onUpdateProfile) {
-        onUpdateProfile({
-          plan: selectedPlanForCheckout.id,
-          planStartedAt: now.toISOString(),
-          planExpiresAt: expiresAt.toISOString()
-        });
+        onUpdateProfile(updatedData);
       }
 
       if (user && user.uid) {
+        const fullUpdatedProfile: UserProfile = {
+          ...user,
+          ...updatedData
+        };
+        FirestoreService.saveProfile(fullUpdatedProfile).catch(e => console.warn("Failed to save updated plan profile to Firestore:", e));
+
         FirestoreService.recordFinancialTransaction({
           userId: user.uid,
           userName: user.displayName || user.email?.split('@')[0] || 'Student',
@@ -144,10 +157,14 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
         }).catch(e => console.warn("Failed to record subscription transaction in Firestore:", e));
       }
 
+      const boughtPlanName = selectedPlanForCheckout.name;
       setSelectedPlanForCheckout(null);
-      setToastMessage(`Upgraded to ${selectedPlanForCheckout.name} (Valid for 30 Days)!`);
+      setToastMessage(`Upgraded to ${boughtPlanName} (Valid for 30 Days)!`);
       setShowSuccessToast(true);
-      setTimeout(() => setShowSuccessToast(false), 5000);
+
+      if (onPlanPurchased) {
+        onPlanPurchased(boughtPlanName);
+      }
     }, 1200);
   };
 
