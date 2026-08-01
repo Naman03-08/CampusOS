@@ -4308,13 +4308,17 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
           if (unlockedFromDb.length > 0) {
             setUnlockedCourses((prev) => {
               const combined = [...new Set([...prev, ...unlockedFromDb])];
-              localStorage.setItem('campus_os_unlocked_courses', JSON.stringify(combined));
+              try {
+                localStorage.setItem('campus_os_unlocked_courses', JSON.stringify(combined));
+              } catch {}
               return combined;
             });
           }
 
           setCompletedTopics(completedFromDb);
-          localStorage.setItem('campus_os_completed_topics', JSON.stringify(completedFromDb));
+          try {
+            localStorage.setItem('campus_os_completed_topics', JSON.stringify(completedFromDb));
+          } catch {}
         }
       }).catch(err => console.warn("Failed to load user course progress from Firestore:", err));
     }
@@ -4322,7 +4326,9 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
 
   // Save unlocked courses to localStorage
   useEffect(() => {
-    localStorage.setItem('campus_os_unlocked_courses', JSON.stringify(unlockedCourses));
+    try {
+      localStorage.setItem('campus_os_unlocked_courses', JSON.stringify(unlockedCourses));
+    } catch {}
   }, [unlockedCourses]);
 
   const handleUnlockCourseClick = (course: CourseItem) => {
@@ -4391,7 +4397,9 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
       // 1. Remove from unlocked courses
       setUnlockedCourses((prev) => {
         const updated = prev.filter(id => id !== targetCourseId);
-        localStorage.setItem('campus_os_unlocked_courses', JSON.stringify(updated));
+        try {
+          localStorage.setItem('campus_os_unlocked_courses', JSON.stringify(updated));
+        } catch {}
         return updated;
       });
 
@@ -4403,7 +4411,9 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
             delete updated[key];
           }
         });
-        localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
+        try {
+          localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
+        } catch {}
         return updated;
       });
 
@@ -4492,7 +4502,9 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
     }
 
     setCompletedTopics(updated);
-    localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
+    try {
+      localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
+    } catch {}
     onUpdateCourseTopics?.();
 
     if (user && user.uid) {
@@ -4539,7 +4551,9 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
     }
 
     setCompletedTopics(updated);
-    localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
+    try {
+      localStorage.setItem('campus_os_completed_topics', JSON.stringify(updated));
+    } catch {}
     onUpdateCourseTopics?.();
 
     if (user && user.uid) {

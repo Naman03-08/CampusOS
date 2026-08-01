@@ -4,6 +4,7 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
+import fs from "fs";
 
 dotenv.config();
 
@@ -12,6 +13,19 @@ const PORT = 3000;
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+// Diagnostic endpoint to catch and log all client-side runtime errors
+app.post("/api/log", (req, res) => {
+  const { type, message, stack } = req.body;
+  const logMsg = `[${new Date().toISOString()}] [CLIENT ${String(type).toUpperCase()}] ${message}\nStack: ${stack || "None"}\n\n`;
+  console.log(`[CLIENT ${String(type).toUpperCase()}]`, message, stack || "");
+  try {
+    fs.appendFileSync(path.join(process.cwd(), "client_errors.log"), logMsg);
+  } catch (err) {
+    console.error("Failed to write to client_errors.log:", err);
+  }
+  res.json({ success: true });
+});
 
 // In-Memory OTP Store for Password Reset
 interface OTPRecord {
@@ -272,15 +286,15 @@ function checkApiKey() {
   }
 }
 
-// Multi-model Gemini Fallback Manager (Strictly using gemini-2.5-flash-lite and gemini-1.5-flash)
+// Multi-model Gemini Fallback Manager (Using official gemini-3.6-flash and gemini-flash-latest)
 const GEMINI_MODELS = [
-  "gemini-2.5-flash-lite",
-  "gemini-1.5-flash"
+  "gemini-3.6-flash",
+  "gemini-flash-latest"
 ];
 
 const GEMINI_LOW_MODELS = [
-  "gemini-2.5-flash-lite",
-  "gemini-1.5-flash"
+  "gemini-3.6-flash",
+  "gemini-flash-latest"
 ];
 
 // Options Shuffler helper so correct answer is randomly distributed (0, 1, 2, 3) and not always option 0
@@ -323,7 +337,7 @@ async function generateContentWithFallback(options: {
   let lastError: any = null;
   const modelsToTry = options.models && options.models.length > 0 
     ? options.models 
-    : ["gemini-2.5-flash-lite", "gemini-1.5-flash"];
+    : GEMINI_MODELS;
 
   for (const model of modelsToTry) {
     // Retry up to 2 attempts per model before trying next model in fallback list if high demand / 503 occurs
@@ -341,8 +355,7 @@ async function generateContentWithFallback(options: {
         const response = await ai.models.generateContent({
           model,
           contents: options.contents,
-          config: config,
-          ...(model.startsWith("gemini-1.5") ? { generationConfig: options.config } : {})
+          config: config
         });
         if (response && response.text && response.text.trim().length > 0) {
           return response;

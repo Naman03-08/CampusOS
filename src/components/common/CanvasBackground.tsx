@@ -377,10 +377,12 @@ export const CanvasBackground: React.FC = () => {
 
         // Draw glowing vertex dots at each node
         projected.forEach((p) => {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, 2.2 * p.scale, 0, Math.PI * 2);
-          ctx.fillStyle = mesh.color;
-          ctx.fill();
+          if (!isNaN(p.x) && !isNaN(p.y) && p.scale > 0) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, Math.max(0.1, 2.2 * p.scale), 0, Math.PI * 2);
+            ctx.fillStyle = mesh.color;
+            ctx.fill();
+          }
         });
 
         ctx.restore();

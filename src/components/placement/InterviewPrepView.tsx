@@ -402,11 +402,15 @@ export const InterviewPrepView: React.FC<InterviewPrepViewProps> = ({ onNavigate
   const [copiedQuestionId, setCopiedQuestionId] = useState<string | null>(null);
 
   useEffect(() => {
-    localStorage.setItem('interview_prep_mastered', JSON.stringify(masteredIds));
+    try {
+      localStorage.setItem('interview_prep_mastered', JSON.stringify(masteredIds));
+    } catch {}
   }, [masteredIds]);
 
   useEffect(() => {
-    localStorage.setItem('interview_prep_bookmarked', JSON.stringify(bookmarkedIds));
+    try {
+      localStorage.setItem('interview_prep_bookmarked', JSON.stringify(bookmarkedIds));
+    } catch {}
   }, [bookmarkedIds]);
 
   // Toggle Mastered

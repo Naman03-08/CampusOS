@@ -58,7 +58,11 @@ const SECURITY_KEY = 'Naman@#2008';
 
 export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigateTab }) => {
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
-    return sessionStorage.getItem('placivo_admin_unlocked') === 'true' || sessionStorage.getItem('campusos_admin_unlocked') === 'true';
+    try {
+      return sessionStorage.getItem('placivo_admin_unlocked') === 'true' || sessionStorage.getItem('campusos_admin_unlocked') === 'true';
+    } catch {
+      return false;
+    }
   });
   const [securityInput, setSecurityInput] = useState('');
   const [showKey, setShowKey] = useState(false);
@@ -328,7 +332,9 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
 
     if (securityInput === SECURITY_KEY) {
       setIsUnlocked(true);
-      sessionStorage.setItem('placivo_admin_unlocked', 'true');
+      try {
+        sessionStorage.setItem('placivo_admin_unlocked', 'true');
+      } catch {}
       setSecurityInput('');
       setErrorMsg('');
     } else {
@@ -340,8 +346,10 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
 
   const handleLockPanel = () => {
     setIsUnlocked(false);
-    sessionStorage.removeItem('placivo_admin_unlocked');
-    sessionStorage.removeItem('campusos_admin_unlocked');
+    try {
+      sessionStorage.removeItem('placivo_admin_unlocked');
+      sessionStorage.removeItem('campusos_admin_unlocked');
+    } catch {}
     setSecurityInput('');
     setErrorMsg('');
   };
@@ -446,13 +454,29 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
     if (!userToCancelSub) return;
     setIsCancellingSub(true);
     try {
-      await FirestoreService.cancelUserSubscription(userToCancelSub.uid);
+      await FirestoreService.cancelUserSubscriptionAndAdjustRevenue(userToCancelSub.uid, userToCancelSub.email);
       // Update local allUsers state
-      setAllUsers(prev => prev.map(u => u.uid === userToCancelSub.uid ? { ...u, plan: 'Free Tier', planExpiresAt: undefined } : u));
+      const nowIso = new Date().toISOString();
+      setAllUsers(prev => prev.map(u => u.uid === userToCancelSub.uid ? {
+        ...u,
+        plan: 'Free Tier',
+        planExpiresAt: undefined,
+        planCancelled: true,
+        planCancelledAt: nowIso
+      } : u));
+      
+      // Sync purchases and monthly profits for admin panel
+      const [updatedPurchases, updatedProfits] = await Promise.all([
+        FirestoreService.getAllCoursePurchases(),
+        FirestoreService.getMonthlyProfits()
+      ]);
+      setCoursePurchases(updatedPurchases);
+      setMonthlyProfits(updatedProfits);
+
       setUserToCancelSub(null);
       setActionFeedback({
         type: 'success',
-        text: `Subscription cancelled successfully for ${userToCancelSub.displayName || userToCancelSub.email}. User set to Free Tier in Firestore.`
+        text: `Subscription cancelled successfully for ${userToCancelSub.displayName || userToCancelSub.email}. User set to Free Tier in Firestore and admin panel profits adjusted.`
       });
     } catch (e: any) {
       console.error("Failed to cancel subscription:", e);
@@ -468,15 +492,18 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
   // Helper calculation for Subscription Expiration Days Remaining & Real Paid Amount
   const getSubscriptionInfo = (u: UserProfile) => {
     const rawPlan = u.plan ? u.plan.trim() : '';
-    const isFree = !rawPlan || rawPlan === 'free_trial' || rawPlan === 'Free Tier' || rawPlan === 'Free' || rawPlan.toLowerCase().includes('starter') || rawPlan.toLowerCase().includes('free');
+    const isCancelled = Boolean(u.planCancelled);
+    const isFree = isCancelled || !rawPlan || rawPlan === 'free_trial' || rawPlan === 'Free Tier' || rawPlan === 'Free' || rawPlan.toLowerCase().includes('starter') || rawPlan.toLowerCase().includes('free');
     
-    const planName = isFree 
-      ? 'Free Tier / Starter' 
-      : (rawPlan === 'free_trial' ? '4-Day Free Trial' : rawPlan);
+    const planName = isCancelled
+      ? 'Subscription Cancelled'
+      : (isFree 
+        ? 'Free Tier / Starter' 
+        : (rawPlan === 'free_trial' ? '4-Day Free Trial' : rawPlan));
 
     // Exact paid price mapping for active plan
     let price = 0;
-    if (!isFree) {
+    if (!isFree && !isCancelled) {
       if (rawPlan === 'plan_199' || planName.toLowerCase().includes('pro scholar') || rawPlan.includes('199')) {
         price = 199;
       } else if (rawPlan === 'plan_349' || planName.toLowerCase().includes('ultimate') || planName.toLowerCase().includes('pro') || rawPlan.includes('349')) {
@@ -492,9 +519,9 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
 
     // Remaining days calculation
     let daysRemaining = 0;
-    let statusLabel = 'Free Access';
+    let statusLabel = isCancelled ? 'Cancelled' : 'Free Access';
 
-    if (!isFree) {
+    if (!isFree && !isCancelled) {
       if (u.planExpiresAt) {
         const exp = new Date(u.planExpiresAt).getTime();
         const diff = exp - Date.now();
@@ -513,7 +540,8 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       price,
       daysRemaining,
       statusLabel,
-      isFree
+      isFree,
+      isCancelled
     };
   };
 

@@ -28,10 +28,21 @@ if (typeof window !== 'undefined') {
   });
 }
 
-const dbId = (firebaseConfig as any)?.firestoreDatabaseId;
-const db: Firestore = (dbId && dbId !== '(default)' && dbId !== '') 
-  ? getFirestore(app, dbId) 
-  : getFirestore(app);
+let db: Firestore;
+try {
+  const dbId = (firebaseConfig as any)?.firestoreDatabaseId;
+  db = (dbId && dbId !== '(default)' && dbId !== '') 
+    ? getFirestore(app, dbId) 
+    : getFirestore(app);
+} catch (e) {
+  console.warn("Firestore custom database init failed, falling back to default:", e);
+  try {
+    db = getFirestore(app);
+  } catch (err) {
+    console.error("Firestore default database init failed:", err);
+    db = null as any;
+  }
+}
 const googleProvider = new GoogleAuthProvider();
 
 let analytics: Analytics | null = null;

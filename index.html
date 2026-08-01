@@ -9,6 +9,41 @@
     <meta name="theme-color" content="#2563EB" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     
+    <script>
+      (function() {
+        function logError(type, message, stack) {
+          fetch('/api/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: type, message: message, stack: stack })
+          }).catch(function() {});
+        }
+
+        window.addEventListener('error', function(e) {
+          logError('error', e.message || String(e), e.error ? e.error.stack : null);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+          var reason = e.reason || {};
+          logError('promise_rejection', reason.message || String(reason), reason.stack);
+        });
+
+        var originalConsoleError = console.error;
+        console.error = function() {
+          originalConsoleError.apply(console, arguments);
+          var argsArray = Array.prototype.slice.call(arguments);
+          var message = argsArray.map(function(arg) {
+            try {
+              return typeof arg === 'object' ? JSON.stringify(arg) : String(arg);
+            } catch (err) {
+              return String(arg);
+            }
+          }).join(' ');
+          logError('console_error', message);
+        };
+      })();
+    </script>
+    
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" href="/src/components/landing/placivoAI.png" />
     <link rel="apple-touch-icon" href="/src/components/landing/placivoAI.png" />

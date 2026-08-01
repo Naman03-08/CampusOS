@@ -219,89 +219,117 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
         </div>
       </div>
 
-      {/* Active Subscription Plan Section (100% matched with Upgrade Plans) */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950 text-white shadow-xl space-y-6 relative overflow-hidden">
-        <div className="absolute -right-12 -top-12 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      {/* Active Subscription Plan Section */}
+      {planDetails.hasActiveAccess && !user?.planCancelled ? (
+        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950 text-white shadow-xl space-y-6 relative overflow-hidden">
+          <div className="absolute -right-12 -top-12 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500/20 text-blue-300 border border-blue-400/30 uppercase tracking-wide">
-                Account Subscription
-              </span>
-              {activePlanDef.popular && (
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-950 flex items-center gap-1">
-                  <Star className="w-3 h-3 fill-slate-950" /> Most Popular
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500/20 text-blue-300 border border-blue-400/30 uppercase tracking-wide">
+                  Account Subscription
                 </span>
-              )}
-            </div>
-            <h2 className="text-2xl font-black tracking-tight">{activePlanDef.name}</h2>
-            <p className="text-xs text-slate-300 font-medium">{activePlanDef.tagline}</p>
-          </div>
-
-          <div className="flex flex-col items-start sm:items-end gap-1.5 shrink-0">
-            <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
-              planDetails.isExpired 
-                ? 'bg-red-500 text-white shadow-lg shadow-red-500/30' 
-                : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
-            }`}>
-              {planDetails.isExpired ? 'Subscription Expired' : 'Active Plan'}
-            </span>
-            <div className="flex items-center gap-1.5 text-xs text-slate-300 font-bold">
-              <Clock className="w-3.5 h-3.5 text-blue-400" />
-              <span>{planDetails.isExpired ? '0 Days Left (Action Required)' : `${planDetails.daysRemaining} Days Remaining`}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Start / Expiration Timing Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Plan Duration Cycle</p>
-            <p className="text-sm font-extrabold text-white mt-0.5">
-              {planDetails.isFreeTrial ? '4-Day Free Trial (1x Lifetime)' : '30-Day Monthly Subscription'}
-            </p>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Activated On</p>
-            <p className="text-sm font-extrabold text-white mt-0.5">{planDetails.formattedStartedAt}</p>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Expires On</p>
-            <p className="text-sm font-extrabold font-mono text-blue-300 mt-0.5">{planDetails.formattedExpiresAt}</p>
-          </div>
-        </div>
-
-        {/* Plan Benefits Checklist */}
-        <div className="space-y-2">
-          <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Plan Features & Privileges Included:</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-slate-200">
-            {activePlanDef.features.map((feat, idx) => (
-              <div key={idx} className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>{feat}</span>
+                {activePlanDef.popular && (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-950 flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-slate-950" /> Most Popular
+                  </span>
+                )}
               </div>
-            ))}
-          </div>
-        </div>
+              <h2 className="text-2xl font-black tracking-tight">{activePlanDef.name}</h2>
+              <p className="text-xs text-slate-300 font-medium">{activePlanDef.tagline}</p>
+            </div>
 
-        {/* Upgrade / Extend CTA */}
-        {onNavigateTab && (
-          <div className="pt-2">
+            <div className="flex flex-col items-start sm:items-end gap-1.5 shrink-0">
+              <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                planDetails.isExpired 
+                  ? 'bg-red-500 text-white shadow-lg shadow-red-500/30' 
+                  : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
+              }`}>
+                {planDetails.isExpired ? 'Subscription Expired' : 'Active Plan'}
+              </span>
+              <div className="flex items-center gap-1.5 text-xs text-slate-300 font-bold">
+                <Clock className="w-3.5 h-3.5 text-blue-400" />
+                <span>{planDetails.isExpired ? '0 Days Left (Action Required)' : `${planDetails.daysRemaining} Days Remaining`}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Start / Expiration Timing Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Plan Duration Cycle</p>
+              <p className="text-sm font-extrabold text-white mt-0.5">
+                {planDetails.isFreeTrial ? '4-Day Free Trial (1x Lifetime)' : '30-Day Monthly Subscription'}
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Activated On</p>
+              <p className="text-sm font-extrabold text-white mt-0.5">{planDetails.formattedStartedAt}</p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Expires On</p>
+              <p className="text-sm font-extrabold font-mono text-blue-300 mt-0.5">{planDetails.formattedExpiresAt}</p>
+            </div>
+          </div>
+
+          {/* Plan Benefits Checklist */}
+          <div className="space-y-2">
+            <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Plan Features & Privileges Included:</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-slate-200">
+              {activePlanDef.features.map((feat, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>{feat}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Upgrade / Extend CTA */}
+          {onNavigateTab && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => onNavigateTab('pricing')}
+                className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all cursor-pointer"
+              >
+                <Zap className="w-4 h-4 fill-white" />
+                <span>{planDetails.isExpired ? 'Upgrade Subscription Plan Now' : 'Manage & Upgrade Plans'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Free Tier / Cancelled user placeholder */
+        <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 rounded-2xl bg-blue-50 text-blue-600">
+              <Zap className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-slate-950">Free Tier Account</h2>
+              <p className="text-xs text-slate-500 font-medium mt-0.5">
+                {user?.planCancelled 
+                  ? 'Your subscription has been cancelled. You can browse and study our interactive Coding Courses.' 
+                  : 'Activate a premium plan or trial to unlock complete AI tools, ATS resume scans, and question banks.'}
+              </p>
+            </div>
+          </div>
+          {onNavigateTab && (
             <button
               type="button"
               onClick={() => onNavigateTab('pricing')}
-              className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-lg shadow-blue-600/30 flex items-center gap-2 transition-all cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer shrink-0"
             >
-              <Zap className="w-4 h-4 fill-white" />
-              <span>{planDetails.isExpired ? 'Upgrade Subscription Plan Now' : 'Manage & Upgrade Plans'}</span>
-              <ArrowRight className="w-4 h-4" />
+              View Subscription Plans
             </button>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-6">
         {savedSuccess && (

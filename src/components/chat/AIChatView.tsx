@@ -175,12 +175,18 @@ export const AIChatView: React.FC<AIChatViewProps> = ({ user }) => {
 
   // Token saving and word limit settings (default true)
   const [limitWords, setLimitWords] = useState<boolean>(() => {
-    const cached = localStorage.getItem('campus_os_chat_limit_words');
-    return cached !== 'false'; // defaults to true
+    try {
+      const cached = localStorage.getItem('campus_os_chat_limit_words');
+      return cached !== 'false'; // defaults to true
+    } catch {
+      return true;
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem('campus_os_chat_limit_words', limitWords.toString());
+    try {
+      localStorage.setItem('campus_os_chat_limit_words', limitWords.toString());
+    } catch {}
   }, [limitWords]);
 
   const scrollToBottom = () => {

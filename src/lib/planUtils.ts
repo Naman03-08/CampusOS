@@ -127,8 +127,8 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
 
 export function calculatePlanDetails(user: UserProfile) {
   const rawPlan = user.plan;
-  const isPaid = rawPlan === 'plan_199' || rawPlan === 'plan_349';
-  
+  const isCancelled = Boolean(user.planCancelled);
+
   // Check if trial was explicitly started by user action
   const hasStartedTrial = Boolean(user.freeTrialStartedAt || (rawPlan === 'free_trial' && user.planStartedAt));
   const freeTrialUsed = Boolean(user.freeTrialUsed || hasStartedTrial);
@@ -138,7 +138,27 @@ export function calculatePlanDetails(user: UserProfile) {
     currentPlanId = 'none'; // Not active yet
   }
 
+  // If user cancelled or is explicitly on Free Tier / none:
+  if (isCancelled || rawPlan === 'Free Tier' || rawPlan === 'none' || !rawPlan) {
+    return {
+      currentPlanId: 'none',
+      planName: isCancelled ? 'Subscription Cancelled' : 'Free Tier',
+      isFreeTrial: false,
+      isPaid: false,
+      hasStartedTrial,
+      freeTrialUsed,
+      hasActiveAccess: false,
+      isExpired: false, // Do NOT mark cancelled / free plan as expired
+      daysRemaining: 0,
+      formattedStartedAt: user.planStartedAt ? new Date(user.planStartedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A',
+      formattedExpiresAt: user.planCancelledAt ? new Date(user.planCancelledAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A',
+      expiresAtIso: '',
+      startedAtIso: ''
+    };
+  }
+
   const isFreeTrial = currentPlanId === 'free_trial';
+  const isPaid = rawPlan === 'plan_199' || rawPlan === 'plan_349';
 
   let startedAtMs = 0;
   let expiresAtMs = 0;

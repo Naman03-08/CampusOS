@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Laptop, Smartphone, AlertCircle } from 'lucide-react';
+import { X } from 'lucide-react';
 import { CanvasBackground } from './components/common/CanvasBackground';
 import { Navbar } from './components/common/Navbar';
 import { Header } from './components/common/Header';
@@ -72,50 +72,58 @@ export function App() {
   const [showUpgradeModal, setShowUpgradeModal] = useState<boolean>(false);
   const [upgradeFeatureName, setUpgradeFeatureName] = useState<string>('this feature');
   const [pendingTabAfterTrial, setPendingTabAfterTrial] = useState<string | null>(null);
-  const [showMobileDisclaimer, setShowMobileDisclaimer] = useState<boolean>(() => {
-    const dismissed = sessionStorage.getItem('placivo_disclaimer_dismissed');
-    if (dismissed === 'true') return false;
-    
-    const isMobileSize = window.innerWidth < 1024;
-    const isMobileAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
-    return isMobileSize || isMobileAgent;
-  });
 
   // Global Focus Timer State for Navbar Watch & Habiturex (Backed by Local Storage to prevent reset bugs)
   const [focusTimerInitialMinutes, setFocusTimerInitialMinutes] = useState<number>(() => {
-    const cached = localStorage.getItem('campus_os_focus_initial_minutes');
-    return cached ? parseInt(cached, 10) : 25;
+    try {
+      const cached = localStorage.getItem('campus_os_focus_initial_minutes');
+      return cached ? parseInt(cached, 10) : 25;
+    } catch {
+      return 25;
+    }
   });
 
   const [focusTimerSeconds, setFocusTimerSeconds] = useState<number>(() => {
-    const cachedSeconds = localStorage.getItem('campus_os_focus_seconds');
-    if (cachedSeconds) {
-      return parseInt(cachedSeconds, 10);
+    try {
+      const cachedSeconds = localStorage.getItem('campus_os_focus_seconds');
+      if (cachedSeconds) {
+        return parseInt(cachedSeconds, 10);
+      }
+      const cachedMins = localStorage.getItem('campus_os_focus_initial_minutes');
+      return cachedMins ? parseInt(cachedMins, 10) * 60 : 25 * 60;
+    } catch {
+      return 25 * 60;
     }
-    const cachedMins = localStorage.getItem('campus_os_focus_initial_minutes');
-    return cachedMins ? parseInt(cachedMins, 10) * 60 : 25 * 60;
   });
 
   const [isFocusTimerRunning, setIsFocusTimerRunning] = useState<boolean>(() => {
-    const cachedRunning = localStorage.getItem('campus_os_focus_running');
-    return cachedRunning === 'true';
+    try {
+      const cachedRunning = localStorage.getItem('campus_os_focus_running');
+      return cachedRunning === 'true';
+    } catch {
+      return false;
+    }
   });
 
   const [focusTimerMode, setFocusTimerMode] = useState<'focus' | 'shortBreak' | 'longBreak'>('focus');
 
   // Keep Local Storage synced with Focus Timer state
   useEffect(() => {
-    localStorage.setItem('campus_os_focus_initial_minutes', focusTimerInitialMinutes.toString());
+    try {
+      localStorage.setItem('campus_os_focus_initial_minutes', focusTimerInitialMinutes.toString());
+    } catch {}
   }, [focusTimerInitialMinutes]);
 
   useEffect(() => {
-    localStorage.setItem('campus_os_focus_seconds', focusTimerSeconds.toString());
+    try {
+      localStorage.setItem('campus_os_focus_seconds', focusTimerSeconds.toString());
+    } catch {}
   }, [focusTimerSeconds]);
 
   useEffect(() => {
-    localStorage.setItem('campus_os_focus_running', isFocusTimerRunning.toString());
+    try {
+      localStorage.setItem('campus_os_focus_running', isFocusTimerRunning.toString());
+    } catch {}
   }, [isFocusTimerRunning]);
 
   // Use a ref to access latest user data without restarting interval ticks
@@ -197,10 +205,19 @@ export function App() {
     }
   }, []);
 
-  const gatedTabs = ['notes', 'quiz', 'studyhub', 'resumebuilder', 'chat', 'attendance', 'habiturex', 'coding', 'courses', 'interviewprep', 'placement'];
+  const gatedTabs = ['dashboard', 'notes', 'quiz', 'studyhub', 'resumebuilder', 'chat', 'attendance', 'habiturex', 'coding', 'interviewprep', 'placement'];
+
+  // Enforce website lock: If user has no active subscription/access, force activeTab to 'courses' (Coding Courses)
+  useEffect(() => {
+    const planDetails = calculatePlanDetails(user);
+    if (!planDetails.hasActiveAccess && gatedTabs.includes(activeTab)) {
+      setActiveTab('courses');
+    }
+  }, [user, activeTab]);
 
   const getTabDisplayName = (tabId: string) => {
     switch (tabId) {
+      case 'dashboard': return 'Main Dashboard Overview';
       case 'notes': return 'AI Smart Notes Summarizer';
       case 'quiz': return 'AI Practice Quiz Hub';
       case 'studyhub':
@@ -290,18 +307,29 @@ export function App() {
 
     const totalActivityCount = dsaSolved + assignmentsSolved + courseTopicsCompleted;
 
-    const prevActivityCount = parseInt(localStorage.getItem('campus_os_prev_activity_count') || '0', 10);
+    let prevActivityCount = 0;
+    try {
+      prevActivityCount = parseInt(localStorage.getItem('campus_os_prev_activity_count') || '0', 10);
+    } catch {
+      prevActivityCount = 0;
+    }
     
     let streakInfo = StreakService.evaluateStreak();
 
     if (totalActivityCount > prevActivityCount && totalActivityCount > 0) {
       streakInfo = StreakService.recordActivity();
-      localStorage.setItem('campus_os_prev_activity_count', totalActivityCount.toString());
+      try {
+        localStorage.setItem('campus_os_prev_activity_count', totalActivityCount.toString());
+      } catch {}
     } else if (totalActivityCount > 0 && !streakInfo.completedToday) {
       streakInfo = StreakService.recordActivity();
-      localStorage.setItem('campus_os_prev_activity_count', totalActivityCount.toString());
+      try {
+        localStorage.setItem('campus_os_prev_activity_count', totalActivityCount.toString());
+      } catch {}
     } else if (totalActivityCount === 0) {
-      localStorage.setItem('campus_os_prev_activity_count', '0');
+      try {
+        localStorage.setItem('campus_os_prev_activity_count', '0');
+      } catch {}
     }
 
     const updatedProfile: UserProfile = {
@@ -574,71 +602,6 @@ export function App() {
     <div className="min-h-screen bg-transparent text-slate-900 font-sans selection:bg-purple-600 selection:text-white relative overflow-x-hidden">
       {/* 3D WebGL Canvas Ambient Particle Background */}
       <CanvasBackground />
-
-      {/* Mobile/Tablet Laptop Preference Disclaimer Popup */}
-      {showMobileDisclaimer && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md">
-          <div className="relative bg-white border border-slate-100 max-w-sm sm:max-w-md w-full rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6 overflow-hidden">
-            {/* Ambient subtle light-glows inside the card */}
-            <div className="absolute -top-12 -right-12 w-32 h-32 bg-blue-100/40 rounded-full blur-2xl pointer-events-none" />
-            <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-indigo-100/40 rounded-full blur-2xl pointer-events-none" />
-
-            {/* Icons illustrating transition to Laptop/PC */}
-            <div className="flex items-center justify-center gap-4 relative">
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 shadow-xs relative">
-                <Smartphone className="w-7 h-7 text-slate-400" />
-                <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-slate-300 animate-pulse" />
-                <span className="h-1.5 w-1.5 rounded-full bg-slate-300 animate-pulse delay-100" />
-                <span className="h-1.5 w-1.5 rounded-full bg-slate-300 animate-pulse delay-200" />
-              </div>
-              <div className="p-3.5 rounded-2xl bg-blue-50 border border-blue-100 shadow-3d-sm relative">
-                <Laptop className="w-9 h-9 text-blue-600 animate-bounce" />
-              </div>
-            </div>
-
-            {/* Disclaimer Content */}
-            <div className="space-y-2.5 relative">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[10px] font-bold text-amber-700 tracking-wide uppercase">
-                <AlertCircle className="w-3.5 h-3.5" /> Laptop / PC Recommended
-              </span>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Enhance Your Placement Prep
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-semibold">
-                For the absolute best experience with coding compilers, aptitude tests, and interactive resume tools, we highly recommend using <span className="text-blue-600 font-extrabold">Placivo AI</span> on a laptop or desktop computer.
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="pt-1.5 flex flex-col gap-2 relative">
-              <button
-                onClick={() => {
-                  setShowMobileDisclaimer(false);
-                  sessionStorage.setItem('placivo_disclaimer_dismissed', 'true');
-                }}
-                className="w-full py-2.5 px-5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs sm:text-sm shadow-md shadow-blue-500/10 active:scale-[0.98] transition-all cursor-pointer"
-              >
-                Continue Anyway
-              </button>
-              <button
-                onClick={() => {
-                  setShowMobileDisclaimer(false);
-                  sessionStorage.setItem('placivo_disclaimer_dismissed', 'true');
-                }}
-                className="text-[10px] sm:text-xs font-semibold text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                Don't show this again today
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <SEOHead activeTab={isLoggedIn ? activeTab : 'landing'} />
 
