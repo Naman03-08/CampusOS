@@ -2054,7 +2054,7 @@ app.get("/manifest.json", (req, res) => {
     name: "Placivo AI — Student Academic Operating System",
     icons: [
       {
-        src: "/src/components/placivoAI.png",
+        src: "/src/components/landing/placivoAI.png",
         type: "image/png",
         sizes: "192x192 512x512"
       }
