@@ -45,6 +45,7 @@ import {
 } from 'lucide-react';
 import { UserProfile, MonthlyProfitRecord, StudentCoursePurchase, GlobalBounty, UserBountySubmission } from '../../types';
 import { FirestoreService, UserFullData } from '../../lib/firestoreService';
+import { StorageService } from '../../lib/storage';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 
 interface AdminPanelViewProps {
@@ -143,34 +144,64 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
     setLoadingSubmissions(true);
 
     try {
-      // 1. Fetch Users
-      const usersList = await FirestoreService.getAllUsers();
-      let finalUsers = usersList;
-      if (usersList.length === 0 && user) {
-        finalUsers = [user];
+      // 1. Ensure active user profile and local profile are synced to Firestore users collection
+      if (user && user.uid) {
+        await FirestoreService.saveProfile(user).catch(() => {});
       }
+      const localProfile = StorageService.getProfile();
+      if (localProfile && localProfile.uid && localProfile.uid !== user?.uid) {
+        await FirestoreService.saveProfile(localProfile).catch(() => {});
+      }
+
+      // 2. Fetch all collections in parallel safely using Promise.allSettled
+      const [usersRes, profitsRes, purchasesRes, bountiesRes, subsRes] = await Promise.allSettled([
+        FirestoreService.getAllUsers(),
+        FirestoreService.getMonthlyProfits(),
+        FirestoreService.getAllCoursePurchases(),
+        FirestoreService.getGlobalBounties(),
+        FirestoreService.getUserSubmissions()
+      ]);
+
+      // Parse Users
+      const usersList: UserProfile[] = usersRes.status === 'fulfilled' ? usersRes.value : [];
+      const userMap = new Map<string, UserProfile>();
+      usersList.forEach(u => { if (u && u.uid) userMap.set(u.uid, u); });
+      if (user && user.uid) userMap.set(user.uid, { ...userMap.get(user.uid), ...user });
+      if (localProfile && localProfile.uid) {
+        if (!userMap.has(localProfile.uid)) userMap.set(localProfile.uid, localProfile);
+      }
+      const finalUsers = Array.from(userMap.values());
       setAllUsers(finalUsers);
 
-      // 2. Fetch Monthly Profits from Firestore
-      const profitRecords = await FirestoreService.getMonthlyProfits();
+      // Parse Monthly Profits
+      const profitRecords = profitsRes.status === 'fulfilled' ? profitsRes.value : [];
       setMonthlyProfits(profitRecords);
       if (profitRecords.length > 0) {
         setSelectedMonthKey(profitRecords[0].monthKey);
       }
 
-      // 3. Fetch Course Purchases from Firestore
-      const purchases = await FirestoreService.getAllCoursePurchases();
+      // Parse Course Purchases
+      const purchases = purchasesRes.status === 'fulfilled' ? purchasesRes.value : [];
       setCoursePurchases(purchases);
 
-      // 4. Fetch Global Bounties & Student Submissions
-      const bounties = await FirestoreService.getGlobalBounties();
+      // Parse Bounties & Submissions
+      const bounties = bountiesRes.status === 'fulfilled' ? bountiesRes.value : [];
       setGlobalBounties(bounties);
 
-      const subs = await FirestoreService.getUserSubmissions();
+      const subs = subsRes.status === 'fulfilled' ? subsRes.value : [];
       setBountySubmissions(subs);
 
-    } catch (e) {
+      setActionFeedback({
+        type: 'success',
+        text: `⚡ Firebase Firestore Sync Complete! Successfully loaded ${finalUsers.length} student profile(s), ${profitRecords.length} financial record(s), ${purchases.length} course purchase(s), and ${bounties.length} bounty task(s) live from Firebase.`
+      });
+
+    } catch (e: any) {
       console.warn("Error fetching admin data:", e);
+      setActionFeedback({
+        type: 'error',
+        text: `Firestore Sync Failed: ${e?.message || e || 'Unable to connect to Firebase Firestore'}`
+      });
     } finally {
       setLoadingUsers(false);
       setLoadingProfits(false);
@@ -768,11 +799,11 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={fetchAllData}
-            disabled={loadingUsers}
-            className="px-4 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100/80 text-blue-700 font-extrabold text-xs border border-blue-200/80 flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-2xs"
+            disabled={loadingUsers || loadingProfits || loadingPurchases || loadingBounties}
+            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs border border-blue-600 flex items-center gap-2 transition-all active:scale-95 disabled:opacity-60 cursor-pointer shadow-xs"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers ? 'animate-spin text-blue-600' : ''}`} />
-            <span>Sync Firestore</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${(loadingUsers || loadingProfits || loadingPurchases || loadingBounties) ? 'animate-spin' : ''}`} />
+            <span>{(loadingUsers || loadingProfits || loadingPurchases || loadingBounties) ? 'Syncing Firebase...' : 'Sync Firebase / Firestore'}</span>
           </button>
 
           <button
