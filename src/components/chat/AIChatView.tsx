@@ -117,7 +117,7 @@ const renderStepIcon = (type: string) => {
   }
 };
 
-import aiLogoImg from '../../assets/AILogo.jpeg';
+import placivoAILogo from '../landing/placivoAI.png';
 
 // Custom Personalized Mini Assistant Logo in Light Theme
 const PersonalAssistantMiniLogo: React.FC = () => {
@@ -136,13 +136,14 @@ const PersonalAssistantMiniLogo: React.FC = () => {
         className="absolute inset-1 rounded-2xl border border-indigo-300/40"
       />
       
-      {/* Core Badge with AILogo.jpeg */}
-      <div className="absolute inset-1 bg-white rounded-xl shadow-xs border border-blue-100 p-0.5 flex items-center justify-center overflow-hidden">
+      {/* Core Badge with placivoAI.png */}
+      <div className="absolute inset-0.5 bg-white rounded-xl shadow-xs border border-blue-100 p-0.5 flex items-center justify-center overflow-hidden">
         <img 
-          src={aiLogoImg} 
+          src={placivoAILogo} 
           alt="Personal AI Assistant Logo" 
-          className="w-full h-full object-cover rounded-lg"
-          onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/AILogo.jpeg'; }}
+          className="w-full h-full object-contain rounded-lg"
+          referrerPolicy="no-referrer"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placivoAI.png'; }}
         />
       </div>
     </div>
@@ -394,10 +395,11 @@ export const AIChatView: React.FC<AIChatViewProps> = ({ user }) => {
         {/* Subtle Watermark */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
           <img 
-            src={aiLogoImg} 
+            src={placivoAILogo} 
             alt="" 
             className="w-80 h-80 object-contain rounded-full" 
-            onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/AILogo.jpeg'; }}
+            referrerPolicy="no-referrer"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placivoAI.png'; }}
           />
         </div>
 

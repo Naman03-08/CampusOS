@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { StudySuite } from '../../types';
 import { AIChatView } from '../chat/AIChatView';
-import aiLogoImg from '../../assets/AILogo.jpeg';
+import placivoAILogo from '../landing/placivoAI.png';
 
 // Bespoke Placivo Assistant Core Logo Component
 const PersonalAssistantLogo: React.FC = () => {
@@ -60,13 +60,14 @@ const PersonalAssistantLogo: React.FC = () => {
         <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-indigo-500 shadow-sm ring-2 ring-white" />
       </motion.div>
 
-      {/* Solid Tech Frame housing AILogo */}
-      <div className="absolute inset-3 bg-white rounded-2xl border-2 border-blue-100 shadow-md p-1 flex items-center justify-center overflow-hidden">
+      {/* Solid Tech Frame housing Placivo AI Logo */}
+      <div className="absolute inset-2.5 bg-white rounded-2xl border-2 border-blue-100 shadow-md p-1.5 flex items-center justify-center overflow-hidden">
         <img 
-          src={aiLogoImg} 
-          alt="Personal AI Assistant Logo" 
-          className="w-full h-full object-cover rounded-xl shadow-2xs"
-          onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/AILogo.jpeg'; }}
+          src={placivoAILogo} 
+          alt="Placivo Personal Assistant Logo" 
+          className="w-full h-full object-contain rounded-xl drop-shadow-2xs"
+          referrerPolicy="no-referrer"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placivoAI.png'; }}
         />
       </div>
     </motion.div>
