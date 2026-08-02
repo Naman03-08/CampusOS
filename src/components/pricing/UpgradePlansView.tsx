@@ -303,10 +303,20 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
           const isTrialUsed = plan.id === 'free_trial' && planDetails.freeTrialUsed;
           const displayPrice = billingCycle === 'monthly' ? plan.priceMonthly : plan.priceYearly;
 
+          // Check if active plan is Ultimate or Scholar Pass
+          const isUltimateActive = (planDetails.currentPlanId === 'plan_349' || planDetails.currentPlanId === 'plan_399') && planDetails.hasActiveAccess && !planDetails.isExpired;
+          const isScholarActive = planDetails.currentPlanId === 'plan_199' && planDetails.hasActiveAccess && !planDetails.isExpired;
+
+          // Check if this card is included in the user's active higher-level plan
+          const isIncludedInActive = (isUltimateActive && (plan.id === 'free_trial' || plan.id === 'plan_199')) || (isScholarActive && plan.id === 'free_trial');
+
           let buttonText = 'Upgrade Now';
           let isDisabled = false;
 
-          if (plan.id === 'free_trial') {
+          if (isIncludedInActive) {
+            buttonText = isUltimateActive ? 'Included in Pro Ultimate' : 'Included in Pro Scholar';
+            isDisabled = true;
+          } else if (plan.id === 'free_trial') {
             if (isCurrentActive) {
               buttonText = 'Active Free Trial (4 Days Pass)';
               isDisabled = true;
@@ -342,11 +352,15 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                   <span className={`px-3 py-1 rounded-full text-[11px] font-extrabold border ${plan.badgeColor}`}>
                     {plan.badge}
                   </span>
-                  {plan.popular && (
+                  {isIncludedInActive ? (
+                    <span className="flex items-center gap-1 text-[11px] font-extrabold text-emerald-800 bg-emerald-100/90 border border-emerald-300 px-2.5 py-0.5 rounded-full shadow-2xs">
+                      <Check className="w-3.5 h-3.5 text-emerald-700 stroke-[3]" /> Included in Plan
+                    </span>
+                  ) : plan.popular ? (
                     <span className="flex items-center gap-1 text-[11px] font-extrabold text-blue-600">
                       <Star className="w-3.5 h-3.5 fill-blue-600 text-blue-600" /> Most Recommended
                     </span>
-                  )}
+                  ) : null}
                 </div>
 
                 {/* Plan Name & Tagline */}
@@ -419,7 +433,9 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                 disabled={isDisabled}
                 onClick={() => handleSelectPlan(plan)}
                 className={`w-full py-3.5 px-4 rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                  isDisabled
+                  isIncludedInActive
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 cursor-not-allowed shadow-2xs font-extrabold'
+                    : isDisabled
                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
                     : plan.id === 'plan_199'
                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md btn-3d-blue'
@@ -428,20 +444,25 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                     : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md btn-3d-emerald'
                 }`}
               >
-                {isDisabled ? (
+                {isIncludedInActive ? (
                   <>
-                    <CheckCircle2 className="w-4 h-4 text-slate-400" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>{buttonText}</span>
+                  </>
+                ) : isDisabled ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0" />
                     <span>{buttonText}</span>
                   </>
                 ) : isCurrentActive ? (
                   <>
-                    <RotateCw className="w-4 h-4 text-white" />
+                    <RotateCw className="w-4 h-4 text-white shrink-0" />
                     <span>Renew Plan (+30 Days)</span>
                   </>
                 ) : (
                   <>
                     <span>{buttonText}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 shrink-0" />
                   </>
                 )}
               </button>
