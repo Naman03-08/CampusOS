@@ -5424,11 +5424,11 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
           <p className="text-xs sm:text-sm font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest">
             More premium courses will be uploaded soon
           </p>
-          <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white font-display">
+          <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-800 dark:text-white font-display">
             More Premium Courses Coming Soon! <span className="text-purple-600 dark:text-purple-400">🚀</span>
           </h3>
           <div className="h-[2px] w-12 bg-purple-200 dark:bg-purple-800 mx-auto my-3 rounded-full" />
-          <p className="text-sm sm:text-base text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+          <p className="text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
             We are curating world-class premium courses focused on Web Development, AI Agents Engineering, and Advanced SaaS Architecture. Prepare to elevate your coding skills to senior engineer level!
           </p>
           <p className="text-xs sm:text-sm text-purple-600 dark:text-purple-400 font-bold italic mt-2">

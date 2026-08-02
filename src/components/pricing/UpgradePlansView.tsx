@@ -344,7 +344,9 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
               key={plan.id}
               className={`p-7 rounded-3xl backdrop-blur-xl flex flex-col justify-between relative transition-all duration-300 card-3d ${
                 plan.popular
-                  ? 'bg-white border-2 border-blue-600 shadow-3d-blue lg:-translate-y-2 z-10'
+                  ? plan.id === 'plan_349'
+                    ? 'bg-white border-2 border-indigo-600 shadow-3d-indigo lg:-translate-y-2 z-10'
+                    : 'bg-white border-2 border-blue-600 shadow-3d-blue lg:-translate-y-2 z-10'
                   : 'bg-white/90 border border-slate-200/90 shadow-3d-sm hover:border-blue-300 hover:shadow-xl'
               }`}
             >
@@ -359,20 +361,20 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                       <Check className="w-3.5 h-3.5 text-emerald-700 stroke-[3]" /> Included in Plan
                     </span>
                   ) : plan.popular ? (
-                    <span className="flex items-center gap-1 text-[11px] font-extrabold text-blue-600">
-                      <Star className="w-3.5 h-3.5 fill-blue-600 text-blue-600" /> Most Recommended
+                    <span className={`flex items-center gap-1 text-[11px] font-extrabold ${plan.id === 'plan_349' ? 'text-indigo-600' : 'text-blue-600'}`}>
+                      <Star className={`w-3.5 h-3.5 ${plan.id === 'plan_349' ? 'fill-indigo-600 text-indigo-600' : 'fill-blue-600 text-blue-600'}`} /> Most Recommended
                     </span>
                   ) : null}
                 </div>
 
                 {/* Plan Name & Tagline */}
-                <h3 className="text-xl font-black text-slate-900">{plan.name}</h3>
+                <h3 className="text-xl font-black text-slate-800">{plan.name}</h3>
                 <p className="text-xs text-slate-500 font-medium mt-1 min-h-[32px]">{plan.tagline}</p>
 
                 {/* Price Display */}
                 <div className="mt-5 mb-5 pb-5 border-b border-slate-100">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-slate-900 tracking-tight">{displayPrice}</span>
+                    <span className="text-4xl font-black text-slate-800 tracking-tight">{displayPrice}</span>
                     <span className="text-xs font-bold text-slate-500">{plan.period}</span>
                   </div>
                 </div>
@@ -381,28 +383,28 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                 <div className="mb-5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
                   <p className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider flex items-center justify-between">
                     <span>Feature Usage Amounts:</span>
-                    <span className="text-blue-600 font-black">{plan.period}</span>
+                    <span className={`${plan.id === 'plan_349' ? 'text-indigo-600' : 'text-blue-600'} font-black`}>{plan.period}</span>
                   </p>
                   <div className="grid grid-cols-1 gap-1 text-[11px] font-bold text-slate-700">
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500">AI Study Suites:</span>
-                      <span className="text-slate-900 font-extrabold">{plan.usageLimits.studySuites}</span>
+                      <span className="text-slate-800 font-extrabold">{plan.usageLimits.studySuites}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500">AI Academic Tutor:</span>
-                      <span className="text-slate-900 font-extrabold">{plan.usageLimits.assignmentSolver}</span>
+                      <span className="text-slate-800 font-extrabold">{plan.usageLimits.assignmentSolver}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500">ATS Resume Scans:</span>
-                      <span className="text-slate-900 font-extrabold">{plan.usageLimits.resumeScans}</span>
+                      <span className="text-slate-800 font-extrabold">{plan.usageLimits.resumeScans}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500">375 DSA Sheet AI:</span>
-                      <span className="text-slate-900 font-extrabold">{plan.usageLimits.dsaSolutions}</span>
+                      <span className="text-slate-800 font-extrabold">{plan.usageLimits.dsaSolutions}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500">Interview Prep & Qs:</span>
-                      <span className="text-slate-900 font-extrabold">{plan.usageLimits.interviewPrep}</span>
+                      <span className="text-slate-800 font-extrabold">{plan.usageLimits.interviewPrep}</span>
                     </div>
                   </div>
                 </div>
@@ -412,7 +414,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                   <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">What's included:</p>
                   {plan.features.map((feat, i) => (
                     <div key={i} className="flex items-start gap-2.5 text-xs font-semibold text-slate-800">
-                      <Check className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                      <Check className={`w-4 h-4 shrink-0 mt-0.5 ${plan.id === 'plan_349' ? 'text-indigo-600' : 'text-blue-600'}`} />
                       <span>{feat}</span>
                     </div>
                   ))}
@@ -442,7 +444,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                     : plan.id === 'plan_199'
                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md btn-3d-blue'
                     : plan.id === 'plan_349'
-                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md btn-3d-blue'
+                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md btn-3d-indigo'
                     : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md btn-3d-emerald'
                 }`}
               >
