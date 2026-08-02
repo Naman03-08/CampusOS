@@ -134,24 +134,19 @@ function normalizeQuizData(data: any): QuizData {
   if (Array.isArray(data.questions)) {
     data.questions.forEach((q: any) => {
       const type = (q.questionType || '').toLowerCase();
+      const hasOptions = Array.isArray(q.options) && q.options.length >= 2;
       if (
-        type.includes('multiple') ||
+        (type.includes('multiple') ||
         type.includes('choice') ||
         type.includes('mcq') ||
         type.includes('assertion') ||
         type.includes('match') ||
         type.includes('conceptual') ||
         type.includes('application') ||
-        type.includes('hots')
+        type.includes('hots')) &&
+        hasOptions
       ) {
-        let options = Array.isArray(q.options) && q.options.length >= 2
-          ? q.options
-          : [
-              q.question || 'Standard Option A',
-              'Alternative theoretical parameter',
-              'Baseline system invariant',
-              'Boundary scenario'
-            ];
+        let options = q.options;
         let correctIdx = typeof q.correctAnswer === 'number' ? q.correctAnswer : parseInt(q.correctAnswer);
         if (isNaN(correctIdx) || correctIdx < 0 || correctIdx >= options.length) correctIdx = 0;
 

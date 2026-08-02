@@ -1304,41 +1304,63 @@ Return a JSON object with:
           };
         }
 
-        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite for grounded quiz generation");
-        const response: any = await generateContentWithFallback({
-          contents: contentsPayload,
-          models: ["gemini-2.5-flash-lite", "gemini-1.5-flash"],
-          config: {
-            responseMimeType: "application/json",
-            maxOutputTokens: 8192,
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                title: { type: Type.STRING },
-                subject: { type: Type.STRING },
-                questions: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      id: { type: Type.STRING },
-                      questionType: { type: Type.STRING },
-                      difficulty: { type: Type.STRING },
-                      question: { type: Type.STRING },
-                      options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                      correctAnswer: { type: Type.STRING },
-                      explanation: { type: Type.STRING },
-                      pageNumber: { type: Type.INTEGER },
-                      confidenceScore: { type: Type.INTEGER },
-                    },
-                    required: ["questionType", "difficulty", "question", "correctAnswer", "explanation", "pageNumber", "confidenceScore"]
-                  },
+        console.log("[Gemini Engine] Querying model for grounded quiz generation");
+        const modelList = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite"];
+        
+        const responseSchemaObj = {
+          type: Type.OBJECT,
+          properties: {
+            title: { type: Type.STRING },
+            subject: { type: Type.STRING },
+            questions: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  id: { type: Type.STRING },
+                  questionType: { type: Type.STRING },
+                  difficulty: { type: Type.STRING },
+                  question: { type: Type.STRING },
+                  options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                  correctAnswer: { type: Type.STRING },
+                  explanation: { type: Type.STRING },
+                  pageNumber: { type: Type.INTEGER },
+                  confidenceScore: { type: Type.INTEGER },
                 },
+                required: ["questionType", "difficulty", "question", "correctAnswer", "explanation", "pageNumber", "confidenceScore"]
               },
-              required: ["title", "subject", "questions"]
+            },
+          },
+          required: ["title", "subject", "questions"]
+        };
+
+        let response: any;
+        try {
+          response = await generateContentWithFallback({
+            contents: contentsPayload,
+            models: modelList,
+            config: {
+              responseMimeType: "application/json",
+              maxOutputTokens: 8192,
+              responseSchema: responseSchemaObj
             }
-          }
-        });
+          });
+        } catch (payloadErr) {
+          console.warn("[Gemini Engine] Primary PDF payload generation failed. Retrying with extracted text only...", payloadErr);
+          // Fall back immediately to text-only prompt to prevent total generation failure
+          const textOnlyPrompt = `${promptText}\n\nExtracted PDF Content with Page Markers:\n"""\n${notesText.slice(0, 300000)}\n"""`;
+          response = await generateContentWithFallback({
+            contents: {
+              parts: [{ text: textOnlyPrompt }]
+            },
+            models: modelList,
+            config: {
+              responseMimeType: "application/json",
+              maxOutputTokens: 8192,
+              responseSchema: responseSchemaObj
+            }
+          });
+        }
 
         const parsed = safeParseJSON(response?.text || "");
         if (parsed && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
@@ -1369,19 +1391,20 @@ Return a JSON object with:
 
           processedQuestions.forEach((q: any) => {
             const type = (q.questionType || "").toLowerCase();
+            const hasOptions = Array.isArray(q.options) && q.options.length >= 2;
+
             if (
-              type.includes("multiple") ||
+              (type.includes("multiple") ||
               type.includes("choice") ||
               type.includes("mcq") ||
               type.includes("assertion") ||
               type.includes("match") ||
               type.includes("conceptual") ||
               type.includes("application") ||
-              type.includes("hots")
+              type.includes("hots")) &&
+              hasOptions
             ) {
-              const options = Array.isArray(q.options) && q.options.length >= 2
-                ? q.options
-                : [q.question, "Alternative theoretical baseline", "Inversely proportional relation", "Non-standard boundary scenario"];
+              const options = q.options;
               let correctIdx = typeof q.correctAnswer === "number" ? q.correctAnswer : parseInt(q.correctAnswer);
               if (isNaN(correctIdx) || correctIdx < 0 || correctIdx >= options.length) correctIdx = 0;
 
@@ -1414,6 +1437,7 @@ Return a JSON object with:
                 explanation: q.explanation || "Detailed analysis grounded in text."
               });
             } else {
+              // Open-ended questions without options are categorized as Short Answers
               shortAnswers.push({
                 question: q.question || "Explain the core concept.",
                 sampleAnswer: String(q.correctAnswer || "Model answer derived from PDF text."),
@@ -1435,7 +1459,7 @@ Return a JSON object with:
           });
         }
       } catch (geminiErr) {
-        console.warn("Gemini 3.1 Flash-Lite quiz generation note:", geminiErr);
+        console.warn("Gemini grounded quiz generation note:", geminiErr);
       }
     }
 
