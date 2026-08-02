@@ -616,7 +616,7 @@ export function App() {
     return false;
   };
 
-  const isTabExcludedByPlan = planDetails.hasActiveAccess && isCheckTab && !planIncludesTab(planDetails.currentPlanId, activeTab);
+  const isTabExcludedByPlan = isCheckTab && (!planDetails.hasActiveAccess || !planIncludesTab(planDetails.currentPlanId, activeTab));
 
   return (
     <div className="min-h-screen bg-transparent text-slate-900 font-sans selection:bg-purple-600 selection:text-white relative overflow-x-hidden">
@@ -718,13 +718,18 @@ export function App() {
 
             {/* Main Stage View Area */}
             <main className="flex-1 h-full overflow-y-auto p-3 sm:p-5 lg:p-6 min-w-0 max-w-full scrollbar-thin relative">
-              <div className={
-                !calculatePlanDetails(user).hasActiveAccess && gatedTabs.includes(activeTab)
-                  ? "pointer-events-none select-none opacity-70"
-                  : isTabExcludedByPlan
-                    ? "pointer-events-none select-none blur-[40px] opacity-25 scale-95 origin-center transition-all duration-500"
-                    : ""
-              }>
+              <div 
+                className={
+                  isTabExcludedByPlan
+                    ? "pointer-events-none select-none opacity-[0.01] scale-95 origin-center transition-all duration-500"
+                    : !calculatePlanDetails(user).hasActiveAccess && gatedTabs.includes(activeTab)
+                      ? "pointer-events-none select-none opacity-70"
+                      : ""
+                }
+                style={{
+                  filter: isTabExcludedByPlan ? 'blur(180px) saturate(0)' : undefined
+                }}
+              >
                 {activeTab === 'dashboard' && (
                   <DashboardView
                     user={user}
@@ -855,7 +860,7 @@ export function App() {
 
               {/* Heavy Lock Overlay for Excluded Tabs */}
               {isTabExcludedByPlan && (
-                <div className="absolute inset-0 z-40 flex flex-col items-center justify-center p-6 text-center bg-slate-950/20 backdrop-blur-[2px]">
+                <div className="absolute inset-0 z-40 flex flex-col items-center justify-center p-6 text-center bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-2xl">
                   <div className="bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 max-w-md shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200">
                     <div className="w-16 h-16 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
                       <Zap className="w-8 h-8 text-blue-600 dark:text-blue-400 fill-blue-600 dark:fill-blue-400" />
@@ -867,14 +872,17 @@ export function App() {
                       Unlock {getTabDisplayName(activeTab)}
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-6">
-                      Your current plan ({planDetails.planName}) does not include access to the {getTabDisplayName(activeTab)}. Upgrade to Placivo Pro Ultimate for full unlimited access to all features.
+                      {planDetails.hasActiveAccess 
+                        ? `Your current plan (${planDetails.planName}) does not include access to the ${getTabDisplayName(activeTab)}. Upgrade your plan to unlock full unlimited access.`
+                        : `Your access to the ${getTabDisplayName(activeTab)} has expired. Upgrade your plan to restore full unlimited access.`
+                      }
                     </p>
                     <button
                       onClick={() => setActiveTab('pricing')}
                       className="w-full py-3.5 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/20 cursor-pointer transition-all flex items-center justify-center gap-2"
                     >
                       <Zap className="w-4 h-4 fill-amber-300 text-amber-300" />
-                      <span>Upgrade to Pro Ultimate</span>
+                      <span>Upgrade to Unlock</span>
                     </button>
                   </div>
                 </div>
