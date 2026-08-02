@@ -61,7 +61,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
     const nowIso = new Date().toISOString();
     if (onUpdateProfile) {
       onUpdateProfile({
-        plan: 'Free Tier',
+        plan: 'free_trial',
         planExpiresAt: undefined,
         planCancelled: true,
         planCancelledAt: nowIso
@@ -257,17 +257,19 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
 
           {/* Cancel Subscription & Cycle Switcher */}
           <div className="flex flex-wrap items-center gap-3 self-start md:self-auto shrink-0">
-            <button
-              onClick={() => {
-                setHasStartedCancel(false);
-                setShowCancelModal(true);
-              }}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-              title="Cancel Subscription Any Time"
-            >
-              <X className="w-3.5 h-3.5 text-rose-600" />
-              <span>Cancel Subscription</span>
-            </button>
+            {(planDetails.currentPlanId === 'plan_199' || planDetails.currentPlanId === 'plan_349' || planDetails.currentPlanId === 'plan_399') && (
+              <button
+                onClick={() => {
+                  setHasStartedCancel(false);
+                  setShowCancelModal(true);
+                }}
+                className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                title="Cancel Subscription Any Time"
+              >
+                <X className="w-3.5 h-3.5 text-rose-600" />
+                <span>Cancel Subscription</span>
+              </button>
+            )}
 
             <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl">
               <button

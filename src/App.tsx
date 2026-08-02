@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, AlertTriangle, Zap } from 'lucide-react';
 import { CanvasBackground } from './components/common/CanvasBackground';
 import { Navbar } from './components/common/Navbar';
 import { Header } from './components/common/Header';
@@ -217,14 +217,6 @@ export function App() {
 
   const gatedTabs = ['dashboard', 'notes', 'quiz', 'studyhub', 'resumebuilder', 'chat', 'attendance', 'habiturex', 'coding', 'interviewprep', 'placement'];
 
-  // Enforce website lock: If user has no active subscription/access, force activeTab to 'courses' (Coding Courses)
-  useEffect(() => {
-    const planDetails = calculatePlanDetails(user);
-    if (!planDetails.hasActiveAccess && gatedTabs.includes(activeTab)) {
-      setActiveTab('courses');
-    }
-  }, [user, activeTab]);
-
   const getTabDisplayName = (tabId: string) => {
     switch (tabId) {
       case 'dashboard': return 'Main Dashboard Overview';
@@ -245,13 +237,7 @@ export function App() {
   };
 
   const handleNavigateTabWithGuard = (tabId: string, customFeatureName?: string) => {
-    const planDetails = calculatePlanDetails(user);
-    if (gatedTabs.includes(tabId) && !planDetails.hasActiveAccess) {
-      setUpgradeFeatureName(customFeatureName || getTabDisplayName(tabId));
-      setPendingTabAfterTrial(tabId);
-      setShowUpgradeModal(true);
-      return;
-    }
+    // Allow direct navigation to any tab so they can see all the pages, even if subscription is expired
     setActiveTab(tabId);
   };
 
@@ -708,132 +694,158 @@ export function App() {
             />
 
             {/* Main Stage View Area */}
-            <main className="flex-1 h-full overflow-y-auto p-3 sm:p-5 lg:p-6 min-w-0 max-w-full scrollbar-thin">
-              {activeTab === 'dashboard' && (
-                <DashboardView
-                  user={user}
-                  attendance={attendance}
-                  schedule={schedule}
-                  dsa={dsa}
-                  studySuites={studySuites}
-                  assignments={assignments}
-                  onNavigateTab={handleNavigateTabWithGuard}
-                  onOpenStudyHubUpload={() => handleNavigateTabWithGuard('studyhub', 'AI Personal Assistant Upload')}
-                  onStartTrial={handleStartFreeTrial}
-                />
-              )}
+            <main className="flex-1 h-full overflow-y-auto p-3 sm:p-5 lg:p-6 min-w-0 max-w-full scrollbar-thin relative">
+              <div className={!calculatePlanDetails(user).hasActiveAccess && gatedTabs.includes(activeTab) ? "pointer-events-none select-none opacity-70" : ""}>
+                {activeTab === 'dashboard' && (
+                  <DashboardView
+                    user={user}
+                    attendance={attendance}
+                    schedule={schedule}
+                    dsa={dsa}
+                    studySuites={studySuites}
+                    assignments={assignments}
+                    onNavigateTab={handleNavigateTabWithGuard}
+                    onOpenStudyHubUpload={() => handleNavigateTabWithGuard('studyhub', 'AI Personal Assistant Upload')}
+                    onStartTrial={handleStartFreeTrial}
+                  />
+                )}
 
-              {activeTab === 'notes' && (
-                <AINotesSummarizerView
-                  user={user}
-                  onSaveSuite={handleSaveSuite}
-                  onNavigateTab={handleNavigateTabWithGuard}
-                />
-              )}
+                {activeTab === 'notes' && (
+                  <AINotesSummarizerView
+                    user={user}
+                    onSaveSuite={handleSaveSuite}
+                    onNavigateTab={handleNavigateTabWithGuard}
+                  />
+                )}
 
-              {activeTab === 'quiz' && (
-                <AIQuizHubView
-                  user={user}
-                />
-              )}
+                {activeTab === 'quiz' && (
+                  <AIQuizHubView
+                    user={user}
+                  />
+                )}
 
-              {(activeTab === 'studyhub' || activeTab === 'chat') && (
-                <StudyHubView
-                  studySuites={studySuites}
-                  onSaveSuite={handleSaveSuite}
-                  onDeleteSuite={handleDeleteSuite}
-                />
-              )}
+                {(activeTab === 'studyhub' || activeTab === 'chat') && (
+                  <StudyHubView
+                    studySuites={studySuites}
+                    onSaveSuite={handleSaveSuite}
+                    onDeleteSuite={handleDeleteSuite}
+                  />
+                )}
 
-              {(activeTab === 'habiturex' || activeTab === 'attendance') && (
-                <HabiturexView
-                  user={user}
-                  attendance={attendance}
-                  onUpdateAttendance={handleUpdateAttendance}
-                  onSyncUserStats={() => syncUserStats(user, attendance, dsa, assignments, studySuites, resumeData)}
-                  focusTimerSeconds={focusTimerSeconds}
-                  focusTimerInitialMinutes={focusTimerInitialMinutes}
-                  isFocusTimerRunning={isFocusTimerRunning}
-                  focusTimerMode={focusTimerMode}
-                  onToggleFocusTimer={() => setIsFocusTimerRunning(prev => !prev)}
-                  onResetFocusTimer={() => {
-                    setIsFocusTimerRunning(false);
-                    setFocusTimerSeconds(focusTimerInitialMinutes * 60);
-                  }}
-                  onSetFocusTimerDuration={(mins: number) => {
-                    setIsFocusTimerRunning(false);
-                    setFocusTimerInitialMinutes(mins);
-                    setFocusTimerSeconds(mins * 60);
-                  }}
-                  initialInnerTab={activeTab === 'attendance' ? 'attendance' : undefined}
-                />
-              )}
+                {(activeTab === 'habiturex' || activeTab === 'attendance') && (
+                  <HabiturexView
+                    user={user}
+                    attendance={attendance}
+                    onUpdateAttendance={handleUpdateAttendance}
+                    onSyncUserStats={() => syncUserStats(user, attendance, dsa, assignments, studySuites, resumeData)}
+                    focusTimerSeconds={focusTimerSeconds}
+                    focusTimerInitialMinutes={focusTimerInitialMinutes}
+                    isFocusTimerRunning={isFocusTimerRunning}
+                    focusTimerMode={focusTimerMode}
+                    onToggleFocusTimer={() => setIsFocusTimerRunning(prev => !prev)}
+                    onResetFocusTimer={() => {
+                      setIsFocusTimerRunning(false);
+                      setFocusTimerSeconds(focusTimerInitialMinutes * 60);
+                    }}
+                    onSetFocusTimerDuration={(mins: number) => {
+                      setIsFocusTimerRunning(false);
+                      setFocusTimerInitialMinutes(mins);
+                      setFocusTimerSeconds(mins * 60);
+                    }}
+                    initialInnerTab={activeTab === 'attendance' ? 'attendance' : undefined}
+                  />
+                )}
 
-              {activeTab === 'coding' && (
-                <CodingHubView
-                  dsa={dsa}
-                  onToggleSolved={handleToggleDSA}
-                  onResetDSASheet={handleResetDSASheet}
-                  onNavigateTab={handleNavigateTabWithGuard}
-                />
-              )}
+                {activeTab === 'coding' && (
+                  <CodingHubView
+                    dsa={dsa}
+                    onToggleSolved={handleToggleDSA}
+                    onResetDSASheet={handleResetDSASheet}
+                    onNavigateTab={handleNavigateTabWithGuard}
+                  />
+                )}
 
-              {activeTab === 'courses' && (
-                <CodingCoursesView
-                  user={user}
-                  onNavigateTab={handleNavigateTabWithGuard}
-                  onUpdateCourseTopics={() => syncUserStats(user, attendance, dsa, assignments, studySuites, resumeData)}
-                />
-              )}
+                {activeTab === 'courses' && (
+                  <CodingCoursesView
+                    user={user}
+                    onNavigateTab={handleNavigateTabWithGuard}
+                    onUpdateCourseTopics={() => syncUserStats(user, attendance, dsa, assignments, studySuites, resumeData)}
+                  />
+                )}
 
-              {activeTab === 'resumebuilder' && (
-                <AIResumeBuilderView
-                  user={user}
-                  resumeData={resumeData}
-                  onUpdateResume={handleUpdateResume}
-                  onNavigateTab={handleNavigateTabWithGuard}
-                />
-              )}
+                {activeTab === 'resumebuilder' && (
+                  <AIResumeBuilderView
+                    user={user}
+                    resumeData={resumeData}
+                    onUpdateResume={handleUpdateResume}
+                    onNavigateTab={handleNavigateTabWithGuard}
+                  />
+                )}
 
-              {activeTab === 'interviewprep' && (
-                <InterviewPrepView
-                  user={user}
-                  resumeData={resumeData}
-                  onNavigateTab={handleNavigateTabWithGuard}
-                />
-              )}
+                {activeTab === 'interviewprep' && (
+                  <InterviewPrepView
+                    user={user}
+                    resumeData={resumeData}
+                    onNavigateTab={handleNavigateTabWithGuard}
+                  />
+                )}
 
-              {activeTab === 'placement' && (
-                <StartupJobsHubView
-                  user={user}
-                  resumeData={resumeData}
-                  onUpdateResume={handleUpdateResume}
-                  onNavigateTab={handleNavigateTabWithGuard}
-                />
-              )}
+                {activeTab === 'placement' && (
+                  <StartupJobsHubView
+                    user={user}
+                    resumeData={resumeData}
+                    onUpdateResume={handleUpdateResume}
+                    onNavigateTab={handleNavigateTabWithGuard}
+                  />
+                )}
 
-              {activeTab === 'pricing' && (
-                <UpgradePlansView
-                  user={user}
-                  onUpdateProfile={handleUpdateProfile}
-                  onPlanPurchased={handlePlanPurchased}
-                />
-              )}
+                {activeTab === 'pricing' && (
+                  <UpgradePlansView
+                    user={user}
+                    onUpdateProfile={handleUpdateProfile}
+                    onPlanPurchased={handlePlanPurchased}
+                  />
+                )}
 
-              {activeTab === 'settings' && (
-                <SettingsView 
-                  user={user} 
-                  onSaveProfile={handleUpdateProfile}
-                  onNavigateTab={setActiveTab}
-                  onOpenTerms={handleOpenTerms}
-                />
-              )}
+                {activeTab === 'settings' && (
+                  <SettingsView 
+                    user={user} 
+                    onSaveProfile={handleUpdateProfile}
+                    onNavigateTab={setActiveTab}
+                    onOpenTerms={handleOpenTerms}
+                  />
+                )}
 
-              {activeTab === 'admin' && (
-                <AdminPanelView
-                  user={user}
-                  onNavigateTab={handleNavigateTabWithGuard}
-                />
+                {activeTab === 'admin' && (
+                  <AdminPanelView
+                    user={user}
+                    onNavigateTab={handleNavigateTabWithGuard}
+                  />
+                )}
+              </div>
+
+              {/* Sticky View-Only Mode Alert Banner */}
+              {!calculatePlanDetails(user).hasActiveAccess && gatedTabs.includes(activeTab) && (
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-[calc(50%+112px)] z-50 w-[90%] max-w-xl bg-white border border-amber-200 rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 animate-in slide-in-from-bottom duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-amber-50 rounded-xl text-amber-600 shrink-0">
+                      <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-black text-slate-900">Plan Expired (View-Only Mode)</h4>
+                      <p className="text-[10px] text-slate-500 font-medium leading-normal mt-0.5">
+                        Your free trial has expired. You can see your dashboard, notes, and progress, but creating new content or chatting is locked.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('pricing')}
+                    className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shrink-0 flex items-center gap-1 cursor-pointer transition-all shadow-md shadow-blue-600/10"
+                  >
+                    <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                    <span>Upgrade</span>
+                  </button>
+                </div>
               )}
             </main>
           </div>

@@ -1061,7 +1061,7 @@ export class FirestoreService {
       // 1. Immediately update user profile document in Firestore (< 100ms)
       const userRef = doc(db, 'users', uid);
       await setDoc(userRef, {
-        plan: 'Free Tier',
+        plan: 'free_trial',
         planExpiresAt: null,
         planCancelled: true,
         planCancelledAt: now.toISOString(),
