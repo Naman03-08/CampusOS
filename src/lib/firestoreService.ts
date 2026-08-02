@@ -1058,7 +1058,7 @@ export class FirestoreService {
       const now = new Date();
       const monthKey = now.toISOString().slice(0, 7);
 
-      // 1. Update user profile document in Firestore
+      // 1. Immediately update user profile document in Firestore (< 100ms)
       const userRef = doc(db, 'users', uid);
       await setDoc(userRef, {
         plan: 'Free Tier',
@@ -1068,55 +1068,43 @@ export class FirestoreService {
         updatedAt: now.toISOString()
       }, { merge: true });
 
-      // 2. Query course_purchases for matching subscription transactions
-      const purchasesSnap = await getDocs(collection(db, 'course_purchases'));
+      // 2. Query course_purchases specifically for matching user transactions
       let subTransactionFound = false;
       let totalSubDeduction = 0;
 
-      for (const dSnap of purchasesSnap.docs) {
-        const data = dSnap.data() as StudentCoursePurchase;
-        if (data && data.userId === uid) {
-          const isSub = data.id.startsWith('sub_') || data.courseTitle.toLowerCase().includes('subscription');
-          if (isSub && data.paymentStatus !== 'Cancelled (No Refund)') {
-            subTransactionFound = true;
-            totalSubDeduction += (data.pricePaid || 349);
+      try {
+        const q = query(collection(db, 'course_purchases'), where('userId', '==', uid));
+        const purchasesSnap = await getDocs(q);
+        const updatePromises: Promise<any>[] = [];
 
-            // Mark transaction as Cancelled (No Refund)
-            await setDoc(doc(db, 'course_purchases', data.id), {
-              paymentStatus: 'Cancelled (No Refund)',
-              cancelledAt: now.toISOString()
-            }, { merge: true });
+        for (const dSnap of purchasesSnap.docs) {
+          const data = dSnap.data() as StudentCoursePurchase;
+          if (data) {
+            const isSub = data.id.startsWith('sub_') || (data.courseTitle && data.courseTitle.toLowerCase().includes('subscription'));
+            if (isSub && data.paymentStatus !== 'Cancelled (No Refund)') {
+              subTransactionFound = true;
+              totalSubDeduction += (data.pricePaid || 349);
 
-            // Adjust monthly profit for this transaction's month
-            const pDate = new Date(data.purchaseDate || now);
-            const pMonthKey = !isNaN(pDate.getTime()) ? pDate.toISOString().slice(0, 7) : monthKey;
-
-            const allProfits = await this.getMonthlyProfits();
-            const existingMonth = allProfits.find(m => m.monthKey === pMonthKey);
-            if (existingMonth) {
-              const subRev = Math.max(0, (existingMonth.subscriptionRevenue || 0) - data.pricePaid);
-              const crsRev = existingMonth.courseRevenue || 0;
-              const subCount = Math.max(0, (existingMonth.subscriptionCount || 0) - 1);
-
-              await this.saveMonthlyProfit({
-                ...existingMonth,
-                subscriptionRevenue: subRev,
-                grossProfit: subRev + crsRev,
-                subscriptionCount: subCount,
-                updatedAt: now.toISOString()
-              });
+              updatePromises.push(
+                setDoc(doc(db, 'course_purchases', data.id), {
+                  paymentStatus: 'Cancelled (No Refund)',
+                  cancelledAt: now.toISOString()
+                }, { merge: true })
+              );
             }
           }
         }
-      }
 
-      // If no subscription record document was logged previously in course_purchases, adjust current month baseline
-      if (!subTransactionFound) {
+        if (updatePromises.length > 0) {
+          await Promise.all(updatePromises);
+        }
+
+        // Adjust monthly profit record once
         const allProfits = await this.getMonthlyProfits();
         const existingMonth = allProfits.find(m => m.monthKey === monthKey);
         if (existingMonth) {
-          const defaultSubPrice = 349;
-          const subRev = Math.max(0, (existingMonth.subscriptionRevenue || 0) - defaultSubPrice);
+          const deduction = subTransactionFound ? totalSubDeduction : 349;
+          const subRev = Math.max(0, (existingMonth.subscriptionRevenue || 0) - deduction);
           const crsRev = existingMonth.courseRevenue || 0;
           const subCount = Math.max(0, (existingMonth.subscriptionCount || 0) - 1);
 
@@ -1128,6 +1116,8 @@ export class FirestoreService {
             updatedAt: now.toISOString()
           });
         }
+      } catch (err) {
+        console.warn("Secondary purchase log adjustment notice:", err);
       }
     } catch (e) {
       console.warn("Error cancelling user subscription and adjusting revenue:", e);

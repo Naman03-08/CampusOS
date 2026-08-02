@@ -48,23 +48,29 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
   // Cancellation Modal State
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isProcessingCancel, setIsProcessingCancel] = useState(false);
+  const [hasStartedCancel, setHasStartedCancel] = useState(false);
 
   const planDetails = calculatePlanDetails(user);
 
   const handleConfirmCancelSubscription = async () => {
     setIsProcessingCancel(true);
+    setHasStartedCancel(true);
     setErrorMessage('');
+
+    // Update profile state immediately so UI updates instantly across app and admin panel
+    const nowIso = new Date().toISOString();
+    if (onUpdateProfile) {
+      onUpdateProfile({
+        plan: 'Free Tier',
+        planExpiresAt: undefined,
+        planCancelled: true,
+        planCancelledAt: nowIso
+      });
+    }
+
     try {
       if (user && user.uid) {
         await FirestoreService.cancelUserSubscriptionAndAdjustRevenue(user.uid, user.email);
-      }
-      if (onUpdateProfile) {
-        onUpdateProfile({
-          plan: 'Free Tier',
-          planExpiresAt: undefined,
-          planCancelled: true,
-          planCancelledAt: new Date().toISOString()
-        });
       }
       setShowCancelModal(false);
       setToastMessage("Subscription cancelled successfully. As warned, paid amounts are non-refundable.");
@@ -252,7 +258,10 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
           {/* Cancel Subscription & Cycle Switcher */}
           <div className="flex flex-wrap items-center gap-3 self-start md:self-auto shrink-0">
             <button
-              onClick={() => setShowCancelModal(true)}
+              onClick={() => {
+                setHasStartedCancel(false);
+                setShowCancelModal(true);
+              }}
               className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
               title="Cancel Subscription Any Time"
             >
@@ -661,7 +670,14 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
 
       {/* Subscription Cancellation Warning Modal */}
       {showCancelModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4">
+        <div 
+          className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !isProcessingCancel && !hasStartedCancel) {
+              setShowCancelModal(false);
+            }
+          }}
+        >
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 border border-rose-100 animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3 text-rose-600 border-b border-rose-100 pb-4">
               <div className="p-2.5 bg-rose-100 rounded-2xl">
@@ -682,25 +698,41 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
               </p>
             </div>
 
+            {hasStartedCancel && (
+              <div className="p-2.5 rounded-xl bg-rose-100 border border-rose-300 text-rose-900 text-xs font-bold flex items-center gap-2 animate-pulse">
+                <div className="w-2 h-2 rounded-full bg-rose-600 animate-ping shrink-0"></div>
+                <span>Cancellation process started. 'Keep My Subscription' is blocked forever.</span>
+              </div>
+            )}
+
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 type="button"
-                disabled={isProcessingCancel}
-                onClick={() => setShowCancelModal(false)}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                disabled={isProcessingCancel || hasStartedCancel}
+                onClick={() => {
+                  if (!isProcessingCancel && !hasStartedCancel) {
+                    setShowCancelModal(false);
+                  }
+                }}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                  isProcessingCancel || hasStartedCancel
+                    ? 'bg-slate-100 text-slate-400 opacity-40 cursor-not-allowed border border-slate-200 pointer-events-none'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer'
+                }`}
+                title={isProcessingCancel || hasStartedCancel ? "Keep My Subscription is blocked forever once cancellation starts" : "Keep My Subscription"}
               >
                 Keep My Subscription
               </button>
               <button
                 type="button"
-                disabled={isProcessingCancel}
+                disabled={isProcessingCancel || hasStartedCancel}
                 onClick={handleConfirmCancelSubscription}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/30 flex items-center gap-2 transition-all cursor-pointer"
+                className="px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/30 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isProcessingCancel ? (
                   <>
                     <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Cancelling...</span>
+                    <span>Cancelling Subscription...</span>
                   </>
                 ) : (
                   <span>Cancel Subscription At My Own Risk</span>
