@@ -36,20 +36,20 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
     badge: '4-Day Free Pass',
     badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
     usageLimits: {
-      studySuites: '5 Generations total',
+      studySuites: '1 Generation / day',
       dsaSolutions: '3 Solutions / day',
-      assignmentSolver: '5 Chats total',
-      resumeScans: '2 ATS Resume Audits total',
-      interviewPrep: '1 Practice Session total',
-      aiChatTutor: '20 Messages total'
+      assignmentSolver: '1 Chat / day',
+      resumeScans: '1 Audit Scan / day',
+      interviewPrep: 'No Subjects',
+      aiChatTutor: '1 Session / day'
     },
     features: [
       '4 Days Full Access to basic features',
-      '5 AI Study Suite generations (Notes, Flashcards, Quiz)',
+      '1/Day AI Study Suite generations (Notes, Flashcards, Quiz)',
       '3 Placivo 375 DSA question AI solutions / day',
-      '5 AI Academic Tutor Sessions',
-      '2 ATS Resume Audit Scans & PDF Export',
-      '256 Subjects Technical Interview Question Bank',
+      '1/Day AI Academic Tutor Sessions',
+      '1/Day ATS Resume Audit Scans & PDF Export',
+      'No Subjects Technical Interview Question Bank',
       'Attendance Tracker & Smart Calendar'
     ],
     notIncluded: [
