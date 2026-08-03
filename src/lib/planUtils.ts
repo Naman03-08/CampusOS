@@ -106,19 +106,18 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
       studySuites: 'UNLIMITED Generations',
       dsaSolutions: 'UNLIMITED Code Coach',
       assignmentSolver: 'UNLIMITED Chats',
-      resumeScans: 'UNLIMITED Scans & PDF Exports',
+      resumeScans: '10 ATS Scans / month',
       interviewPrep: 'UNLIMITED Question Bank Access',
       aiChatTutor: 'UNLIMITED Priority Chat'
     },
     features: [
       'Everything in ₹199 Plan, PLUS:',
       'UNLIMITED Technical Interview Question Bank (All 256 Subjects)',
-      'UNLIMITED High-Score ATS Resume Builder & Job Matcher',
+      '10/ Month High-Score ATS Resume Builder & Job Matcher',
       'UNLIMITED Instant Placivo 375 DSA Code Coach (C++, Java, Python, TS)',
-      'UNLIMITED AI Cover Letter Generators for Target Companies',
-      '1-on-1 AI Placement Mentor & Company Technical Interview Prep',
-      'Priority Ultra-Fast AI Reasoning Engine',
-      'Verified Placivo Completion Certificate'
+      '10 AI Cover Letter Generators for Target Companies / month',
+      'Complete AI Placement Mentor & Company Technical Interview Prep',
+      'Priority Ultra-Fast AI Reasoning Engine'
     ],
     notIncluded: []
   }
