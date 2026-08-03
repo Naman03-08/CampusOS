@@ -70,21 +70,21 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
     badge: 'Popular',
     badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
     usageLimits: {
-      studySuites: '30 Generations / month',
+      studySuites: '10 /week Generations',
       dsaSolutions: 'Unlimited 375 DSA Sheet',
-      assignmentSolver: '5 Chats / day',
+      assignmentSolver: '10 /week',
       resumeScans: '5 ATS Scans / month',
       interviewPrep: 'Full Access (256 Subjects)',
-      aiChatTutor: '5 Chats / day'
+      aiChatTutor: '10 /week'
     },
     features: [
       'Everything in Free Trial, PLUS:',
       'Complete Placivo 375 DSA Roadmap Sheet access',
       '5 High-Score ATS Resume Scans & Keyword Scans / month',
-      '30 AI Study Suites Generators / month',
+      '10 /week AI Study Suites Generations',
       'Full Access to 256 Technical Interview Subjects & Questions',
       'Smart Calendar Auto-Scheduler with exam alerts',
-      '5 chat/Day AI Tutor Chat Assistant'
+      '10 /week AI Tutor Chat Assistant'
     ],
     notIncluded: [
       'Unlimited High-Score ATS Resume Builder',
@@ -330,7 +330,7 @@ export function checkStudySuiteLimit(user: UserProfile, currentCount: number): L
   }
 
   if (details.currentPlanId === 'plan_199') {
-    const maxLimit = 30;
+    const maxLimit = 10;
     const allowed = currentCount < maxLimit;
     return {
       allowed,
@@ -338,8 +338,8 @@ export function checkStudySuiteLimit(user: UserProfile, currentCount: number): L
       currentCount,
       featureName: 'AI Study Suites',
       message: allowed
-        ? `Pro Scholar Plan: ${currentCount}/${maxLimit} Study Suites generated this month.`
-        : `Pro Scholar monthly limit reached (${maxLimit} Generations/month). Upgrade to Placivo Pro Ultimate (₹399) for UNLIMITED generations!`
+        ? `Pro Scholar Plan: ${currentCount}/${maxLimit} Study Suites generated this week.`
+        : `Pro Scholar weekly limit reached (${maxLimit} Generations/week). Upgrade to Placivo Pro Ultimate (₹399) for UNLIMITED generations!`
     };
   }
 
@@ -415,12 +415,26 @@ export function checkAIChatLimit(user: UserProfile, currentChatCount: number): L
     };
   }
 
+  if (details.currentPlanId === 'plan_199') {
+    const maxLimit = 10;
+    const allowed = currentChatCount < maxLimit;
+    return {
+      allowed,
+      maxLimit,
+      currentCount: currentChatCount,
+      featureName: '24/7 AI Academic Tutor Chat',
+      message: allowed
+        ? `Pro Scholar Plan: ${currentChatCount}/${maxLimit} AI Tutor messages used this week.`
+        : `Pro Scholar weekly chat limit reached (${maxLimit} messages/week). Upgrade to Placivo Pro Ultimate (₹399) for UNLIMITED AI Tutor Chat Assistant!`
+    };
+  }
+
   return {
     allowed: true,
     maxLimit: -1,
     currentCount: currentChatCount,
     featureName: '24/7 AI Academic Tutor Chat',
-    message: 'Pro Plan: UNLIMITED 24/7 AI Academic Tutor Chat active.'
+    message: 'Placivo Pro Ultimate: UNLIMITED 24/7 AI Academic Tutor Chat active.'
   };
 }
 
