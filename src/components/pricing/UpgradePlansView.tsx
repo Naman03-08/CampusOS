@@ -339,21 +339,61 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
             }
           }
 
+          // Let's configure beautiful styling tokens for each specific card
+          let cardBgClass = '';
+          let accentTextClass = '';
+          let featureIconColor = '';
+          let topBarGlow = null;
+          let usageBoxBgClass = '';
+          let usageBoxBorderClass = '';
+          let badgeOverride = '';
+
+          if (plan.id === 'free_trial') {
+            cardBgClass = 'bg-gradient-to-br from-emerald-50/50 via-teal-50/5 to-white border border-emerald-200 shadow-3d-emerald hover:border-emerald-300';
+            accentTextClass = 'text-emerald-700';
+            featureIconColor = 'text-emerald-600';
+            usageBoxBgClass = 'bg-gradient-to-r from-emerald-500/5 via-teal-500/5 to-transparent';
+            usageBoxBorderClass = 'border-emerald-200/60';
+            badgeOverride = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            topBarGlow = (
+              <div className="absolute top-0 inset-x-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500" />
+            );
+          } else if (plan.id === 'plan_199') {
+            cardBgClass = 'bg-gradient-to-br from-blue-50/50 via-sky-50/5 to-white border-2 border-blue-600 shadow-3d-blue lg:-translate-y-2 z-10';
+            accentTextClass = 'text-blue-700';
+            featureIconColor = 'text-blue-600';
+            usageBoxBgClass = 'bg-gradient-to-r from-blue-500/5 via-sky-500/5 to-transparent';
+            usageBoxBorderClass = 'border-blue-200/60';
+            badgeOverride = 'bg-blue-600 text-white border-transparent shadow-xs';
+            topBarGlow = (
+              <div className="absolute top-0 inset-x-0 h-2 rounded-t-3xl bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500" />
+            );
+          } else {
+            cardBgClass = 'bg-gradient-to-br from-purple-50/60 via-pink-50/10 to-white border-2 border-indigo-600 shadow-3d-indigo lg:-translate-y-2 z-10 overflow-hidden';
+            accentTextClass = 'text-indigo-700';
+            featureIconColor = 'text-purple-600';
+            usageBoxBgClass = 'bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-transparent';
+            usageBoxBorderClass = 'border-indigo-200/60';
+            badgeOverride = 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white border-transparent shadow-xs';
+            topBarGlow = (
+              <>
+                <div className="absolute top-0 inset-x-0 h-2 rounded-t-3xl bg-gradient-to-r from-indigo-500 via-purple-500 via-pink-500 to-amber-500" />
+                <div className="absolute -top-12 -right-12 w-28 h-28 bg-purple-200/40 rounded-full blur-2xl pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
+                <div className="absolute -bottom-12 -left-12 w-24 h-24 bg-pink-200/30 rounded-full blur-2xl pointer-events-none" />
+              </>
+            );
+          }
+
           return (
             <div
               key={plan.id}
-              className={`p-7 rounded-3xl backdrop-blur-xl flex flex-col justify-between relative transition-all duration-300 card-3d ${
-                plan.popular
-                  ? plan.id === 'plan_349'
-                    ? 'bg-white border-2 border-indigo-600 shadow-3d-indigo lg:-translate-y-2 z-10'
-                    : 'bg-white border-2 border-blue-600 shadow-3d-blue lg:-translate-y-2 z-10'
-                  : 'bg-white/90 border border-slate-200/90 shadow-3d-sm hover:border-blue-300 hover:shadow-xl'
-              }`}
+              className={`p-7 rounded-3xl backdrop-blur-xl flex flex-col justify-between relative transition-all duration-300 card-3d ${cardBgClass}`}
             >
+              {topBarGlow}
               <div>
                 {/* Badge Header */}
                 <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className={`px-3 py-1 rounded-full text-[11px] font-extrabold border ${plan.badgeColor}`}>
+                  <span className={`px-3 py-1 rounded-full text-[11px] font-extrabold border ${badgeOverride}`}>
                     {plan.badge}
                   </span>
                   {isIncludedInActive ? (
@@ -380,10 +420,10 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                 </div>
 
                 {/* Amount of Uses Badge Box */}
-                <div className="mb-5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                <div className={`mb-5 p-3.5 rounded-2xl border ${usageBoxBgClass} ${usageBoxBorderClass} space-y-1.5`}>
                   <p className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider flex items-center justify-between">
                     <span>Feature Usage Amounts:</span>
-                    <span className={`${plan.id === 'plan_349' ? 'text-indigo-600' : 'text-blue-600'} font-black`}>{plan.period}</span>
+                    <span className={`${accentTextClass} font-black`}>{plan.period}</span>
                   </p>
                   <div className="grid grid-cols-1 gap-1 text-[11px] font-bold text-slate-700">
                     <div className="flex items-center justify-between">
@@ -414,7 +454,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                   <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">What's included:</p>
                   {plan.features.map((feat, i) => (
                     <div key={i} className="flex items-start gap-2.5 text-xs font-semibold text-slate-800">
-                      <Check className={`w-4 h-4 shrink-0 mt-0.5 ${plan.id === 'plan_349' ? 'text-indigo-600' : 'text-blue-600'}`} />
+                      <Check className={`w-4 h-4 shrink-0 mt-0.5 ${featureIconColor}`} />
                       <span>{feat}</span>
                     </div>
                   ))}
