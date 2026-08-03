@@ -132,15 +132,15 @@
 }
 
 .shadow-3d-blue {
-  box-shadow: 0 6px 0 0 #1d4ed8, 0 15px 30px -5px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 8px 0 0 #2563eb, 0 16px 32px -4px rgba(37, 99, 235, 0.2);
 }
 
 .shadow-3d-emerald {
-  box-shadow: 0 6px 0 0 #047857, 0 15px 30px -5px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 8px 0 0 #10b981, 0 16px 32px -4px rgba(16, 185, 129, 0.2);
 }
 
 .shadow-3d-indigo {
-  box-shadow: 0 6px 0 0 #4338ca, 0 15px 30px -5px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 8px 0 0 #6366f1, 0 16px 32px -4px rgba(99, 102, 241, 0.2);
 }
 
 .glow-amber {

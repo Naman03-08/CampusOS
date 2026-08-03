@@ -311,7 +311,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                   {planDetails.planName}
                 </span>
 
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold flex items-center gap-1 bg-slate-900 text-white">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold flex items-center gap-1 bg-slate-100 text-slate-800 border border-slate-200/80 shadow-3d-sm">
                   <Clock className="w-3 h-3" />
                   {`${planDetails.daysRemaining} Days Remaining`}
                 </span>
@@ -746,12 +746,12 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
               )}
 
               {paymentMethod === 'qr' && (
-                <div className="p-4 rounded-2xl bg-slate-900 text-center space-y-2">
-                  <div className="w-32 h-32 bg-white p-2 mx-auto rounded-xl flex items-center justify-center border-4 border-blue-500">
-                    <QrCode className="w-24 h-24 text-slate-900" />
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-center space-y-2">
+                  <div className="w-32 h-32 bg-white p-2 mx-auto rounded-xl flex items-center justify-center border-4 border-blue-500 shadow-sm">
+                    <QrCode className="w-24 h-24 text-slate-800" />
                   </div>
-                  <p className="text-xs text-slate-300 font-bold">Scan with Google Pay, PhonePe, or Paytm</p>
-                  <p className="text-[10px] text-slate-400">Merchant: Placivo AI Student Services</p>
+                  <p className="text-xs text-slate-700 font-bold">Scan with Google Pay, PhonePe, or Paytm</p>
+                  <p className="text-[10px] text-slate-500">Merchant: Placivo AI Student Services</p>
                 </div>
               )}
 
@@ -878,12 +878,12 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
 
       {/* Congratulations / Redirection Screen Overlay (5 Seconds Countdown) */}
       {congratsState && congratsState.show && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="relative max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center overflow-hidden shadow-2xl space-y-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="relative max-w-md w-full bg-white border border-slate-100 rounded-3xl p-8 text-center overflow-hidden shadow-2xl space-y-6">
             
             {/* Ambient Background Glows */}
-            <div className="absolute -top-16 -left-16 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
-            <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-16 -left-16 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
+            <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-pink-500/5 rounded-full blur-3xl pointer-events-none" />
             
             {/* Animated particles simulating confetti */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -912,8 +912,8 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
 
             {/* Main Trophy Icon with Waves */}
             <div className="relative mx-auto w-24 h-24 flex items-center justify-center">
-              <div className="absolute inset-0 bg-indigo-500/15 rounded-full animate-ping" style={{ animationDuration: '2.5s' }} />
-              <div className="absolute inset-2 bg-purple-500/10 rounded-full animate-pulse" />
+              <div className="absolute inset-0 bg-indigo-500/10 rounded-full animate-ping" style={{ animationDuration: '2.5s' }} />
+              <div className="absolute inset-2 bg-purple-500/5 rounded-full animate-pulse" />
               <div className="relative w-16 h-16 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 text-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
                 <Award className="w-9 h-9 text-white animate-bounce" style={{ animationDuration: '2s' }} />
               </div>
@@ -921,25 +921,25 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
 
             {/* Typographical Headings */}
             <div className="space-y-2">
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
-                <Sparkles className="w-3 h-3 text-indigo-400" /> Subscription Activated <Sparkles className="w-3 h-3 text-indigo-400" />
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase bg-indigo-50 text-indigo-700 border border-indigo-100">
+                <Sparkles className="w-3 h-3 text-indigo-500 animate-spin" style={{ animationDuration: '6s' }} /> Subscription Activated <Sparkles className="w-3 h-3 text-indigo-500 animate-spin" style={{ animationDuration: '6s' }} />
               </span>
-              <h2 className="text-3xl font-extrabold text-white tracking-tight leading-none bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+              <h2 className="text-3xl font-black tracking-tight leading-none bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Congratulations!
               </h2>
-              <p className="text-xs text-slate-400 font-medium">
+              <p className="text-xs text-slate-500 font-semibold">
                 Your premium academic & career accelerator workspace is being unlocked.
               </p>
             </div>
 
             {/* Display Purchased Plan details */}
-            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 space-y-2 max-w-sm mx-auto">
-              <p className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider">Activated Premium Subscription</p>
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2 max-w-sm mx-auto">
+              <p className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Activated Premium Subscription</p>
               <div className="flex items-center justify-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-indigo-400" />
-                <span className="text-sm font-black text-white">{congratsState.planName}</span>
+                <ShieldCheck className="w-5 h-5 text-indigo-600" />
+                <span className="text-sm font-black text-slate-800">{congratsState.planName}</span>
               </div>
-              <div className="flex items-center justify-center gap-2 text-[11px] text-indigo-300 font-bold">
+              <div className="flex items-center justify-center gap-2 text-[11px] text-indigo-600 font-bold">
                 <span>30-Day Pass</span>
                 <span>•</span>
                 <span>{congratsState.price}</span>
@@ -948,17 +948,17 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
 
             {/* Redirection countdown with a stylized progress bar */}
             <div className="space-y-3 max-w-xs mx-auto pt-2">
-              <div className="flex items-center justify-between text-[11px] font-bold text-slate-400">
+              <div className="flex items-center justify-between text-[11px] font-bold text-slate-500">
                 <span>Syncing cloud access...</span>
-                <span className="text-indigo-400 font-extrabold">Redirecting in {congratsState.countdown}s</span>
+                <span className="text-indigo-600 font-extrabold">Redirecting in {congratsState.countdown}s</span>
               </div>
-              <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-1000 ease-linear"
                   style={{ width: `${(congratsState.countdown / 5) * 100}%` }}
                 />
               </div>
-              <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+              <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
                 Applying model profiles, database sync, and unlocking academic features...
               </p>
             </div>
