@@ -49,10 +49,10 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
       '3 Placivo 375 DSA question AI solutions / day',
       '1/Day AI Academic Tutor Sessions',
       '1/Day ATS Resume Audit Scans & PDF Export',
-      'No Subjects Technical Interview Question Bank',
       'Attendance Tracker & Smart Calendar'
     ],
     notIncluded: [
+      'Subjects Technical Interview Question Bank',
       'Unlimited High-Score ATS Resume Scans',
       'Unlimited Placivo 375 DSA Code Coach',
       'Priority High-Speed Processing Engine'
