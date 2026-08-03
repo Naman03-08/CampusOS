@@ -70,21 +70,21 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
     badge: 'Popular',
     badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
     usageLimits: {
-      studySuites: '10 /week Generations',
+      studySuites: '5 Generations / week',
       dsaSolutions: 'Unlimited 375 DSA Sheet',
-      assignmentSolver: '10 /week',
+      assignmentSolver: '3 Chats / day',
       resumeScans: '5 ATS Scans / month',
       interviewPrep: 'Full Access (256 Subjects)',
-      aiChatTutor: '10 /week'
+      aiChatTutor: '3 Chats / day'
     },
     features: [
       'Everything in Free Trial, PLUS:',
       'Complete Placivo 375 DSA Roadmap Sheet access',
       '5 High-Score ATS Resume Scans & Keyword Scans / month',
-      '10 /week AI Study Suites Generations',
+      '5 Generations / week AI Study Suites',
       'Full Access to 256 Technical Interview Subjects & Questions',
       'Smart Calendar Auto-Scheduler with exam alerts',
-      '10 /week AI Tutor Chat Assistant'
+      '3 Chats / day AI Tutor Chat Assistant'
     ],
     notIncluded: [
       'Unlimited High-Score ATS Resume Builder',
@@ -330,7 +330,7 @@ export function checkStudySuiteLimit(user: UserProfile, currentCount: number): L
   }
 
   if (details.currentPlanId === 'plan_199') {
-    const maxLimit = 10;
+    const maxLimit = 5;
     const allowed = currentCount < maxLimit;
     return {
       allowed,
@@ -416,7 +416,7 @@ export function checkAIChatLimit(user: UserProfile, currentChatCount: number): L
   }
 
   if (details.currentPlanId === 'plan_199') {
-    const maxLimit = 10;
+    const maxLimit = 3;
     const allowed = currentChatCount < maxLimit;
     return {
       allowed,
@@ -424,8 +424,8 @@ export function checkAIChatLimit(user: UserProfile, currentChatCount: number): L
       currentCount: currentChatCount,
       featureName: '24/7 AI Academic Tutor Chat',
       message: allowed
-        ? `Pro Scholar Plan: ${currentChatCount}/${maxLimit} AI Tutor messages used this week.`
-        : `Pro Scholar weekly chat limit reached (${maxLimit} messages/week). Upgrade to Placivo Pro Ultimate (₹399) for UNLIMITED AI Tutor Chat Assistant!`
+        ? `Pro Scholar Plan: ${currentChatCount}/${maxLimit} AI Tutor messages used today.`
+        : `Pro Scholar daily chat limit reached (${maxLimit} messages/day). Upgrade to Placivo Pro Ultimate (₹399) for UNLIMITED AI Tutor Chat Assistant!`
     };
   }
 

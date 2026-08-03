@@ -605,7 +605,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                   <BookOpen className="w-4 h-4 text-blue-600" /> AI Study Suite Generations
                 </td>
                 <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">1 / Day</td>
-                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">10 / Week</td>
+                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">5 / Week</td>
                 <td className="py-3.5 px-4 text-center font-extrabold text-indigo-600">UNLIMITED</td>
               </tr>
               <tr>
@@ -639,7 +639,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                   <Flame className="w-4 h-4 text-orange-500" /> AI Academic Tutor
                 </td>
                 <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">1 Session / Day</td>
-                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">10 / Week</td>
+                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">3 / Day</td>
                 <td className="py-3.5 px-4 text-center font-extrabold text-indigo-600">UNLIMITED Chats</td>
               </tr>
             </tbody>
