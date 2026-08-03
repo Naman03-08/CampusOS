@@ -604,8 +604,8 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                 <td className="py-3.5 px-4 font-bold flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-blue-600" /> AI Study Suite Generations
                 </td>
-                <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">5 Total</td>
-                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">50 / Month</td>
+                <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">1 / Day</td>
+                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">30 / Month</td>
                 <td className="py-3.5 px-4 text-center font-extrabold text-indigo-600">UNLIMITED</td>
               </tr>
               <tr>
@@ -620,33 +620,27 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                 <td className="py-3.5 px-4 font-bold flex items-center gap-2">
                   <Briefcase className="w-4 h-4 text-emerald-600" /> ATS Resume Scans & Builder
                 </td>
-                <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">2 Audits Total</td>
-                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">15 Scans / Month</td>
-                <td className="py-3.5 px-4 text-center font-extrabold text-indigo-600">UNLIMITED Scans & Builder</td>
+                <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">1 Audit / Day</td>
+                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">5 Scans / Month</td>
+                <td className="py-3.5 px-4 text-center font-extrabold text-indigo-600">10 Scans / Month</td>
               </tr>
               <tr>
                 <td className="py-3.5 px-4 font-bold flex items-center gap-2">
                   <Zap className="w-4 h-4 text-purple-600" /> Technical Interview Prep Suite
                 </td>
-                <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">1 Practice Session</td>
-                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">5 Sessions / Month</td>
-                <td className="py-3.5 px-4 text-center font-extrabold text-indigo-600">UNLIMITED 1-on-1 Interviews</td>
+                <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">
+                  <span className="line-through text-slate-400 font-medium">Subjects Question Bank</span>
+                </td>
+                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">Full Access (256 Subjects)</td>
+                <td className="py-3.5 px-4 text-center font-extrabold text-indigo-600">UNLIMITED (All 256 Subjects)</td>
               </tr>
               <tr>
                 <td className="py-3.5 px-4 font-bold flex items-center gap-2">
                   <Flame className="w-4 h-4 text-orange-500" /> AI Academic Tutor
                 </td>
-                <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">5 Chats Total</td>
-                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">UNLIMITED Chats</td>
+                <td className="py-3.5 px-4 text-center text-slate-600 font-extrabold">1 Session / Day</td>
+                <td className="py-3.5 px-4 text-center font-extrabold text-blue-600">5 Chats / Day</td>
                 <td className="py-3.5 px-4 text-center font-extrabold text-indigo-600">UNLIMITED Chats</td>
-              </tr>
-              <tr>
-                <td className="py-3.5 px-4 font-bold flex items-center gap-2">
-                  <Award className="w-4 h-4 text-amber-500" /> Verified Placement Certificate
-                </td>
-                <td className="py-3.5 px-4 text-center text-slate-400">-</td>
-                <td className="py-3.5 px-4 text-center text-slate-400">-</td>
-                <td className="py-3.5 px-4 text-center font-bold text-indigo-600">Included</td>
               </tr>
             </tbody>
           </table>

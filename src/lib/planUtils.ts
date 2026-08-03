@@ -330,7 +330,7 @@ export function checkStudySuiteLimit(user: UserProfile, currentCount: number): L
   }
 
   if (details.currentPlanId === 'plan_199') {
-    const maxLimit = 50;
+    const maxLimit = 30;
     const allowed = currentCount < maxLimit;
     return {
       allowed,
@@ -437,7 +437,7 @@ export function checkResumeScanLimit(user: UserProfile, currentScanCount: number
   }
 
   if (details.currentPlanId === 'free_trial') {
-    const maxLimit = 2;
+    const maxLimit = 1;
     const allowed = currentScanCount < maxLimit;
     return {
       allowed,
@@ -446,12 +446,12 @@ export function checkResumeScanLimit(user: UserProfile, currentScanCount: number
       featureName: 'ATS Resume Scans',
       message: allowed
         ? `Free Trial Pass: ${currentScanCount}/${maxLimit} ATS Resume Audits completed.`
-        : `Free Trial ATS scan limit reached (${maxLimit} Audits total). Upgrade to Pro Scholar (15 Scans/month) or Pro Ultimate (UNLIMITED Scans & Resume Builder)!`
+        : `Free Trial ATS scan limit reached (${maxLimit} Audit/day). Upgrade to Pro Scholar (5 Scans/month) or Pro Ultimate (10 Scans/month)!`
     };
   }
 
   if (details.currentPlanId === 'plan_199') {
-    const maxLimit = 15;
+    const maxLimit = 5;
     const allowed = currentScanCount < maxLimit;
     return {
       allowed,
@@ -460,16 +460,20 @@ export function checkResumeScanLimit(user: UserProfile, currentScanCount: number
       featureName: 'ATS Resume Scans',
       message: allowed
         ? `Pro Scholar Plan: ${currentScanCount}/${maxLimit} ATS Resume Scans used this month.`
-        : `Pro Scholar monthly limit reached (${maxLimit} Scans/month). Upgrade to Placivo Pro Ultimate (₹399) for UNLIMITED ATS Scans & Resume Builder!`
+        : `Pro Scholar monthly limit reached (${maxLimit} Scans/month). Upgrade to Placivo Pro Ultimate (₹399) for 10 Scans/month & Resume Builder!`
     };
   }
 
+  const maxLimit = 10;
+  const allowed = currentScanCount < maxLimit;
   return {
-    allowed: true,
-    maxLimit: -1,
+    allowed,
+    maxLimit,
     currentCount: currentScanCount,
     featureName: 'ATS Resume Scans',
-    message: 'Placivo Pro Ultimate: UNLIMITED High-Score ATS Resume Builder & Scans active.'
+    message: allowed
+      ? `Placivo Pro Ultimate: ${currentScanCount}/${maxLimit} ATS Resume Scans used this month.`
+      : `Placivo Pro Ultimate monthly limit reached (${maxLimit} Scans/month).`
   };
 }
 
@@ -486,30 +490,22 @@ export function checkInterviewPrepLimit(user: UserProfile, currentSessionCount: 
   }
 
   if (details.currentPlanId === 'free_trial') {
-    const maxLimit = 1;
-    const allowed = currentSessionCount < maxLimit;
     return {
-      allowed,
-      maxLimit,
+      allowed: false,
+      maxLimit: 0,
       currentCount: currentSessionCount,
       featureName: 'Technical Interview Prep',
-      message: allowed
-        ? `Free Trial Pass: ${currentSessionCount}/${maxLimit} Technical Interview practice session completed.`
-        : `Free Trial interview prep limit reached (${maxLimit} Session total). Upgrade to Pro Scholar (5/month) or Pro Ultimate (UNLIMITED 1-on-1 Practice)!`
+      message: 'Technical Interview Prep is not included in the Free Trial. Upgrade to Pro Scholar (₹199) or Pro Ultimate (₹399) to gain full access!'
     };
   }
 
   if (details.currentPlanId === 'plan_199') {
-    const maxLimit = 5;
-    const allowed = currentSessionCount < maxLimit;
     return {
-      allowed,
-      maxLimit,
+      allowed: true,
+      maxLimit: -1,
       currentCount: currentSessionCount,
       featureName: 'Technical Interview Prep',
-      message: allowed
-        ? `Pro Scholar Plan: ${currentSessionCount}/${maxLimit} Technical Interview practice sessions used this month.`
-        : `Pro Scholar monthly interview limit reached (${maxLimit} Sessions/month). Upgrade to Placivo Pro Ultimate (₹399) for UNLIMITED 1-on-1 Practice & Question Bank!`
+      message: 'Pro Scholar Plan: UNLIMITED 1-on-1 Practice & 256 Subjects Question Bank active.'
     };
   }
 
