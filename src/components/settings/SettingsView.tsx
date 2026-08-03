@@ -260,7 +260,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ user, onSaveProfile,
             <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Plan Duration Cycle</p>
               <p className="text-sm font-extrabold text-white mt-0.5">
-                {planDetails.isFreeTrial ? '4-Day Free Trial (1x Lifetime)' : '30-Day Monthly Subscription'}
+                {planDetails.isFreeTrial ? '4-Day Free Trial' : '30-Day Monthly Subscription'}
               </p>
             </div>
 

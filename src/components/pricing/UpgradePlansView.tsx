@@ -250,7 +250,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
         subtitle="Choose the ideal plan to accelerate your academic grades, DSA mastery, and placement success"
         purpose="Upgrade to unlock unlimited AI Academic Tutor Chat, full Placivo 375 DSA Roadmap Code Coach, unlimited ATS Resume Scans, and Technical Interview Prep."
         keyFeatures={[
-          '3 Plans: 4-Day Free Trial (1x Lifetime, Choose When to Start), ₹199 & ₹399 Plans',
+          '3 Plans: 4-Day Free Trial (Choose When to Start), ₹199 & ₹399 Plans',
           '30-Day Auto Renewal Cycles for Pro Scholar & Ultimate Plans',
           'Unlimited AI Study Suites, AI Academic Tutor Chat & 375 DSA Sheet Solutions',
           'Instant Activation via UPI, QR Code, Net Banking, or Cards'
@@ -391,7 +391,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
               buttonText = 'Active Free Trial (4 Days Pass)';
               isDisabled = true;
             } else if (isTrialUsed) {
-              buttonText = 'Trial Expired (1x Lifetime)';
+              buttonText = 'Trial Expired';
               isDisabled = true;
             } else {
               buttonText = 'Start 4-Day Free Trial (₹0)';
