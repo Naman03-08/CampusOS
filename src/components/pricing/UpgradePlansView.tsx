@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Zap, 
   Check, 
@@ -16,7 +16,8 @@ import {
   X,
   Clock,
   AlertTriangle,
-  RotateCw
+  RotateCw,
+  Sparkles
 } from 'lucide-react';
 import { UserProfile } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
@@ -45,12 +46,74 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
   const [toastMessage, setToastMessage] = useState('Subscription Plan Updated Successfully!');
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Congratulations state with 5-second countdown
+  const [congratsState, setCongratsState] = useState<{
+    show: boolean;
+    planId: string;
+    planName: string;
+    price: string;
+    rawPrice: number;
+    pendingUpdateData: Partial<UserProfile>;
+    countdown: number;
+  } | null>(null);
+
   // Cancellation Modal State
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isProcessingCancel, setIsProcessingCancel] = useState(false);
   const [hasStartedCancel, setHasStartedCancel] = useState(false);
 
   const planDetails = calculatePlanDetails(user);
+
+  // Handle countdown interval tick
+  useEffect(() => {
+    if (!congratsState || !congratsState.show) return;
+
+    if (congratsState.countdown <= 0) {
+      // 5-second countdown is over, apply the plan upgrade and clean up!
+      const { pendingUpdateData, planId, planName, rawPrice } = congratsState;
+
+      if (onUpdateProfile) {
+        onUpdateProfile(pendingUpdateData);
+      }
+
+      if (user && user.uid) {
+        const fullUpdatedProfile: UserProfile = {
+          ...user,
+          ...pendingUpdateData
+        };
+        FirestoreService.saveProfile(fullUpdatedProfile).catch(e => console.warn("Failed to save updated plan profile to Firestore:", e));
+
+        if (planId !== 'free_trial') {
+          FirestoreService.recordFinancialTransaction({
+            userId: user.uid,
+            userName: user.displayName || user.email?.split('@')[0] || 'Student',
+            userEmail: user.email || '',
+            itemType: 'subscription',
+            itemId: planId,
+            itemTitle: `Subscription Plan: ${planName}`,
+            amount: rawPrice
+          }).catch(e => console.warn("Failed to record subscription transaction in Firestore:", e));
+        }
+      }
+
+      const boughtPlanName = planName;
+      setToastMessage(planId === 'free_trial' ? '4-Day Free Trial activated successfully!' : `Upgraded to ${boughtPlanName} (Valid for 30 Days)!`);
+      setShowSuccessToast(true);
+
+      if (onPlanPurchased) {
+        onPlanPurchased(boughtPlanName);
+      }
+
+      setCongratsState(null);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCongratsState(prev => prev ? { ...prev, countdown: prev.countdown - 1 } : null);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [congratsState, onUpdateProfile, user, onPlanPurchased]);
 
   const handleConfirmCancelSubscription = async () => {
     setIsProcessingCancel(true);
@@ -96,21 +159,23 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000);
 
-      if (onUpdateProfile) {
-        onUpdateProfile({
-          plan: 'free_trial',
-          freeTrialUsed: true,
-          freeTrialStartedAt: now.toISOString(),
-          planStartedAt: now.toISOString(),
-          planExpiresAt: expiresAt.toISOString()
-        });
-      }
+      const pendingData: Partial<UserProfile> = {
+        plan: 'free_trial',
+        freeTrialUsed: true,
+        freeTrialStartedAt: now.toISOString(),
+        planStartedAt: now.toISOString(),
+        planExpiresAt: expiresAt.toISOString()
+      };
 
-      setToastMessage('4-Day Free Trial activated successfully!');
-      setShowSuccessToast(true);
-      if (onPlanPurchased) {
-        onPlanPurchased('4-Day Free Trial Pass');
-      }
+      setCongratsState({
+        show: true,
+        planId: 'free_trial',
+        planName: '4-Day Free Trial Pass',
+        price: '₹0',
+        rawPrice: 0,
+        pendingUpdateData: pendingData,
+        countdown: 5
+      });
       return;
     }
 
@@ -129,6 +194,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
     setIsProcessing(true);
     setTimeout(() => {
       setIsProcessing(false);
+      // Proceed with Congratulations screen overlay instead of instant activation
 
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 Days Renewal
@@ -142,10 +208,10 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
       };
 
       if (onUpdateProfile) {
-        onUpdateProfile(updatedData);
+        // updated after congratulations countdown
       }
 
-      if (user && user.uid) {
+      if (false && user && user.uid) {
         const fullUpdatedProfile: UserProfile = {
           ...user,
           ...updatedData
@@ -163,14 +229,16 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
         }).catch(e => console.warn("Failed to record subscription transaction in Firestore:", e));
       }
 
-      const boughtPlanName = selectedPlanForCheckout.name;
+      setCongratsState({
+        show: true,
+        planId: selectedPlanForCheckout.id,
+        planName: selectedPlanForCheckout.name,
+        price: selectedPlanForCheckout.price,
+        rawPrice: selectedPlanForCheckout.rawPrice,
+        pendingUpdateData: updatedData,
+        countdown: 5
+      });
       setSelectedPlanForCheckout(null);
-      setToastMessage(`Upgraded to ${boughtPlanName} (Valid for 30 Days)!`);
-      setShowSuccessToast(true);
-
-      if (onPlanPurchased) {
-        onPlanPurchased(boughtPlanName);
-      }
     }, 1200);
   };
 
@@ -804,6 +872,97 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                 )}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Congratulations / Redirection Screen Overlay (5 Seconds Countdown) */}
+      {congratsState && congratsState.show && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="relative max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center overflow-hidden shadow-2xl space-y-6">
+            
+            {/* Ambient Background Glows */}
+            <div className="absolute -top-16 -left-16 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
+            <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
+            
+            {/* Animated particles simulating confetti */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {[...Array(20)].map((_, idx) => {
+                const colors = ['#FCD34D', '#F472B6', '#60A5FA', '#34D399', '#A78BFA'];
+                const randColor = colors[idx % colors.length];
+                const randLeft = `${Math.random() * 100}%`;
+                const randDelay = `${Math.random() * 2}s`;
+                const randDuration = `${3 + Math.random() * 3}s`;
+                return (
+                  <div 
+                    key={idx}
+                    className="absolute w-2 h-2 rounded-full animate-bounce"
+                    style={{
+                      backgroundColor: randColor,
+                      left: randLeft,
+                      top: `-10px`,
+                      animationDelay: randDelay,
+                      animationDuration: randDuration,
+                      opacity: 0.7,
+                    }}
+                  />
+                );
+              })}
+            </div>
+
+            {/* Main Trophy Icon with Waves */}
+            <div className="relative mx-auto w-24 h-24 flex items-center justify-center">
+              <div className="absolute inset-0 bg-indigo-500/15 rounded-full animate-ping" style={{ animationDuration: '2.5s' }} />
+              <div className="absolute inset-2 bg-purple-500/10 rounded-full animate-pulse" />
+              <div className="relative w-16 h-16 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 text-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                <Award className="w-9 h-9 text-white animate-bounce" style={{ animationDuration: '2s' }} />
+              </div>
+            </div>
+
+            {/* Typographical Headings */}
+            <div className="space-y-2">
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                <Sparkles className="w-3 h-3 text-indigo-400" /> Subscription Activated <Sparkles className="w-3 h-3 text-indigo-400" />
+              </span>
+              <h2 className="text-3xl font-extrabold text-white tracking-tight leading-none bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+                Congratulations!
+              </h2>
+              <p className="text-xs text-slate-400 font-medium">
+                Your premium academic & career accelerator workspace is being unlocked.
+              </p>
+            </div>
+
+            {/* Display Purchased Plan details */}
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 space-y-2 max-w-sm mx-auto">
+              <p className="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider">Activated Premium Subscription</p>
+              <div className="flex items-center justify-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-indigo-400" />
+                <span className="text-sm font-black text-white">{congratsState.planName}</span>
+              </div>
+              <div className="flex items-center justify-center gap-2 text-[11px] text-indigo-300 font-bold">
+                <span>30-Day Pass</span>
+                <span>•</span>
+                <span>{congratsState.price}</span>
+              </div>
+            </div>
+
+            {/* Redirection countdown with a stylized progress bar */}
+            <div className="space-y-3 max-w-xs mx-auto pt-2">
+              <div className="flex items-center justify-between text-[11px] font-bold text-slate-400">
+                <span>Syncing cloud access...</span>
+                <span className="text-indigo-400 font-extrabold">Redirecting in {congratsState.countdown}s</span>
+              </div>
+              <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-1000 ease-linear"
+                  style={{ width: `${(congratsState.countdown / 5) * 100}%` }}
+                />
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+                Applying model profiles, database sync, and unlocking academic features...
+              </p>
+            </div>
+            
           </div>
         </div>
       )}
