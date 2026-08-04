@@ -5,6 +5,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import fs from "fs";
+import { COMPANY_DOMAINS } from "./src/data/companyDomains";
 
 dotenv.config();
 
@@ -2233,6 +2234,114 @@ app.post("/api/admin/send-email", async (req, res) => {
   } catch (err: any) {
     console.error("Error in email dispatch:", err);
     res.status(500).json({ error: err.message || "Failed to send emails" });
+  }
+});
+
+// Endpoint to automatically search and fetch company logo by name using Clearbit Autocomplete API
+app.get("/api/company/logo", async (req, res) => {
+  try {
+    const { name } = req.query;
+    if (!name || typeof name !== "string") {
+      return res.status(400).json({ error: "Company name is required." });
+    }
+
+    const cleanName = name.trim();
+    if (!cleanName) {
+      return res.status(400).json({ error: "Company name is required." });
+    }
+
+    console.log(`[LOGO SERVICE] Searching logo for: "${cleanName}"`);
+
+    // 1. Check in our static 1000+ top company domains list
+    const lookupName = cleanName.toLowerCase()
+      .replace(/^(the|a|an)\s+/i, "")
+      .replace(/\s+(llc|co|corp|corporation|inc|incorporated|ltd|limited|services|bpm|technologies|university|college|school of|school)\b.*$/g, "")
+      .trim();
+
+    let domain = COMPANY_DOMAINS[lookupName] || COMPANY_DOMAINS[cleanName.toLowerCase().trim()];
+    if (!domain) {
+      // Find substring match
+      const matchedKey = Object.keys(COMPANY_DOMAINS).find(k => 
+        lookupName.includes(k) || k.includes(lookupName)
+      );
+      if (matchedKey) {
+        domain = COMPANY_DOMAINS[matchedKey];
+      }
+    }
+
+    if (domain) {
+      const logoUrl = `https://logo.clearbit.com/${domain}`;
+      console.log(`[LOGO SERVICE] Found in COMPANY_DOMAINS database for "${cleanName}" -> ${domain}: ${logoUrl}`);
+      return res.json({
+        exists: true,
+        name: cleanName,
+        domain: domain,
+        logo: logoUrl
+      });
+    }
+
+    // 2. Fetch from Clearbit Autocomplete API (with User-Agent to avoid 403)
+    try {
+      const response = await fetch(`https://autocomplete.clearbit.com/v1/companies/suggest?query=${encodeURIComponent(cleanName)}`, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+          "Accept": "application/json"
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const bestMatch = data[0];
+          console.log(`[LOGO SERVICE] Clearbit Autocomplete found logo for "${cleanName}": ${bestMatch.logo}`);
+          return res.json({
+            exists: true,
+            name: bestMatch.name,
+            domain: bestMatch.domain,
+            logo: bestMatch.logo
+          });
+        }
+      } else {
+        console.warn(`[LOGO SERVICE] Clearbit Autocomplete returned status ${response.status} for query: "${cleanName}"`);
+      }
+    } catch (apiErr) {
+      console.error("[LOGO SERVICE] Clearbit Autocomplete fetch failed:", apiErr);
+    }
+
+    // 3. Fallback to Gemini AI to discover the domain of the company
+    console.log(`[LOGO SERVICE] Falling back to Gemini AI for company domain resolution: "${cleanName}"`);
+    try {
+      const prompt = `Identify the official web domain of the following company, organization, or university/school: "${cleanName}".
+
+Return ONLY the pure domain name (e.g. "adobe.com" or "stanford.edu").
+Do NOT write any introduction, codeblocks, explanations, spaces, or extra characters.
+If you do not know the company or it is extremely fake, return 'not_found'.`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+      });
+
+      const text = response.text ? response.text.trim().toLowerCase() : "";
+      if (text && text !== "not_found" && text.includes(".")) {
+        const resolvedDomain = text.replace(/^(https?:\/\/)?(www\.)?/, "");
+        const logoUrl = `https://logo.clearbit.com/${resolvedDomain}`;
+        console.log(`[LOGO SERVICE] Gemini resolved "${cleanName}" to domain: "${resolvedDomain}" -> ${logoUrl}`);
+        return res.json({
+          exists: true,
+          name: cleanName,
+          domain: resolvedDomain,
+          logo: logoUrl
+        });
+      }
+    } catch (geminiErr) {
+      console.error("[LOGO SERVICE] Gemini domain resolution failed:", geminiErr);
+    }
+
+    console.log(`[LOGO SERVICE] No logo could be found or generated for: "${cleanName}"`);
+    return res.json({ exists: false });
+  } catch (err: any) {
+    console.error("[LOGO SERVICE] Error fetching logo:", err);
+    return res.status(500).json({ error: "Failed to fetch company logo." });
   }
 });
 

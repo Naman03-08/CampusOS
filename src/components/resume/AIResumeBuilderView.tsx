@@ -41,7 +41,12 @@ import {
   Upload,
   ArrowUpRight,
   Star,
-  Info as InfoIcon
+  Info as InfoIcon,
+  Mail,
+  Phone,
+  MapPin,
+  Linkedin,
+  Github
 } from 'lucide-react';
 import { ResumeData, UserProfile } from '../../types';
 import { exportTextToPDF, exportCanvasToPDF } from '../../lib/pdfExport';
@@ -179,6 +184,75 @@ interface CustomSectionItem {
   content: string;
 }
 
+const getLinkUrl = (val: string, type: 'email' | 'phone' | 'linkedin' | 'github' | 'generic' = 'generic') => {
+  if (!val) return '';
+  const trimmed = val.trim();
+  if (type === 'email') {
+    return trimmed.toLowerCase().startsWith('mailto:') ? trimmed : `mailto:${trimmed}`;
+  }
+  if (type === 'phone') {
+    return trimmed.toLowerCase().startsWith('tel:') ? trimmed : `tel:${trimmed}`;
+  }
+  if (type === 'linkedin') {
+    if (trimmed.toLowerCase().startsWith('http://') || trimmed.toLowerCase().startsWith('https://')) {
+      return trimmed;
+    }
+    if (trimmed.toLowerCase().includes('linkedin.com')) {
+      return `https://${trimmed}`;
+    }
+    return `https://linkedin.com/in/${trimmed}`;
+  }
+  if (type === 'github') {
+    if (trimmed.toLowerCase().startsWith('http://') || trimmed.toLowerCase().startsWith('https://')) {
+      return trimmed;
+    }
+    if (trimmed.toLowerCase().includes('github.com')) {
+      return `https://${trimmed}`;
+    }
+    return `https://github.com/${trimmed}`;
+  }
+  // Generic links
+  if (trimmed.toLowerCase().startsWith('http://') || trimmed.toLowerCase().startsWith('https://')) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+};
+
+const LinkifiedText: React.FC<{ text: string; className?: string }> = ({ text, className = '' }) => {
+  if (!text) return null;
+  // Regex to match URLs
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.(?:com|org|net|edu|gov|io|co|me|dev|ai)(?:\/[^\s]*)?)/g;
+  const parts = text.split(urlRegex);
+  if (parts.length === 1) {
+    return <span className={className}>{text}</span>;
+  }
+  return (
+    <span className={className}>
+      {parts.map((part, i) => {
+        if (part.match(urlRegex)) {
+          let href = part;
+          if (!href.toLowerCase().startsWith('http://') && !href.toLowerCase().startsWith('https://')) {
+            href = `https://${href}`;
+          }
+          return (
+            <a
+              key={i}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-purple-600 hover:text-purple-800 underline transition-colors cursor-pointer break-all"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {part}
+            </a>
+          );
+        }
+        return part;
+      })}
+    </span>
+  );
+};
+
 export const AIResumeBuilderView: React.FC<AIResumeBuilderViewProps> = ({
   user,
   resumeData,
@@ -276,6 +350,60 @@ export const AIResumeBuilderView: React.FC<AIResumeBuilderViewProps> = ({
   const [activeHeaderTab, setActiveHeaderTab] = useState<'ats' | 'design' | 'export'>('ats');
   const [hovered3dCard, setHovered3dCard] = useState<number | null>(null);
 
+  // Automated Company/School Logo Search and Fetching from Clearbit Autocomplete API
+  const [companyLogos, setCompanyLogos] = useState<Record<string, string>>({});
+  const companyLogosRef = useRef<Record<string, string>>({});
+  const pendingFetches = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const fetchLogoForName = async (name: string) => {
+      const trimmed = name.trim();
+      if (!trimmed || trimmed.length < 2) return;
+      
+      const key = trimmed.toLowerCase();
+      // Skip if already fetched, or currently fetching
+      if (companyLogosRef.current[key] || pendingFetches.current.has(key)) return;
+
+      // Skip if it is a hardcoded logo to preserve custom high-fidelity SVGs
+      const hardcoded = ['microsoft', 'google', 'stripe', 'amazon', 'aws', 'meta', 'facebook', 'openai', 'chatgpt', 'github', 'spotify', 'apple', 'netflix'];
+      if (hardcoded.some(hc => key.includes(hc))) return;
+
+      pendingFetches.current.add(key);
+
+      try {
+        const response = await fetch(`/api/company/logo?name=${encodeURIComponent(trimmed)}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.exists && data.logo) {
+            companyLogosRef.current[key] = data.logo;
+            setCompanyLogos(prev => ({ ...prev, [key]: data.logo }));
+          } else {
+            companyLogosRef.current[key] = 'NOT_FOUND';
+            setCompanyLogos(prev => ({ ...prev, [key]: 'NOT_FOUND' }));
+          }
+        } else {
+          companyLogosRef.current[key] = 'NOT_FOUND';
+          setCompanyLogos(prev => ({ ...prev, [key]: 'NOT_FOUND' }));
+        }
+      } catch (err) {
+        console.error('Failed to fetch company logo:', err);
+        companyLogosRef.current[key] = 'NOT_FOUND';
+        setCompanyLogos(prev => ({ ...prev, [key]: 'NOT_FOUND' }));
+      } finally {
+        pendingFetches.current.delete(key);
+      }
+    };
+
+    // Gather all names from experience and education
+    const experienceCompanies = resume.experience.map(e => e.company).filter(Boolean);
+    const educationInstitutions = resume.education.map(ed => ed.institution).filter(Boolean);
+    const allNames = Array.from(new Set([...experienceCompanies, ...educationInstitutions]));
+
+    allNames.forEach(name => {
+      fetchLogoForName(name);
+    });
+  }, [resume.experience, resume.education]);
+
   // Hidden File Input Ref for Importing JSON
   const fileInputRef = useRef<HTMLInputElement>(null);
   const saveTimerRef = useRef<any>(null);
@@ -311,6 +439,357 @@ export const AIResumeBuilderView: React.FC<AIResumeBuilderViewProps> = ({
       }));
     }
   }, [resumeData]);
+
+  // Sync design customization styles automatically when active template changes
+  useEffect(() => {
+    switch (template) {
+      case 'modern':
+        setAccentColor('#4338ca');
+        setTextColor('#0f172a');
+        setPaperBgColor('#ffffff');
+        setDividerColor('accent');
+        setFontFamily('sans');
+        setFontSize('standard');
+        setNameFontSize('xl');
+        setSectionTitleSize('md');
+        setHeadingTransform('uppercase');
+        setSectionBorderStyle('bottom-solid');
+        setLineSpacing('normal');
+        setSectionGap('normal');
+        setPaperPadding('standard');
+        setHeaderAlign('left');
+        setBulletStyle('•');
+        setBulletColorStyle('accent');
+        setPaperFrameStyle('top-line');
+        break;
+      case 'harvard':
+        setAccentColor('#1e293b');
+        setTextColor('#1e293b');
+        setPaperBgColor('#fdfbf7'); // Warm Cream
+        setDividerColor('dark');
+        setFontFamily('serif'); // Classic Garamond Serif
+        setFontSize('standard');
+        setNameFontSize('lg');
+        setSectionTitleSize('md');
+        setHeadingTransform('uppercase');
+        setSectionBorderStyle('bottom-double');
+        setLineSpacing('relaxed');
+        setSectionGap('spacious');
+        setPaperPadding('spacious');
+        setHeaderAlign('center');
+        setBulletStyle('•');
+        setBulletColorStyle('text');
+        setPaperFrameStyle('none');
+        break;
+      case 'executive':
+        setAccentColor('#1e3a8a'); // Executive Navy
+        setTextColor('#1e293b');
+        setPaperBgColor('#fafaf9'); // Soft Parchment
+        setDividerColor('accent');
+        setFontFamily('editorial');
+        setFontSize('spacious');
+        setNameFontSize('2xl');
+        setSectionTitleSize('lg');
+        setHeadingTransform('capitalize');
+        setSectionBorderStyle('left-bar');
+        setLineSpacing('relaxed');
+        setSectionGap('spacious');
+        setPaperPadding('standard');
+        setHeaderAlign('split');
+        setBulletStyle('◆');
+        setBulletColorStyle('accent');
+        setPaperFrameStyle('accent-left');
+        break;
+      case 'tech':
+        setAccentColor('#0f766e'); // Tech Teal
+        setTextColor('#1e293b');
+        setPaperBgColor('#f8fafc'); // Cool Ice Slate
+        setDividerColor('light');
+        setFontFamily('mono');
+        setFontSize('compact');
+        setNameFontSize('md');
+        setSectionTitleSize('sm');
+        setHeadingTransform('normal');
+        setSectionBorderStyle('bottom-dashed');
+        setLineSpacing('compact');
+        setSectionGap('tight');
+        setPaperPadding('compact');
+        setHeaderAlign('left');
+        setBulletStyle('>');
+        setBulletColorStyle('emerald');
+        setPaperFrameStyle('full-border');
+        break;
+      case 'minimal':
+        setAccentColor('#18181b'); // Charcoal Carbon
+        setTextColor('#27272a');
+        setPaperBgColor('#ffffff');
+        setDividerColor('none');
+        setFontFamily('space');
+        setFontSize('standard');
+        setNameFontSize('xl');
+        setSectionTitleSize('md');
+        setHeadingTransform('uppercase');
+        setSectionBorderStyle('none');
+        setLineSpacing('normal');
+        setSectionGap('spacious');
+        setPaperPadding('spacious');
+        setHeaderAlign('left');
+        setBulletStyle('-');
+        setBulletColorStyle('slate');
+        setPaperFrameStyle('none');
+        break;
+      case 'crimson':
+        setAccentColor('#b91c1c'); // Crimson Wine
+        setTextColor('#1f2937');
+        setPaperBgColor('#ffffff');
+        setDividerColor('light');
+        setFontFamily('geometric');
+        setFontSize('standard');
+        setNameFontSize('xl');
+        setSectionTitleSize('lg');
+        setHeadingTransform('uppercase');
+        setSectionBorderStyle('bottom-solid');
+        setLineSpacing('normal');
+        setSectionGap('normal');
+        setPaperPadding('standard');
+        setHeaderAlign('badge');
+        setBulletStyle('★');
+        setBulletColorStyle('gold');
+        setPaperFrameStyle('top-line');
+        break;
+      case 'emerald':
+        setAccentColor('#047857'); // Emerald Green
+        setTextColor('#0f172a');
+        setPaperBgColor('#f0fdf4'); // Soft Mint
+        setDividerColor('accent');
+        setFontFamily('montserrat');
+        setFontSize('spacious');
+        setNameFontSize('2xl');
+        setSectionTitleSize('lg');
+        setHeadingTransform('capitalize');
+        setSectionBorderStyle('filled-banner');
+        setLineSpacing('relaxed');
+        setSectionGap('spacious');
+        setPaperPadding('standard');
+        setHeaderAlign('banner');
+        setBulletStyle('⚡');
+        setBulletColorStyle('accent');
+        setPaperFrameStyle('none');
+        break;
+      case 'compact':
+        setAccentColor('#111827');
+        setTextColor('#111827');
+        setPaperBgColor('#ffffff');
+        setDividerColor('dark');
+        setFontFamily('sans');
+        setFontSize('compact');
+        setNameFontSize('sm');
+        setSectionTitleSize('sm');
+        setHeadingTransform('uppercase');
+        setSectionBorderStyle('bottom-solid');
+        setLineSpacing('compact');
+        setSectionGap('tight');
+        setPaperPadding('compact');
+        setHeaderAlign('split');
+        setBulletStyle('▪');
+        setBulletColorStyle('text');
+        setPaperFrameStyle('none');
+        break;
+    }
+  }, [template]);
+
+  // Dynamic Elegant Vector Company/School Logo Generator
+  const renderLogo = (name: string, type: 'company' | 'school' | 'project') => {
+    if (!name) return null;
+    const cleanName = name.replace(/^(the|a|an)\s+/i, '').trim();
+    const initials = cleanName.split(/\s+/).slice(0, 2).map(w => w[0]?.toUpperCase()).join('');
+    const normalizedName = name.toLowerCase();
+
+    // 1. High-fidelity Company SVG Logos
+    if (type === 'company') {
+      const fetchedLogo = companyLogos[normalizedName];
+      if (fetchedLogo && fetchedLogo !== 'NOT_FOUND') {
+        return (
+          <div className="w-9 h-9 shrink-0 shadow-xs p-1 bg-white border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden transition-all duration-200 hover:scale-105">
+            <img 
+              src={fetchedLogo} 
+              alt={`${name} logo`} 
+              className="w-full h-full object-contain rounded-lg" 
+              referrerPolicy="no-referrer"
+              onError={() => {
+                setCompanyLogos(prev => ({ ...prev, [normalizedName]: 'NOT_FOUND' }));
+              }}
+            />
+          </div>
+        );
+      }
+
+      if (normalizedName.includes('microsoft')) {
+        return (
+          <div className="grid grid-cols-2 gap-0.5 w-9 h-9 shrink-0 shadow-xs p-1.5 bg-white border border-slate-200 rounded-xl items-center justify-center">
+            <div className="bg-[#f25022] w-2.5 h-2.5"></div>
+            <div className="bg-[#7fba00] w-2.5 h-2.5"></div>
+            <div className="bg-[#00a4ef] w-2.5 h-2.5"></div>
+            <div className="bg-[#ffb900] w-2.5 h-2.5"></div>
+          </div>
+        );
+      }
+      
+      if (normalizedName.includes('google')) {
+        return (
+          <div className="w-9 h-9 shrink-0 shadow-xs p-1 bg-white border border-slate-200 rounded-xl flex items-center justify-center">
+            <svg className="w-6 h-6 shrink-0" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z" />
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+            </svg>
+          </div>
+        );
+      }
+      
+      if (normalizedName.includes('stripe')) {
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#635bff] text-white shrink-0 shadow-xs border border-indigo-400/20">
+            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M13.92 7.1c0-.5-.4-.74-1.05-.74-.75 0-1.74.22-2.58.64V4.14c.94-.37 2-.54 2.92-.54 2.5 0 3.86 1.1 3.86 3.14v6.86c0 1.94.38 2.62.77 3.03l-2.9 1.1c-.27-.4-.52-1.03-.52-1.97-.68.83-1.85 2.1-4.04 2.1-2.07 0-3.54-1.22-3.54-3.13 0-2.62 2.37-3.58 5.75-3.58.55 0 .9-.05 1.33-.12V7.1zm-1.33 3.9c-1.34.05-2.58.33-2.58 1.48 0 .58.46.96 1.1.96 1.05 0 1.48-.7 1.48-1.57v-.87z"/>
+            </svg>
+          </div>
+        );
+      }
+      
+      if (normalizedName.includes('amazon') || normalizedName.includes('aws')) {
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#111111] text-[#ff9900] shrink-0 shadow-xs border border-slate-800">
+            <svg className="w-5 h-5 text-[#ff9900]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M15.5 12.8c-1.1.5-2.6.8-3.7.8-2 0-3.1-1-3.1-2.9 0-2.4 1.8-3.5 4.9-3.5h1.9v1.2c0 1.2-.5 2-1.9 2.5l1.9 1.9zm1.3-4.7c0-2.5-1.5-3.8-4.2-3.8-2.1 0-3.9.9-4.8 1.6l1 1.6c.7-.6 1.9-1.2 3.1-1.2 1.5 0 2.2.7 2.2 2v.6h-2.1c-4.2 0-6.8 1.8-6.8 5 0 2.8 2 4.6 4.8 4.6 2.3 0 3.9-1.1 4.6-2.1l.1 1.7h2.6v-9.5zM21.9 19C17.2 21.6 11 22.8 5.1 21.9c-3.1-.5-6.1-1.7-8.1-4l1.5-1.5c1.6 1.8 4.2 2.8 6.9 3.2 4.9.7 10.2-.4 14.1-2.7L21.9 19zm1.1-1.6c.1.3-.2.5-.5.3l-2.4-1.3c-.3-.2-.2-.5.1-.4l2.7.3c.3.1.2.8.1.1.1.7.1 1.1.1 1.1zm-2.4-2.2l.6 1.9c.1.3-.2.5-.5.3l-1.9-.9c-.3-.1-.2-.5.1-.5l1.7-.1.1-.3z"/>
+            </svg>
+          </div>
+        );
+      }
+      
+      if (normalizedName.includes('meta') || normalizedName.includes('facebook')) {
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#0668e1] shrink-0 shadow-xs text-white">
+            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M15.75 6c-1.75 0-3.37 1.05-4.25 2.62-.88-1.57-2.5-2.62-4.25-2.62-2.76 0-5 2.24-5 5s2.24 5 5 5c1.75 0 3.37-1.05 4.25-2.62.88 1.57 2.5 2.62 4.25 2.62 2.76 0 5-2.24 5-5s-2.24-5-5-5zm-8.5 7.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zm8.5 0c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+          </div>
+        );
+      }
+      
+      if (normalizedName.includes('openai') || normalizedName.includes('chatgpt')) {
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-950 shrink-0 shadow-xs border border-slate-800">
+            <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21.5 10c-.2-.9-.7-1.7-1.4-2.3l.1-.1c.5-.3.9-.8 1.1-1.3.4-1.1.1-2.4-.8-3.2-1-1-2.5-1.1-3.6-.3l-.1-.1c-.4-.5-.9-.8-1.5-1-.9-.3-1.8-.2-2.6.3L12 3 11.3 2.1c-.8-.5-1.7-.6-2.6-.3-.6.2-1.1.5-1.5 1l-.1.1C6 2.1 4.5 2.2 3.5 3.2c-.9.8-1.2 2.1-.8 3.2.2.5.6 1 1.1 1.3l.1.1C3.2 8.5 2.7 9.3 2.5 10c-.3.9-.2 1.8.3 2.6L3.7 13.5l-.9.9c-.5.8-.6 1.7-.3 2.6.2.6.5 1.1 1 1.5l.1.1C3.1 19.5 3 21 4 22c1 1 2.5 1.1 3.6.3l.1.1c.4.5.9.8 1.5 1 .9.3 1.8.2 2.6-.3l.7-.9.7.9c.8.5 1.7.6 2.6.3.6-.2 1.1-.5 1.5-1l.1-.1c1.1.8 2.6.7 3.6-.3 1-1 1.1-2.5 3-3.6l.1-.1c.5-.4.8-.9 1-1.5.3-.9.2-1.8-.3-2.6L20.3 10.5l1.2-.5zm-9.5 5.5l-2.3-1.3 2.3-4 2.3 1.3-2.3 4z" />
+            </svg>
+          </div>
+        );
+      }
+
+      if (normalizedName.includes('github')) {
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-900 text-white shrink-0 border border-slate-700 shadow-xs">
+            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.577.688.479C19.138 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+            </svg>
+          </div>
+        );
+      }
+
+      if (normalizedName.includes('spotify')) {
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#1ED760] shrink-0 shadow-xs">
+            <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.565.387-.86.207-2.377-1.454-5.37-1.783-8.893-.98-.336.075-.668-.135-.744-.47-.077-.337.135-.668.47-.743 3.856-.88 7.15-.51 9.82 1.127.296.18.388.565.207.86zm1.225-2.72c-.227.367-.707.487-1.074.26-2.72-1.672-6.87-2.157-10.076-1.182-.412.125-.843-.107-.968-.52-.125-.41.108-.844.52-.968 3.67-1.114 8.24-.57 11.34 1.33.366.226.486.707.258 1.08zm.105-2.836C14.492 8.71 8.822 8.52 5.54 9.513c-.51.156-1.05-.137-1.206-.648-.156-.51.137-1.05.648-1.206 3.76-1.14 10.007-.92 14.437 1.71.46.27.61.87.34 1.33-.27.46-.87.61-1.33.34z"/>
+            </svg>
+          </div>
+        );
+      }
+
+      if (normalizedName.includes('apple')) {
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-900 shrink-0 shadow-xs border border-slate-700/30">
+            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-.96.04-2.13.64-2.82 1.45-.6.69-1.12 1.83-.98 2.94 1.08.08 2.15-.52 2.81-1.33z" />
+            </svg>
+          </div>
+        );
+      }
+
+      if (normalizedName.includes('netflix')) {
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-black shrink-0 shadow-xs">
+            <svg className="w-4 h-5 text-[#E50914]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M4 21V3h4.63l6.59 13.91V3h4.31v18h-4.32l-6.9-14.39V21H4z" />
+            </svg>
+          </div>
+        );
+      }
+    }
+
+    // Consistent color list based on initials
+    const colors = [
+      { bg: '#f5f3ff', border: '#ddd6fe', text: '#6d28d9' }, // Purple
+      { bg: '#ecfdf5', border: '#a7f3d0', text: '#047857' }, // Emerald
+      { bg: '#fef3c7', border: '#fde68a', text: '#b45309' }, // Amber
+      { bg: '#fff1f2', border: '#fecdd3', text: '#be123c' }, // Rose
+      { bg: '#f0f9ff', border: '#bae6fd', text: '#0369a1' }, // Sky
+      { bg: '#fdf4ff', border: '#f5d0fe', text: '#a21caf' }, // Fuchsia
+      { bg: '#f0fdfa', border: '#99f6e4', text: '#0f766e' }  // Teal
+    ];
+    
+    const index = initials ? (initials.charCodeAt(0) + (initials.charCodeAt(1) || 0)) % colors.length : 0;
+    const themeColor = colors[index];
+    
+    if (type === 'school') {
+      const fetchedSchoolLogo = companyLogos[normalizedName];
+      if (fetchedSchoolLogo && fetchedSchoolLogo !== 'NOT_FOUND') {
+        return (
+          <div className="w-8 h-8 shrink-0 shadow-xs p-1 bg-white border border-slate-200 rounded-full flex items-center justify-center overflow-hidden transition-all duration-200 hover:scale-105">
+            <img 
+              src={fetchedSchoolLogo} 
+              alt={`${name} logo`} 
+              className="w-full h-full object-contain rounded-full" 
+              referrerPolicy="no-referrer"
+              onError={() => {
+                setCompanyLogos(prev => ({ ...prev, [normalizedName]: 'NOT_FOUND' }));
+              }}
+            />
+          </div>
+        );
+      }
+      return (
+        <div 
+          style={{ backgroundColor: themeColor.bg, borderColor: themeColor.border, color: themeColor.text }}
+          className="w-8 h-8 rounded-full border shadow-xs flex items-center justify-center shrink-0"
+        >
+          <span className="text-[10px] font-black tracking-tighter">{initials}</span>
+        </div>
+      );
+    }
+
+    if (type === 'project') {
+      return (
+        <div 
+          style={{ backgroundColor: themeColor.bg, borderColor: themeColor.border, color: themeColor.text }}
+          className="w-8 h-8 rounded-xl border shadow-xs flex items-center justify-center shrink-0"
+        >
+          <span className="text-[10px] font-black tracking-tighter">{initials}</span>
+        </div>
+      );
+    }
+
+    return (
+      <div 
+        style={{ backgroundColor: themeColor.bg, borderColor: themeColor.border, color: themeColor.text }}
+        className="w-9 h-9 rounded-xl border shadow-xs flex items-center justify-center shrink-0 transition-transform hover:scale-105"
+      >
+        <span className="text-[11px] font-black tracking-tight">{initials}</span>
+      </div>
+    );
+  };
 
   // In-place update handlers
   const handleUpdateExperience = (idx: number, field: string, value: any) => {
@@ -3402,28 +3881,43 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                   <h1 className={`${getNameFontSizeClass()} font-black uppercase tracking-tight`}>
                     {resume.fullName || 'ALEX RIVERA'}
                   </h1>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium opacity-90 mt-1">
-                    <span>{resume.email}</span>
-                    <span>•</span>
-                    <span>{resume.phone}</span>
-                    <span>•</span>
-                    <span>{resume.location}</span>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] font-medium opacity-90 mt-2">
+                    <a href={getLinkUrl(resume.email, 'email')} className="flex items-center gap-1.5 hover:underline text-white">
+                      <Mail className="w-3.5 h-3.5 opacity-85 shrink-0" />
+                      <span>{resume.email}</span>
+                    </a>
+                    <span className="opacity-40">•</span>
+                    <a href={getLinkUrl(resume.phone, 'phone')} className="flex items-center gap-1.5 hover:underline text-white">
+                      <Phone className="w-3.5 h-3.5 opacity-85 shrink-0" />
+                      <span>{resume.phone}</span>
+                    </a>
+                    <span className="opacity-40">•</span>
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 opacity-85 shrink-0" />
+                      <span>{resume.location}</span>
+                    </span>
                     {resume.linkedin && (
                       <>
-                        <span>•</span>
-                        <span>{resume.linkedin}</span>
+                        <span className="opacity-40">•</span>
+                        <a href={getLinkUrl(resume.linkedin, 'linkedin')} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:underline text-white">
+                          <Linkedin className="w-3.5 h-3.5 opacity-85 shrink-0" />
+                          <span>{resume.linkedin}</span>
+                        </a>
                       </>
                     )}
                     {resume.github && (
                       <>
-                        <span>•</span>
-                        <span>{resume.github}</span>
+                        <span className="opacity-40">•</span>
+                        <a href={getLinkUrl(resume.github, 'github')} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:underline text-white">
+                          <Github className="w-3.5 h-3.5 opacity-85 shrink-0" />
+                          <span>{resume.github}</span>
+                        </a>
                       </>
                     )}
                   </div>
                 </div>
               ) : headerAlign === 'badge' ? (
-                <div className="pb-3 space-y-2 border-b-2" style={{ borderColor: accentColor }}>
+                <div className="pb-4 space-y-2.5 border-b-2 mb-2" style={{ borderColor: accentColor }}>
                   <h1 
                     className={`${getNameFontSizeClass()} font-black uppercase tracking-tight`}
                     style={{ color: accentColor }}
@@ -3431,16 +3925,35 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                     {resume.fullName || 'ALEX RIVERA'}
                   </h1>
                   <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-bold">
-                    <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200">{resume.email}</span>
-                    <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200">{resume.phone}</span>
-                    <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200">{resume.location}</span>
-                    {resume.linkedin && <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-900 border border-purple-200">{resume.linkedin}</span>}
-                    {resume.github && <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200">{resume.github}</span>}
+                    <a href={getLinkUrl(resume.email, 'email')} className="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200/60 flex items-center gap-1 text-slate-800 hover:bg-slate-200 hover:text-slate-900 transition-colors">
+                      <Mail className="w-3 h-3 text-slate-500 shrink-0" />
+                      <span>{resume.email}</span>
+                    </a>
+                    <a href={getLinkUrl(resume.phone, 'phone')} className="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200/60 flex items-center gap-1 text-slate-800 hover:bg-slate-200 hover:text-slate-900 transition-colors">
+                      <Phone className="w-3 h-3 text-slate-500 shrink-0" />
+                      <span>{resume.phone}</span>
+                    </a>
+                    <span className="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200/60 flex items-center gap-1 text-slate-800">
+                      <MapPin className="w-3 h-3 text-slate-500 shrink-0" />
+                      <span>{resume.location}</span>
+                    </span>
+                    {resume.linkedin && (
+                      <a href={getLinkUrl(resume.linkedin, 'linkedin')} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-md bg-purple-50 text-purple-900 border border-purple-200/60 flex items-center gap-1 hover:bg-purple-100 hover:text-purple-950 transition-colors">
+                        <Linkedin className="w-3 h-3 text-purple-600 shrink-0" />
+                        <span>{resume.linkedin}</span>
+                      </a>
+                    )}
+                    {resume.github && (
+                      <a href={getLinkUrl(resume.github, 'github')} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200/60 flex items-center gap-1 text-slate-800 hover:bg-slate-200 hover:text-slate-900 transition-colors">
+                        <Github className="w-3 h-3 text-slate-500 shrink-0" />
+                        <span>{resume.github}</span>
+                      </a>
+                    )}
                   </div>
                 </div>
               ) : (
                 <div 
-                  className={`pb-3 space-y-1 border-b-2 ${
+                  className={`pb-4 space-y-1.5 border-b-2 mb-2 ${
                     headerAlign === 'center' ? 'text-center' :
                     headerAlign === 'split' ? 'flex flex-wrap items-baseline justify-between' : ''
                   }`}
@@ -3454,22 +3967,37 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                       {resume.fullName || 'ALEX RIVERA'}
                     </h1>
                   </div>
-                  <div className={`flex flex-wrap items-center gap-x-2 gap-y-1 text-[10.5px] font-medium opacity-90 ${headerAlign === 'center' ? 'justify-center' : ''}`}>
-                    <span>{resume.email}</span>
-                    <span>•</span>
-                    <span>{resume.phone}</span>
-                    <span>•</span>
-                    <span>{resume.location}</span>
+                  <div className={`flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[10.5px] font-medium opacity-90 ${headerAlign === 'center' ? 'justify-center' : ''}`}>
+                    <a href={getLinkUrl(resume.email, 'email')} style={{ color: textColor }} className="flex items-center gap-1.5 hover:underline">
+                      <Mail className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                      <span>{resume.email}</span>
+                    </a>
+                    <span className="opacity-40">•</span>
+                    <a href={getLinkUrl(resume.phone, 'phone')} style={{ color: textColor }} className="flex items-center gap-1.5 hover:underline">
+                      <Phone className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                      <span>{resume.phone}</span>
+                    </a>
+                    <span className="opacity-40">•</span>
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                      <span>{resume.location}</span>
+                    </span>
                     {resume.linkedin && (
                       <>
-                        <span>•</span>
-                        <span>{resume.linkedin}</span>
+                        <span className="opacity-40">•</span>
+                        <a href={getLinkUrl(resume.linkedin, 'linkedin')} target="_blank" rel="noopener noreferrer" style={{ color: textColor }} className="flex items-center gap-1.5 hover:underline">
+                          <Linkedin className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                          <span>{resume.linkedin}</span>
+                        </a>
                       </>
                     )}
                     {resume.github && (
                       <>
-                        <span>•</span>
-                        <span>{resume.github}</span>
+                        <span className="opacity-40">•</span>
+                        <a href={getLinkUrl(resume.github, 'github')} target="_blank" rel="noopener noreferrer" style={{ color: textColor }} className="flex items-center gap-1.5 hover:underline">
+                          <Github className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                          <span>{resume.github}</span>
+                        </a>
                       </>
                     )}
                   </div>
@@ -3481,30 +4009,35 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                 <div className="space-y-1">
                   {renderSectionHeader('Professional Summary')}
                   <p className="opacity-90 leading-relaxed">
-                    {resume.summary}
+                    <LinkifiedText text={resume.summary} />
                   </p>
                 </div>
               )}
 
               {/* Technical Experience Section */}
               {sectionVisibility.experience && resume.experience.length > 0 && (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {renderSectionHeader('Technical Experience')}
-                  <div className="space-y-2.5">
+                  <div className="space-y-3.5">
                     {resume.experience.map((exp, idx) => (
-                      <div key={idx} className="space-y-0.5">
-                        <div className="flex items-baseline justify-between font-bold">
-                          <span className="text-[12px]" style={{ color: textColor }}>{exp.role} — <span style={{ color: accentColor }}>{exp.company}</span></span>
-                          <span className="text-[10px] font-normal opacity-70">{exp.duration}</span>
+                      <div key={idx} className="flex gap-3 items-start">
+                        {renderLogo(exp.company || 'Company', 'company')}
+                        <div className="flex-1 min-w-0 space-y-0.5">
+                          <div className="flex items-baseline justify-between font-bold">
+                            <span className="text-[12px]" style={{ color: textColor }}>{exp.role} — <span style={{ color: accentColor }}>{exp.company}</span></span>
+                            <span className="text-[10px] font-normal opacity-70">{exp.duration}</span>
+                          </div>
+                          <ul className="space-y-0.5 pl-1 opacity-90">
+                            {exp.bulletPoints.map((b, bIdx) => (
+                              <li key={bIdx} className="flex items-start gap-1.5">
+                                <span className="font-bold shrink-0" style={{ color: getResolvedBulletColor() }}>{bulletStyle}</span>
+                                <span className="leading-snug">
+                                  <LinkifiedText text={b} />
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                        <ul className="space-y-0.5 pl-1 opacity-90">
-                          {exp.bulletPoints.map((b, bIdx) => (
-                            <li key={bIdx} className="flex items-start gap-1.5">
-                              <span className="font-bold shrink-0" style={{ color: getResolvedBulletColor() }}>{bulletStyle}</span>
-                              <span className="leading-snug">{b}</span>
-                            </li>
-                          ))}
-                        </ul>
                       </div>
                     ))}
                   </div>
@@ -3513,24 +4046,38 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
 
               {/* Key Projects Section */}
               {sectionVisibility.projects && resume.projects.length > 0 && (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {renderSectionHeader('Key Projects')}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {resume.projects.map((proj, idx) => (
-                      <div key={idx} className="space-y-0.5">
-                        <div className="flex items-baseline justify-between font-bold">
-                          <span className="text-[12px]" style={{ color: textColor }}>
-                            {proj.name} {proj.link && <span className="text-[10px] font-normal opacity-70">({proj.link})</span>}
-                          </span>
-                          <div className="flex gap-1">
-                            {proj.techStack.map((tech, tIdx) => (
-                              <span key={tIdx} className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-slate-100 text-slate-700 border border-slate-200">
-                                {tech}
-                              </span>
-                            ))}
+                      <div key={idx} className="flex gap-3 items-start">
+                        {renderLogo(proj.name || 'Project', 'project')}
+                        <div className="flex-1 min-w-0 space-y-0.5">
+                          <div className="flex items-baseline justify-between font-bold">
+                            <span className="text-[12px]" style={{ color: textColor }}>
+                              {proj.name} {proj.link && (
+                                <a 
+                                  href={getLinkUrl(proj.link, 'generic')} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="text-[10px] font-bold text-purple-600 hover:text-purple-800 hover:underline inline-flex items-center gap-0.5 ml-1 transition-colors"
+                                >
+                                  ({proj.link})
+                                </a>
+                              )}
+                            </span>
+                            <div className="flex gap-1">
+                              {proj.techStack.map((tech, tIdx) => (
+                                <span key={tIdx} className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-slate-100 text-slate-700 border border-slate-200">
+                                  {tech}
+                                </span>
+                              ))}
+                            </div>
                           </div>
+                          <p className="opacity-90 leading-snug">
+                            <LinkifiedText text={proj.description} />
+                          </p>
                         </div>
-                        <p className="opacity-90 leading-snug">{proj.description}</p>
                       </div>
                     ))}
                   </div>
@@ -3539,17 +4086,22 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
 
               {/* Education Section */}
               {sectionVisibility.education && resume.education.length > 0 && (
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {renderSectionHeader('Education')}
-                  <div className="space-y-1">
+                  <div className="space-y-2.5">
                     {resume.education.map((edu, idx) => (
-                      <div key={idx} className="flex items-baseline justify-between">
-                        <div>
-                          <span className="font-black" style={{ color: textColor }}>{edu.institution}</span>
-                          <span className="opacity-80"> — {edu.degree}</span>
-                        </div>
-                        <div className="text-[10px] opacity-70">
-                          <span>{edu.year}</span> | <span className="font-bold">GPA: {edu.gpa}</span>
+                      <div key={idx} className="flex gap-3 items-center">
+                        {renderLogo(edu.institution || 'School', 'school')}
+                        <div className="flex-1 min-w-0 flex items-baseline justify-between">
+                          <div>
+                            <span className="font-black text-[12px]" style={{ color: textColor }}>{edu.institution}</span>
+                            <span className="opacity-85 text-[11px]"> — {edu.degree}</span>
+                          </div>
+                          <div className="text-[10px] opacity-70 flex items-center gap-1.5">
+                            <span>{edu.year}</span>
+                            <span>|</span>
+                            <span className="font-bold">GPA: {edu.gpa}</span>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -3583,7 +4135,9 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                           <span>{item.role} — <span style={{ color: accentColor }}>{item.organization}</span></span>
                           <span className="text-[10px] font-normal opacity-70">{item.duration}</span>
                         </div>
-                        <p className="opacity-90 leading-snug">{item.description}</p>
+                        <p className="opacity-90 leading-snug">
+                          <LinkifiedText text={item.description} />
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -3626,8 +4180,22 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                   <div className="space-y-1">
                     {research.map((r, idx) => (
                       <div key={idx}>
-                        <p className="font-bold">{r.title} — <span className="font-normal opacity-80">{r.publisher} ({r.year})</span></p>
-                        <p className="opacity-80 text-[10.5px]">{r.summary}</p>
+                        <p className="font-bold">
+                          {r.title} — <span className="font-normal opacity-80">{r.publisher} ({r.year})</span>
+                          {r.link && (
+                            <a
+                              href={getLinkUrl(r.link, 'generic')}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] font-bold text-purple-600 hover:text-purple-800 hover:underline ml-2 inline-block transition-colors"
+                            >
+                              [Link]
+                            </a>
+                          )}
+                        </p>
+                        <p className="opacity-80 text-[10.5px]">
+                          <LinkifiedText text={r.summary} />
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -3654,7 +4222,9 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                         <span>{v.role} — {v.organization}</span>
                         <span className="text-[10px] font-normal opacity-70">{v.duration}</span>
                       </div>
-                      <p className="opacity-90">{v.description}</p>
+                      <p className="opacity-90">
+                        <LinkifiedText text={v.description} />
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -3664,7 +4234,9 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
               {sectionVisibility.custom && customSections.length > 0 && customSections.map((cs, idx) => (
                 <div key={idx} className="space-y-1">
                   {renderSectionHeader(cs.heading)}
-                  <p className="opacity-90 leading-relaxed">{cs.content}</p>
+                  <p className="opacity-90 leading-relaxed">
+                    <LinkifiedText text={cs.content} />
+                  </p>
                 </div>
               ))}
 
