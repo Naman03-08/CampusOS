@@ -222,6 +222,34 @@
         "updatedAt": { "type": "string" }
       },
       "required": ["uid", "displayName", "university"]
+    },
+    "coverLetters": {
+      "title": "AI Cover Letters",
+      "description": "Generated cover letters and performance analytical scores.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "fullName": { "type": "string" },
+        "targetCompany": { "type": "string" },
+        "targetJobRole": { "type": "string" },
+        "tone": { "type": "string" },
+        "template": { "type": "string" },
+        "greeting": { "type": "string" },
+        "opening": { "type": "string" },
+        "whyCompany": { "type": "string" },
+        "whyMe": { "type": "string" },
+        "experience": { "type": "string" },
+        "projects": { "type": "string" },
+        "skills": { "type": "string" },
+        "achievements": { "type": "string" },
+        "closing": { "type": "string" },
+        "signature": { "type": "string" },
+        "scores": { "type": "object" },
+        "suggestions": { "type": "array" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "targetCompany", "targetJobRole"]
     }
   },
   "securityRules": {
@@ -278,6 +306,10 @@
       "write": "auth != null && auth.uid == request.resource.data.userId"
     },
     "dsaProblems": {
+      "read": "auth != null && auth.uid == resource.data.userId",
+      "write": "auth != null && auth.uid == request.resource.data.userId"
+    },
+    "coverLetters": {
       "read": "auth != null && auth.uid == resource.data.userId",
       "write": "auth != null && auth.uid == request.resource.data.userId"
     }

@@ -33,6 +33,7 @@ import { CodingCoursesView } from './components/courses/CodingCoursesView';
 import { InterviewPrepView } from './components/placement/InterviewPrepView';
 import { StartupJobsHubView } from './components/placement/StartupJobsHubView';
 import { AIResumeBuilderView } from './components/resume/AIResumeBuilderView';
+import { AICoverLetterView } from './components/coverletter/AICoverLetterView';
 import { SettingsView } from './components/settings/SettingsView';
 import { AdminPanelView } from './components/admin/AdminPanelView';
 import { UpgradePlansView } from './components/pricing/UpgradePlansView';
@@ -227,6 +228,8 @@ export function App() {
         return 'Personal Assistant';
       case 'attendance': return 'Attendance Manager & Calculator';
       case 'habiturex': return 'Habiturex Daily Consistency OS';
+      case 'resumebuilder': return 'AI Resume Builder';
+      case 'coverletter': return 'AI Cover Letter';
       case 'coding': return 'Coding Hub & 375 DSA Roadmap Sheet';
       case 'courses': return 'Interactive Coding Courses & Academies';
       case 'interviewprep': return 'Technical Interview Prep & Question Bank';
@@ -817,6 +820,10 @@ export function App() {
                     onUpdateResume={handleUpdateResume}
                     onNavigateTab={handleNavigateTabWithGuard}
                   />
+                )}
+
+                {activeTab === 'coverletter' && (
+                  <AICoverLetterView />
                 )}
 
                 {activeTab === 'interviewprep' && (

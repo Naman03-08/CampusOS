@@ -91,6 +91,11 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // Cover Letters
+    match /coverLetters/{docId} {
+      allow read, write: if true;
+    }
+
     // Fallback rule for all other collections
     match /{document=**} {
       allow read, write: if true;
