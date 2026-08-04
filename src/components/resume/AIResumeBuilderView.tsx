@@ -45,6 +45,7 @@ import {
 } from 'lucide-react';
 import { ResumeData, UserProfile } from '../../types';
 import { exportTextToPDF, exportCanvasToPDF } from '../../lib/pdfExport';
+import { checkResumeScanLimit, checkPDFExportLimit, incrementFeatureUsage, getDailyKey, getMonthlyKey, calculatePlanDetails } from '../../lib/planUtils';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -264,6 +265,7 @@ export const AIResumeBuilderView: React.FC<AIResumeBuilderViewProps> = ({
   const [loadingEval, setLoadingEval] = useState(false);
   const [copiedToast, setCopiedToast] = useState(false);
   const [importMessage, setImportMessage] = useState<string | null>(null);
+  const [limitError, setLimitError] = useState<string | null>(null);
 
   // Optimizer & Draft State
   const [selectedOptimizeSection, setSelectedOptimizeSection] = useState<string>('');
@@ -510,6 +512,14 @@ export const AIResumeBuilderView: React.FC<AIResumeBuilderViewProps> = ({
 
   // Run ATS Scan
   const handleEvaluateResume = async () => {
+    if (user) {
+      const limitCheck = checkResumeScanLimit(user, 0);
+      if (!limitCheck.allowed) {
+        setLimitError(limitCheck.message);
+        return;
+      }
+    }
+    setLimitError(null);
     setLoadingEval(true);
     try {
       const res = await fetch('/api/ai/evaluate-resume', {
@@ -521,6 +531,11 @@ export const AIResumeBuilderView: React.FC<AIResumeBuilderViewProps> = ({
         }),
       });
       const data = await res.json();
+      if (user) {
+        const details = calculatePlanDetails(user);
+        const periodKey = details.currentPlanId === 'free_trial' ? getDailyKey() : getMonthlyKey();
+        incrementFeatureUsage(user.uid, 'resume_scan', periodKey);
+      }
       setEvaluationResult(data);
     } catch (err) {
       console.error('Resume evaluation error:', err);
@@ -864,6 +879,14 @@ export const AIResumeBuilderView: React.FC<AIResumeBuilderViewProps> = ({
 
   // PDF Export
   const handleExportPDF = async () => {
+    if (user) {
+      const limitCheck = checkPDFExportLimit(user);
+      if (!limitCheck.allowed) {
+        alert(limitCheck.message);
+        return;
+      }
+    }
+
     const exportContent = `====================================================
 ${resume.fullName.toUpperCase()}
 Email: ${resume.email} | Phone: ${resume.phone} | Location: ${resume.location}
@@ -925,9 +948,15 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
     setIsExportingPDF(true);
     try {
       await exportCanvasToPDF('resume-paper-canvas', `${safeName}_Resume.pdf`);
+      if (user) {
+        incrementFeatureUsage(user.uid, 'pdf_export', getDailyKey());
+      }
     } catch (err) {
       console.warn('Canvas PDF export failed, fallback to text PDF:', err);
       exportTextToPDF(`${safeName}_Resume`, exportContent, `${safeName}_Resume.pdf`);
+      if (user) {
+        incrementFeatureUsage(user.uid, 'pdf_export', getDailyKey());
+      }
     } finally {
       setIsExportingPDF(false);
     }
@@ -3127,6 +3156,14 @@ ${volunteer.map((v) => `${v.role} at ${v.organization} (${v.duration}): ${v.desc
                     </p>
                   </div>
                 </div>
+
+                {/* Limit Error Banner */}
+                {limitError && (
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 text-xs font-bold leading-normal flex items-start gap-2">
+                    <AlertTriangle className="w-4.5 h-4.5 text-rose-600 shrink-0 mt-0.5 animate-pulse" />
+                    <span>{limitError}</span>
+                  </div>
+                )}
 
                 {/* Deep AI ATS Audit Button */}
                 <button

@@ -305,56 +305,113 @@ export interface LimitCheckResult {
   message: string;
 }
 
+// Calendar period key helpers for robust, correct plan limits tracking
+export function getDailyKey(): string {
+  try {
+    return new Date().toISOString().split('T')[0];
+  } catch {
+    return '2026-08-03';
+  }
+}
+
+export function getWeeklyKey(): string {
+  try {
+    const d = new Date();
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust to find Monday
+    const monday = new Date(d.setDate(diff));
+    return monday.toISOString().split('T')[0];
+  } catch {
+    return '2026-W31';
+  }
+}
+
+export function getMonthlyKey(): string {
+  try {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  } catch {
+    return '2026-08';
+  }
+}
+
+export function getFeatureUsage(uid: string, feature: string, periodKey: string): number {
+  try {
+    const val = localStorage.getItem(`placivo_usage_${uid || 'anon'}_${feature}_${periodKey}`);
+    return val ? parseInt(val, 10) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function incrementFeatureUsage(uid: string, feature: string, periodKey: string): number {
+  try {
+    const current = getFeatureUsage(uid, feature, periodKey);
+    const newVal = current + 1;
+    localStorage.setItem(`placivo_usage_${uid || 'anon'}_${feature}_${periodKey}`, newVal.toString());
+    return newVal;
+  } catch {
+    return 1;
+  }
+}
+
 export function checkStudySuiteLimit(user: UserProfile, currentCount: number): LimitCheckResult {
   const details = calculatePlanDetails(user);
   if (!details.hasActiveAccess) {
     return {
       allowed: false,
       maxLimit: 0,
-      currentCount,
+      currentCount: 0,
       featureName: 'AI Study Suites',
       message: 'Please start your 4-Day Free Trial or upgrade to a Pro Plan to generate AI Study Suites.'
     };
   }
 
+  const uid = user?.uid || 'anon';
   if (details.currentPlanId === 'free_trial') {
-    const maxLimit = 5;
-    const allowed = currentCount < maxLimit;
+    const dailyKey = getDailyKey();
+    const periodCount = getFeatureUsage(uid, 'study_suite', dailyKey);
+    const maxLimit = 1; // 1 Generation per day
+    const allowed = periodCount < maxLimit;
     return {
       allowed,
       maxLimit,
-      currentCount,
+      currentCount: periodCount,
       featureName: 'AI Study Suites',
       message: allowed
-        ? `Free Trial Pass: ${currentCount}/${maxLimit} Study Suites generated.`
-        : `Free Trial limit reached (${maxLimit} Study Suites total). Upgrade to Pro Scholar (₹199) or Pro Ultimate (₹399) for more generations!`
+        ? `Free Trial Pass: ${periodCount}/${maxLimit} Study Suites generated today.`
+        : `Free Trial daily limit reached (${maxLimit} Study Suite / day). Upgrade to Pro Scholar (₹199) or Pro Ultimate (₹399) for more generations!`
     };
   }
 
   if (details.currentPlanId === 'plan_199') {
+    const weeklyKey = getWeeklyKey();
+    const periodCount = getFeatureUsage(uid, 'study_suite', weeklyKey);
     const maxLimit = 5;
-    const allowed = currentCount < maxLimit;
+    const allowed = periodCount < maxLimit;
     return {
       allowed,
       maxLimit,
-      currentCount,
+      currentCount: periodCount,
       featureName: 'AI Study Suites',
       message: allowed
-        ? `Pro Scholar Plan: ${currentCount}/${maxLimit} Study Suites generated this week.`
+        ? `Pro Scholar Plan: ${periodCount}/${maxLimit} Study Suites generated this week.`
         : `Pro Scholar weekly limit reached (${maxLimit} Generations/week). Upgrade to Placivo Pro Ultimate (₹399) for 10 generations/week!`
     };
   }
 
   if (details.currentPlanId === 'plan_349') {
+    const weeklyKey = getWeeklyKey();
+    const periodCount = getFeatureUsage(uid, 'study_suite', weeklyKey);
     const maxLimit = 10;
-    const allowed = currentCount < maxLimit;
+    const allowed = periodCount < maxLimit;
     return {
       allowed,
       maxLimit,
-      currentCount,
+      currentCount: periodCount,
       featureName: 'AI Study Suites',
       message: allowed
-        ? `Placivo Pro Ultimate: ${currentCount}/${maxLimit} Study Suites generated this week.`
+        ? `Placivo Pro Ultimate: ${periodCount}/${maxLimit} Study Suites generated this week.`
         : `Placivo Pro Ultimate weekly limit reached (${maxLimit} Generations/week).`
     };
   }
@@ -374,22 +431,25 @@ export function checkDSASolutionLimit(user: UserProfile, todayCount: number): Li
     return {
       allowed: false,
       maxLimit: 0,
-      currentCount: todayCount,
+      currentCount: 0,
       featureName: '375 DSA AI Code Coach',
       message: 'Please start your 4-Day Free Trial or upgrade to a Pro Plan to access 375 DSA AI solutions.'
     };
   }
 
+  const uid = user?.uid || 'anon';
   if (details.currentPlanId === 'free_trial') {
+    const dailyKey = getDailyKey();
+    const periodCount = getFeatureUsage(uid, 'dsa_solution', dailyKey);
     const maxLimit = 3;
-    const allowed = todayCount < maxLimit;
+    const allowed = periodCount < maxLimit;
     return {
       allowed,
       maxLimit,
-      currentCount: todayCount,
+      currentCount: periodCount,
       featureName: '375 DSA AI Code Coach',
       message: allowed
-        ? `Free Trial Pass: ${todayCount}/${maxLimit} DSA AI Solutions used today.`
+        ? `Free Trial Pass: ${periodCount}/${maxLimit} DSA AI Solutions used today.`
         : `Free Trial daily limit reached (${maxLimit} DSA Solutions / day). Upgrade to Pro Scholar (₹199) or Pro Ultimate (₹399) for UNLIMITED 375 DSA Sheet Solutions!`
     };
   }
@@ -398,7 +458,7 @@ export function checkDSASolutionLimit(user: UserProfile, todayCount: number): Li
   return {
     allowed: true,
     maxLimit: -1,
-    currentCount: todayCount,
+    currentCount: 0,
     featureName: '375 DSA AI Code Coach',
     message: 'Pro Plan: UNLIMITED 375 DSA Roadmap Code Coach active.'
   };
@@ -410,50 +470,57 @@ export function checkAIChatLimit(user: UserProfile, currentChatCount: number): L
     return {
       allowed: false,
       maxLimit: 0,
-      currentCount: currentChatCount,
+      currentCount: 0,
       featureName: '24/7 AI Academic Tutor Chat',
       message: 'Please start your 4-Day Free Trial or upgrade to a Pro Plan to chat with the AI Academic Tutor.'
     };
   }
 
+  const uid = user?.uid || 'anon';
   if (details.currentPlanId === 'free_trial') {
-    const maxLimit = 20;
-    const allowed = currentChatCount < maxLimit;
+    const dailyKey = getDailyKey();
+    const periodCount = getFeatureUsage(uid, 'ai_chat', dailyKey);
+    const maxLimit = 1; // 1 Session/Day
+    const allowed = periodCount < maxLimit;
     return {
       allowed,
       maxLimit,
-      currentCount: currentChatCount,
+      currentCount: periodCount,
       featureName: '24/7 AI Academic Tutor Chat',
       message: allowed
-        ? `Free Trial Pass: ${currentChatCount}/${maxLimit} AI Tutor messages used.`
-        : `Free Trial chat limit reached (${maxLimit} Messages total). Upgrade to Pro Scholar (₹199) or Pro Ultimate (₹399) for more chats!`
+        ? `Free Trial Pass: ${periodCount}/${maxLimit} AI Academic Tutor Chat session used today.`
+        : `Free Trial daily limit reached (${maxLimit} Chat session / day). Upgrade to Pro Scholar (₹199) or Pro Ultimate (₹399) for more chats!`
     };
   }
 
   if (details.currentPlanId === 'plan_199') {
+    const dailyKey = getDailyKey();
+    const periodCount = getFeatureUsage(uid, 'ai_chat', dailyKey);
     const maxLimit = 3;
-    const allowed = currentChatCount < maxLimit;
+    const allowed = periodCount < maxLimit;
     return {
       allowed,
       maxLimit,
-      currentCount: currentChatCount,
+      currentCount: periodCount,
       featureName: '24/7 AI Academic Tutor Chat',
       message: allowed
-        ? `Pro Scholar Plan: ${currentChatCount}/${maxLimit} AI Tutor messages used today.`
+        ? `Pro Scholar Plan: ${periodCount}/${maxLimit} AI Tutor messages used today.`
         : `Pro Scholar daily chat limit reached (${maxLimit} messages/day). Upgrade to Placivo Pro Ultimate (₹399) for 10 messages/week!`
     };
   }
 
   if (details.currentPlanId === 'plan_349') {
+    const weeklyKey = getWeeklyKey();
+    const periodCount = getFeatureUsage(uid, 'ai_chat', weeklyKey);
     const maxLimit = 10;
-    const allowed = currentChatCount < maxLimit;
+    const allowed = periodCount < maxLimit;
     return {
       allowed,
       maxLimit,
-      currentCount: currentChatCount,
+      currentCount: periodCount,
       featureName: '24/7 AI Academic Tutor Chat',
       message: allowed
-        ? `Placivo Pro Ultimate: ${currentChatCount}/${maxLimit} AI Tutor messages used this week.`
+        ? `Placivo Pro Ultimate: ${periodCount}/${maxLimit} AI Tutor messages used this week.`
         : `Placivo Pro Ultimate weekly chat limit reached (${maxLimit} messages/week).`
     };
   }
@@ -473,50 +540,95 @@ export function checkResumeScanLimit(user: UserProfile, currentScanCount: number
     return {
       allowed: false,
       maxLimit: 0,
-      currentCount: currentScanCount,
+      currentCount: 0,
       featureName: 'ATS Resume Scans',
       message: 'Please start your 4-Day Free Trial or upgrade to a Pro Plan to run ATS Resume Audits.'
     };
   }
 
+  const uid = user?.uid || 'anon';
   if (details.currentPlanId === 'free_trial') {
-    const maxLimit = 1;
-    const allowed = currentScanCount < maxLimit;
+    const dailyKey = getDailyKey();
+    const periodCount = getFeatureUsage(uid, 'resume_scan', dailyKey);
+    const maxLimit = 1; // 1 Scan/Day
+    const allowed = periodCount < maxLimit;
     return {
       allowed,
       maxLimit,
-      currentCount: currentScanCount,
+      currentCount: periodCount,
       featureName: 'ATS Resume Scans',
       message: allowed
-        ? `Free Trial Pass: ${currentScanCount}/${maxLimit} ATS Resume Audits completed.`
+        ? `Free Trial Pass: ${periodCount}/${maxLimit} ATS Resume Audits completed today.`
         : `Free Trial ATS scan limit reached (${maxLimit} Audit/day). Upgrade to Pro Scholar (5 Scans/month) or Pro Ultimate (10 Scans/month)!`
     };
   }
 
   if (details.currentPlanId === 'plan_199') {
+    const monthlyKey = getMonthlyKey();
+    const periodCount = getFeatureUsage(uid, 'resume_scan', monthlyKey);
     const maxLimit = 5;
-    const allowed = currentScanCount < maxLimit;
+    const allowed = periodCount < maxLimit;
     return {
       allowed,
       maxLimit,
-      currentCount: currentScanCount,
+      currentCount: periodCount,
       featureName: 'ATS Resume Scans',
       message: allowed
-        ? `Pro Scholar Plan: ${currentScanCount}/${maxLimit} ATS Resume Scans used this month.`
+        ? `Pro Scholar Plan: ${periodCount}/${maxLimit} ATS Resume Scans used this month.`
         : `Pro Scholar monthly limit reached (${maxLimit} Scans/month). Upgrade to Placivo Pro Ultimate (₹399) for 10 Scans/month & Resume Builder!`
     };
   }
 
+  const monthlyKey = getMonthlyKey();
+  const periodCount = getFeatureUsage(uid, 'resume_scan', monthlyKey);
   const maxLimit = 10;
-  const allowed = currentScanCount < maxLimit;
+  const allowed = periodCount < maxLimit;
   return {
     allowed,
     maxLimit,
-    currentCount: currentScanCount,
+    currentCount: periodCount,
     featureName: 'ATS Resume Scans',
     message: allowed
-      ? `Placivo Pro Ultimate: ${currentScanCount}/${maxLimit} ATS Resume Scans used this month.`
+      ? `Placivo Pro Ultimate: ${periodCount}/${maxLimit} ATS Resume Scans used this month.`
       : `Placivo Pro Ultimate monthly limit reached (${maxLimit} Scans/month).`
+  };
+}
+
+export function checkPDFExportLimit(user: UserProfile): LimitCheckResult {
+  const details = calculatePlanDetails(user);
+  if (!details.hasActiveAccess) {
+    return {
+      allowed: false,
+      maxLimit: 0,
+      currentCount: 0,
+      featureName: 'PDF Resume Export',
+      message: 'Please start your 4-Day Free Trial or upgrade to a Pro Plan to export your Resume as PDF.'
+    };
+  }
+
+  const uid = user?.uid || 'anon';
+  if (details.currentPlanId === 'free_trial') {
+    const dailyKey = getDailyKey();
+    const periodCount = getFeatureUsage(uid, 'pdf_export', dailyKey);
+    const maxLimit = 1; // 1 PDF Export/Day
+    const allowed = periodCount < maxLimit;
+    return {
+      allowed,
+      maxLimit,
+      currentCount: periodCount,
+      featureName: 'PDF Resume Export',
+      message: allowed
+        ? `Free Trial Pass: ${periodCount}/${maxLimit} PDF exports completed today.`
+        : `Free Trial PDF export limit reached (${maxLimit} PDF Export/day). Upgrade to Pro Scholar (₹199) or Pro Ultimate (₹399) for unlimited downloads!`
+    };
+  }
+
+  return {
+    allowed: true,
+    maxLimit: -1,
+    currentCount: 0,
+    featureName: 'PDF Resume Export',
+    message: 'Pro Plan: UNLIMITED PDF exports active.'
   };
 }
 

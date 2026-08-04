@@ -16,7 +16,7 @@ import {
   MessageSquare,
   Globe
 } from 'lucide-react';
-import { StudySuite } from '../../types';
+import { StudySuite, UserProfile } from '../../types';
 import { AIChatView } from '../chat/AIChatView';
 import placivoAILogo from '../landing/placivoAI.png';
 
@@ -75,13 +75,14 @@ const PersonalAssistantLogo: React.FC = () => {
 };
 
 interface StudyHubViewProps {
+  user: UserProfile | null;
   studySuites?: StudySuite[];
   onSaveSuite?: (suite: StudySuite) => void;
   onDeleteSuite?: (id: string) => void;
   initialMode?: 'chat';
 }
 
-export const StudyHubView: React.FC<StudyHubViewProps> = () => {
+export const StudyHubView: React.FC<StudyHubViewProps> = ({ user, studySuites, onSaveSuite, onDeleteSuite }) => {
   const [activeIntroTab, setActiveIntroTab] = useState<'tutor' | 'proofs' | 'hacks'>('tutor');
   const [hovered3dCard, setHovered3dCard] = useState<number | null>(null);
 
@@ -421,7 +422,7 @@ export const StudyHubView: React.FC<StudyHubViewProps> = () => {
       </motion.div>
 
       {/* MODE 1: AI Chat Assistant & Tutor */}
-      <AIChatView />
+      <AIChatView user={user || undefined} />
     </div>
   );
 };

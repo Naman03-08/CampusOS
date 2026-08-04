@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChatMessage } from '../../types';
+import { checkAIChatLimit, incrementFeatureUsage, getDailyKey, getWeeklyKey, calculatePlanDetails } from '../../lib/planUtils';
 import { StructuredResponseFormatter } from './StructuredResponseFormatter';
 
 interface ThinkingStep {
@@ -202,6 +203,20 @@ export const AIChatView: React.FC<AIChatViewProps> = ({ user }) => {
     if (e) e.preventDefault();
     if (!inputText.trim() || loading) return;
 
+    if (user) {
+      const limitCheck = checkAIChatLimit(user, 0);
+      if (!limitCheck.allowed) {
+        const errorMsg: ChatMessage = {
+          id: 'ai_limit_error_' + Date.now(),
+          sender: 'ai',
+          text: `⚠️ **Usage Limit Reached**\n\n${limitCheck.message}`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages((prev) => [...prev, errorMsg]);
+        return;
+      }
+    }
+
     const userMsg: ChatMessage = {
       id: 'u_' + Date.now(),
       sender: 'user',
@@ -260,6 +275,12 @@ export const AIChatView: React.FC<AIChatViewProps> = ({ user }) => {
       });
 
       const data = await res.json();
+
+      if (user) {
+        const details = calculatePlanDetails(user);
+        const periodKey = details.currentPlanId === 'free_trial' || details.currentPlanId === 'plan_199' ? getDailyKey() : getWeeklyKey();
+        incrementFeatureUsage(user.uid, 'ai_chat', periodKey);
+      }
 
       const aiMsg: ChatMessage = {
         id: 'ai_' + Date.now(),

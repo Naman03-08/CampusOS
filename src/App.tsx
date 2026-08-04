@@ -215,7 +215,7 @@ export function App() {
     }
   }, []);
 
-  const gatedTabs = ['dashboard', 'notes', 'quiz', 'studyhub', 'resumebuilder', 'chat', 'attendance', 'habiturex', 'coding', 'interviewprep', 'placement'];
+  const gatedTabs = ['notes', 'quiz', 'studyhub', 'resumebuilder', 'chat', 'attendance', 'habiturex', 'coding', 'interviewprep', 'placement'];
 
   const getTabDisplayName = (tabId: string) => {
     switch (tabId) {
@@ -596,22 +596,23 @@ export function App() {
   };
 
   const planDetails = calculatePlanDetails(user);
-  const checkTabs = ['placement', 'interviewprep', 'coding'];
+  const checkTabs = ['placement', 'interviewprep', 'courses'];
   const isCheckTab = checkTabs.includes(activeTab);
 
   const planIncludesTab = (planId: string, tabId: string): boolean => {
     const normId = planId ? planId.trim().toLowerCase() : '';
     if (normId === 'plan_349' || normId === 'plan_399' || normId.includes('ultimate') || normId.includes('pro')) {
-      // Pro Ultimate / active pro plan (default fallback) includes everything
+      // Pro Ultimate / active pro plan includes everything
       return true;
     }
     if (normId === 'plan_199' || normId.includes('scholar')) {
-      // Pro Scholar includes coding and interviewprep but not placement
-      return tabId === 'coding' || tabId === 'interviewprep';
+      // Pro Scholar includes everything except placement and courses
+      return tabId !== 'placement' && tabId !== 'courses';
     }
     if (normId === 'free_trial' || normId.includes('trial')) {
-      // Free trial includes coding and interviewprep but not placement
-      return tabId === 'coding' || tabId === 'interviewprep';
+      // Free trial includes study suite, coding sheet, chats, resumebuilder, and attendance tracker
+      // But does NOT include placement, courses, and interviewprep
+      return tabId !== 'placement' && tabId !== 'courses' && tabId !== 'interviewprep';
     }
     return false;
   };
@@ -760,6 +761,7 @@ export function App() {
 
                 {(activeTab === 'studyhub' || activeTab === 'chat') && (
                   <StudyHubView
+                    user={user}
                     studySuites={studySuites}
                     onSaveSuite={handleSaveSuite}
                     onDeleteSuite={handleDeleteSuite}
@@ -792,6 +794,7 @@ export function App() {
 
                 {activeTab === 'coding' && (
                   <CodingHubView
+                    user={user}
                     dsa={dsa}
                     onToggleSolved={handleToggleDSA}
                     onResetDSASheet={handleResetDSASheet}

@@ -99,7 +99,7 @@ import {
   Clock
 } from 'lucide-react';
 import { UserProfile, StudySuite } from '../../types';
-import { checkStudySuiteLimit } from '../../lib/planUtils';
+import { checkStudySuiteLimit, incrementFeatureUsage, getDailyKey, getWeeklyKey, calculatePlanDetails } from '../../lib/planUtils';
 
 interface AINotesSummarizerViewProps {
   user: UserProfile | null;
@@ -248,6 +248,11 @@ export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
       }
 
       const data = await response.json();
+      if (user) {
+        const details = calculatePlanDetails(user);
+        const periodKey = details.currentPlanId === 'free_trial' ? getDailyKey() : getWeeklyKey();
+        incrementFeatureUsage(user.uid, 'study_suite', periodKey);
+      }
       setSummaryData(data);
       setActiveTab('overview');
 

@@ -17,14 +17,16 @@ import {
   ShieldCheck,
   Layers,
   Info as InfoIcon,
-  Star
+  Star,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { DSAProblem } from '../../types';
+import { DSAProblem, UserProfile } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
 import { getPlacivoDSASheet } from '../../data/dsaSheet375';
 import { StreakService } from '../../lib/streakService';
 import { getGfgUrl, getLeetcodeUrl, getPracticeUrl } from '../../lib/dsaProblemLinks';
+import { checkDSASolutionLimit, incrementFeatureUsage, getDailyKey, calculatePlanDetails } from '../../lib/planUtils';
 
 // Bespoke Placivo Coding Hub 3D Orbiting Logo Component
 const CodingHubLogo: React.FC = () => {
@@ -110,6 +112,7 @@ const CodingHubLogo: React.FC = () => {
 };
 
 interface CodingHubProps {
+  user: UserProfile | null;
   dsa: DSAProblem[];
   onToggleSolved: (id: string) => void;
   onResetDSASheet?: (newSheet: DSAProblem[]) => void;
@@ -219,7 +222,7 @@ const SECTION_RESOURCES: Record<string, { gfg: string; leetcode: string; youtube
   }
 };
 
-export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, onResetDSASheet, onNavigateTab }) => {
+export const CodingHubView: React.FC<CodingHubProps> = ({ user, dsa, onToggleSolved, onResetDSASheet, onNavigateTab }) => {
   const [problems, setProblems] = useState<DSAProblem[]>(dsa);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('All');
@@ -231,6 +234,58 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
   // Custom 3D Header Active Tab & Hover States
   const [activeHeaderTab, setActiveHeaderTab] = useState<'sheet' | 'streak' | 'resources'>('sheet');
   const [hovered3dCard, setHovered3dCard] = useState<number | null>(null);
+
+  // AI Solution Coach State
+  const [selectedAIProblem, setSelectedAIProblem] = useState<DSAProblem | null>(null);
+  const [aiCoachSolution, setAICoachSolution] = useState<string | null>(null);
+  const [loadingAISolution, setLoadingAISolution] = useState<boolean>(false);
+  const [aiLimitError, setAILimitError] = useState<string | null>(null);
+
+  const handleFetchAISolution = async (prob: DSAProblem) => {
+    if (user) {
+      const limitCheck = checkDSASolutionLimit(user, 0);
+      if (!limitCheck.allowed) {
+        setAILimitError(limitCheck.message);
+        setSelectedAIProblem(prob);
+        setAICoachSolution(null);
+        return;
+      }
+    }
+    setAILimitError(null);
+    setSelectedAIProblem(prob);
+    setLoadingAISolution(true);
+    setAICoachSolution(null);
+
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: `Solve this DSA problem: "${prob.title}" from category "${prob.category}" with difficulty "${prob.difficulty}".
+Provide:
+1. Clear description of the optimal approach.
+2. Step-by-step logic and intuition.
+3. Fully optimized, correct code solution with comments.
+4. Time & Space complexity analysis.
+Structure the answer beautifully using bullet points and clean sections.`,
+        }),
+      });
+      const data = await res.json();
+      if (data.reply) {
+        setAICoachSolution(data.reply);
+        if (user) {
+          incrementFeatureUsage(user.uid, 'dsa_solution', getDailyKey());
+        }
+      } else {
+        setAICoachSolution('Unable to generate solution. Please try again.');
+      }
+    } catch (err) {
+      console.error('AI solution fetch error:', err);
+      setAICoachSolution('An error occurred while connecting to Placivo AI. Please try again.');
+    } finally {
+      setLoadingAISolution(false);
+    }
+  };
 
   // Sync state if props change externally
   React.useEffect(() => {
@@ -1033,6 +1088,15 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
                           <ExternalLink className="w-3 h-3 text-red-500" />
                         </a>
                       )}
+
+                      <button
+                        onClick={() => handleFetchAISolution(prob)}
+                        className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-95 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-2xs hover:shadow-md hover:scale-[1.03] cursor-pointer"
+                        title="Get Placivo AI custom step-by-step code solution"
+                      >
+                        <Zap className="w-3.5 h-3.5 text-amber-300 animate-pulse fill-amber-300" />
+                        <span>AI Code Coach</span>
+                      </button>
                     </div>
                   </motion.div>
                 );
@@ -1073,6 +1137,85 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ dsa, onToggleSolved, o
             )}
           </div>
         </div>
+
+        {/* AI Solution Coach Overlay Modal */}
+        <AnimatePresence>
+          {selectedAIProblem && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto"
+              onClick={() => setSelectedAIProblem(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, y: 15 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.95, y: 15 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-3xl bg-white rounded-3xl border border-slate-200 shadow-2xl p-6 md:p-8 space-y-6 relative overflow-hidden"
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-extrabold uppercase text-purple-800 bg-purple-50 px-2.5 py-0.5 rounded-md border border-purple-100">
+                        AI Code Coach
+                      </span>
+                      <span className="text-xs font-bold text-slate-500">
+                        {selectedAIProblem.category}
+                      </span>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-black text-slate-900 leading-tight">
+                      {selectedAIProblem.title}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => setSelectedAIProblem(null)}
+                    className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Content body */}
+                <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-4 text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
+                  {aiLimitError ? (
+                    <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-950 space-y-3">
+                      <div className="flex items-center gap-2 font-black text-rose-900">
+                        <AlertTriangle className="w-5 h-5 text-rose-600 animate-bounce" />
+                        <span>Placivo AI Solution Limit Reached</span>
+                      </div>
+                      <p className="font-bold">{aiLimitError}</p>
+                      <p className="text-[11px] text-rose-800 font-semibold leading-normal">
+                        Consistency and deliberate practice are key. To gain unlimited on-demand solutions, please upgrade your subscription from your Profile dashboard.
+                      </p>
+                    </div>
+                  ) : loadingAISolution ? (
+                    <div className="py-12 flex flex-col items-center justify-center gap-3 text-slate-500">
+                      <RefreshCw className="w-8 h-8 text-purple-600 animate-spin" />
+                      <p className="font-bold text-purple-950 animate-pulse">Placivo AI is formulating step-by-step logic & code...</p>
+                    </div>
+                  ) : (
+                    <div className="whitespace-pre-wrap font-mono bg-slate-50 border border-slate-200 rounded-2xl p-4 overflow-x-auto text-slate-800 text-[11px] sm:text-xs">
+                      {aiCoachSolution}
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-end pt-4 border-t border-slate-100">
+                  <button
+                    onClick={() => setSelectedAIProblem(null)}
+                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                  >
+                    Close Coach
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
   );
 };
