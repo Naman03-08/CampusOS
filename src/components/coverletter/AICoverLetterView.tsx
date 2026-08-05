@@ -180,7 +180,7 @@ const COMPANY_PRESETS: CompanyCulturePreset[] = [
 const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, logoUrl }) => {
   if (logoUrl && logoUrl !== 'NOT_FOUND') {
     return (
-      <div className="w-6 h-6 shrink-0 shadow-xs p-0.5 bg-white border border-slate-200/85 rounded-lg flex items-center justify-center overflow-hidden transition-all duration-200 hover:scale-105">
+      <div className="w-6 h-6 shrink-0 shadow-xs p-0.5 bg-white border border-slate-200/85 rounded-lg flex items-center justify-center overflow-hidden transition-all duration-200 hover:scale-105" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <img 
           src={logoUrl} 
           alt={`${name} logo`} 
@@ -194,7 +194,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
   
   if (normalizedName.includes('microsoft')) {
     return (
-      <div className="grid grid-cols-2 gap-0.5 w-6 h-6 shrink-0 shadow-sm" id="logo-microsoft">
+      <div className="grid grid-cols-2 gap-0.5 w-6 h-6 shrink-0 shadow-sm" id="logo-microsoft" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <div className="bg-[#f25022] w-2.5 h-2.5"></div>
         <div className="bg-[#7fba00] w-2.5 h-2.5"></div>
         <div className="bg-[#00a4ef] w-2.5 h-2.5"></div>
@@ -205,7 +205,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
   
   if (normalizedName.includes('google')) {
     return (
-      <svg className="w-6 h-6 shrink-0 shadow-sm rounded-full" viewBox="0 0 24 24" id="logo-google">
+      <svg className="w-6 h-6 shrink-0 shadow-sm rounded-full" viewBox="0 0 24 24" id="logo-google" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
         <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z" />
@@ -216,7 +216,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
   
   if (normalizedName.includes('stripe')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#635bff] text-white shrink-0 shadow-sm border border-indigo-400/20" id="logo-stripe">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#635bff] text-white shrink-0 shadow-sm border border-indigo-400/20" id="logo-stripe" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
           <path d="M13.92 7.1c0-.5-.4-.74-1.05-.74-.75 0-1.74.22-2.58.64V4.14c.94-.37 2-.54 2.92-.54 2.5 0 3.86 1.1 3.86 3.14v6.86c0 1.94.38 2.62.77 3.03l-2.9 1.1c-.27-.4-.52-1.03-.52-1.97-.68.83-1.85 2.1-4.04 2.1-2.07 0-3.54-1.22-3.54-3.13 0-2.62 2.37-3.58 5.75-3.58.55 0 .9-.05 1.33-.12V7.1zm-1.33 3.9c-1.34.05-2.58.33-2.58 1.48 0 .58.46.96 1.1.96 1.05 0 1.48-.7 1.48-1.57v-.87z"/>
         </svg>
@@ -226,7 +226,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
   
   if (normalizedName.includes('amazon') || normalizedName.includes('aws')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#111111] text-[#ff9900] shrink-0 shadow-sm border border-slate-800" id="logo-amazon">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#111111] text-[#ff9900] shrink-0 shadow-sm border border-slate-800" id="logo-amazon" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-3.5 h-3.5 text-[#ff9900]" fill="currentColor" viewBox="0 0 24 24">
           <path d="M15.5 12.8c-1.1.5-2.6.8-3.7.8-2 0-3.1-1-3.1-2.9 0-2.4 1.8-3.5 4.9-3.5h1.9v1.2c0 1.2-.5 2-1.9 2.5l1.9 1.9zm1.3-4.7c0-2.5-1.5-3.8-4.2-3.8-2.1 0-3.9.9-4.8 1.6l1 1.6c.7-.6 1.9-1.2 3.1-1.2 1.5 0 2.2.7 2.2 2v.6h-2.1c-4.2 0-6.8 1.8-6.8 5 0 2.8 2 4.6 4.8 4.6 2.3 0 3.9-1.1 4.6-2.1l.1 1.7h2.6v-9.5zM21.9 19C17.2 21.6 11 22.8 5.1 21.9c-3.1-.5-6.1-1.7-8.1-4l1.5-1.5c1.6 1.8 4.2 2.8 6.9 3.2 4.9.7 10.2-.4 14.1-2.7L21.9 19zm1.1-1.6c.1.3-.2.5-.5.3l-2.4-1.3c-.3-.2-.2-.5.1-.4l2.7.3c.3.1.2.8.1.1.1.7.1 1.1.1 1.1zm-2.4-2.2l.6 1.9c.1.3-.2.5-.5.3l-1.9-.9c-.3-.1-.2-.5.1-.5l1.7-.1.1-.3z"/>
         </svg>
@@ -236,7 +236,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
   
   if (normalizedName.includes('meta') || normalizedName.includes('facebook')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#0668e1] shrink-0 shadow-sm" id="logo-meta">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#0668e1] shrink-0 shadow-sm" id="logo-meta" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
           <path d="M15.75 6c-1.75 0-3.37 1.05-4.25 2.62-.88-1.57-2.5-2.62-4.25-2.62-2.76 0-5 2.24-5 5s2.24 5 5 5c1.75 0 3.37-1.05 4.25-2.62.88 1.57 2.5 2.62 4.25 2.62 2.76 0 5-2.24 5-5s-2.24-5-5-5zm-8.5 7.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zm8.5 0c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
         </svg>
@@ -246,7 +246,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
   
   if (normalizedName.includes('openai') || normalizedName.includes('chatgpt')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-slate-950 shrink-0 shadow-sm border border-slate-800" id="logo-openai">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-slate-950 shrink-0 shadow-sm border border-slate-800" id="logo-openai" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
           <path d="M21.5 10c-.2-.9-.7-1.7-1.4-2.3l.1-.1c.5-.3.9-.8 1.1-1.3.4-1.1.1-2.4-.8-3.2-1-1-2.5-1.1-3.6-.3l-.1-.1c-.4-.5-.9-.8-1.5-1-.9-.3-1.8-.2-2.6.3L12 3 11.3 2.1c-.8-.5-1.7-.6-2.6-.3-.6.2-1.1.5-1.5 1l-.1.1C6 2.1 4.5 2.2 3.5 3.2c-.9.8-1.2 2.1-.8 3.2.2.5.6 1 1.1 1.3l.1.1C3.2 8.5 2.7 9.3 2.5 10c-.3.9-.2 1.8.3 2.6L3.7 13.5l-.9.9c-.5.8-.6 1.7-.3 2.6.2.6.5 1.1 1 1.5l.1.1C3.1 19.5 3 21 4 22c1 1 2.5 1.1 3.6.3l.1.1c.4.5.9.8 1.5 1 .9.3 1.8.2 2.6-.3l.7-.9.7.9c.8.5 1.7.6 2.6.3.6-.2 1.1-.5 1.5-1l.1-.1c1.1.8 2.6.7 3.6-.3 1-1 1.1-2.5 3-3.6l.1-.1c.5-.4.8-.9 1-1.5.3-.9.2-1.8-.3-2.6L20.3 10.5l1.2-.5zm-9.5 5.5l-2.3-1.3 2.3-4 2.3 1.3-2.3 4z" />
         </svg>
@@ -256,7 +256,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('thoughtworks')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#ef4444] text-white font-black text-[10px] shrink-0 shadow-sm tracking-tighter" id="logo-thoughtworks">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#ef4444] text-white font-black text-[10px] shrink-0 shadow-sm tracking-tighter" id="logo-thoughtworks" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         TW
       </div>
     );
@@ -264,7 +264,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('apple')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-slate-900 shrink-0 shadow-sm border border-slate-700/30" id="logo-apple">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-slate-900 shrink-0 shadow-sm border border-slate-700/30" id="logo-apple" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
           <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-.96.04-2.13.64-2.82 1.45-.6.69-1.12 1.83-.98 2.94 1.08.08 2.15-.52 2.81-1.33z" />
         </svg>
@@ -274,7 +274,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('netflix')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-black shrink-0 shadow-sm" id="logo-netflix">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-black shrink-0 shadow-sm" id="logo-netflix" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-3 h-4 text-[#E50914]" fill="currentColor" viewBox="0 0 24 24">
           <path d="M4 21V3h4.63l6.59 13.91V3h4.31v18h-4.32l-6.9-14.39V21H4z" />
         </svg>
@@ -284,7 +284,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('airbnb')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#FF5A5F] shrink-0 shadow-sm" id="logo-airbnb">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#FF5A5F] shrink-0 shadow-sm" id="logo-airbnb" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 01-9-9c0-1.74.84-3.3 2.16-4.27a9 9 0 0113.68 0C20.16 8.7 21 10.26 21 12a9 9 0 01-9 9z" />
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 11.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
@@ -295,7 +295,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('spotify')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#1ED760] shrink-0 shadow-sm" id="logo-spotify">
+      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#1ED760] shrink-0 shadow-sm" id="logo-spotify" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.565.387-.86.207-2.377-1.454-5.37-1.783-8.893-.98-.336.075-.668-.135-.744-.47-.077-.337.135-.668.47-.743 3.856-.88 7.15-.51 9.82 1.127.296.18.388.565.207.86zm1.225-2.72c-.227.367-.707.487-1.074.26-2.72-1.672-6.87-2.157-10.076-1.182-.412.125-.843-.107-.968-.52-.125-.41.108-.844.52-.968 3.67-1.114 8.24-.57 11.34 1.33.366.226.486.707.258 1.08zm.105-2.836C14.492 8.71 8.822 8.52 5.54 9.513c-.51.156-1.05-.137-1.206-.648-.156-.51.137-1.05.648-1.206 3.76-1.14 10.007-.92 14.437 1.71.46.27.61.87.34 1.33-.27.46-.87.61-1.33.34z"/>
         </svg>
@@ -305,7 +305,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('adobe')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#FF0000] text-white shrink-0 shadow-sm" id="logo-adobe">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-[#FF0000] text-white shrink-0 shadow-sm" id="logo-adobe" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
           <path d="M13.9 2h7.1v19h-5.9l-3.3-6.1h-4.3l-2.4 6.1H2.1L9.9 2h4zm-3.2 8.8l2.1 4.2H9.2l1.5-4.2z"/>
         </svg>
@@ -315,7 +315,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('tesla')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-black shrink-0 border border-slate-800" id="logo-tesla">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-black shrink-0 border border-slate-800" id="logo-tesla" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-3.5 h-3.5 text-[#E01A22]" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm2.19 5.38c-.37 0-.74.19-.94.49L12 9.77l-1.25-1.9c-.2-.3-.57-.49-.94-.49H8.25c-.71 0-1.14.79-.75 1.38l2.5 3.8-2.5 3.8c-.39.59.04 1.38.75 1.38H9.8c.37 0 .74-.19.94-.49L12 15.35l1.25 1.9c.2.3.57.49.94.49h1.56c.71 0 1.14-.79.75-1.38l-2.5-3.8 2.5-3.8c.39-.59-.04-1.38-.75-1.38h-1.56z"/>
         </svg>
@@ -325,7 +325,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('twitter') || normalizedName.includes(' x ')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-black text-white shrink-0 shadow-sm" id="logo-twitter">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-black text-white shrink-0 shadow-sm" id="logo-twitter" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
         </svg>
@@ -335,7 +335,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('github')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white shrink-0 border border-slate-700 shadow-sm" id="logo-github">
+      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white shrink-0 border border-slate-700 shadow-sm" id="logo-github" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
           <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.577.688.479C19.138 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
         </svg>
@@ -345,7 +345,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('nvidia')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-black shrink-0 border border-slate-800 shadow-sm" id="logo-nvidia">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-black shrink-0 border border-slate-800 shadow-sm" id="logo-nvidia" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-3.5 h-3.5 text-[#76B900]" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15.5c-2.48 0-4.5-2.02-4.5-4.5s2.02-4.5 4.5-4.5 4.5 2.02 4.5 4.5-2.02 4.5-4.5 4.5zm0-7c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5z" />
         </svg>
@@ -355,7 +355,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('salesforce')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-white shrink-0 border border-slate-200 shadow-sm" id="logo-salesforce">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-white shrink-0 border border-slate-200 shadow-sm" id="logo-salesforce" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-4 h-3 text-[#00A1E0]" fill="currentColor" viewBox="0 0 24 24">
           <path d="M19.1 8c-.1 0-.1 0 0 0-1-.3-1.9-.3-2.8-.1-.4-1.9-1.9-3.4-3.8-3.7-2.6-.4-5 1.1-5.7 3.6-.5-.2-1.1-.3-1.6-.2-1.8.3-3.1 1.9-3.2 3.7C.8 11.7 0 13.1 0 14.6c0 2.5 2 4.5 4.5 4.5h14.6c2.7-.2 4.9-2.5 4.9-5.2 0-3-2.2-5.5-4.9-5.9z" />
         </svg>
@@ -365,7 +365,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('atlassian') || normalizedName.includes('jira') || normalizedName.includes('confluence')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-slate-50 border border-slate-200 shrink-0 shadow-sm" id="logo-atlassian">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-slate-50 border border-slate-200 shrink-0 shadow-sm" id="logo-atlassian" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-3.5 h-3.5 text-[#0052CC]" fill="currentColor" viewBox="0 0 24 24">
           <path d="M13.9 14.3l-2.4-4.5-2.4 4.5h4.8M12 .5L1.5 20.2h5.8l4.7-8.8 4.7 8.8h5.8L12 .5z" />
         </svg>
@@ -375,7 +375,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('uber')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-black shrink-0 border border-slate-800 shadow-sm" id="logo-uber">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-black shrink-0 border border-slate-800 shadow-sm" id="logo-uber" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <span className="text-white font-black text-[10px] tracking-tight">U</span>
       </div>
     );
@@ -383,7 +383,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   if (normalizedName.includes('slack')) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded bg-white border border-slate-200 shrink-0 shadow-sm" id="logo-slack">
+      <div className="flex items-center justify-center w-6 h-6 rounded bg-white border border-slate-200 shrink-0 shadow-sm" id="logo-slack" style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
           <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523 2.528 2.528 0 0 1-2.522-2.523 2.528 2.528 0 0 1 2.522-2.52h2.52v2.52zm1.261 0a2.528 2.528 0 0 1 2.52-2.52h5.043a2.528 2.528 0 0 1 2.522 2.52v5.042a2.528 2.528 0 0 1-2.522 2.52H8.823a2.528 2.528 0 0 1-2.52-2.52v-5.042z" fill="#36C5F0"/>
           <path d="M8.823 5.043a2.528 2.528 0 0 1 2.52-2.52 2.528 2.528 0 0 1 2.522 2.52v2.52h-2.522a2.528 2.528 0 0 1-2.52-2.52zm0 1.261a2.528 2.528 0 0 1 2.52 2.52v5.043a2.528 2.528 0 0 1-2.52 2.522H3.78a2.528 2.528 0 0 1-2.522-2.522V8.824a2.528 2.528 0 0 1 2.522-2.52h5.043z" fill="#2EB67D"/>
@@ -394,7 +394,7 @@ const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, l
 
   // Fallback Monogram
   return (
-    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-xs shrink-0 shadow-sm border border-white" id="logo-fallback">
+    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-xs shrink-0 shadow-sm border border-white" id={`logo-fallback-${name}`} style={{ minWidth: '24px', minHeight: '24px', width: '24px', height: '24px' }}>
       {name ? name.charAt(0).toUpperCase() : 'C'}
     </div>
   );

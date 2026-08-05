@@ -986,8 +986,8 @@ ${additionalInstructions || ""}
 """
 - Visual Template Style: ${template || "Modern"}
 
-Generate a full, persuasive, and highly professional cover letter structured precisely into the requested JSON schema.
-Ensure each section text is highly engaging, fully detailed, and tailored to both the role and the company. No placeholders or brackets like "[Company Name]" should remain; everything must be perfectly resolved.
+Generate a full, persuasive, highly professional, and COMPACT cover letter structured precisely into the requested JSON schema.
+CRITICAL CONSTRAINT FOR PAGE LAYOUT AND PDF EXPORT: To prevent text overflow, overlaps, and page cuts in the PDF rendering, EACH generated section (opening, whyCompany, whyMe, experience, projects, skills, achievements, closing) MUST be extremely concise and limited to EXACTLY 1 to 2 punchy, professional sentences. The total length of the entire letter must not exceed 250-300 words. Keep it elegant, direct, and compact. No placeholders or brackets like "[Company Name]" should remain; everything must be perfectly resolved.
 Additionally, calculate analytical scores (0 to 100) evaluating the cover letter's ATS matching, professional grade, and clarity, along with helpful improvement suggestions.
 
 Return ONLY a valid JSON object matching the schema.`;

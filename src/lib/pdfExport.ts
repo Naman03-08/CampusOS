@@ -105,8 +105,30 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
         clonedElem.style.overflow = 'hidden';
         clonedElem.style.background = 'linear-gradient(to bottom right, #E3EDF7 0%, #E0F2F1 45%, #FBEED0 85%, #F5D77F 100%)';
       } else {
-        clonedElem.style.width = '100%';
-        clonedElem.style.maxWidth = '100%';
+        if (clonedDoc.body) {
+          clonedDoc.body.style.width = '1024px';
+          clonedDoc.body.style.height = 'auto';
+          clonedDoc.body.style.margin = '0';
+          clonedDoc.body.style.padding = '0';
+          clonedDoc.body.style.overflow = 'visible';
+          clonedDoc.body.style.background = 'transparent';
+        }
+
+        let parent = clonedElem.parentElement;
+        while (parent && parent !== clonedDoc.body) {
+          parent.style.maxWidth = 'none';
+          parent.style.width = '1024px';
+          parent.style.overflow = 'visible';
+          parent.style.maxHeight = 'none';
+          parent.style.height = 'auto';
+          parent.style.padding = '0';
+          parent.style.margin = '0 auto';
+          parent = parent.parentElement;
+        }
+
+        clonedElem.style.width = '1024px';
+        clonedElem.style.minWidth = '1024px';
+        clonedElem.style.maxWidth = '1024px';
         clonedElem.style.borderRadius = '0';
         clonedElem.style.overflow = 'visible';
         clonedElem.style.height = 'auto';
@@ -132,7 +154,7 @@ export async function exportCanvasToPDF(elementId: string, filename: string = 'R
     allowTaint: true,
     logging: false,
     windowWidth: 1200,
-    backgroundColor: isCert ? null : '#FAF8F3',
+    backgroundColor: null,
     onclone: (clonedDoc) => {
       sanitizeDocumentForHtml2Canvas(clonedDoc, elementId);
     }
