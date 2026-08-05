@@ -587,11 +587,6 @@ export const AICoverLetterView: React.FC = () => {
     });
   }, [targetCompany, experience]);
 
-  // Interactive 3D tilt coordinates
-  const [tiltLetter, setTiltLetter] = useState({ rx: 0, ry: 0 });
-  const [tiltScores, setTiltScores] = useState({ rx: 0, ry: 0 });
-  const [tiltCheat, setTiltCheat] = useState({ rx: 0, ry: 0 });
-
   // Resume Parsing / Import Text
   const [resumeText, setResumeText] = useState('');
   const [isParsingResume, setIsParsingResume] = useState(false);
@@ -1288,24 +1283,6 @@ export const AICoverLetterView: React.FC = () => {
       origin: { y: 0.8 },
       colors: ['#3b82f6', '#8b5cf6', '#6366f1', '#10b981']
     });
-  };
-
-  // Mouse move handler for 3D card tilt effect
-  const handleMouseMoveTilt = (e: React.MouseEvent<HTMLDivElement>, setTiltState: React.Dispatch<React.SetStateAction<{ rx: number; ry: number }>>) => {
-    const card = e.currentTarget;
-    const box = card.getBoundingClientRect();
-    const x = e.clientX - box.left;
-    const y = e.clientY - box.top;
-    const centerX = box.width / 2;
-    const centerY = box.height / 2;
-    // Calculate tilt angles (limit between -10 and 10 degrees for elegant restraint)
-    const rotateY = ((x - centerX) / centerX) * 8;
-    const rotateX = -((y - centerY) / centerY) * 8;
-    setTiltState({ rx: rotateX, ry: rotateY });
-  };
-
-  const handleMouseLeaveTilt = (setTiltState: React.Dispatch<React.SetStateAction<{ rx: number; ry: number }>>) => {
-    setTiltState({ rx: 0, ry: 0 });
   };
 
   // Compare input skills with parsed keywords to highlight match index
@@ -2224,24 +2201,14 @@ export const AICoverLetterView: React.FC = () => {
 
                 return (
                   <div 
-                    onMouseMove={(e) => handleMouseMoveTilt(e, setTiltLetter)}
-                    onMouseLeave={() => handleMouseLeaveTilt(setTiltLetter)}
                     className={`rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 relative ${
                       zoomLetter ? 'max-w-none' : ''
                     } ${textFamily} ${containerBg}`}
                     style={{
                       border: '1px solid rgba(226, 232, 240, 0.9)',
-                      transform: `perspective(1000px) rotateX(${tiltLetter.rx}deg) rotateY(${tiltLetter.ry}deg)`,
-                      transition: 'transform 0.1s ease-out, box-shadow 0.2s ease-out'
+                      transition: 'box-shadow 0.2s ease-out'
                     }}
                   >
-                    {/* 3D Shining Gloss Reflection Effect overlay */}
-                    <div 
-                      className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay"
-                      style={{
-                        background: `linear-gradient(${135 + tiltLetter.ry * 5}deg, #ffffff 0%, #000000 100%)`
-                      }}
-                    />
 
                     {/* Visual Letterhead Decorator */}
                     <div className={`h-2.5 w-full bg-gradient-to-r ${accentBarColor}`}></div>
@@ -2731,15 +2698,9 @@ export const AICoverLetterView: React.FC = () => {
               </div>
             )}
 
-              {/* AI Scores Gauge Dashboard Panel - with 3D perspective tilt */}
+              {/* AI Scores Gauge Dashboard Panel */}
               <div 
-                onMouseMove={(e) => handleMouseMoveTilt(e, setTiltScores)}
-                onMouseLeave={() => handleMouseLeaveTilt(setTiltScores)}
                 className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xl transition-all"
-                style={{
-                  transform: `perspective(1000px) rotateX(${tiltScores.rx}deg) rotateY(${tiltScores.ry}deg)`,
-                  transition: 'transform 0.1s ease-out'
-                }}
               >
                 <div className="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
                   <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
@@ -2870,13 +2831,7 @@ export const AICoverLetterView: React.FC = () => {
 
               {interviewCheatSheet && (
                 <div 
-                  onMouseMove={(e) => handleMouseMoveTilt(e, setTiltCheat)}
-                  onMouseLeave={() => handleMouseLeaveTilt(setTiltCheat)}
                   className="bg-slate-900 text-white rounded-3xl border border-slate-800 p-6 shadow-2xl relative overflow-hidden transition-all"
-                  style={{
-                    transform: `perspective(1000px) rotateX(${tiltCheat.rx}deg) rotateY(${tiltCheat.ry}deg)`,
-                    transition: 'transform 0.1s ease-out'
-                  }}
                 >
                   {/* Decorative glowing gradient inside the cheat sheet card */}
                   <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
