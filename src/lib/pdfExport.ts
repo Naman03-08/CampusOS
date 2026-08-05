@@ -108,6 +108,10 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
         clonedElem.style.width = '100%';
         clonedElem.style.maxWidth = '100%';
         clonedElem.style.borderRadius = '0';
+        clonedElem.style.overflow = 'visible';
+        clonedElem.style.height = 'auto';
+        clonedElem.style.minHeight = 'auto';
+        clonedElem.style.maxHeight = 'none';
       }
     }
   }
@@ -158,9 +162,53 @@ export async function exportCanvasToPDF(elementId: string, filename: string = 'R
     });
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-    const yOffset = imgHeight < pdfHeight ? (pdfHeight - imgHeight) / 2 : 0;
-    pdf.addImage(imgData, 'PNG', 0, yOffset, pdfWidth, imgHeight, undefined, 'FAST');
+    
+    // We want to calculate the maximum canvas height that fits in a single PDF page
+    const pageCanvasHeight = canvas.width * (pdfHeight / pdfWidth);
+    
+    // If the canvas is short and fits fully on one page, we can center it vertically
+    if (canvas.height <= pageCanvasHeight) {
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      const yOffset = (pdfHeight - imgHeight) / 2;
+      pdf.addImage(imgData, 'PNG', 0, yOffset, pdfWidth, imgHeight, undefined, 'FAST');
+    } else {
+      // It's a multi-page document! Slice the canvas into multiple pages
+      let remainingHeight = canvas.height;
+      let yOffset = 0;
+      let pageNum = 1;
+
+      while (remainingHeight > 0) {
+        if (pageNum > 1) {
+          pdf.addPage();
+        }
+
+        const sHeight = Math.min(pageCanvasHeight, remainingHeight);
+        
+        // Slicing via temporary canvas
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = sHeight;
+        const ctx = tempCanvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(
+            canvas,
+            0, yOffset, canvas.width, sHeight, // source rectangle
+            0, 0, canvas.width, sHeight       // destination rectangle
+          );
+        }
+        
+        const pageImgData = tempCanvas.toDataURL('image/png', 1.0);
+        const pHeight = (sHeight * pdfWidth) / canvas.width;
+        
+        // Draw edge-to-edge on each page
+        pdf.addImage(pageImgData, 'PNG', 0, 0, pdfWidth, pHeight, undefined, 'FAST');
+        
+        yOffset += sHeight;
+        remainingHeight -= sHeight;
+        pageNum++;
+      }
+    }
+    
     pdf.save(filename);
   }
 }
