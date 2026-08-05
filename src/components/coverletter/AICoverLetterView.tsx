@@ -2315,7 +2315,7 @@ export const AICoverLetterView: React.FC = () => {
                         </div>
 
                         {/* Horizontal Contact Pill Bar with Premium Logos (inspired by image) */}
-                        <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ${portfolio ? 'lg:grid-cols-6' : 'lg:grid-cols-5'} gap-2.5 mt-5 text-[11px] font-semibold text-slate-600 w-full`}>
+                        <div id="cover-letter-contact-grid" className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ${portfolio ? 'lg:grid-cols-6' : 'lg:grid-cols-5'} gap-2.5 mt-5 text-[11px] font-semibold text-slate-600 w-full`}>
                           <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
                             <CompactMailIcon />
                             <span className="truncate">{email || "naman03mgs@gmail.com"}</span>

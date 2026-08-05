@@ -139,10 +139,19 @@ export function sanitizeCssString(cssText: string): string {
   return cleaned;
 }
 
-export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElementId?: string): void {
+export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElementId?: string, sanitizedCss?: string): void {
   // Copy all stylesheet and preconnect <link> tags from main document to cloned document's head
   const links = Array.from(document.querySelectorAll('link[rel="stylesheet"], link[rel="preconnect"]'));
   links.forEach((link) => {
+    const href = link.getAttribute('href') || '';
+    const absoluteUrl = href ? new URL(href, window.location.origin).href : '';
+    
+    // If we have pre-sanitized CSS, we skip copying same-origin stylesheet links
+    // to avoid loading raw CSS files with oklch syntax.
+    if (sanitizedCss && absoluteUrl.startsWith(window.location.origin) && link.getAttribute('rel') === 'stylesheet') {
+      return;
+    }
+
     const clonedLink = clonedDoc.createElement('link');
     clonedLink.rel = link.getAttribute('rel') || 'stylesheet';
     clonedLink.href = (link as HTMLLinkElement).href;
@@ -153,10 +162,18 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
     clonedDoc.head.appendChild(clonedLink);
   });
 
+  // Inject the pre-sanitized CSS to ensure all Tailwind background-colors and borders are parsed perfectly by html2canvas
+  if (sanitizedCss) {
+    const styleTag = clonedDoc.createElement('style');
+    styleTag.textContent = sanitizedCss;
+    clonedDoc.head.appendChild(styleTag);
+  }
+
   // Re-create <style> elements with sanitized CSS so the cloned iframe re-parses stylesheets cleanly
   const styleTags = Array.from(clonedDoc.querySelectorAll('style'));
   styleTags.forEach((styleTag) => {
-    if (styleTag.textContent) {
+    // Skip our newly injected style tag
+    if (styleTag.textContent && (!sanitizedCss || styleTag !== clonedDoc.head.lastChild)) {
       const sanitized = sanitizeCssString(styleTag.textContent);
       const newStyle = clonedDoc.createElement('style');
       newStyle.textContent = sanitized;
@@ -399,7 +416,7 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
           }
 
           // 5. Force horizontal contact pills and dynamically copy the exact background, border, text colors from webpage template
-          const contactInfoGrid = clonedElem.querySelector('div[class*="grid-cols-1 sm:grid-cols-2"]');
+          const contactInfoGrid = clonedElem.querySelector('#cover-letter-contact-grid') || clonedElem.querySelector('div[class*="grid-cols-1 sm:grid-cols-2"]');
           if (contactInfoGrid instanceof HTMLElement) {
             contactInfoGrid.style.setProperty('display', 'flex', 'important');
             contactInfoGrid.style.setProperty('flex-direction', 'row', 'important');
@@ -409,7 +426,7 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
             contactInfoGrid.style.setProperty('margin-top', '10px', 'important');
             contactInfoGrid.style.setProperty('width', '100%', 'important');
 
-            const originalGrid = document.querySelector('div[class*="grid-cols-1 sm:grid-cols-2"]');
+            const originalGrid = document.getElementById('cover-letter-contact-grid') || document.querySelector('div[class*="grid-cols-1 sm:grid-cols-2"]');
             const originalPills = originalGrid ? Array.from(originalGrid.children) : [];
 
             const pills = Array.from(contactInfoGrid.children);
@@ -555,6 +572,43 @@ export async function exportCanvasToPDF(elementId: string, filename: string = 'R
     throw new Error(`Element with id #${elementId} not found`);
   }
 
+  const isCoverLetter = elementId === 'cover-letter-paper-canvas';
+
+  // Pre-fetch same-origin stylesheets and sanitize them to replace oklch with rgb/rgba
+  let sanitizedCss = '';
+  try {
+    const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+    for (const link of links) {
+      const href = link.getAttribute('href');
+      if (href) {
+        const absoluteUrl = new URL(href, window.location.origin).href;
+        if (absoluteUrl.startsWith(window.location.origin)) {
+          const response = await fetch(absoluteUrl);
+          if (response.ok) {
+            const rawCss = await response.text();
+            sanitizedCss += '\n' + sanitizeCssString(rawCss);
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to pre-fetch and sanitize stylesheets:', err);
+  }
+
+  // Save original inline style to restore it perfectly after html2canvas completes cloning
+  const originalStyle = elem.style.cssText;
+
+  if (isCoverLetter) {
+    // Temporarily apply export-optimized width and remove any transforms (like 3D tilt hovers)
+    elem.style.setProperty('width', '1000px', 'important');
+    elem.style.setProperty('min-width', '1000px', 'important');
+    elem.style.setProperty('max-width', '1000px', 'important');
+    elem.style.setProperty('transform', 'none', 'important');
+    elem.style.setProperty('box-shadow', 'none', 'important');
+    elem.style.setProperty('margin', '0', 'important');
+    elem.style.setProperty('padding', '0', 'important');
+  }
+
   const isCert = filename.toLowerCase().includes('certificate') || elementId.includes('cert');
 
   // Generate crisp canvas rendering with desktop layout width
@@ -566,9 +620,12 @@ export async function exportCanvasToPDF(elementId: string, filename: string = 'R
     windowWidth: 1200,
     backgroundColor: null,
     onclone: (clonedDoc) => {
-      sanitizeDocumentForHtml2Canvas(clonedDoc, elementId);
+      sanitizeDocumentForHtml2Canvas(clonedDoc, elementId, sanitizedCss);
     }
   });
+
+  // Restores the original inline style immediately
+  elem.style.cssText = originalStyle;
 
   const imgData = canvas.toDataURL('image/png', 1.0);
 
