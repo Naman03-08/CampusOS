@@ -165,7 +165,19 @@ const COMPANY_PRESETS: CompanyCulturePreset[] = [
 ];
 
 // Company logo icon helper component
-const CompanyLogoIcon: React.FC<{ name: string }> = ({ name }) => {
+const CompanyLogoIcon: React.FC<{ name: string; logoUrl?: string }> = ({ name, logoUrl }) => {
+  if (logoUrl && logoUrl !== 'NOT_FOUND') {
+    return (
+      <div className="w-6 h-6 shrink-0 shadow-xs p-0.5 bg-white border border-slate-200/85 rounded-lg flex items-center justify-center overflow-hidden transition-all duration-200 hover:scale-105">
+        <img 
+          src={logoUrl} 
+          alt={`${name} logo`} 
+          className="w-full h-full object-contain rounded" 
+          referrerPolicy="no-referrer"
+        />
+      </div>
+    );
+  }
   const normalizedName = name.toLowerCase();
   
   if (normalizedName.includes('microsoft')) {
@@ -512,6 +524,68 @@ export const AICoverLetterView: React.FC = () => {
   const [jobDescription, setJobDescription] = useState('');
   const [additionalInstructions, setAdditionalInstructions] = useState('');
   const [template, setTemplate] = useState('Modern Serif');
+
+  // Automated Company logo fetching for Target and Experience companies
+  const [companyLogos, setCompanyLogos] = useState<Record<string, string>>({});
+  const companyLogosRef = useRef<Record<string, string>>({});
+  const pendingFetches = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const fetchLogoForName = async (name: string) => {
+      const trimmed = name.trim();
+      if (!trimmed || trimmed.length < 2) return;
+      
+      const key = trimmed.toLowerCase();
+      // Skip if already fetched, or currently fetching
+      if (companyLogosRef.current[key] || pendingFetches.current.has(key)) return;
+
+      // Skip if it is a hardcoded logo to preserve custom high-fidelity SVGs
+      const hardcoded = ['microsoft', 'google', 'stripe', 'amazon', 'aws', 'meta', 'facebook', 'openai', 'chatgpt', 'github', 'spotify', 'apple', 'netflix', 'slack', 'atlassian', 'salesforce', 'nvidia', 'uber', 'airbnb', 'adobe', 'tesla'];
+      if (hardcoded.some(hc => key.includes(hc))) return;
+
+      pendingFetches.current.add(key);
+
+      try {
+        const response = await fetch(`/api/company/logo?name=${encodeURIComponent(trimmed)}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.exists && data.logo) {
+            companyLogosRef.current[key] = data.logo;
+            setCompanyLogos(prev => ({ ...prev, [key]: data.logo }));
+          } else {
+            companyLogosRef.current[key] = 'NOT_FOUND';
+            setCompanyLogos(prev => ({ ...prev, [key]: 'NOT_FOUND' }));
+          }
+        } else {
+          companyLogosRef.current[key] = 'NOT_FOUND';
+          setCompanyLogos(prev => ({ ...prev, [key]: 'NOT_FOUND' }));
+        }
+      } catch (err) {
+        console.error('Failed to fetch company logo:', err);
+        companyLogosRef.current[key] = 'NOT_FOUND';
+        setCompanyLogos(prev => ({ ...prev, [key]: 'NOT_FOUND' }));
+      } finally {
+        pendingFetches.current.delete(key);
+      }
+    };
+
+    // Gather names from targetCompany and parsed experience blocks
+    const namesToFetch: string[] = [];
+    if (targetCompany) {
+      namesToFetch.push(targetCompany);
+    }
+    const parsedExp = parseExperienceBlocks(experience);
+    parsedExp.forEach((exp: any) => {
+      if (exp && exp.company) {
+        namesToFetch.push(exp.company);
+      }
+    });
+
+    const uniqueNames = Array.from(new Set(namesToFetch));
+    uniqueNames.forEach(name => {
+      fetchLogoForName(name);
+    });
+  }, [targetCompany, experience]);
 
   // Interactive 3D tilt coordinates
   const [tiltLetter, setTiltLetter] = useState({ rx: 0, ry: 0 });
@@ -1616,7 +1690,7 @@ export const AICoverLetterView: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-4">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Voice Tone</label>
                       <select
@@ -1632,17 +1706,71 @@ export const AICoverLetterView: React.FC = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Visual Template</label>
-                      <select
-                        value={template}
-                        onChange={(e) => setTemplate(e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-xl text-xs font-semibold outline-none"
-                      >
-                        <option value="Modern Serif">Modern Serif</option>
-                        <option value="Corporate Clean">Corporate Clean</option>
-                        <option value="Aesthetic Warm">Aesthetic Warm</option>
-                        <option value="Futuristic Minimalist">Futuristic Minimalist</option>
-                      </select>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Visual Template Style</label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          {
+                            id: 'Modern Serif',
+                            name: 'Modern Serif',
+                            desc: 'Ivory linen with editorial serif typography',
+                            badge: 'Editorial',
+                            previewBg: 'bg-[#fbfbf8] border-emerald-800/40',
+                            fontSample: 'font-serif text-emerald-800 italic',
+                            sampleName: 'Aa'
+                          },
+                          {
+                            id: 'Corporate Clean',
+                            name: 'Corporate Clean',
+                            desc: 'Pristine white with corporate navy borders',
+                            badge: 'Executive',
+                            previewBg: 'bg-white border-blue-600',
+                            fontSample: 'font-sans text-blue-900 font-bold',
+                            sampleName: 'Aa'
+                          },
+                          {
+                            id: 'Aesthetic Warm',
+                            name: 'Aesthetic Warm',
+                            desc: 'Soft sand with warm terracotta accents',
+                            badge: 'Creative',
+                            previewBg: 'bg-[#fdf9f3] border-orange-300',
+                            fontSample: 'font-sans text-[#7c2d12] font-semibold',
+                            sampleName: 'Aa'
+                          },
+                          {
+                            id: 'Futuristic Minimalist',
+                            name: 'Futuristic Minimalist',
+                            desc: 'Monospace with high-tech gridded details',
+                            badge: 'Tech-Core',
+                            previewBg: 'bg-[#fcfdfd] border-dashed border-slate-300',
+                            fontSample: 'font-mono text-violet-600 font-bold',
+                            sampleName: '01'
+                          }
+                        ].map((t) => (
+                          <div
+                            key={t.id}
+                            onClick={() => {
+                              setTemplate(t.id);
+                              triggerToast(`Switched visual style to ${t.name}`);
+                            }}
+                            className={`cursor-pointer rounded-2xl border p-3 text-left transition-all relative overflow-hidden group flex flex-col justify-between h-[105px] ${
+                              template === t.id
+                                ? 'bg-blue-50/20 border-blue-500 shadow-md ring-1 ring-blue-500/20'
+                                : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-sm'
+                            }`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <span className="text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider">{t.badge}</span>
+                              <div className={`w-6 h-6 rounded flex items-center justify-center border text-[11px] ${t.previewBg} ${t.fontSample} shadow-3xs`}>
+                                {t.sampleName}
+                              </div>
+                            </div>
+                            <div className="mt-1">
+                              <div className="font-extrabold text-[11.5px] text-slate-800 leading-tight">{t.name}</div>
+                              <p className="text-[9.5px] text-slate-400 font-semibold line-clamp-1 mt-0.5 leading-snug">{t.desc}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -1753,27 +1881,83 @@ export const AICoverLetterView: React.FC = () => {
           
           {/* Active Generation Loader */}
           {isGenerating && (
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xl p-12 text-center flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-tr from-slate-50/50 to-white/30 -z-10"></div>
-              <div className="relative mb-6">
-                <div className="w-24 h-24 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+            <div className="bg-slate-950 text-slate-100 rounded-3xl border border-slate-800 shadow-2xl p-8 sm:p-12 text-center flex flex-col items-center justify-center min-h-[520px] relative overflow-hidden">
+              {/* Grid backdrop */}
+              <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '20px 20px' }}></div>
+              <div className="absolute inset-0 bg-radial-gradient from-indigo-500/10 via-transparent to-transparent -z-10"></div>
+              
+              <div className="relative mb-8">
+                {/* Dual spinning tech rings */}
+                <div className="w-24 h-24 border-4 border-slate-800 border-t-indigo-500 rounded-full animate-spin"></div>
+                <div className="w-20 h-20 border-4 border-dashed border-slate-700 border-t-cyan-400 rounded-full animate-spin absolute top-2 left-2 animate-[spin_3s_linear_infinite_reverse]"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Sparkles className="h-10 w-10 text-indigo-500 animate-bounce" />
+                  <Sparkles className="h-8 w-8 text-cyan-400 animate-[pulse_1.5s_ease-in-out_infinite]" />
                 </div>
               </div>
               
-              <h3 className="text-xl font-extrabold text-slate-800">Architecting Cover Letter</h3>
-              <p className="text-slate-400 text-xs mt-1 mb-8 max-w-sm mx-auto">Evaluating company cultural directives, analyzing project relevance, and mapping ATS-compliant structures...</p>
+              <div className="space-y-1">
+                <span className="text-[10px] uppercase font-mono tracking-widest text-indigo-400 font-bold bg-indigo-950/60 border border-indigo-900/60 px-3 py-1 rounded-full">Placivo Gen-4 AI Architecture</span>
+                <h3 className="text-xl font-bold tracking-tight text-white pt-2">Synthesizing Bespoke Cover Letter</h3>
+                <p className="text-slate-400 text-xs max-w-sm mx-auto leading-relaxed">Cross-referencing your credentials with {targetCompany || "target company"}'s engineering culture rules and job criteria...</p>
+              </div>
 
-              <div className="w-full max-w-sm bg-slate-100 rounded-full h-2 mb-6 overflow-hidden">
+              {/* High-quality technical progress bar */}
+              <div className="w-full max-w-md mt-8 bg-slate-900 border border-slate-800 rounded-full h-3 p-0.5 overflow-hidden shadow-inner">
                 <div 
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 h-2 rounded-full transition-all duration-1000" 
+                  className="bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_8px_rgba(99,102,241,0.5)]" 
                   style={{ width: `${((genStep + 1) / generationSteps.length) * 100}%` }}
                 ></div>
               </div>
 
-              <div className="text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-4 py-1.5 rounded-full animate-pulse">
-                {generationSteps[genStep]}
+              {/* Progress metric */}
+              <div className="flex justify-between w-full max-w-md text-[10px] font-mono text-slate-500 mt-2 font-bold px-1">
+                <span>PHASE {genStep + 1} OF {generationSteps.length}</span>
+                <span className="text-indigo-400">{Math.round(((genStep + 1) / generationSteps.length) * 100)}% ANALYSIS COMPLETE</span>
+              </div>
+
+              {/* Tech Diagnostic Live Stream Panel */}
+              <div className="w-full max-w-md bg-slate-900/80 border border-slate-800 rounded-2xl p-4 mt-6 text-left font-mono text-[10.5px] leading-relaxed text-slate-400 shadow-lg min-h-[140px] flex flex-col justify-between">
+                <div className="space-y-1.5 flex-1">
+                  <div className="flex items-center gap-1.5 text-indigo-400 font-bold">
+                    <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-ping"></span>
+                    <span>SYSTEM_STATUS: ACTIVE_OPTIMIZATION</span>
+                  </div>
+                  <div className="text-slate-500">
+                    &gt; Initializing neural semantic pipeline...
+                  </div>
+                  {genStep >= 1 && (
+                    <div className="text-slate-400">
+                      &gt; Extrapolating company values for <span className="text-white">"{targetCompany}"</span>...
+                    </div>
+                  )}
+                  {genStep >= 2 && (
+                    <div className="text-slate-400">
+                      &gt; Parsing experience highlights and technology stacks...
+                    </div>
+                  )}
+                  {genStep >= 3 && (
+                    <div className="text-emerald-400">
+                      &gt; Synthesizing bespoke paragraphs matching tone: <span className="italic">"{tone}"</span>...
+                    </div>
+                  )}
+                  {genStep >= 4 && (
+                    <div className="text-cyan-400">
+                      &gt; Running real-time ATS keyword matching index simulations...
+                    </div>
+                  )}
+                  {genStep >= 5 && (
+                    <div className="text-indigo-400 font-bold">
+                      &gt; Performing final structural polishing and formatting checks...
+                    </div>
+                  )}
+                </div>
+                <div className="pt-2 border-t border-slate-800 text-[10px] font-bold text-slate-500 flex justify-between items-center mt-3">
+                  <span className="animate-pulse flex items-center gap-1">
+                    <span className="h-1 w-1 bg-cyan-400 rounded-full"></span>
+                    ACTIVE_PROCESS: {generationSteps[genStep]}
+                  </span>
+                  <span>v1.4.2</span>
+                </div>
               </div>
             </div>
           )}
@@ -2085,7 +2269,7 @@ export const AICoverLetterView: React.FC = () => {
                               isFuturistic ? 'bg-slate-950 border border-slate-800 rounded-none text-emerald-400 font-mono text-[10px]' :
                               'bg-slate-50 border border-slate-200/60 rounded-xl text-slate-700'
                             }`}>
-                              <CompanyLogoIcon name={targetCompany} />
+                              <CompanyLogoIcon name={targetCompany} logoUrl={companyLogos[targetCompany.toLowerCase()]} />
                               <span className="text-xs font-bold">{targetCompany} Candidate</span>
                             </div>
                           )}
@@ -2213,7 +2397,7 @@ export const AICoverLetterView: React.FC = () => {
                               parseExperienceBlocks(experience).slice(0, 2).map((expItem: any) => (
                                 <div key={expItem.id} className={`${cardBg}`}>
                                   <div className="flex items-start gap-2.5">
-                                    <CompanyLogoIcon name={expItem.company} />
+                                    <CompanyLogoIcon name={expItem.company} logoUrl={companyLogos[expItem.company.toLowerCase()]} />
                                     <div className="flex-1 min-w-0">
                                       <div className="font-extrabold text-xs text-slate-800 truncate">{expItem.role}</div>
                                       <div className={`text-[10px] font-bold truncate ${isSerif ? 'text-emerald-800' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>{expItem.company}</div>
