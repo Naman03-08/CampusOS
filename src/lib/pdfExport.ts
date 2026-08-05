@@ -169,9 +169,18 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
   // Sanitize inline styles on all elements
   const allElements = clonedDoc.querySelectorAll('*');
   allElements.forEach((el) => {
-    const styleAttr = el.getAttribute('style');
-    if (styleAttr) {
-      el.setAttribute('style', sanitizeCssString(styleAttr));
+    if (el instanceof HTMLElement) {
+      const styleAttr = el.getAttribute('style');
+      if (styleAttr) {
+        el.setAttribute('style', sanitizeCssString(styleAttr));
+      }
+      // Remove all shadow-related styling and classes to completely prevent html2canvas rendering black spots or black boxes
+      el.style.setProperty('box-shadow', 'none', 'important');
+      el.style.setProperty('text-shadow', 'none', 'important');
+      el.style.setProperty('filter', 'none', 'important');
+      if (el.className) {
+        el.className = el.className.replace(/\bshadow\b|\bshadow-\w+/g, '');
+      }
     }
   });
 
@@ -217,13 +226,22 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
         clonedElem.style.overflow = 'hidden';
         clonedElem.style.background = 'linear-gradient(to bottom right, #E3EDF7 0%, #E0F2F1 45%, #FBEED0 85%, #F5D77F 100%)';
       } else {
+        // Read the actual background color of the original element on the webpage
+        const originalElem = document.getElementById(targetElementId);
+        let bgToApply = '#ffffff';
+        if (originalElem) {
+          const computedStyle = window.getComputedStyle(originalElem);
+          bgToApply = computedStyle.backgroundColor || '#ffffff';
+        }
+
         if (clonedDoc.body) {
           clonedDoc.body.style.width = '1024px';
           clonedDoc.body.style.height = 'auto';
           clonedDoc.body.style.margin = '0';
           clonedDoc.body.style.padding = '0';
           clonedDoc.body.style.overflow = 'visible';
-          clonedDoc.body.style.background = 'transparent';
+          clonedDoc.body.style.background = bgToApply;
+          clonedDoc.body.style.backgroundColor = bgToApply;
         }
 
         let parent = clonedElem.parentElement;
@@ -238,17 +256,52 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
           parent = parent.parentElement;
         }
 
-        clonedElem.style.width = '1024px';
-        clonedElem.style.minWidth = '1024px';
-        clonedElem.style.maxWidth = '1024px';
-        clonedElem.style.borderRadius = '0';
-        clonedElem.style.overflow = 'visible';
-        clonedElem.style.height = 'auto';
-        clonedElem.style.minHeight = 'auto';
-        clonedElem.style.maxHeight = 'none';
-
-        // Tighten layouts inside cover letter specifically so it beautifully fits exactly one page
         if (targetElementId === 'cover-letter-paper-canvas') {
+          // Force outer cloned element parameters to render perfectly on desktop dimension
+          clonedElem.style.setProperty('width', '1000px', 'important');
+          clonedElem.style.setProperty('min-width', '1000px', 'important');
+          clonedElem.style.setProperty('max-width', '1000px', 'important');
+          clonedElem.style.setProperty('height', 'auto', 'important');
+          clonedElem.style.setProperty('min-height', 'auto', 'important');
+          clonedElem.style.setProperty('max-height', 'none', 'important');
+          clonedElem.style.setProperty('overflow', 'visible', 'important');
+          clonedElem.style.setProperty('border-radius', '0px', 'important');
+          clonedElem.style.setProperty('box-shadow', 'none', 'important');
+          clonedElem.style.setProperty('margin', '0', 'important'); // Zero margin to prevent any subpixel shifting/left clipping
+          clonedElem.style.setProperty('padding', '0', 'important');
+          clonedElem.style.setProperty('background-color', bgToApply, 'important');
+          clonedElem.style.setProperty('background', bgToApply, 'important');
+
+          // Ensure parent container matches width and has no constraints or margins that cause shifting
+          let pNode = clonedElem.parentElement;
+          while (pNode && pNode !== clonedDoc.body) {
+            pNode.style.setProperty('width', '1000px', 'important');
+            pNode.style.setProperty('min-width', '1000px', 'important');
+            pNode.style.setProperty('max-width', '1000px', 'important');
+            pNode.style.setProperty('height', 'auto', 'important');
+            pNode.style.setProperty('max-height', 'none', 'important');
+            pNode.style.setProperty('overflow', 'visible', 'important');
+            pNode.style.setProperty('margin', '0', 'important'); // Remove margins to prevent left-side crops
+            pNode.style.setProperty('padding', '0', 'important');
+            pNode.style.setProperty('display', 'block', 'important'); // Standard block flow rather than centering flex container
+            pNode = pNode.parentElement;
+          }
+          if (clonedDoc.body) {
+            clonedDoc.body.style.setProperty('width', '1000px', 'important');
+            clonedDoc.body.style.setProperty('height', 'auto', 'important');
+            clonedDoc.body.style.setProperty('overflow', 'visible', 'important');
+            clonedDoc.body.style.setProperty('background-color', bgToApply, 'important');
+            clonedDoc.body.style.setProperty('margin', '0', 'important');
+            clonedDoc.body.style.setProperty('padding', '0', 'important');
+            clonedDoc.body.style.setProperty('display', 'block', 'important');
+          }
+          const htmlEl = clonedDoc.documentElement;
+          if (htmlEl) {
+            htmlEl.style.setProperty('width', '1000px', 'important');
+            htmlEl.style.setProperty('margin', '0', 'important');
+            htmlEl.style.setProperty('padding', '0', 'important');
+          }
+
           // 0. Force top header container to render side-by-side (flex-row)
           const topHeaderContainer = clonedElem.querySelector('div[class*="flex flex-col md:flex-row"], div[class*="flex-col md:flex-row"]');
           if (topHeaderContainer instanceof HTMLElement) {
@@ -257,26 +310,34 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
             topHeaderContainer.style.setProperty('justify-content', 'space-between', 'important');
             topHeaderContainer.style.setProperty('align-items', 'center', 'important');
             topHeaderContainer.style.setProperty('width', '100%', 'important');
+            topHeaderContainer.style.setProperty('margin-bottom', '12px', 'important');
           }
 
-          // 1. Convert all space-y-x classes to flex layouts to easily tighten vertical margin-tops
+          // Tighten header margins slightly
+          const headerSection = clonedElem.querySelector('div[class*="border-b"], div[class*="pb-6"]');
+          if (headerSection instanceof HTMLElement) {
+            headerSection.style.setProperty('padding-bottom', '12px', 'important');
+            headerSection.style.setProperty('margin-bottom', '14px', 'important');
+          }
+
+          // 1. Convert space-y elements to flex layouts with elegant, readable gaps matching website
           const spaceYElements = clonedElem.querySelectorAll('[class*="space-y-"]');
           spaceYElements.forEach((el) => {
             if (el instanceof HTMLElement) {
               el.style.setProperty('display', 'flex', 'important');
               el.style.setProperty('flex-direction', 'column', 'important');
               
-              let gap = '10px';
+              let gap = '14px';
               if (el.className.includes('space-y-8')) {
-                gap = '12px';
+                gap = '20px';
               } else if (el.className.includes('space-y-6')) {
-                gap = '8px';
+                gap = '14px';
               } else if (el.className.includes('space-y-4')) {
-                gap = '6px';
+                gap = '10px';
               } else if (el.className.includes('space-y-3')) {
-                gap = '5px';
+                gap = '8px';
               } else if (el.className.includes('space-y-2')) {
-                gap = '4px';
+                gap = '6px';
               }
               el.style.setProperty('gap', gap, 'important');
               
@@ -291,19 +352,24 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
             }
           });
 
-          // 2. Reduce the outer padding of the primary canvas sheet
+          // 2. Set beautiful outer padding of the primary canvas sheet to feel balanced and match A4
           const outerPaddingContainer = clonedElem.querySelector('div.p-8, div.p-12, div.sm\\:p-12, div[class*="p-8"], div[class*="p-12"]');
           if (outerPaddingContainer instanceof HTMLElement) {
-            outerPaddingContainer.style.setProperty('padding', '20px 28px', 'important');
+            outerPaddingContainer.style.setProperty('padding', '24px 30px', 'important');
           }
 
-          // 3. Compact typography for the main cover letter body paragraphs
+          // 3. Elegant, highly readable typography for the main cover letter body paragraphs to match the website
           const mainParagraphs = clonedElem.querySelectorAll('p');
           mainParagraphs.forEach((p) => {
             if (p instanceof HTMLElement) {
-              p.style.setProperty('font-size', '11.5px', 'important');
-              p.style.setProperty('line-height', '1.35', 'important');
-              p.style.setProperty('margin-bottom', '1px', 'important');
+              const origFs = window.getComputedStyle(p).fontSize;
+              const fsVal = parseFloat(origFs);
+              const targetFs = fsVal ? Math.max(12, Math.min(fsVal, 14.5)) : 13.5;
+
+              p.style.setProperty('font-size', `${targetFs}px`, 'important');
+              p.style.setProperty('line-height', '1.5', 'important');
+              p.style.setProperty('margin-top', '0px', 'important');
+              p.style.setProperty('margin-bottom', '0px', 'important');
             }
           });
 
@@ -312,61 +378,171 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
           if (mainGrid instanceof HTMLElement) {
             mainGrid.style.setProperty('display', 'grid', 'important');
             mainGrid.style.setProperty('grid-template-columns', 'repeat(12, minmax(0, 1fr))', 'important');
-            mainGrid.style.setProperty('gap', '14px', 'important');
+            mainGrid.style.setProperty('gap', '20px', 'important');
           }
 
           const leftColumn = clonedElem.querySelector('.lg\\:col-span-8, div[class*="lg:col-span-8"]');
           if (leftColumn instanceof HTMLElement) {
             leftColumn.style.setProperty('grid-column', 'span 8 / span 8', 'important');
-            leftColumn.style.setProperty('padding-right', '14px', 'important');
+            leftColumn.style.setProperty('padding-right', '16px', 'important');
+            leftColumn.style.setProperty('display', 'flex', 'important');
+            leftColumn.style.setProperty('flex-direction', 'column', 'important');
+            leftColumn.style.setProperty('gap', '10px', 'important');
           }
 
           const rightSidebar = clonedElem.querySelector('.lg\\:col-span-4, div[class*="lg:col-span-4"]');
           if (rightSidebar instanceof HTMLElement) {
             rightSidebar.style.setProperty('grid-column', 'span 4 / span 4', 'important');
+            rightSidebar.style.setProperty('display', 'flex', 'important');
+            rightSidebar.style.setProperty('flex-direction', 'column', 'important');
+            rightSidebar.style.setProperty('gap', '12px', 'important');
           }
 
-          // 5. Contact info grid spacing and layout column force
-          const contactInfoGrid = clonedElem.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2, div[class*="grid-cols-1 sm:grid-cols-2"]');
+          // 5. Force horizontal contact pills and dynamically copy the exact background, border, text colors from webpage template
+          const contactInfoGrid = clonedElem.querySelector('div[class*="grid-cols-1 sm:grid-cols-2"]');
           if (contactInfoGrid instanceof HTMLElement) {
-            contactInfoGrid.style.setProperty('margin-top', '6px', 'important');
-            contactInfoGrid.style.setProperty('gap', '5px', 'important');
-            
-            const colsCount = contactInfoGrid.children.length;
-            contactInfoGrid.style.setProperty('display', 'grid', 'important');
-            contactInfoGrid.style.setProperty('grid-template-columns', `repeat(${colsCount}, minmax(0, 1fr))`, 'important');
+            contactInfoGrid.style.setProperty('display', 'flex', 'important');
+            contactInfoGrid.style.setProperty('flex-direction', 'row', 'important');
+            contactInfoGrid.style.setProperty('flex-wrap', 'wrap', 'important');
+            contactInfoGrid.style.setProperty('justify-content', 'space-between', 'important');
+            contactInfoGrid.style.setProperty('gap', '6px', 'important');
+            contactInfoGrid.style.setProperty('margin-top', '10px', 'important');
+            contactInfoGrid.style.setProperty('width', '100%', 'important');
+
+            const originalGrid = document.querySelector('div[class*="grid-cols-1 sm:grid-cols-2"]');
+            const originalPills = originalGrid ? Array.from(originalGrid.children) : [];
+
+            const pills = Array.from(contactInfoGrid.children);
+            pills.forEach((pill, idx) => {
+              if (pill instanceof HTMLElement) {
+                pill.style.setProperty('flex', '1 1 0%', 'important');
+                pill.style.setProperty('min-width', '0', 'important');
+                pill.style.setProperty('padding', '6px 8px', 'important');
+                pill.style.setProperty('display', 'flex', 'important');
+                pill.style.setProperty('align-items', 'center', 'important');
+                pill.style.setProperty('justify-content', 'flex-start', 'important');
+                pill.style.setProperty('gap', '4px', 'important');
+                pill.style.setProperty('height', 'auto', 'important');
+                pill.style.setProperty('box-shadow', 'none', 'important');
+                pill.style.setProperty('overflow', 'visible', 'important'); // Allow full height rendering without clipping!
+
+                const orig = originalPills[idx];
+                if (orig instanceof HTMLElement) {
+                  const comp = window.getComputedStyle(orig);
+                  pill.style.setProperty('background-color', comp.backgroundColor, 'important');
+                  pill.style.setProperty('border', comp.border || `1px solid ${comp.borderColor}`, 'important');
+                  pill.style.setProperty('border-radius', comp.borderRadius || '8px', 'important');
+                  pill.style.setProperty('color', comp.color, 'important');
+                } else {
+                  pill.style.setProperty('background-color', '#f8fafc', 'important');
+                  pill.style.setProperty('border', '1px solid #cbd5e1', 'important');
+                  pill.style.setProperty('border-radius', '8px', 'important');
+                  pill.style.setProperty('color', '#334155', 'important');
+                }
+
+                // Tighten text inside pill
+                const textSpan = pill.querySelector('span');
+                if (textSpan instanceof HTMLElement) {
+                  textSpan.style.setProperty('font-size', '10px', 'important');
+                  textSpan.style.setProperty('font-weight', '600', 'important');
+                  textSpan.style.setProperty('white-space', 'nowrap', 'important');
+                  textSpan.style.setProperty('overflow', 'visible', 'important'); // Prevent scrollbar/truncate cut-offs
+                  textSpan.style.setProperty('text-overflow', 'unset', 'important');
+                  textSpan.style.setProperty('line-height', '1.4', 'important'); // Robust height so descenders/caps are fully shown!
+                  
+                  const origText = orig?.querySelector('span');
+                  if (origText instanceof HTMLElement) {
+                    const compText = window.getComputedStyle(origText);
+                    textSpan.style.setProperty('color', compText.color, 'important');
+                  }
+                }
+              }
+            });
           }
 
-          // 6. Tighten sidebar cards, headers, and spacing
+          // 6. Adjust sidebar typography and cards to remain beautifully legible
           if (rightSidebar instanceof HTMLElement) {
             const sidebarH4s = rightSidebar.querySelectorAll('h4');
             sidebarH4s.forEach((h4) => {
               if (h4 instanceof HTMLElement) {
-                h4.style.setProperty('font-size', '9.5px', 'important');
+                h4.style.setProperty('font-size', '11px', 'important');
+                h4.style.setProperty('margin-top', '0px', 'important');
+                h4.style.setProperty('margin-bottom', '0px', 'important');
+              }
+            });
+
+            // Adjust headings border containers
+            const headerContainers = rightSidebar.querySelectorAll('div[class*="border-b"], div[class*="border-l"]');
+            headerContainers.forEach((hc) => {
+              if (hc instanceof HTMLElement) {
+                hc.style.setProperty('padding-bottom', '4px', 'important');
+                hc.style.setProperty('margin-bottom', '6px', 'important');
               }
             });
 
             const sidebarCards = rightSidebar.querySelectorAll('div[class*="rounded-"], div[class*="border-"]');
             sidebarCards.forEach((card) => {
               if (card instanceof HTMLElement) {
-                card.style.setProperty('padding', '5px 8px', 'important');
-                card.style.setProperty('margin-bottom', '1px', 'important');
+                card.style.setProperty('padding', '6px 8px', 'important');
+                card.style.setProperty('margin-top', '0px', 'important');
+                card.style.setProperty('margin-bottom', '0px', 'important');
               }
             });
 
-            const allTexts = rightSidebar.querySelectorAll('div, span, p');
+            const allTexts = rightSidebar.querySelectorAll('div, span, p, li');
             allTexts.forEach((text) => {
               if (text instanceof HTMLElement) {
+                // Skip structural parent DIVs to prevent vertical block/flex collapse and overlapping text
+                if (text.tagName === 'DIV' && text.children.length > 0) {
+                  return;
+                }
                 const computedFs = window.getComputedStyle(text).fontSize;
                 const fsVal = parseFloat(computedFs);
-                if (fsVal > 11) {
-                  text.style.setProperty('font-size', '9.5px', 'important');
-                } else if (fsVal > 9) {
-                  text.style.setProperty('font-size', '8px', 'important');
+                if (fsVal) {
+                  const targetFs = Math.max(9, Math.min(fsVal, 11));
+                  text.style.setProperty('font-size', `${targetFs}px`, 'important');
+                  text.style.setProperty('line-height', '1.4', 'important'); // Balanced, readable leading
                 }
               }
             });
           }
+
+          // 7. Resolve currentColor and SVG paths to ensure pristine icon rendering without black shapes/black spots
+          const allSvgs = clonedElem.querySelectorAll('svg');
+          allSvgs.forEach((svg) => {
+            if (svg instanceof SVGElement) {
+              const id = svg.getAttribute('id') || svg.parentElement?.getAttribute('id') || '';
+              if (id.includes('logo-') || id.includes('logo-fallback')) {
+                return;
+              }
+
+              svg.style.setProperty('fill', 'none', 'important');
+              const paths = svg.querySelectorAll('path, rect, circle, polygon, ellipse, line');
+              paths.forEach((p) => {
+                if (p instanceof SVGElement) {
+                  p.style.setProperty('fill', 'none', 'important');
+                  
+                  let currentStroke = p.getAttribute('stroke') || svg.getAttribute('stroke');
+                  if (currentStroke === 'currentColor') {
+                    // Resolve currentColor to actual computed color of the parent SVG
+                    currentStroke = window.getComputedStyle(svg).color || '#3b82f6';
+                  }
+                  if (currentStroke && currentStroke !== 'none') {
+                    p.style.setProperty('stroke', currentStroke, 'important');
+                  }
+                }
+              });
+            }
+          });
+
+          // 8. Disable truncation clipping globally on the page to prevent any cropped or half-shown characters in text boxes
+          const allTruncated = clonedElem.querySelectorAll('[class*="truncate"]');
+          allTruncated.forEach((el) => {
+            if (el instanceof HTMLElement) {
+              el.style.setProperty('overflow', 'visible', 'important');
+              el.style.setProperty('text-overflow', 'unset', 'important');
+            }
+          });
         }
       }
     }
@@ -419,14 +595,25 @@ export async function exportCanvasToPDF(elementId: string, filename: string = 'R
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
     
+    const isCoverLetter = elementId === 'cover-letter-paper-canvas';
+    
     // We want to calculate the maximum canvas height that fits in a single PDF page
     const pageCanvasHeight = canvas.width * (pdfHeight / pdfWidth);
     
-    // If the canvas is short and fits fully on one page, we can center it vertically
-    if (canvas.height <= pageCanvasHeight) {
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+    // If the canvas fits fully on one page, or if it is a cover letter (which must always be exactly 1 page)
+    if (isCoverLetter || canvas.height <= pageCanvasHeight) {
+      let imgWidth = pdfWidth;
+      let imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      // If it's a cover letter and slightly overflows, scale it to fit A4 height perfectly
+      if (isCoverLetter && imgHeight > pdfHeight) {
+        imgHeight = pdfHeight;
+        imgWidth = (canvas.width * pdfHeight) / canvas.height;
+      }
+      
+      const xOffset = (pdfWidth - imgWidth) / 2;
       const yOffset = (pdfHeight - imgHeight) / 2;
-      pdf.addImage(imgData, 'PNG', 0, yOffset, pdfWidth, imgHeight, undefined, 'FAST');
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight, undefined, 'FAST');
     } else {
       // It's a multi-page document! Slice the canvas into multiple pages
       let remainingHeight = canvas.height;
