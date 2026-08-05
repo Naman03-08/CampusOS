@@ -942,6 +942,7 @@ app.post("/api/ai/generate-cover-letter", async (req, res) => {
       targetCompany,
       targetJobRole,
       experienceYears,
+      experienceLevel,
       skills,
       education,
       achievements,
@@ -959,6 +960,21 @@ app.post("/api/ai/generate-cover-letter", async (req, res) => {
     const companyStr = targetCompany || "your esteemed company";
     const roleStr = targetJobRole || "Software Engineer";
 
+    const expLevel = experienceLevel || "mid";
+    let wordCountConstraint = "300–450 words";
+    let lineCountConstraint = "22–30 lines";
+    let levelTitle = "1–5 years experience (Intermediate)";
+
+    if (expLevel === "fresher") {
+      wordCountConstraint = "250–350 words";
+      lineCountConstraint = "18–25 lines";
+      levelTitle = "Student / Fresher";
+    } else if (expLevel === "senior") {
+      wordCountConstraint = "350–500 words";
+      lineCountConstraint = "25–35 lines";
+      levelTitle = "Senior Professional";
+    }
+
     const prompt = `You are a legendary tech career coach, Senior Technical Writer, and expert hiring manager.
 Your task is to write an absolute masterpiece of a Cover Letter for candidate "${fullName || "the candidate"}" applying for "${roleStr}" at "${companyStr}".
 
@@ -966,6 +982,7 @@ Candidate Details:
 - Name: ${fullName || "Candidate"}
 - Contact: ${email || ""}, ${phone || ""}
 - Experience: ${experienceYears || "0"} years
+- Experience Category: ${levelTitle}
 - Primary Skills: ${skills || ""}
 - Education: ${education || ""}
 - Key Achievements: ${achievements || ""}
@@ -986,8 +1003,14 @@ ${additionalInstructions || ""}
 """
 - Visual Template Style: ${template || "Modern"}
 
-Generate a full, persuasive, highly professional, and COMPACT cover letter structured precisely into the requested JSON schema.
-CRITICAL CONSTRAINT FOR PAGE LAYOUT AND PDF EXPORT: To prevent text overflow, overlaps, and page cuts in the PDF rendering, EACH generated section (opening, whyCompany, whyMe, experience, projects, skills, achievements, closing) MUST be extremely concise and limited to EXACTLY 1 to 2 punchy, professional sentences. The total length of the entire letter must not exceed 250-300 words. Keep it elegant, direct, and compact. No placeholders or brackets like "[Company Name]" should remain; everything must be perfectly resolved.
+Generate a full, persuasive, highly professional cover letter structured precisely into the requested JSON schema.
+CRITICAL CONSTRAINT FOR EXPERIENCE LEVEL AND PAGE LAYOUT:
+- Candidate's experience level category: ${levelTitle}
+- Ideal total length of the letter must be strictly within ${wordCountConstraint}.
+- The letter must span approximately ${lineCountConstraint} of readable text when rendered.
+- Distribute this length beautifully across the sections (opening, whyCompany, whyMe, experience, projects, skills, achievements, closing, signature) so that each section is complete, cohesive, elegant, and highly tailored to ${companyStr} and "${roleStr}".
+- No placeholders or brackets like "[Company Name]" should remain; everything must be perfectly resolved.
+
 Additionally, calculate analytical scores (0 to 100) evaluating the cover letter's ATS matching, professional grade, and clarity, along with helpful improvement suggestions.
 
 Return ONLY a valid JSON object matching the schema.`;

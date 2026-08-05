@@ -524,6 +524,7 @@ export const AICoverLetterView: React.FC = () => {
   const [targetCompany, setTargetCompany] = useState('');
   const [targetJobRole, setTargetJobRole] = useState('');
   const [experienceYears, setExperienceYears] = useState('2');
+  const [experienceLevel, setExperienceLevel] = useState<'fresher' | 'mid' | 'senior'>('mid');
   const [skills, setSkills] = useState('');
   const [education, setEducation] = useState('');
   const [achievements, setAchievements] = useState('');
@@ -737,7 +738,15 @@ export const AICoverLetterView: React.FC = () => {
           const bulletPoints = Array.isArray(ex.bulletPoints) ? ex.bulletPoints.join('. ') : '';
           return `${ex.role || 'Role'} at ${ex.company || 'Company'} (${ex.duration || ''}): ${bulletPoints}`;
         }).join('\n\n');
-        setExperienceYears(resume.experience.length > 0 ? String(resume.experience.length * 2 || '2') : '2');
+        const calculatedYears = resume.experience.length > 0 ? (resume.experience.length * 2 || 2) : 2;
+        setExperienceYears(String(calculatedYears));
+        if (calculatedYears <= 1) {
+          setExperienceLevel('fresher');
+        } else if (calculatedYears <= 5) {
+          setExperienceLevel('mid');
+        } else {
+          setExperienceLevel('senior');
+        }
         setExperience(expStr);
       }
 
@@ -900,6 +909,7 @@ export const AICoverLetterView: React.FC = () => {
           targetCompany,
           targetJobRole,
           experienceYears,
+          experienceLevel,
           skills,
           education,
           achievements,
@@ -951,6 +961,7 @@ export const AICoverLetterView: React.FC = () => {
           targetCompany,
           targetJobRole,
           experienceYears,
+          experienceLevel,
           skills,
           education,
           achievements,
@@ -1443,7 +1454,7 @@ export const AICoverLetterView: React.FC = () => {
               {/* Tab 1: Profile Details */}
               {activeFormTab === 'details' && (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Full Name *</label>
                       <input
@@ -1455,17 +1466,44 @@ export const AICoverLetterView: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Exp Level</label>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Experience Level *</label>
                       <select
-                        value={experienceYears}
-                        onChange={(e) => setExperienceYears(e.target.value)}
+                        value={experienceLevel}
+                        onChange={(e) => {
+                          const level = e.target.value as 'fresher' | 'mid' | 'senior';
+                          setExperienceLevel(level);
+                          if (level === 'fresher') setExperienceYears('0');
+                          else if (level === 'mid') setExperienceYears('3');
+                          else if (level === 'senior') setExperienceYears('7');
+                        }}
                         className="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-xl text-xs font-semibold transition-all outline-none"
                       >
-                        <option value="0">Fresh Graduate / Entry</option>
+                        <option value="fresher">Student / Fresher</option>
+                        <option value="mid">1–5 years experience</option>
+                        <option value="senior">Senior Professional</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Years of Experience</label>
+                      <select
+                        value={experienceYears}
+                        onChange={(e) => {
+                          setExperienceYears(e.target.value);
+                          const yrs = parseInt(e.target.value, 10);
+                          if (yrs === 0) setExperienceLevel('fresher');
+                          else if (yrs <= 5) setExperienceLevel('mid');
+                          else setExperienceLevel('senior');
+                        }}
+                        className="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-xl text-xs font-semibold transition-all outline-none"
+                      >
+                        <option value="0">Fresh Graduate (0 yr)</option>
                         <option value="1">1 Year</option>
                         <option value="2">2 Years</option>
                         <option value="3">3 Years</option>
-                        <option value="5">5+ Years</option>
+                        <option value="4">4 Years</option>
+                        <option value="5">5 Years</option>
+                        <option value="7">7+ Years (Senior)</option>
+                        <option value="10">10+ Years (Senior)</option>
                       </select>
                     </div>
                   </div>
@@ -2140,17 +2178,17 @@ export const AICoverLetterView: React.FC = () => {
                 let contactPillBg = 'bg-slate-50/80 border border-slate-100 rounded-lg';
 
                 if (isSerif) {
-                  containerBg = 'bg-[#fbfbf8]';
+                  containerBg = 'bg-[#ffffff]';
                   textFamily = 'font-serif tracking-normal';
-                  titleColor = 'text-slate-900 font-serif font-semibold tracking-wide capitalize';
-                  subTitleColor = 'text-emerald-800 font-serif font-bold italic tracking-wider';
-                  accentBarColor = 'from-emerald-800 via-teal-700 to-slate-900';
-                  sectionHeaderBg = 'border-b border-emerald-800 pb-1 mb-3';
-                  sectionHeaderText = 'text-emerald-800 font-serif font-bold tracking-wide italic';
-                  cardBg = 'bg-transparent border-b border-slate-200/50 rounded-none shadow-none pb-3 px-0';
-                  bulletColor = 'text-slate-700 font-serif leading-relaxed';
-                  chipBg = 'bg-transparent text-emerald-800 border border-emerald-800/40 rounded-md font-serif italic px-2 py-0.5 text-[10px] font-bold';
-                  contactPillBg = 'bg-transparent border-0 px-1 py-0.5 text-slate-700 hover:text-emerald-800';
+                  titleColor = 'text-[#111d2a] font-serif font-bold tracking-wide capitalize';
+                  subTitleColor = 'text-[#111d2a]/80 font-serif font-bold italic tracking-wider';
+                  accentBarColor = 'from-[#111d2a] to-[#111d2a]';
+                  sectionHeaderBg = 'border-b-4 border-double border-[#111d2a]/80 pb-1.5 mb-4';
+                  sectionHeaderText = 'text-[#111d2a] font-serif font-black tracking-wider uppercase text-xs';
+                  cardBg = 'bg-transparent pb-3 px-0';
+                  bulletColor = 'text-slate-800 font-serif leading-relaxed';
+                  chipBg = 'bg-transparent text-[#111d2a] border border-[#111d2a]/40 rounded-md font-serif italic px-2 py-0.5 text-[10px] font-bold';
+                  contactPillBg = 'bg-slate-50 border border-slate-200 rounded-lg text-slate-700 hover:text-[#111d2a] hover:bg-slate-100/50';
                 } else if (isClean) {
                   containerBg = 'bg-[#ffffff]';
                   textFamily = 'font-sans tracking-wide';
@@ -2208,13 +2246,13 @@ export const AICoverLetterView: React.FC = () => {
                     <div className="p-8 sm:p-12 space-y-8 text-sm md:text-[15px] leading-relaxed text-slate-700 relative">
                       
                       {/* Top Header Section (Inspired by Radha Gupta Resume) */}
-                      <div className="border-b border-slate-100 pb-6 mb-2">
+                      <div className={`border-b ${isSerif ? 'border-slate-200' : 'border-slate-100'} pb-6 mb-6`}>
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                           <div>
-                            <h2 className={`text-3xl sm:text-4xl ${isSerif ? 'font-serif font-normal italic capitalize text-slate-900 tracking-wide' : titleColor}`}>
+                            <h2 className={`text-3xl sm:text-4xl ${isSerif ? 'font-serif font-extrabold capitalize text-[#111d2a] tracking-wide' : titleColor}`}>
                               {fullName || "Radha Gupta"}
                             </h2>
-                            <div className={`text-sm mt-2 ${isSerif ? 'font-serif font-bold italic text-emerald-800' : subTitleColor}`}>
+                            <div className={`text-sm mt-2 ${isSerif ? 'font-serif font-bold italic text-[#111d2a]/80' : subTitleColor}`}>
                               {targetJobRole || "Software Developer"}
                             </div>
                           </div>
@@ -2222,43 +2260,43 @@ export const AICoverLetterView: React.FC = () => {
                           {/* Active Company Target Badge */}
                           {targetCompany && (
                             <div className={`flex items-center gap-2 px-3 py-1.5 shadow-sm ${
-                              isSerif ? 'bg-transparent border border-emerald-800/30 rounded-md font-serif italic text-emerald-800' :
+                              isSerif ? 'bg-[#111d2a] border border-slate-700 rounded-lg font-serif italic text-white' :
                               isWarm ? 'bg-[#fffdf9] border border-[#fed7aa] rounded-2xl text-[#7c2d12]' :
                               isFuturistic ? 'bg-slate-950 border border-slate-800 rounded-none text-emerald-400 font-mono text-[10px]' :
                               'bg-slate-50 border border-slate-200/60 rounded-xl text-slate-700'
                             }`}>
                               <CompanyLogoIcon name={targetCompany} logoUrl={companyLogos[targetCompany.toLowerCase()]} />
-                              <span className="text-xs font-bold">{targetCompany} Candidate</span>
+                              <span className={`text-xs font-bold ${isSerif ? 'text-[#ff9900]' : ''}`}>{targetCompany} Candidate</span>
                             </div>
                           )}
                         </div>
 
                         {/* Horizontal Contact Pill Bar with Premium Logos (inspired by image) */}
-                        <div className="flex flex-wrap gap-2.5 mt-5 text-[11px] font-semibold text-slate-600">
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all ${contactPillBg}`}>
+                        <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ${portfolio ? 'lg:grid-cols-6' : 'lg:grid-cols-5'} gap-2.5 mt-5 text-[11px] font-semibold text-slate-600 w-full`}>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
                             <Mail className="h-3.5 w-3.5 text-blue-500 shrink-0" />
-                            <span>{email || "naman03mgs@gmail.com"}</span>
+                            <span className="truncate">{email || "naman03mgs@gmail.com"}</span>
                           </div>
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all ${contactPillBg}`}>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
                             <Phone className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                            <span>{phone || "+91 98765 43210"}</span>
+                            <span className="truncate">{phone || "+91 98765 43210"}</span>
                           </div>
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all ${contactPillBg}`}>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
                             <MapPin className="h-3.5 w-3.5 text-rose-500 shrink-0" />
-                            <span>Bengaluru, India</span>
+                            <span className="truncate">Bengaluru, India</span>
                           </div>
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all ${contactPillBg}`}>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
                             <Linkedin className="h-3.5 w-3.5 text-[#0a66c2] shrink-0" />
-                            <span className="text-blue-600 truncate max-w-[150px]">{linkedIn || "linkedin.com/in/naman-pandey"}</span>
+                            <span className="text-blue-600 truncate">{linkedIn || "linkedin.com/in/naman-pandey"}</span>
                           </div>
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all ${contactPillBg}`}>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
                             <Github className="h-3.5 w-3.5 text-slate-900 shrink-0" />
-                            <span className="truncate max-w-[150px]">{github || "github.com/naman-pandey"}</span>
+                            <span className="truncate">{github || "github.com/naman-pandey"}</span>
                           </div>
                           {portfolio && (
-                            <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all ${contactPillBg}`}>
+                            <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
                               <Globe className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
-                              <span className="truncate max-w-[150px]">{portfolio}</span>
+                              <span className="truncate">{portfolio}</span>
                             </div>
                           )}
                         </div>
@@ -2270,7 +2308,7 @@ export const AICoverLetterView: React.FC = () => {
                         {/* Left Grid: The Document Text (Cover Letter Paragraphs) */}
                         <div className="lg:col-span-8 space-y-6 border-r border-slate-100/80 pr-0 lg:pr-8">
                           <div className={`flex items-center gap-2 ${sectionHeaderBg}`}>
-                            <FileText className={`h-4.5 w-4.5 ${isSerif ? 'text-emerald-800' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-blue-600'}`} />
+                            <FileText className={`h-4.5 w-4.5 ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-blue-600'}`} />
                             <h3 className={`text-xs font-black uppercase tracking-wider ${sectionHeaderText}`}>
                               {isFuturistic ? '[ COVER_LETTER_STATEMENT ]' : 'Cover Letter Statement'}
                             </h3>
@@ -2345,7 +2383,7 @@ export const AICoverLetterView: React.FC = () => {
                           {/* EXPERIENCE */}
                           <div className="space-y-3">
                             <div className={`flex items-center gap-2 ${sectionHeaderBg}`}>
-                              <Briefcase className={`h-4.5 w-4.5 ${isSerif ? 'text-emerald-800' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-blue-600'}`} />
+                              <Briefcase className={`h-4.5 w-4.5 ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-blue-600'}`} />
                               <h4 className={`text-xs font-black uppercase tracking-wider ${sectionHeaderText}`}>
                                 {isFuturistic ? '[ EXPERIENCE_HIGHLIGHTS ]' : 'Experience Highlight'}
                               </h4>
@@ -2358,7 +2396,7 @@ export const AICoverLetterView: React.FC = () => {
                                     <CompanyLogoIcon name={expItem.company} logoUrl={companyLogos[expItem.company.toLowerCase()]} />
                                     <div className="flex-1 min-w-0">
                                       <div className="font-extrabold text-xs text-slate-800 truncate">{expItem.role}</div>
-                                      <div className={`text-[10px] font-bold truncate ${isSerif ? 'text-emerald-800' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>{expItem.company}</div>
+                                      <div className={`text-[10px] font-bold truncate ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>{expItem.company}</div>
                                       <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold mt-1">
                                         <span>{expItem.duration}</span>
                                         <span>{expItem.location}</span>
@@ -2381,7 +2419,7 @@ export const AICoverLetterView: React.FC = () => {
                                   <CompanyLogoIcon name="Microsoft" />
                                   <div className="flex-1 min-w-0">
                                     <div className="font-extrabold text-xs text-slate-800">Software Development Engineer</div>
-                                    <div className={`text-[10px] font-bold truncate ${isSerif ? 'text-emerald-800' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>Microsoft</div>
+                                    <div className={`text-[10px] font-bold truncate ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>Microsoft</div>
                                     <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold mt-1">
                                       <span>Aug 2024 - Present</span>
                                       <span>Bengaluru, India</span>
@@ -2396,10 +2434,10 @@ export const AICoverLetterView: React.FC = () => {
                             )}
                           </div>
 
-                          {/* EDUCATION */}
+                           {/* EDUCATION */}
                           <div className="space-y-3">
                             <div className={`flex items-center gap-2 ${sectionHeaderBg}`}>
-                              <GraduationCap className={`h-4.5 w-4.5 ${isSerif ? 'text-emerald-800' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-indigo-600'}`} />
+                              <GraduationCap className={`h-4.5 w-4.5 ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-indigo-600'}`} />
                               <h4 className={`text-xs font-black uppercase tracking-wider ${sectionHeaderText}`}>
                                 {isFuturistic ? '[ ACADEMIC_CREDENTIALS ]' : 'Education'}
                               </h4>
@@ -2410,7 +2448,7 @@ export const AICoverLetterView: React.FC = () => {
                                 <div key={eduItem.id} className={`${cardBg}`}>
                                   <div className="font-extrabold text-xs text-slate-800 leading-snug">{eduItem.degree}</div>
                                   <div className="text-[10px] font-bold text-slate-500">{eduItem.institution}</div>
-                                  <div className={`text-[9px] font-bold ${isSerif ? 'text-emerald-800' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>{eduItem.year}</div>
+                                  <div className={`text-[9px] font-bold ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>{eduItem.year}</div>
                                 </div>
                               ))
                             ) : (
@@ -2419,7 +2457,7 @@ export const AICoverLetterView: React.FC = () => {
                                 <div className="font-extrabold text-xs text-slate-800 leading-snug">B.Tech. in Computer Science</div>
                                 <div className="text-[10px] font-bold text-slate-500 font-sans">Government Engineering College</div>
                                 <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold mt-1">
-                                  <span className={`font-extrabold ${isSerif ? 'text-emerald-800' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>2018 - 2022</span>
+                                  <span className={`font-extrabold ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>2018 - 2022</span>
                                   <span>CGPA: 8.2 / 10</span>
                                 </div>
                               </div>
@@ -2429,7 +2467,7 @@ export const AICoverLetterView: React.FC = () => {
                           {/* MOST PROUD OF / ACHIEVEMENTS */}
                           <div className="space-y-3">
                             <div className={`flex items-center gap-2 ${sectionHeaderBg}`}>
-                              <Trophy className={`h-4.5 w-4.5 ${isSerif ? 'text-emerald-800' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-purple-600'}`} />
+                              <Trophy className={`h-4.5 w-4.5 ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-purple-600'}`} />
                               <h4 className={`text-xs font-black uppercase tracking-wider ${sectionHeaderText}`}>
                                 {isFuturistic ? '[ PROUD_ACHIEVEMENTS ]' : 'Most Proud Of'}
                               </h4>
@@ -2468,7 +2506,7 @@ export const AICoverLetterView: React.FC = () => {
                           {/* PROJECTS */}
                           <div className="space-y-3">
                             <div className={`flex items-center gap-2 ${sectionHeaderBg}`}>
-                              <Terminal className={`h-4.5 w-4.5 ${isSerif ? 'text-emerald-800' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-emerald-600'}`} />
+                              <Terminal className={`h-4.5 w-4.5 ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-emerald-600'}`} />
                               <h4 className={`text-xs font-black uppercase tracking-wider ${sectionHeaderText}`}>
                                 {isFuturistic ? '[ CODE_PROJECTS ]' : 'Projects'}
                               </h4>
@@ -2509,7 +2547,7 @@ export const AICoverLetterView: React.FC = () => {
                           {/* SKILLS & STRENGTHS */}
                           <div className="space-y-3">
                             <div className={`flex items-center gap-2 ${sectionHeaderBg}`}>
-                              <Layers className={`h-4.5 w-4.5 ${isSerif ? 'text-emerald-800' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-orange-500'}`} />
+                              <Layers className={`h-4.5 w-4.5 ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#7c2d12]' : isFuturistic ? 'text-violet-600' : 'text-orange-500'}`} />
                               <h4 className={`text-xs font-black uppercase tracking-wider ${sectionHeaderText}`}>
                                 {isFuturistic ? '[ SKILLS_INVENTORY ]' : 'Skills & Strengths'}
                               </h4>
