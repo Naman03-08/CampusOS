@@ -60,6 +60,7 @@ import {
   Terminal
 } from 'lucide-react';
 import jsPDF from 'jspdf';
+import { exportCanvasToPDF } from '../../lib/pdfExport';
 import confetti from 'canvas-confetti';
 
 interface CoverLetterData {
@@ -94,6 +95,17 @@ interface SavedCoverLetter {
   template: string;
   letter: CoverLetterData;
   createdAt: string;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  skills?: string;
+  education?: string;
+  achievements?: string;
+  projects?: string;
+  experience?: string;
+  linkedIn?: string;
+  portfolio?: string;
+  github?: string;
 }
 
 // Company Preset Information
@@ -622,6 +634,7 @@ export const AICoverLetterView: React.FC = () => {
   const [isCopied, setIsCopied] = useState(false);
   const [isSavedInCloud, setIsSavedInCloud] = useState(false);
   const [zoomLetter, setZoomLetter] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [activeMode, setActiveMode] = useState<'letter' | 'outreach'>('letter');
   const [outreachCopiedKey, setOutreachCopiedKey] = useState<string | null>(null);
   
@@ -1045,7 +1058,18 @@ export const AICoverLetterView: React.FC = () => {
       tone,
       template,
       letter: editingLetter,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      fullName,
+      email,
+      phone,
+      skills,
+      education,
+      achievements,
+      projects,
+      experience,
+      linkedIn,
+      portfolio,
+      github
     };
 
     try {
@@ -1076,7 +1100,7 @@ export const AICoverLetterView: React.FC = () => {
 
   // Load selected history item
   const handleLoadHistoryItem = (item: SavedCoverLetter) => {
-    setFullName(fullName || item.letter.signature.split('\n')[2] || '');
+    setFullName(item.fullName || item.letter.signature.split('\n')[2] || '');
     setTargetCompany(item.targetCompany);
     setTargetJobRole(item.targetJobRole);
     setTone(item.tone);
@@ -1087,10 +1111,17 @@ export const AICoverLetterView: React.FC = () => {
     setIsSavedInCloud(true);
     setIsHistoryOpen(false);
     
-    // Attempt parsing list elements to populate ATS highlights
-    if (item.letter.skills) {
-      setSkills(item.letter.skills);
-    }
+    // Restore all fields
+    if (item.email) setEmail(item.email);
+    if (item.phone) setPhone(item.phone);
+    if (item.skills) setSkills(item.skills);
+    if (item.education) setEducation(item.education);
+    if (item.achievements) setAchievements(item.achievements);
+    if (item.projects) setProjects(item.projects);
+    if (item.experience) setExperience(item.experience);
+    if (item.linkedIn) setLinkedIn(item.linkedIn);
+    if (item.portfolio) setPortfolio(item.portfolio);
+    if (item.github) setGithub(item.github);
 
     // Load Interview Cheat Sheet fallback
     handleGenerateInterviewCheatSheet(item.letter);
@@ -1206,62 +1237,20 @@ export const AICoverLetterView: React.FC = () => {
     triggerToast("DOCX file exported successfully!");
   };
 
-  // Export PDF using jsPDF
-  const handleExportPDF = () => {
+  // Export PDF using premium canvas-to-pdf engine
+  const handleExportPDF = async () => {
     if (!editingLetter) return;
+    setIsExportingPDF(true);
     try {
-      const docPdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const fullText = [
-        editingLetter.greeting,
-        editingLetter.opening,
-        editingLetter.whyCompany,
-        editingLetter.whyMe,
-        editingLetter.experience,
-        editingLetter.projects,
-        editingLetter.skills,
-        editingLetter.achievements,
-        editingLetter.closing,
-        editingLetter.signature
-      ].join('\n\n');
-
-      docPdf.setFont('times', 'normal');
-      docPdf.setFontSize(11);
-      
-      const pageHeight = docPdf.internal.pageSize.height;
-      const margin = 20;
-      const maxLineWidth = 170; // 210 - 40
-      const splitText = docPdf.splitTextToSize(fullText, maxLineWidth);
-      
-      let cursorY = 25;
-      
-      docPdf.text(`PLACIVO AI COVER LETTER SUITE`, 20, 15);
-      docPdf.setFontSize(10);
-      docPdf.text(`Candidate: ${fullName} | Company: ${targetCompany} | Role: ${targetJobRole}`, 20, 20);
-      docPdf.line(20, 21, 190, 21);
-      
-      docPdf.setFontSize(11);
-      cursorY = 28;
-
-      for (let i = 0; i < splitText.length; i++) {
-        if (cursorY > pageHeight - margin) {
-          docPdf.addPage();
-          cursorY = 20;
-        }
-        docPdf.text(splitText[i], 20, cursorY);
-        cursorY += 6;
-      }
-
-      docPdf.save(`PlacivoAI_CoverLetter_${targetCompany.replace(/\s+/g, '_')}.pdf`);
-      triggerToast("PDF generated and downloaded!");
+      const safeName = (targetCompany || "CoverLetter").replace(/\s+/g, '_');
+      await exportCanvasToPDF('cover-letter-paper-canvas', `PlacivoAI_CoverLetter_${safeName}.pdf`);
+      triggerToast("PDF generated and downloaded successfully!");
     } catch (err) {
       console.error(err);
-      triggerToast("Failed to compile pdf. Copying plain text instead.");
+      triggerToast("Failed to compile layout PDF. Copying plain text instead.");
       handleCopyToClipboard();
+    } finally {
+      setIsExportingPDF(false);
     }
   };
 
@@ -2055,10 +2044,11 @@ export const AICoverLetterView: React.FC = () => {
 
                   <button
                     onClick={handleExportPDF}
-                    className="p-2 text-slate-600 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all"
+                    disabled={isExportingPDF}
+                    className="p-2 text-slate-600 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all disabled:opacity-50"
                     title="Download PDF"
                   >
-                    <FileDown className="h-4 w-4" />
+                    {isExportingPDF ? <RefreshCw className="h-4 w-4 animate-spin text-blue-600" /> : <FileDown className="h-4 w-4" />}
                   </button>
 
                   <button
@@ -2201,6 +2191,7 @@ export const AICoverLetterView: React.FC = () => {
 
                 return (
                   <div 
+                    id="cover-letter-paper-canvas"
                     className={`rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 relative ${
                       zoomLetter ? 'max-w-none' : ''
                     } ${textFamily} ${containerBg}`}
