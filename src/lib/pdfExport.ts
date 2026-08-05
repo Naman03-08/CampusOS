@@ -1,11 +1,131 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 
+export function oklchToRgb(l: number, c: number, h: number, a: number = 1): string {
+  const hue = isNaN(h) ? 0 : h;
+  const hRad = (hue * Math.PI) / 180;
+  
+  // Convert OKLCH to OKLAB
+  const aLab = c * Math.cos(hRad);
+  const bLab = c * Math.sin(hRad);
+  
+  // Convert OKLAB to LMS
+  const l_ = l + 0.3963377774 * aLab + 0.2158037573 * bLab;
+  const m_ = l - 0.1055613458 * aLab - 0.0638541728 * bLab;
+  const s_ = l - 0.0894841775 * aLab - 1.2914855480 * bLab;
+  
+  // Cube LMS to get linear LMS
+  const l_3 = l_ * l_ * l_;
+  const m_3 = m_ * m_ * m_;
+  const s_3 = s_ * s_ * s_;
+  
+  // Convert linear LMS to linear sRGB
+  const rL = +4.0767416621 * l_3 - 3.3077115913 * m_3 + 0.2309699292 * s_3;
+  const gL = -1.2684380046 * l_3 + 2.6097574011 * m_3 - 0.3413193965 * s_3;
+  const bL = -0.0041960863 * l_3 - 0.7034186147 * m_3 + 1.7076147010 * s_3;
+  
+  // Convert linear sRGB to sRGB (gamma correction)
+  const toSRGB = (x: number) => {
+    if (x <= 0.0031308) {
+      return 12.92 * x;
+    }
+    return 1.055 * Math.pow(Math.max(0, x), 1 / 2.4) - 0.055;
+  };
+  
+  const r = Math.max(0, Math.min(255, Math.round(toSRGB(rL) * 255)));
+  const g = Math.max(0, Math.min(255, Math.round(toSRGB(gL) * 255)));
+  const b = Math.max(0, Math.min(255, Math.round(toSRGB(bL) * 255)));
+  
+  if (a === 1) {
+    return `rgb(${r}, ${g}, ${b})`;
+  } else {
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
+}
+
 export function sanitizeCssString(cssText: string): string {
   if (!cssText) return cssText;
   let cleaned = cssText;
 
-  // 1. Remove color-mix with nested parentheses support
+  // Map to store CSS variable resolutions
+  const varMap = new Map<string, string>();
+
+  // Helper: oklch to rgb conversion
+  const parseOklchToRgb = (oklchStr: string): string => {
+    const regex = /oklch\(\s*([\d\%\.]+)\s+([\d\%\.]+)\s+([\d\%\.deg\rad]+)(?:\s*[\/\,]\s*([\d\%\.]+))?\s*\)/i;
+    const match = oklchStr.match(regex);
+    if (!match) return 'rgb(30, 41, 59)'; // default fallback
+
+    const lGrp = match[1];
+    const cGrp = match[2];
+    const hGrp = match[3];
+    const aGrp = match[4];
+
+    const l = lGrp.endsWith('%') ? parseFloat(lGrp) / 100 : parseFloat(lGrp);
+    const c = cGrp.endsWith('%') ? (parseFloat(cGrp) / 100) * 0.4 : parseFloat(cGrp);
+    const h = parseFloat(hGrp);
+    const a = aGrp ? (aGrp.endsWith('%') ? parseFloat(aGrp) / 100 : parseFloat(aGrp)) : 1;
+
+    return oklchToRgb(l, c, h, a);
+  };
+
+  // 1. Convert all oklch(...) in CSS variables and store them in a map
+  // Example match: --color-slate-50: oklch(0.97 0.01 256.6);
+  const varRegex = /(--[\w-]+)\s*:\s*(oklch\([^)]+\))/gi;
+  let varMatch;
+  while ((varMatch = varRegex.exec(cleaned)) !== null) {
+    const varName = varMatch[1];
+    const oklchVal = varMatch[2];
+    const rgbVal = parseOklchToRgb(oklchVal);
+    varMap.set(varName, rgbVal);
+  }
+
+  // 2. Also map non-oklch variables if they are set to simple colors
+  const otherVarRegex = /(--[\w-]+)\s*:\s*(#[a-f0-9]{3,8}|rgb\([^)]+\)|rgba\([^)]+\))/gi;
+  let otherVarMatch;
+  while ((otherVarMatch = otherVarRegex.exec(cleaned)) !== null) {
+    varMap.set(otherVarMatch[1], otherVarMatch[2]);
+  }
+
+  // 3. Replace oklch(...) occurrences in the rest of the file with their RGB equivalent
+  cleaned = cleaned.replace(/oklch\(\s*[\d\%\.]+\s+[\d\%\.]+\s+[\d\%\.deg\rad]+(?:\s*[\/\,]\s*[\d\%\.]+)?\s*\)/gi, (match) => {
+    return parseOklchToRgb(match);
+  });
+
+  // 4. Resolve color-mix(in oklch, var(--color-slate-50) 80%, transparent) or color-mix(in oklch, oklch(...) 80%, transparent)
+  cleaned = cleaned.replace(/color-mix\(\s*in\s+(?:oklch|srgb|oklab|xyz)\s*,\s*([^,]+?)\s+(\d+(?:\.\d+)?%)\s*,\s*transparent\s*\)/gi, (match, colorPart, percentPart) => {
+    const pct = parseFloat(percentPart) / 100;
+    let resolvedColor = colorPart.trim();
+    
+    // Resolve var(...) if any
+    const varMatch = resolvedColor.match(/var\((--[\w-]+)\)/i);
+    if (varMatch && varMap.has(varMatch[1])) {
+      resolvedColor = varMap.get(varMatch[1])!;
+    }
+
+    // If it's a raw oklch, parse it directly
+    if (resolvedColor.toLowerCase().startsWith('oklch')) {
+      resolvedColor = parseOklchToRgb(resolvedColor);
+    }
+
+    // Now, resolvedColor should be rgb(r, g, b) or hex.
+    // Let's parse rgb/hex and convert to rgba
+    const rgbMatch = resolvedColor.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+    if (rgbMatch) {
+      return `rgba(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}, ${pct})`;
+    }
+    const hexMatch = resolvedColor.match(/#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})/i);
+    if (hexMatch) {
+      const r = parseInt(hexMatch[1], 16);
+      const g = parseInt(hexMatch[2], 16);
+      const b = parseInt(hexMatch[3], 16);
+      return `rgba(${r}, ${g}, ${b}, ${pct})`;
+    }
+
+    return `rgba(30, 41, 59, ${pct})`; // fallback
+  });
+
+  // 5. General fallback for other color-mix formats
   cleaned = cleaned.replace(/color-mix\((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*\)/gi, (match) => {
     if (match.toLowerCase().includes('transparent')) {
       return 'rgba(0, 0, 0, 0)';
@@ -13,16 +133,8 @@ export function sanitizeCssString(cssText: string): string {
     return 'rgb(30, 41, 59)';
   });
 
-  // 2. Remove oklch / oklab / lab / lch functions
-  cleaned = cleaned.replace(/\b(?:oklch|oklab|lab|lch)\((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*\)/gi, 'rgb(30, 41, 59)');
-
-  // 3. Remove keywords in color-space declarations
-  cleaned = cleaned.replace(/in\s+oklab/gi, 'in srgb');
-  cleaned = cleaned.replace(/in\s+oklch/gi, 'in srgb');
-
-  // 4. Fallback cleanup for lone oklab/oklch occurrences
-  cleaned = cleaned.replace(/\boklab\b/gi, 'srgb');
-  cleaned = cleaned.replace(/\boklch\b/gi, 'srgb');
+  // 6. Remove remaining oklab/lch/etc.
+  cleaned = cleaned.replace(/\b(?:oklab|lab|lch)\((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*\)/gi, 'rgb(30, 41, 59)');
 
   return cleaned;
 }
@@ -134,6 +246,128 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
         clonedElem.style.height = 'auto';
         clonedElem.style.minHeight = 'auto';
         clonedElem.style.maxHeight = 'none';
+
+        // Tighten layouts inside cover letter specifically so it beautifully fits exactly one page
+        if (targetElementId === 'cover-letter-paper-canvas') {
+          // 0. Force top header container to render side-by-side (flex-row)
+          const topHeaderContainer = clonedElem.querySelector('div[class*="flex flex-col md:flex-row"], div[class*="flex-col md:flex-row"]');
+          if (topHeaderContainer instanceof HTMLElement) {
+            topHeaderContainer.style.setProperty('display', 'flex', 'important');
+            topHeaderContainer.style.setProperty('flex-direction', 'row', 'important');
+            topHeaderContainer.style.setProperty('justify-content', 'space-between', 'important');
+            topHeaderContainer.style.setProperty('align-items', 'center', 'important');
+            topHeaderContainer.style.setProperty('width', '100%', 'important');
+          }
+
+          // 1. Convert all space-y-x classes to flex layouts to easily tighten vertical margin-tops
+          const spaceYElements = clonedElem.querySelectorAll('[class*="space-y-"]');
+          spaceYElements.forEach((el) => {
+            if (el instanceof HTMLElement) {
+              el.style.setProperty('display', 'flex', 'important');
+              el.style.setProperty('flex-direction', 'column', 'important');
+              
+              let gap = '10px';
+              if (el.className.includes('space-y-8')) {
+                gap = '12px';
+              } else if (el.className.includes('space-y-6')) {
+                gap = '8px';
+              } else if (el.className.includes('space-y-4')) {
+                gap = '6px';
+              } else if (el.className.includes('space-y-3')) {
+                gap = '5px';
+              } else if (el.className.includes('space-y-2')) {
+                gap = '4px';
+              }
+              el.style.setProperty('gap', gap, 'important');
+              
+              const children = el.children;
+              for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+                if (child instanceof HTMLElement) {
+                  child.style.setProperty('margin-top', '0px', 'important');
+                  child.style.setProperty('margin-bottom', '0px', 'important');
+                }
+              }
+            }
+          });
+
+          // 2. Reduce the outer padding of the primary canvas sheet
+          const outerPaddingContainer = clonedElem.querySelector('div.p-8, div.p-12, div.sm\\:p-12, div[class*="p-8"], div[class*="p-12"]');
+          if (outerPaddingContainer instanceof HTMLElement) {
+            outerPaddingContainer.style.setProperty('padding', '20px 28px', 'important');
+          }
+
+          // 3. Compact typography for the main cover letter body paragraphs
+          const mainParagraphs = clonedElem.querySelectorAll('p');
+          mainParagraphs.forEach((p) => {
+            if (p instanceof HTMLElement) {
+              p.style.setProperty('font-size', '11.5px', 'important');
+              p.style.setProperty('line-height', '1.35', 'important');
+              p.style.setProperty('margin-bottom', '1px', 'important');
+            }
+          });
+
+          // 4. Force the main grid to be a 12-column layout (side-by-side desktop view) on the PDF!
+          const mainGrid = clonedElem.querySelector('.grid.grid-cols-1.lg\\:grid-cols-12, div[class*="grid-cols-1"]');
+          if (mainGrid instanceof HTMLElement) {
+            mainGrid.style.setProperty('display', 'grid', 'important');
+            mainGrid.style.setProperty('grid-template-columns', 'repeat(12, minmax(0, 1fr))', 'important');
+            mainGrid.style.setProperty('gap', '14px', 'important');
+          }
+
+          const leftColumn = clonedElem.querySelector('.lg\\:col-span-8, div[class*="lg:col-span-8"]');
+          if (leftColumn instanceof HTMLElement) {
+            leftColumn.style.setProperty('grid-column', 'span 8 / span 8', 'important');
+            leftColumn.style.setProperty('padding-right', '14px', 'important');
+          }
+
+          const rightSidebar = clonedElem.querySelector('.lg\\:col-span-4, div[class*="lg:col-span-4"]');
+          if (rightSidebar instanceof HTMLElement) {
+            rightSidebar.style.setProperty('grid-column', 'span 4 / span 4', 'important');
+          }
+
+          // 5. Contact info grid spacing and layout column force
+          const contactInfoGrid = clonedElem.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2, div[class*="grid-cols-1 sm:grid-cols-2"]');
+          if (contactInfoGrid instanceof HTMLElement) {
+            contactInfoGrid.style.setProperty('margin-top', '6px', 'important');
+            contactInfoGrid.style.setProperty('gap', '5px', 'important');
+            
+            const colsCount = contactInfoGrid.children.length;
+            contactInfoGrid.style.setProperty('display', 'grid', 'important');
+            contactInfoGrid.style.setProperty('grid-template-columns', `repeat(${colsCount}, minmax(0, 1fr))`, 'important');
+          }
+
+          // 6. Tighten sidebar cards, headers, and spacing
+          if (rightSidebar instanceof HTMLElement) {
+            const sidebarH4s = rightSidebar.querySelectorAll('h4');
+            sidebarH4s.forEach((h4) => {
+              if (h4 instanceof HTMLElement) {
+                h4.style.setProperty('font-size', '9.5px', 'important');
+              }
+            });
+
+            const sidebarCards = rightSidebar.querySelectorAll('div[class*="rounded-"], div[class*="border-"]');
+            sidebarCards.forEach((card) => {
+              if (card instanceof HTMLElement) {
+                card.style.setProperty('padding', '5px 8px', 'important');
+                card.style.setProperty('margin-bottom', '1px', 'important');
+              }
+            });
+
+            const allTexts = rightSidebar.querySelectorAll('div, span, p');
+            allTexts.forEach((text) => {
+              if (text instanceof HTMLElement) {
+                const computedFs = window.getComputedStyle(text).fontSize;
+                const fsVal = parseFloat(computedFs);
+                if (fsVal > 11) {
+                  text.style.setProperty('font-size', '9.5px', 'important');
+                } else if (fsVal > 9) {
+                  text.style.setProperty('font-size', '8px', 'important');
+                }
+              }
+            });
+          }
+        }
       }
     }
   }
