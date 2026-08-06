@@ -170,7 +170,7 @@ export function calculatePlanDetails(user: UserProfile) {
   const isCancelled = Boolean(user.planCancelled);
 
   if (
-    (!isPaid && (isCancelled || rawPlanLower === 'free tier' || rawPlanLower === 'none' || !rawPlanLower)) ||
+    (!isPaid && rawPlanLower !== 'free_trial' && (isCancelled || rawPlanLower === 'free tier' || rawPlanLower === 'none' || !rawPlanLower)) ||
     rawPlanLower === 'free tier' ||
     rawPlanLower === 'none'
   ) {

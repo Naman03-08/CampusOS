@@ -1056,14 +1056,17 @@ export class FirestoreService {
     if (!db || !uid) return;
     try {
       const now = new Date();
+      const expiresAt = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000);
       const monthKey = now.toISOString().slice(0, 7);
 
       // 1. Immediately update user profile document in Firestore (< 100ms)
       const userRef = doc(db, 'users', uid);
       await setDoc(userRef, {
         plan: 'free_trial',
-        planExpiresAt: null,
-        planCancelled: true,
+        freeTrialStartedAt: now.toISOString(),
+        planStartedAt: now.toISOString(),
+        planExpiresAt: expiresAt.toISOString(),
+        planCancelled: false,
         planCancelledAt: now.toISOString(),
         updatedAt: now.toISOString()
       }, { merge: true });
@@ -1210,13 +1213,17 @@ export class FirestoreService {
   static async cancelUserSubscription(uid: string): Promise<void> {
     if (!db || !uid) return;
     try {
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000);
       const userRef = doc(db, 'users', uid);
       await setDoc(userRef, {
-        plan: 'Free Tier',
-        planExpiresAt: null,
-        planCancelled: true,
-        planCancelledAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        plan: 'free_trial',
+        freeTrialStartedAt: now.toISOString(),
+        planStartedAt: now.toISOString(),
+        planExpiresAt: expiresAt.toISOString(),
+        planCancelled: false,
+        planCancelledAt: now.toISOString(),
+        updatedAt: now.toISOString()
       }, { merge: true });
     } catch (e) {
       console.warn("Error cancelling user subscription in Firestore:", e);

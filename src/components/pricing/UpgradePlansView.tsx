@@ -122,11 +122,14 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
 
     // Update profile state immediately so UI updates instantly across app and admin panel
     const nowIso = new Date().toISOString();
+    const trialExpiry = new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString();
     if (onUpdateProfile) {
       onUpdateProfile({
         plan: 'free_trial',
-        planExpiresAt: undefined,
-        planCancelled: true,
+        freeTrialStartedAt: nowIso,
+        planStartedAt: nowIso,
+        planExpiresAt: trialExpiry,
+        planCancelled: false,
         planCancelledAt: nowIso
       });
     }

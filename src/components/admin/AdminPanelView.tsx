@@ -457,11 +457,14 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       await FirestoreService.cancelUserSubscriptionAndAdjustRevenue(userToCancelSub.uid, userToCancelSub.email);
       // Update local allUsers state
       const nowIso = new Date().toISOString();
+      const trialExpiry = new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString();
       setAllUsers(prev => prev.map(u => u.uid === userToCancelSub.uid ? {
         ...u,
-        plan: 'Free Tier',
-        planExpiresAt: undefined,
-        planCancelled: true,
+        plan: 'free_trial',
+        freeTrialStartedAt: nowIso,
+        planStartedAt: nowIso,
+        planExpiresAt: trialExpiry,
+        planCancelled: false,
         planCancelledAt: nowIso
       } : u));
       
@@ -476,7 +479,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       setUserToCancelSub(null);
       setActionFeedback({
         type: 'success',
-        text: `Subscription cancelled successfully for ${userToCancelSub.displayName || userToCancelSub.email}. User set to Free Tier in Firestore and admin panel profits adjusted.`
+        text: `Subscription cancelled successfully for ${userToCancelSub.displayName || userToCancelSub.email}. User set to 4-Day Free Trial plan in Firestore and admin panel profits adjusted.`
       });
     } catch (e: any) {
       console.error("Failed to cancel subscription:", e);
