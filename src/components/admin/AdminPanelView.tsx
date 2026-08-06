@@ -139,7 +139,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
   // Website Subscriptions Search & Plan Update States
   const [subSearchQuery, setSubSearchQuery] = useState<string>('');
   const [userToEditPlan, setUserToEditPlan] = useState<UserProfile | null>(null);
-  const [editPlanSelected, setEditPlanSelected] = useState<string>('plan_349');
+  const [editPlanSelected, setEditPlanSelected] = useState<string>('plan_399');
   const [editPlanDurationMonths, setEditPlanDurationMonths] = useState<number>(1);
   const [isUpdatingPlan, setIsUpdatingPlan] = useState<boolean>(false);
 
@@ -446,7 +446,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       subscriptionRevenue: subRev,
       courseRevenue: crsRev,
       grossProfit: totalGross,
-      subscriptionCount: Math.round(subRev / 349),
+      subscriptionCount: Math.round(subRev / 199),
       coursePurchaseCount: Math.round(crsRev / 599),
       updatedAt: new Date().toISOString()
     };
@@ -650,7 +650,14 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
     const subPurchasesFromLogs = coursePurchases.filter(
       p => p.id.startsWith('sub_') || p.courseTitle.toLowerCase().includes('subscription')
     );
-    const subRevFromLogs = subPurchasesFromLogs.reduce((sum, p) => sum + (p.pricePaid || 0), 0);
+    const subRevFromLogs = subPurchasesFromLogs.reduce((sum, p) => {
+      let amt = p.pricePaid || 0;
+      // whenever any user will buy then don't show 349 or 399 in the profit section of Admin panel, show 199 instead
+      if (amt === 349 || amt === 399 || p.courseId === 'plan_349' || p.courseId === 'plan_399') {
+        amt = 199;
+      }
+      return sum + amt;
+    }, 0);
 
     // 2. Set of emails already in subPurchasesFromLogs to prevent double-counting
     const loggedUserEmailsForSub = new Set(
@@ -658,17 +665,12 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
     );
 
     // 3. Subscription Revenue from registered users in allUsers holding active paid plans
-    const activePaidUsers = allUsers.filter(u => {
-      const sub = getSubscriptionInfo(u);
-      return !sub.isFree && sub.price > 0;
-    });
-
-    const subRevFromActiveUsers = activePaidUsers
-      .filter(u => !loggedUserEmailsForSub.has((u.email || '').toLowerCase().trim()))
-      .reduce((sum, u) => sum + getSubscriptionInfo(u).price, 0);
+    // We only add the amount when the user buys the subscription on their own (which means they have a purchase log).
+    // If they were upgraded by the admin, they won't have a purchase log, so we do NOT add their plan price to the profit section.
+    const subRevFromActiveUsers = 0;
 
     const totalSubRevenue = subRevFromLogs + subRevFromActiveUsers;
-    const totalSubCount = subPurchasesFromLogs.length + activePaidUsers.filter(u => !loggedUserEmailsForSub.has((u.email || '').toLowerCase().trim())).length;
+    const totalSubCount = subPurchasesFromLogs.length;
 
     // 4. Course Sales Revenue from coursePurchases
     const coursePurchasesOnly = coursePurchases.filter(
@@ -2293,7 +2295,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
                 >
                   <option value="free_trial">4-Day Free Trial Pass (₹0)</option>
                   <option value="plan_199">Pro Scholar Pass (₹199)</option>
-                  <option value="plan_349">Placivo Pro Ultimate (₹399)</option>
+                  <option value="plan_399">Placivo Pro Ultimate (₹399)</option>
                   <option value="none">Free Tier / Demoted Access (₹0)</option>
                 </select>
               </div>

@@ -305,7 +305,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-bold text-slate-500">Active Account Plan:</span>
                 <span className={`px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wide border ${
-                  planDetails.currentPlanId === 'plan_349'
+                  (planDetails.currentPlanId === 'plan_349' || planDetails.currentPlanId === 'plan_399')
                     ? 'bg-indigo-100 text-indigo-900 border-indigo-200'
                     : planDetails.currentPlanId === 'plan_199'
                     ? 'bg-blue-100 text-blue-900 border-blue-200'
@@ -472,8 +472,8 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                       <Check className="w-3.5 h-3.5 text-emerald-700 stroke-[3]" /> Included in Plan
                     </span>
                   ) : plan.popular ? (
-                    <span className={`flex items-center gap-1 text-[11px] font-extrabold ${plan.id === 'plan_349' ? 'text-indigo-600' : 'text-blue-600'}`}>
-                      <Star className={`w-3.5 h-3.5 ${plan.id === 'plan_349' ? 'fill-indigo-600 text-indigo-600' : 'fill-blue-600 text-blue-600'}`} /> Most Recommended
+                    <span className={`flex items-center gap-1 text-[11px] font-extrabold ${plan.id === 'plan_399' ? 'text-indigo-600' : 'text-blue-600'}`}>
+                      <Star className={`w-3.5 h-3.5 ${plan.id === 'plan_399' ? 'fill-indigo-600 text-indigo-600' : 'fill-blue-600 text-blue-600'}`} /> Most Recommended
                     </span>
                   ) : null}
                 </div>
@@ -554,7 +554,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
                     : plan.id === 'plan_199'
                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md btn-3d-blue'
-                    : plan.id === 'plan_349'
+                    : plan.id === 'plan_399'
                     ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md btn-3d-indigo'
                     : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md btn-3d-emerald'
                 }`}

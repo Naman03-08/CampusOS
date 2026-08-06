@@ -25,7 +25,7 @@ export interface UserProfile {
   displayName: string;
   photoURL?: string;
   role: Role;
-  plan?: string; // 'free_trial' | 'plan_199' | 'plan_349'
+  plan?: string; // 'free_trial' | 'plan_199' | 'plan_399'
   freeTrialUsed?: boolean;
   freeTrialStartedAt?: string;
   planStartedAt?: string;

@@ -92,7 +92,7 @@ export const PLAN_DEFINITIONS: PlanInfo[] = [
     ]
   },
   {
-    id: 'plan_349',
+    id: 'plan_399',
     name: 'Placivo Pro Ultimate',
     tagline: 'The most valuable plan for every individual to master academics, placement prep, and high-scoring DSA.',
     priceMonthly: '₹399',
@@ -147,15 +147,15 @@ export function calculatePlanDetails(user: UserProfile) {
     rawPlanLower === '399' ||
     rawPlanLower.includes('ultimate')
   ) {
-    currentPlanId = 'plan_349';
+    currentPlanId = 'plan_399';
   } else if (rawPlanLower.includes('pro')) {
-    // Default any generic 'pro' setting to plan_349 (Ultimate)
-    currentPlanId = 'plan_349';
+    // Default any generic 'pro' setting to plan_399 (Ultimate)
+    currentPlanId = 'plan_399';
   } else if (rawPlanLower === 'free_trial' || rawPlanLower.includes('trial')) {
     currentPlanId = 'free_trial';
   }
 
-  const isPaid = currentPlanId === 'plan_199' || currentPlanId === 'plan_349';
+  const isPaid = currentPlanId === 'plan_199' || currentPlanId === 'plan_399';
 
   // Check if trial was explicitly started by user action
   const hasStartedTrial = Boolean(user.freeTrialStartedAt || (currentPlanId === 'free_trial' && user.planStartedAt));
@@ -267,7 +267,7 @@ export function calculatePlanDetails(user: UserProfile) {
   } else {
     if (currentPlanId === 'free_trial') planName = 'Free Trial (4 Days)';
     if (currentPlanId === 'plan_199') planName = 'Pro Scholar (₹199)';
-    if (currentPlanId === 'plan_349') planName = 'Placivo Pro Ultimate (₹399)';
+    if (currentPlanId === 'plan_399') planName = 'Placivo Pro Ultimate (₹399)';
   }
 
   const formattedStartedAt = startedAtMs > 0 ? new Date(startedAtMs).toLocaleDateString('en-IN', {
@@ -402,7 +402,7 @@ export function checkStudySuiteLimit(user: UserProfile, currentCount: number): L
     };
   }
 
-  if (details.currentPlanId === 'plan_349') {
+  if (details.currentPlanId === 'plan_399') {
     const weeklyKey = getWeeklyKey();
     const periodCount = getFeatureUsage(uid, 'study_suite', weeklyKey);
     const maxLimit = 10;
@@ -456,7 +456,7 @@ export function checkDSASolutionLimit(user: UserProfile, todayCount: number): Li
     };
   }
 
-  // plan_199 and plan_349: UNLIMITED
+  // plan_199 and plan_399: UNLIMITED
   return {
     allowed: true,
     maxLimit: -1,
@@ -511,7 +511,7 @@ export function checkAIChatLimit(user: UserProfile, currentChatCount: number): L
     };
   }
 
-  if (details.currentPlanId === 'plan_349') {
+  if (details.currentPlanId === 'plan_399') {
     const weeklyKey = getWeeklyKey();
     const periodCount = getFeatureUsage(uid, 'ai_chat', weeklyKey);
     const maxLimit = 10;
