@@ -151,6 +151,28 @@ export class FirestoreService {
     }
   }
 
+  // Admin Method: Subscribe to all registered users from Firestore in real-time
+  static subscribeToAllUsers(callback: (users: UserProfile[]) => void): () => void {
+    if (!db) return () => {};
+    try {
+      return onSnapshot(collection(db, 'users'), (snapshot) => {
+        const list: UserProfile[] = [];
+        snapshot.forEach(d => {
+          const data = d.data() as UserProfile;
+          if (data && data.uid) {
+            list.push(data);
+          }
+        });
+        callback(list);
+      }, (error) => {
+        console.warn("All users real-time subscription error:", error);
+      });
+    } catch (e) {
+      console.warn("subscribeToAllUsers error:", e);
+      return () => {};
+    }
+  }
+
   // Admin Method: Fetch complete progress & activity data for a specific user
   static async getUserFullData(uid: string): Promise<UserFullData | null> {
     if (!db || !uid) return null;
@@ -1261,11 +1283,13 @@ export class FirestoreService {
       expiresAt.setMonth(expiresAt.getMonth() + durationMonths);
 
       const userRef = doc(db, 'users', uid);
+      const planIsNone = plan === 'none';
       await setDoc(userRef, {
         plan: plan,
         planStartedAt: now.toISOString(),
-        planExpiresAt: expiresAt.toISOString(),
-        planCancelled: false,
+        planExpiresAt: planIsNone ? now.toISOString() : expiresAt.toISOString(),
+        planCancelled: planIsNone,
+        planCancelledAt: planIsNone ? now.toISOString() : null,
         updatedAt: now.toISOString()
       }, { merge: true });
     } catch (e) {

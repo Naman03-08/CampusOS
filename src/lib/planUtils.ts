@@ -166,13 +166,15 @@ export function calculatePlanDetails(user: UserProfile) {
   }
 
   // Check cancellation flag:
-  // Note: An active paid plan string (plan_199 / plan_349) takes precedence over an old stale planCancelled flag.
   const isCancelled = Boolean(user.planCancelled);
 
   if (
-    (!isPaid && rawPlanLower !== 'free_trial' && (isCancelled || rawPlanLower === 'free tier' || rawPlanLower === 'none' || !rawPlanLower)) ||
+    isCancelled ||
+    rawPlanLower === 'none' ||
     rawPlanLower === 'free tier' ||
-    rawPlanLower === 'none'
+    rawPlanLower === 'free' ||
+    currentPlanId === 'none' ||
+    !rawPlanLower
   ) {
     return {
       currentPlanId: 'none',

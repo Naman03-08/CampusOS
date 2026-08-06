@@ -327,10 +327,39 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
   };
 
   useEffect(() => {
+    let unsubscribeUsers: (() => void) | undefined;
+
     if (isUnlocked && isAuthorizedEmail) {
       fetchAllData();
+
+      // Subscribe to real-time users list updates from Firestore
+      unsubscribeUsers = FirestoreService.subscribeToAllUsers((updatedList) => {
+        const userMap = new Map<string, UserProfile>();
+        updatedList.forEach(u => {
+          if (u && u.uid) userMap.set(u.uid, u);
+        });
+        
+        // Ensure the current active user profile is merged correctly
+        if (user && user.uid) {
+          userMap.set(user.uid, { ...(userMap.get(user.uid) || {}), ...user });
+        }
+        
+        // Ensure standard local profile fallback if needed
+        const localProfile = StorageService.getProfile();
+        if (localProfile && localProfile.uid && !userMap.has(localProfile.uid)) {
+          userMap.set(localProfile.uid, localProfile);
+        }
+        
+        setAllUsers(Array.from(userMap.values()));
+      });
     }
-  }, [isUnlocked, isAuthorizedEmail]);
+
+    return () => {
+      if (unsubscribeUsers) {
+        unsubscribeUsers();
+      }
+    };
+  }, [isUnlocked, isAuthorizedEmail, user]);
 
   // Unlock Admin Key
   const handleUnlock = (e: React.FormEvent) => {
@@ -512,6 +541,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       const now = new Date();
       const expiresAt = new Date();
       expiresAt.setMonth(expiresAt.getMonth() + editPlanDurationMonths);
+      const planIsNone = editPlanSelected === 'none';
 
       setAllUsers((prev) =>
         prev.map((u) =>
@@ -520,8 +550,9 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
                 ...u,
                 plan: editPlanSelected,
                 planStartedAt: now.toISOString(),
-                planExpiresAt: expiresAt.toISOString(),
-                planCancelled: false,
+                planExpiresAt: planIsNone ? now.toISOString() : expiresAt.toISOString(),
+                planCancelled: planIsNone,
+                planCancelledAt: planIsNone ? now.toISOString() : undefined,
                 updatedAt: now.toISOString(),
               }
             : u
@@ -549,6 +580,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
     const q = subSearchQuery.toLowerCase();
     return allUsers.filter(u => 
       (u.displayName || '').toLowerCase().includes(q) || 
+      ((u as any).username || '').toLowerCase().includes(q) || 
       (u.email || '').toLowerCase().includes(q)
     );
   }, [allUsers, subSearchQuery]);
@@ -557,27 +589,30 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
   const getSubscriptionInfo = (u: UserProfile) => {
     const rawPlan = u.plan ? u.plan.trim() : '';
     const isCancelled = Boolean(u.planCancelled);
-    const isFree = isCancelled || !rawPlan || rawPlan === 'free_trial' || rawPlan === 'Free Tier' || rawPlan === 'Free' || rawPlan.toLowerCase().includes('starter') || rawPlan.toLowerCase().includes('free');
+    const isFree = isCancelled || !rawPlan || rawPlan === 'none' || rawPlan === 'free_trial' || rawPlan === 'Free Tier' || rawPlan === 'Free' || rawPlan.toLowerCase().includes('starter') || rawPlan.toLowerCase().includes('free');
     
-    const planName = isCancelled
-      ? 'Subscription Cancelled'
-      : (isFree 
-        ? 'Free Tier / Starter' 
-        : (rawPlan === 'free_trial' ? '4-Day Free Trial' : rawPlan));
+    let planName = 'Free Tier';
+    if (isCancelled) {
+      planName = 'Subscription Cancelled';
+    } else if (rawPlan === 'free_trial') {
+      planName = '4-Day Free Trial';
+    } else if (rawPlan === 'plan_199') {
+      planName = 'Pro Scholar (₹199)';
+    } else if (rawPlan === 'plan_349' || rawPlan === 'plan_399') {
+      planName = 'Pro Ultimate (₹399)';
+    } else if (rawPlan && rawPlan !== 'none') {
+      planName = rawPlan;
+    }
 
     // Exact paid price mapping for active plan
     let price = 0;
     if (!isFree && !isCancelled) {
-      if (rawPlan === 'plan_199' || planName.toLowerCase().includes('pro scholar') || rawPlan.includes('199')) {
+      if (rawPlan === 'plan_199') {
         price = 199;
-      } else if (rawPlan === 'plan_349' || planName.toLowerCase().includes('ultimate') || planName.toLowerCase().includes('pro') || rawPlan.includes('349')) {
-        price = 349;
-      } else if (planName.toLowerCase().includes('ultra') || rawPlan.includes('599')) {
-        price = 599;
-      } else if (planName.toLowerCase().includes('year') || rawPlan.includes('1999')) {
-        price = 1999;
+      } else if (rawPlan === 'plan_349' || rawPlan === 'plan_399') {
+        price = 399;
       } else {
-        price = 349; // Default paid plan rate
+        price = 399; // Default paid plan rate
       }
     }
 
