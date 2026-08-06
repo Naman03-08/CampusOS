@@ -1230,6 +1230,31 @@ export class FirestoreService {
     }
   }
 
+  /**
+   * Admin helper: Manually upgrade or degrade any user's plan directly in Firestore without any charge.
+   * Can decide duration in months (e.g., 1, 2, 3, etc.).
+   */
+  static async updateUserSubscriptionPlan(uid: string, plan: string, durationMonths: number): Promise<void> {
+    if (!db || !uid) return;
+    try {
+      const now = new Date();
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + durationMonths);
+
+      const userRef = doc(db, 'users', uid);
+      await setDoc(userRef, {
+        plan: plan,
+        planStartedAt: now.toISOString(),
+        planExpiresAt: expiresAt.toISOString(),
+        planCancelled: false,
+        updatedAt: now.toISOString()
+      }, { merge: true });
+    } catch (e) {
+      console.warn("Error updating user subscription plan in Firestore:", e);
+      throw e;
+    }
+  }
+
   // -------------------------------------------------------------
   // GLOBAL BOUNTIES & GOLD QUEST ARENA
   // -------------------------------------------------------------

@@ -136,6 +136,13 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
   const [isCancellingSub, setIsCancellingSub] = useState(false);
   const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Website Subscriptions Search & Plan Update States
+  const [subSearchQuery, setSubSearchQuery] = useState<string>('');
+  const [userToEditPlan, setUserToEditPlan] = useState<UserProfile | null>(null);
+  const [editPlanSelected, setEditPlanSelected] = useState<string>('plan_349');
+  const [editPlanDurationMonths, setEditPlanDurationMonths] = useState<number>(1);
+  const [isUpdatingPlan, setIsUpdatingPlan] = useState<boolean>(false);
+
   const currentUserEmail = user?.email?.trim().toLowerCase() || '';
   const isAuthorizedEmail = currentUserEmail === ADMIN_EMAIL;
 
@@ -491,6 +498,62 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       setIsCancellingSub(false);
     }
   };
+
+  const handleUpdateUserPlan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userToEditPlan) return;
+    setIsUpdatingPlan(true);
+    try {
+      await FirestoreService.updateUserSubscriptionPlan(
+        userToEditPlan.uid,
+        editPlanSelected,
+        editPlanDurationMonths
+      );
+
+      // Instantly update the local allUsers state
+      const now = new Date();
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + editPlanDurationMonths);
+
+      setAllUsers((prev) =>
+        prev.map((u) =>
+          u.uid === userToEditPlan.uid
+            ? {
+                ...u,
+                plan: editPlanSelected,
+                planStartedAt: now.toISOString(),
+                planExpiresAt: expiresAt.toISOString(),
+                planCancelled: false,
+                updatedAt: now.toISOString(),
+              }
+            : u
+        )
+      );
+
+      setActionFeedback({
+        type: 'success',
+        text: `Successfully updated subscription plan for ${userToEditPlan.displayName || userToEditPlan.email} to '${editPlanSelected}' for ${editPlanDurationMonths} month(s) immediately!`
+      });
+      setUserToEditPlan(null);
+    } catch (e: any) {
+      console.error("Failed to update user plan:", e);
+      setActionFeedback({
+        type: 'error',
+        text: `Failed to update user plan: ${e.message || e}`
+      });
+    } finally {
+      setIsUpdatingPlan(false);
+    }
+  };
+
+  const filteredSubUsers = useMemo(() => {
+    if (!subSearchQuery.trim()) return allUsers;
+    const q = subSearchQuery.toLowerCase();
+    return allUsers.filter(u => 
+      (u.displayName || '').toLowerCase().includes(q) || 
+      (u.email || '').toLowerCase().includes(q)
+    );
+  }, [allUsers, subSearchQuery]);
 
   // Helper calculation for Subscription Expiration Days Remaining & Real Paid Amount
   const getSubscriptionInfo = (u: UserProfile) => {
@@ -1041,56 +1104,98 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
                   </p>
                 </div>
                 <span className="text-xs font-extrabold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-                  {allUsers.length} Students
+                  {filteredSubUsers.length} of {allUsers.length} Students
                 </span>
               </div>
 
+              {/* Search Bar inside table container */}
+              <div className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search students by username or email..."
+                  value={subSearchQuery}
+                  onChange={(e) => setSubSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 text-xs font-semibold rounded-2xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 placeholder-slate-400"
+                />
+                {subSearchQuery && (
+                  <button
+                    onClick={() => setSubSearchQuery('')}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+
               <div className="overflow-x-auto space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
-                {allUsers.map((u) => {
-                  const sub = getSubscriptionInfo(u);
-                  return (
-                    <div
-                      key={u.uid}
-                      className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 flex items-center justify-between text-xs hover:bg-white transition-colors"
-                    >
-                      <div className="pr-2 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="font-extrabold text-slate-900 truncate">{u.displayName}</p>
-                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
-                            sub.isFree ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
-                          }`}>
-                            {sub.planName}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-500 font-medium font-mono truncate">{u.email}</p>
-                      </div>
-
-                      <div className="flex items-center gap-2.5 shrink-0">
-                        <div className="text-right">
-                          <p className={`font-black text-xs ${
-                            sub.daysRemaining <= 5 && !sub.isFree ? 'text-red-600' : 'text-emerald-600'
-                          }`}>
-                            {sub.statusLabel}
-                          </p>
-                          <p className="text-[10px] text-slate-400 font-bold">
-                            {sub.price > 0 ? `Paid: ₹${sub.price}` : 'Free Access'}
-                          </p>
+                {filteredSubUsers.length === 0 ? (
+                  <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                    <p className="text-xs font-bold text-slate-500">No matching students found.</p>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">Try searching with a different username or email.</p>
+                  </div>
+                ) : (
+                  filteredSubUsers.map((u) => {
+                    const sub = getSubscriptionInfo(u);
+                    return (
+                      <div
+                        key={u.uid}
+                        className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 flex items-center justify-between text-xs hover:bg-white transition-colors"
+                      >
+                        <div className="pr-2 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-extrabold text-slate-900 truncate">{u.displayName}</p>
+                            <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
+                              sub.isFree ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
+                            }`}>
+                              {sub.planName}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 font-medium font-mono truncate">{u.email}</p>
                         </div>
 
-                        {!sub.isFree && (
-                          <button
-                            onClick={() => setUserToCancelSub(u)}
-                            title="Cancel user subscription"
-                            className="p-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[10px] border border-red-200 transition-colors flex items-center gap-1 cursor-pointer"
-                          >
-                            <UserX className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline">Cancel</span>
-                          </button>
-                        )}
+                        <div className="flex items-center gap-2.5 shrink-0">
+                          <div className="text-right">
+                            <p className={`font-black text-xs ${
+                              sub.daysRemaining <= 5 && !sub.isFree ? 'text-red-600' : 'text-emerald-600'
+                            }`}>
+                              {sub.statusLabel}
+                            </p>
+                            <p className="text-[10px] text-slate-400 font-bold">
+                              {sub.price > 0 ? `Paid: ₹${sub.price}` : 'Free Access'}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => {
+                                setUserToEditPlan(u);
+                                setEditPlanSelected(u.plan || 'none');
+                                setEditPlanDurationMonths(1);
+                              }}
+                              title="Modify Student Plan Access"
+                              className="p-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold text-[10px] border border-blue-200 transition-colors flex items-center gap-1 cursor-pointer"
+                            >
+                              <Settings className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline">Modify</span>
+                            </button>
+
+                            {!sub.isFree && (
+                              <button
+                                onClick={() => setUserToCancelSub(u)}
+                                title="Cancel user subscription"
+                                className="p-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[10px] border border-red-200 transition-colors flex items-center gap-1 cursor-pointer"
+                              >
+                                <UserX className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Cancel</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             </div>
 
@@ -2118,6 +2223,90 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
                 <span>{isCancellingSub ? 'Cancelling...' : 'Cancel Subscription'}</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 6: MODIFY STUDENT PLAN ACCESS */}
+      {userToEditPlan && (
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div className="flex items-center gap-2 text-blue-600 font-extrabold text-base">
+                <Settings className="w-5 h-5 text-blue-600" />
+                <span>Modify Student Plan Access</span>
+              </div>
+              <button
+                onClick={() => setUserToEditPlan(null)}
+                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1 font-medium">
+              <p className="text-slate-900 font-extrabold">{userToEditPlan.displayName}</p>
+              <p className="text-slate-600 font-mono">{userToEditPlan.email}</p>
+              <p className="text-blue-700 font-bold pt-1">Current Stored Plan: {userToEditPlan.plan || 'Free Tier'}</p>
+            </div>
+
+            <form onSubmit={handleUpdateUserPlan} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 block">Select Access Plan</label>
+                <select
+                  value={editPlanSelected}
+                  onChange={(e) => setEditPlanSelected(e.target.value)}
+                  className="w-full px-3 py-2 text-xs font-bold rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                >
+                  <option value="free_trial">4-Day Free Trial Pass (₹0)</option>
+                  <option value="plan_199">Pro Scholar Pass (₹199)</option>
+                  <option value="plan_349">Placivo Pro Ultimate (₹399)</option>
+                  <option value="none">Free Tier / Demoted Access (₹0)</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 block">Select Subscription Period</label>
+                <select
+                  value={editPlanDurationMonths}
+                  onChange={(e) => setEditPlanDurationMonths(Number(e.target.value))}
+                  className="w-full px-3 py-2 text-xs font-bold rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                >
+                  <option value={1}>1 Month (30 Days)</option>
+                  <option value={2}>2 Months (60 Days)</option>
+                  <option value={3}>3 Months (90 Days)</option>
+                  <option value={4}>4 Months (120 Days)</option>
+                  <option value={6}>6 Months (180 Days)</option>
+                  <option value={12}>1 Year (365 Days)</option>
+                </select>
+              </div>
+
+              <p className="text-[11px] text-emerald-800 bg-emerald-50 p-3 rounded-xl border border-emerald-200 font-semibold leading-normal">
+                ✨ Upgrade/Degrade happens immediately. This modification is completely free of charge and synchronizes directly with the student's live profile in Firestore.
+              </p>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setUserToEditPlan(null)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 font-bold text-xs text-slate-700 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdatingPlan}
+                  className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+                >
+                  {isUpdatingPlan ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4" />
+                  )}
+                  <span>{isUpdatingPlan ? 'Saving...' : 'Update Access Immediately'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
