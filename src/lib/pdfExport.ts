@@ -540,6 +540,10 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
                 if (text.tagName === 'DIV' && text.children.length > 0) {
                   return;
                 }
+                // Skip metadata lines to keep custom styling
+                if (text.closest('.resume-highlight-card div[class*="justify-between"]')) {
+                  return;
+                }
                 const computedFs = window.getComputedStyle(text).fontSize;
                 const fsVal = parseFloat(computedFs);
                 if (fsVal) {
@@ -547,6 +551,30 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
                   text.style.setProperty('font-size', `${targetFs}px`, 'important');
                   text.style.setProperty('line-height', '1.4', 'important'); // Balanced, readable leading
                 }
+              }
+            });
+
+            // Target and style metadata lines (duration, location, CGPA) inside the highlight cards
+            const metaLines = rightSidebar.querySelectorAll('.resume-highlight-card div[class*="justify-between"]');
+            metaLines.forEach((line) => {
+              if (line instanceof HTMLElement) {
+                line.style.setProperty('display', 'flex', 'important');
+                line.style.setProperty('flex-direction', 'row', 'important');
+                line.style.setProperty('flex-wrap', 'nowrap', 'important');
+                line.style.setProperty('justify-content', 'space-between', 'important');
+                line.style.setProperty('align-items', 'center', 'important');
+                line.style.setProperty('gap', '6px', 'important');
+                line.style.setProperty('width', '100%', 'important');
+                line.style.setProperty('margin-top', '4px', 'important');
+
+                const spans = line.querySelectorAll('span');
+                spans.forEach((span) => {
+                  if (span instanceof HTMLElement) {
+                    span.style.setProperty('font-size', '8px', 'important');
+                    span.style.setProperty('white-space', 'nowrap', 'important');
+                    span.style.setProperty('line-height', '1', 'important');
+                  }
+                });
               }
             });
           }

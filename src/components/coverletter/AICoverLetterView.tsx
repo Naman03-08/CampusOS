@@ -496,13 +496,30 @@ const parseEducationBlocks = (text: string) => {
     let degree = line;
     let institution = "Government Engineering College";
     let year = "2022 - 2026";
+    let cgpa = "";
     
-    const dashIdx = line.indexOf('-');
-    const atIdx = line.toLowerCase().indexOf(' at ');
+    // Check for CGPA / GPA in the line
+    const cgpaRegex = /(?:CGPA|GPA)[:\s]+([\d.]+(?:\s*\/?\s*[\d.]+)?)/i;
+    const cgpaMatch = line.match(cgpaRegex);
+    if (cgpaMatch) {
+      cgpa = `CGPA: ${cgpaMatch[1]}`;
+      degree = degree.replace(cgpaMatch[0], '').trim();
+    }
     
+    const dashIdx = degree.indexOf('-');
     if (dashIdx !== -1) {
-      degree = line.substring(0, dashIdx).trim();
-      year = line.substring(dashIdx + 1).trim();
+      const firstPart = degree.substring(0, dashIdx).trim();
+      const secondPart = degree.substring(dashIdx + 1).trim();
+      
+      degree = firstPart;
+      
+      const yearRegex = /\b(19|20)\d{2}\b/g;
+      const years = secondPart.match(yearRegex);
+      if (years || secondPart.toLowerCase().includes('graduation') || secondPart.toLowerCase().includes('present')) {
+        year = secondPart;
+      } else {
+        institution = secondPart;
+      }
     }
     
     const collegeIdx = degree.toLowerCase().indexOf(' at ');
@@ -511,11 +528,16 @@ const parseEducationBlocks = (text: string) => {
       degree = degree.substring(0, collegeIdx).trim();
     }
     
+    // Clean trailing hyphens or commas
+    degree = degree.replace(/[-,\s]+$/, '').trim();
+    institution = institution.replace(/[-,\s]+$/, '').trim();
+    
     return {
       id: `edu-${idx}`,
       degree,
       institution,
-      year
+      year,
+      cgpa
     };
   });
 };
@@ -2470,9 +2492,9 @@ export const AICoverLetterView: React.FC = () => {
                                     <div className="flex-1 min-w-0">
                                       <div className="font-extrabold text-xs text-slate-800 truncate">{expItem.role}</div>
                                       <div className={`text-[10px] font-bold truncate ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>{expItem.company}</div>
-                                      <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold mt-1">
-                                        <span>{expItem.duration}</span>
-                                        <span>{expItem.location}</span>
+                                      <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold mt-1 flex-wrap gap-x-2">
+                                        <span className="whitespace-nowrap">{expItem.duration}</span>
+                                        <span className="whitespace-nowrap">{expItem.location}</span>
                                       </div>
                                     </div>
                                   </div>
@@ -2493,9 +2515,9 @@ export const AICoverLetterView: React.FC = () => {
                                   <div className="flex-1 min-w-0">
                                     <div className="font-extrabold text-xs text-slate-800">Software Development Engineer</div>
                                     <div className={`text-[10px] font-bold truncate ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>Microsoft</div>
-                                    <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold mt-1">
-                                      <span>Aug 2024 - Present</span>
-                                      <span>Bengaluru, India</span>
+                                    <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold mt-1 flex-wrap gap-x-2">
+                                      <span className="whitespace-nowrap">Aug 2024 - Present</span>
+                                      <span className="whitespace-nowrap">Bengaluru, India</span>
                                     </div>
                                   </div>
                                 </div>
@@ -2521,7 +2543,10 @@ export const AICoverLetterView: React.FC = () => {
                                 <div key={eduItem.id} className={`${cardBg} resume-highlight-card`}>
                                   <div className="font-extrabold text-xs text-slate-800 leading-snug">{eduItem.degree}</div>
                                   <div className="text-[10px] font-bold text-slate-500">{eduItem.institution}</div>
-                                  <div className={`text-[9px] font-bold ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>{eduItem.year}</div>
+                                  <div className="flex justify-between items-center text-[9px] font-bold mt-1 flex-wrap gap-x-2">
+                                    <span className={`whitespace-nowrap ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>{eduItem.year}</span>
+                                    {eduItem.cgpa && <span className="text-slate-400 whitespace-nowrap">{eduItem.cgpa}</span>}
+                                  </div>
                                 </div>
                               ))
                             ) : (
@@ -2529,9 +2554,9 @@ export const AICoverLetterView: React.FC = () => {
                               <div className={`${cardBg} resume-highlight-card`}>
                                 <div className="font-extrabold text-xs text-slate-800 leading-snug">B.Tech. in Computer Science</div>
                                 <div className="text-[10px] font-bold text-slate-500 font-sans">Government Engineering College</div>
-                                <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold mt-1">
-                                  <span className={`font-extrabold ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>2018 - 2022</span>
-                                  <span>CGPA: 8.2 / 10</span>
+                                <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold mt-1 flex-wrap gap-x-2">
+                                  <span className={`font-extrabold whitespace-nowrap ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>2018 - 2022</span>
+                                  <span className="whitespace-nowrap">CGPA: 8.2 / 10</span>
                                 </div>
                               </div>
                             )}
