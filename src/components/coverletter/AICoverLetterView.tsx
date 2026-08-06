@@ -1347,7 +1347,7 @@ export const AICoverLetterView: React.FC = () => {
   const highlights = getSkillsHighlight();
 
   return (
-    <div id="ai-cover-letter-root" className="w-full min-h-screen bg-slate-50/70 py-8 px-4 sm:px-6 lg:px-8 text-slate-800 relative overflow-hidden">
+    <div id="ai-cover-letter-root" className="w-full min-h-screen bg-gradient-to-tr from-sky-50/70 via-indigo-50/45 to-white/95 py-8 px-4 sm:px-6 lg:px-8 text-slate-800 relative overflow-hidden">
       
       {/* Premium Background Particles / 3D Nodes Grid */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none opacity-45">
@@ -1361,9 +1361,33 @@ export const AICoverLetterView: React.FC = () => {
           <rect width="100%" height="100%" fill="url(#grid-pattern)" />
         </svg>
         
-        {/* Animated 3D Floating Blobs */}
-        <div className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-tr from-blue-200/30 to-indigo-200/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-violet-200/20 to-purple-200/30 rounded-full blur-3xl"></div>
+        {/* Animated 3D Floating Blobs using motion */}
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.15, 1], 
+            x: [0, 15, 0], 
+            y: [0, -15, 0] 
+          }}
+          transition={{ 
+            duration: 12, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
+          }}
+          className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-tr from-sky-100/40 via-blue-200/30 to-indigo-200/20 rounded-full blur-3xl pointer-events-none"
+        ></motion.div>
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.1, 1], 
+            x: [0, -20, 0], 
+            y: [0, 15, 0] 
+          }}
+          transition={{ 
+            duration: 15, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
+          }}
+          className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-violet-100/35 via-purple-200/25 to-pink-200/20 rounded-full blur-3xl pointer-events-none"
+        ></motion.div>
       </div>
 
       {/* Visual Elegant Header Block */}
@@ -1371,17 +1395,17 @@ export const AICoverLetterView: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200/80 pb-6">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-blue-700 bg-blue-50 rounded-full border border-blue-100 flex items-center gap-1">
+              <span className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-blue-700 bg-blue-50/85 rounded-full border border-blue-100/90 flex items-center gap-1 shadow-3xs">
                 <Zap className="h-3 w-3 fill-blue-600" /> GEMINI PRO ARCHITECT
               </span>
               <span className="flex items-center gap-1 text-xs text-slate-400">
                 <Sparkles className="h-3.5 w-3.5 text-amber-500 animate-spin" /> Tailored Company Alignment
               </span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-950 bg-clip-text text-transparent">
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-blue-700 via-indigo-600 to-violet-800 bg-clip-text text-transparent">
               AI Cover Letter Architect
             </h1>
-            <p className="mt-2 text-slate-500 max-w-2xl text-sm leading-relaxed">
+            <p className="mt-2 text-slate-500 max-w-2xl text-sm leading-relaxed font-medium">
               Create world-class, ATS-optimized cover letters designed to bypass screening systems and capture the attention of technical hiring managers. Directly integrated with your profile database.
             </p>
           </div>
@@ -1390,7 +1414,7 @@ export const AICoverLetterView: React.FC = () => {
             <button
               onClick={handleLoadStoredResume}
               disabled={loadingHistory}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 shadow-sm transition-all duration-200 hover:scale-[1.02] disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 shadow-xs transition-all duration-200 hover:scale-[1.02] disabled:opacity-50"
             >
               <RefreshCw className={`h-4 w-4 text-blue-600 ${loadingHistory ? 'animate-spin' : ''}`} />
               Sync Profile
@@ -1398,9 +1422,9 @@ export const AICoverLetterView: React.FC = () => {
             
             <button
               onClick={() => setIsHistoryOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md transition-all duration-200 hover:scale-[1.02]"
+              className="flex items-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-150 font-extrabold text-xs rounded-xl shadow-3xs transition-all duration-200 hover:scale-[1.02]"
             >
-              <History className="h-4 w-4 text-indigo-400" />
+              <History className="h-4 w-4 text-indigo-500" />
               Saved Library ({savedLetters.length})
             </button>
           </div>
@@ -1928,85 +1952,91 @@ export const AICoverLetterView: React.FC = () => {
           
           {/* Active Generation Loader */}
           {isGenerating && (
-            <div className="bg-slate-950 text-slate-100 rounded-3xl border border-slate-800 shadow-2xl p-8 sm:p-12 text-center flex flex-col items-center justify-center min-h-[520px] relative overflow-hidden">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="bg-white/95 text-slate-800 rounded-3xl border border-blue-100/90 shadow-2xl shadow-blue-500/5 p-8 sm:p-12 text-center flex flex-col items-center justify-center min-h-[520px] relative overflow-hidden"
+            >
               {/* Grid backdrop */}
-              <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '20px 20px' }}></div>
-              <div className="absolute inset-0 bg-radial-gradient from-indigo-500/10 via-transparent to-transparent -z-10"></div>
+              <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #2563eb 1px, transparent 0)', backgroundSize: '20px 20px' }}></div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 via-indigo-500/5 to-cyan-500/5 -z-10 animate-pulse"></div>
               
               <div className="relative mb-8">
                 {/* Dual spinning tech rings */}
-                <div className="w-24 h-24 border-4 border-slate-800 border-t-indigo-500 rounded-full animate-spin"></div>
-                <div className="w-20 h-20 border-4 border-dashed border-slate-700 border-t-cyan-400 rounded-full animate-spin absolute top-2 left-2 animate-[spin_3s_linear_infinite_reverse]"></div>
+                <div className="w-24 h-24 border-4 border-slate-100 border-t-blue-600 rounded-full animate-spin shadow-3xs"></div>
+                <div className="w-20 h-20 border-4 border-dashed border-indigo-50/80 border-t-cyan-500 rounded-full animate-spin absolute top-2 left-2 animate-[spin_3s_linear_infinite_reverse] shadow-4xs"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Sparkles className="h-8 w-8 text-cyan-400 animate-[pulse_1.5s_ease-in-out_infinite]" />
+                  <Sparkles className="h-8 w-8 text-blue-600 animate-[pulse_1.5s_ease-in-out_infinite]" />
                 </div>
               </div>
               
               <div className="space-y-1">
-                <span className="text-[10px] uppercase font-mono tracking-widest text-indigo-400 font-bold bg-indigo-950/60 border border-indigo-900/60 px-3 py-1 rounded-full">Placivo Gen-4 AI Architecture</span>
-                <h3 className="text-xl font-bold tracking-tight text-white pt-2">Synthesizing Bespoke Cover Letter</h3>
-                <p className="text-slate-400 text-xs max-w-sm mx-auto leading-relaxed">Cross-referencing your credentials with {targetCompany || "target company"}'s engineering culture rules and job criteria...</p>
+                <span className="text-[10px] uppercase font-mono tracking-widest text-indigo-700 font-bold bg-indigo-50 border border-indigo-100/80 px-3 py-1 rounded-full shadow-4xs">Placivo Gen-4 AI Architecture</span>
+                <h3 className="text-xl font-black tracking-tight text-slate-800 pt-2.5">Synthesizing Bespoke Cover Letter</h3>
+                <p className="text-slate-500 text-xs max-w-sm mx-auto leading-relaxed font-semibold">Cross-referencing your credentials with {targetCompany || "target company"}'s engineering culture rules and job criteria...</p>
               </div>
 
               {/* High-quality technical progress bar */}
-              <div className="w-full max-w-md mt-8 bg-slate-900 border border-slate-800 rounded-full h-3 p-0.5 overflow-hidden shadow-inner">
+              <div className="w-full max-w-md mt-8 bg-slate-100 border border-slate-200/50 rounded-full h-3 p-0.5 overflow-hidden shadow-inner">
                 <div 
-                  className="bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_8px_rgba(99,102,241,0.5)]" 
+                  className="bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400 h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_8px_rgba(99,102,241,0.2)]" 
                   style={{ width: `${((genStep + 1) / generationSteps.length) * 100}%` }}
                 ></div>
               </div>
 
               {/* Progress metric */}
-              <div className="flex justify-between w-full max-w-md text-[10px] font-mono text-slate-500 mt-2 font-bold px-1">
+              <div className="flex justify-between w-full max-w-md text-[10px] font-mono text-slate-400 mt-2 font-bold px-1">
                 <span>PHASE {genStep + 1} OF {generationSteps.length}</span>
-                <span className="text-indigo-400">{Math.round(((genStep + 1) / generationSteps.length) * 100)}% ANALYSIS COMPLETE</span>
+                <span className="text-indigo-600 font-black">{Math.round(((genStep + 1) / generationSteps.length) * 100)}% ANALYSIS COMPLETE</span>
               </div>
 
               {/* Tech Diagnostic Live Stream Panel */}
-              <div className="w-full max-w-md bg-slate-900/80 border border-slate-800 rounded-2xl p-4 mt-6 text-left font-mono text-[10.5px] leading-relaxed text-slate-400 shadow-lg min-h-[140px] flex flex-col justify-between">
+              <div className="w-full max-w-md bg-slate-50/80 border border-slate-200/80 rounded-2xl p-4 mt-6 text-left font-mono text-[10.5px] leading-relaxed text-slate-600 shadow-sm min-h-[140px] flex flex-col justify-between">
                 <div className="space-y-1.5 flex-1">
-                  <div className="flex items-center gap-1.5 text-indigo-400 font-bold">
+                  <div className="flex items-center gap-1.5 text-indigo-600 font-bold">
                     <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-ping"></span>
                     <span>SYSTEM_STATUS: ACTIVE_OPTIMIZATION</span>
                   </div>
-                  <div className="text-slate-500">
+                  <div className="text-slate-400 font-semibold">
                     &gt; Initializing neural semantic pipeline...
                   </div>
                   {genStep >= 1 && (
-                    <div className="text-slate-400">
-                      &gt; Extrapolating company values for <span className="text-white">"{targetCompany}"</span>...
+                    <div className="text-slate-500">
+                      &gt; Extrapolating company values for <span className="text-slate-800 font-extrabold">"{targetCompany}"</span>...
                     </div>
                   )}
                   {genStep >= 2 && (
-                    <div className="text-slate-400">
+                    <div className="text-slate-500">
                       &gt; Parsing experience highlights and technology stacks...
                     </div>
                   )}
                   {genStep >= 3 && (
-                    <div className="text-emerald-400">
+                    <div className="text-emerald-600 font-bold">
                       &gt; Synthesizing bespoke paragraphs matching tone: <span className="italic">"{tone}"</span>...
                     </div>
                   )}
                   {genStep >= 4 && (
-                    <div className="text-cyan-400">
+                    <div className="text-cyan-600 font-bold">
                       &gt; Running real-time ATS keyword matching index simulations...
                     </div>
                   )}
                   {genStep >= 5 && (
-                    <div className="text-indigo-400 font-bold">
+                    <div className="text-indigo-600 font-bold">
                       &gt; Performing final structural polishing and formatting checks...
                     </div>
                   )}
                 </div>
-                <div className="pt-2 border-t border-slate-800 text-[10px] font-bold text-slate-500 flex justify-between items-center mt-3">
-                  <span className="animate-pulse flex items-center gap-1">
-                    <span className="h-1 w-1 bg-cyan-400 rounded-full"></span>
+                <div className="pt-2 border-t border-slate-100 text-[10px] font-bold text-slate-400 flex justify-between items-center mt-3">
+                  <span className="animate-pulse flex items-center gap-1 font-bold text-slate-500">
+                    <span className="h-1.5 w-1.5 bg-cyan-400 rounded-full"></span>
                     ACTIVE_PROCESS: {generationSteps[genStep]}
                   </span>
                   <span>v1.4.2</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Error display */}
@@ -2180,7 +2210,7 @@ export const AICoverLetterView: React.FC = () => {
                     disabled={isGeneratingVariantB}
                     className={`flex-1 py-2 px-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 ${
                       activeVariant === 'B'
-                        ? 'bg-slate-900 text-white shadow-sm'
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/15'
                         : 'text-slate-500 hover:text-slate-700'
                     }`}
                   >
@@ -2315,31 +2345,31 @@ export const AICoverLetterView: React.FC = () => {
                         </div>
 
                         {/* Horizontal Contact Pill Bar with Premium Logos (inspired by image) */}
-                        <div id="cover-letter-contact-grid" className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ${portfolio ? 'lg:grid-cols-6' : 'lg:grid-cols-5'} gap-2.5 mt-5 text-[11px] font-semibold text-slate-600 w-full`}>
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
+                        <div id="cover-letter-contact-grid" className="flex flex-wrap gap-2.5 mt-5 text-[11px] font-semibold text-slate-600 w-full">
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start shrink-0 ${contactPillBg}`}>
                             <CompactMailIcon />
-                            <span className="truncate">{email || "naman03mgs@gmail.com"}</span>
+                            <span>{email || "naman03mgs@gmail.com"}</span>
                           </div>
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start shrink-0 ${contactPillBg}`}>
                             <CompactPhoneIcon />
-                            <span className="truncate">{phone || "+91 98765 43210"}</span>
+                            <span>{phone || "+91 98765 43210"}</span>
                           </div>
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start shrink-0 ${contactPillBg}`}>
                             <CompactMapPinIcon />
-                            <span className="truncate">Bengaluru, India</span>
+                            <span>Bengaluru, India</span>
                           </div>
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start shrink-0 ${contactPillBg}`}>
                             <CompactLinkedinIcon />
-                            <span className="text-blue-600 truncate">{linkedIn || "linkedin.com/in/naman-pandey"}</span>
+                            <span className="text-blue-600">{linkedIn || "linkedin.com/in/naman-pandey"}</span>
                           </div>
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start shrink-0 ${contactPillBg}`}>
                             <CompactGithubIcon />
-                            <span className="truncate">{github || "github.com/naman-pandey"}</span>
+                            <span>{github || "github.com/naman-pandey"}</span>
                           </div>
                           {portfolio && (
-                            <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start ${contactPillBg}`}>
+                            <div className={`flex items-center gap-1.5 px-2.5 py-1.5 shadow-sm hover:scale-[1.01] transition-all justify-start shrink-0 ${contactPillBg}`}>
                               <CompactGlobeIcon />
-                              <span className="truncate">{portfolio}</span>
+                              <span>{portfolio}</span>
                             </div>
                           )}
                         </div>
@@ -2434,7 +2464,7 @@ export const AICoverLetterView: React.FC = () => {
                             
                             {parseExperienceBlocks(experience).length > 0 ? (
                               parseExperienceBlocks(experience).slice(0, 2).map((expItem: any) => (
-                                <div key={expItem.id} className={`${cardBg}`}>
+                                <div key={expItem.id} className={`${cardBg} resume-highlight-card`}>
                                   <div className="flex items-start gap-2.5">
                                     <CompanyLogoIcon name={expItem.company} logoUrl={companyLogos[expItem.company.toLowerCase()]} />
                                     <div className="flex-1 min-w-0">
@@ -2457,7 +2487,7 @@ export const AICoverLetterView: React.FC = () => {
                               ))
                             ) : (
                               // Fallback styled item matching high-end Microsoft experience from image
-                              <div className={`${cardBg}`}>
+                              <div className={`${cardBg} resume-highlight-card`}>
                                 <div className="flex items-start gap-2.5">
                                   <CompanyLogoIcon name="Microsoft" />
                                   <div className="flex-1 min-w-0">
@@ -2476,7 +2506,7 @@ export const AICoverLetterView: React.FC = () => {
                               </div>
                             )}
                           </div>
-
+ 
                            {/* EDUCATION */}
                           <div className="space-y-3">
                             <div className={`flex items-center gap-2 ${sectionHeaderBg}`}>
@@ -2488,7 +2518,7 @@ export const AICoverLetterView: React.FC = () => {
                             
                             {parseEducationBlocks(education).length > 0 ? (
                               parseEducationBlocks(education).slice(0, 2).map((eduItem: any) => (
-                                <div key={eduItem.id} className={`${cardBg}`}>
+                                <div key={eduItem.id} className={`${cardBg} resume-highlight-card`}>
                                   <div className="font-extrabold text-xs text-slate-800 leading-snug">{eduItem.degree}</div>
                                   <div className="text-[10px] font-bold text-slate-500">{eduItem.institution}</div>
                                   <div className={`text-[9px] font-bold ${isSerif ? 'text-[#111d2a]' : isWarm ? 'text-[#c2410c]' : isFuturistic ? 'text-violet-500' : 'text-indigo-600'}`}>{eduItem.year}</div>
@@ -2496,7 +2526,7 @@ export const AICoverLetterView: React.FC = () => {
                               ))
                             ) : (
                               // Fallback styled item matching Government Engineering College from image
-                              <div className={`${cardBg}`}>
+                              <div className={`${cardBg} resume-highlight-card`}>
                                 <div className="font-extrabold text-xs text-slate-800 leading-snug">B.Tech. in Computer Science</div>
                                 <div className="text-[10px] font-bold text-slate-500 font-sans">Government Engineering College</div>
                                 <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold mt-1">
@@ -2506,7 +2536,7 @@ export const AICoverLetterView: React.FC = () => {
                               </div>
                             )}
                           </div>
-
+ 
                           {/* MOST PROUD OF / ACHIEVEMENTS */}
                           <div className="space-y-3">
                             <div className={`flex items-center gap-2 ${sectionHeaderBg}`}>
@@ -2519,7 +2549,7 @@ export const AICoverLetterView: React.FC = () => {
                             <div className="space-y-2">
                               {parseAchievements(achievements).length > 0 ? (
                                 parseAchievements(achievements).slice(0, 4).map((ach, idx) => (
-                                  <div key={idx} className={`${cardBg} flex gap-2 items-start`}>
+                                  <div key={idx} className={`${cardBg} resume-highlight-card flex gap-2 items-start`}>
                                     <Award className="h-4 w-4 text-purple-500 shrink-0 mt-0.5" />
                                     <span className={`text-[10px] font-semibold leading-normal ${bulletColor}`}>{ach}</span>
                                   </div>
@@ -2527,14 +2557,14 @@ export const AICoverLetterView: React.FC = () => {
                               ) : (
                                 // Fallback styled items matching Radha's achievements (ranks, smart india hackathon, etc)
                                 <>
-                                  <div className={`${cardBg} flex gap-2.5 items-start`}>
+                                  <div className={`${cardBg} resume-highlight-card flex gap-2.5 items-start`}>
                                     <Trophy className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
                                     <div className="flex-1">
                                       <span className="text-[10px] font-bold text-slate-800 block">DSA Mentor at BossCoder Academy</span>
                                       <span className={`text-[9px] leading-snug block ${bulletColor}`}>Successfully mentored 400+ students in advanced algorithms.</span>
                                     </div>
                                   </div>
-                                  <div className={`${cardBg} flex gap-2.5 items-start`}>
+                                  <div className={`${cardBg} resume-highlight-card flex gap-2.5 items-start`}>
                                     <Award className="h-4 w-4 text-indigo-500 shrink-0 mt-0.5" />
                                     <div className="flex-1">
                                       <span className="text-[10px] font-bold text-slate-800 block">Participated in SIH Finals</span>
@@ -2545,7 +2575,7 @@ export const AICoverLetterView: React.FC = () => {
                               )}
                             </div>
                           </div>
-
+ 
                           {/* PROJECTS */}
                           <div className="space-y-3">
                             <div className={`flex items-center gap-2 ${sectionHeaderBg}`}>
@@ -2557,7 +2587,7 @@ export const AICoverLetterView: React.FC = () => {
                             
                             {parseProjectBlocks(projects).length > 0 ? (
                               parseProjectBlocks(projects).slice(0, 2).map((projItem: any) => (
-                                <div key={projItem.id} className={`${cardBg}`}>
+                                <div key={projItem.id} className={`${cardBg} resume-highlight-card`}>
                                   <div className="font-extrabold text-xs text-slate-800 leading-snug">{projItem.name}</div>
                                   <p className={`text-[10px] line-clamp-2 leading-relaxed ${bulletColor}`}>{projItem.description}</p>
                                   {projItem.techStack.length > 0 && (
@@ -2573,7 +2603,7 @@ export const AICoverLetterView: React.FC = () => {
                               ))
                             ) : (
                               // Fallback styled item matching Radha's actual project
-                              <div className={`${cardBg}`}>
+                              <div className={`${cardBg} resume-highlight-card`}>
                                 <div className="font-extrabold text-xs text-slate-800 leading-snug">AI-Powered Document Intelligence Platform</div>
                                 <p className={`text-[10px] leading-relaxed ${bulletColor}`}>Built an AI document ingestion system extracting structured data from custom invoices using NLP.</p>
                                 <div className="flex flex-wrap gap-1 pt-1.5">
@@ -2671,10 +2701,10 @@ export const AICoverLetterView: React.FC = () => {
                             triggerToast("Copied LinkedIn Connection Note!");
                             setTimeout(() => setOutreachCopiedKey(null), 2000);
                           }}
-                          className={`w-full py-2.5 rounded-xl font-bold text-xs mt-4 flex items-center justify-center gap-1.5 transition-all ${
+                          className={`w-full py-2.5 rounded-xl font-extrabold text-xs mt-4 flex items-center justify-center gap-1.5 transition-all ${
                             isCopied 
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                              : 'bg-slate-900 text-white hover:bg-slate-800'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm' 
+                              : 'bg-indigo-50 border border-indigo-150 text-indigo-700 hover:bg-indigo-100 shadow-3xs'
                           }`}
                         >
                           {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -2714,10 +2744,10 @@ export const AICoverLetterView: React.FC = () => {
                             triggerToast("Copied Cold Email Draft!");
                             setTimeout(() => setOutreachCopiedKey(null), 2000);
                           }}
-                          className={`w-full py-2.5 rounded-xl font-bold text-xs mt-4 flex items-center justify-center gap-1.5 transition-all ${
+                          className={`w-full py-2.5 rounded-xl font-extrabold text-xs mt-4 flex items-center justify-center gap-1.5 transition-all ${
                             isCopied 
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                              : 'bg-slate-900 text-white hover:bg-slate-800'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm' 
+                              : 'bg-indigo-50 border border-indigo-150 text-indigo-700 hover:bg-indigo-100 shadow-3xs'
                           }`}
                         >
                           {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -2754,10 +2784,10 @@ export const AICoverLetterView: React.FC = () => {
                             triggerToast("Copied InMail Follow-up!");
                             setTimeout(() => setOutreachCopiedKey(null), 2000);
                           }}
-                          className={`w-full py-2.5 rounded-xl font-bold text-xs mt-4 flex items-center justify-center gap-1.5 transition-all ${
+                          className={`w-full py-2.5 rounded-xl font-extrabold text-xs mt-4 flex items-center justify-center gap-1.5 transition-all ${
                             isCopied 
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                              : 'bg-slate-900 text-white hover:bg-slate-800'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm' 
+                              : 'bg-indigo-50 border border-indigo-150 text-indigo-700 hover:bg-indigo-100 shadow-3xs'
                           }`}
                         >
                           {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -2902,20 +2932,23 @@ export const AICoverLetterView: React.FC = () => {
               )}
 
               {interviewCheatSheet && (
-                <div 
-                  className="bg-slate-900 text-white rounded-3xl border border-slate-800 p-6 shadow-2xl relative overflow-hidden transition-all"
+                <motion.div 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xl relative overflow-hidden transition-all duration-300"
                 >
                   {/* Decorative glowing gradient inside the cheat sheet card */}
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none"></div>
 
-                  <div className="flex justify-between items-center mb-5 border-b border-slate-800 pb-3">
+                  <div className="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
                     <div className="flex items-center gap-2">
-                      <Zap className="h-4.5 w-4.5 text-amber-400 fill-amber-400 animate-pulse" />
-                      <h3 className="text-xs font-black tracking-widest uppercase text-slate-200">
+                      <Zap className="h-4.5 w-4.5 text-amber-500 fill-amber-400 animate-pulse" />
+                      <h3 className="text-xs font-black tracking-widest uppercase text-slate-800">
                         Live AI Interview Preparation Cheat Sheet
                       </h3>
                     </div>
-                    <span className="text-[9px] bg-slate-800 text-indigo-300 font-extrabold px-2.5 py-0.5 rounded border border-slate-700">
+                    <span className="text-[9px] bg-slate-50 text-indigo-700 font-extrabold px-2.5 py-0.5 rounded border border-slate-200">
                       Companion Guide
                     </span>
                   </div>
@@ -2923,30 +2956,34 @@ export const AICoverLetterView: React.FC = () => {
                   <div className="space-y-6">
                     {/* Predictable Recruiter Questions */}
                     <div>
-                      <span className="text-[10px] text-indigo-300 font-extrabold uppercase tracking-widest block mb-3">Anticipated Interview Scenarios & Qs</span>
+                      <span className="text-[10px] text-indigo-600 font-extrabold uppercase tracking-widest block mb-3">Anticipated Interview Scenarios & Qs</span>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {interviewCheatSheet.questions.map((q, i) => (
-                          <div key={i} className="bg-slate-950/70 border border-slate-800/80 rounded-2xl p-4 space-y-2">
+                          <motion.div 
+                            key={i} 
+                            whileHover={{ y: -2 }}
+                            className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 space-y-2 hover:bg-white hover:border-blue-200 transition-all shadow-3xs hover:shadow-xs"
+                          >
                             <div className="flex items-start gap-2">
-                              <span className="text-xs font-black text-amber-400 shrink-0">Q{i+1}:</span>
-                              <h5 className="text-xs font-bold text-slate-100">{q.question}</h5>
+                              <span className="text-xs font-black text-amber-600 shrink-0">Q{i+1}:</span>
+                              <h5 className="text-xs font-extrabold text-slate-800">{q.question}</h5>
                             </div>
                             <p className="text-[10px] text-slate-400 italic font-semibold">{q.scenario}</p>
-                            <p className="text-[11px] text-slate-300 leading-relaxed font-sans">{q.bestAnswer}</p>
-                          </div>
+                            <p className="text-[11px] text-slate-600 leading-relaxed font-sans font-semibold">{q.bestAnswer}</p>
+                          </motion.div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-800/80">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                       {/* Culture alignment tips */}
                       <div>
-                        <span className="text-[10px] text-indigo-300 font-extrabold uppercase tracking-widest block mb-2">Target Culture Fit Drivers</span>
+                        <span className="text-[10px] text-indigo-600 font-extrabold uppercase tracking-widest block mb-2">Target Culture Fit Drivers</span>
                         <ul className="space-y-1.5">
                           {interviewCheatSheet.culturePoints.map((p, i) => (
-                            <li key={i} className="flex gap-2 text-xs text-slate-300">
+                            <li key={i} className="flex gap-2 text-xs text-slate-600 font-semibold">
                               <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 shrink-0 mt-1.5"></span>
-                              <span className="font-semibold">{p}</span>
+                              <span>{p}</span>
                             </li>
                           ))}
                         </ul>
@@ -2954,19 +2991,19 @@ export const AICoverLetterView: React.FC = () => {
 
                       {/* Strategic questions to ask back */}
                       <div>
-                        <span className="text-[10px] text-indigo-300 font-extrabold uppercase tracking-widest block mb-2">Smart Questions to Ask Them</span>
+                        <span className="text-[10px] text-amber-600 font-extrabold uppercase tracking-widest block mb-2">Smart Questions to Ask Them</span>
                         <ul className="space-y-1.5">
                           {interviewCheatSheet.questionsToAsk.map((q, i) => (
-                            <li key={i} className="flex gap-2 text-xs text-slate-300">
+                            <li key={i} className="flex gap-2 text-xs text-slate-600 font-semibold">
                               <span className="h-1.5 w-1.5 rounded-full bg-amber-400 shrink-0 mt-1.5"></span>
-                              <span className="font-semibold">{q}</span>
+                              <span>{q}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               )}
 
             </div>

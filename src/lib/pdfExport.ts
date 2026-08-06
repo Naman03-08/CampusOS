@@ -337,32 +337,36 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
             headerSection.style.setProperty('margin-bottom', '14px', 'important');
           }
 
-          // 1. Convert space-y elements to flex layouts with elegant, readable gaps matching website
+          // 1. Convert space-y elements to standard block layout with robust margins instead of flex-gap (since html2canvas has poor gap support)
           const spaceYElements = clonedElem.querySelectorAll('[class*="space-y-"]');
           spaceYElements.forEach((el) => {
             if (el instanceof HTMLElement) {
-              el.style.setProperty('display', 'flex', 'important');
-              el.style.setProperty('flex-direction', 'column', 'important');
+              el.style.setProperty('display', 'block', 'important');
               
-              let gap = '14px';
+              let marginSize = '12px';
               if (el.className.includes('space-y-8')) {
-                gap = '20px';
+                marginSize = '20px';
               } else if (el.className.includes('space-y-6')) {
-                gap = '14px';
+                marginSize = '14px';
               } else if (el.className.includes('space-y-4')) {
-                gap = '10px';
+                marginSize = '10px';
               } else if (el.className.includes('space-y-3')) {
-                gap = '8px';
+                marginSize = '8px';
               } else if (el.className.includes('space-y-2')) {
-                gap = '6px';
+                marginSize = '6px';
+              } else if (el.className.includes('space-y-1')) {
+                marginSize = '4px';
               }
-              el.style.setProperty('gap', gap, 'important');
               
               const children = el.children;
               for (let i = 0; i < children.length; i++) {
                 const child = children[i];
                 if (child instanceof HTMLElement) {
-                  child.style.setProperty('margin-top', '0px', 'important');
+                  if (i > 0) {
+                    child.style.setProperty('margin-top', marginSize, 'important');
+                  } else {
+                    child.style.setProperty('margin-top', '0px', 'important');
+                  }
                   child.style.setProperty('margin-bottom', '0px', 'important');
                 }
               }
@@ -421,8 +425,8 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
             contactInfoGrid.style.setProperty('display', 'flex', 'important');
             contactInfoGrid.style.setProperty('flex-direction', 'row', 'important');
             contactInfoGrid.style.setProperty('flex-wrap', 'wrap', 'important');
-            contactInfoGrid.style.setProperty('justify-content', 'space-between', 'important');
-            contactInfoGrid.style.setProperty('gap', '6px', 'important');
+            contactInfoGrid.style.setProperty('justify-content', 'flex-start', 'important');
+            contactInfoGrid.style.setProperty('gap', '0px', 'important'); // Avoid flex-gap limitations
             contactInfoGrid.style.setProperty('margin-top', '10px', 'important');
             contactInfoGrid.style.setProperty('width', '100%', 'important');
 
@@ -432,16 +436,19 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
             const pills = Array.from(contactInfoGrid.children);
             pills.forEach((pill, idx) => {
               if (pill instanceof HTMLElement) {
-                pill.style.setProperty('flex', '1 1 0%', 'important');
-                pill.style.setProperty('min-width', '0', 'important');
-                pill.style.setProperty('padding', '6px 8px', 'important');
+                // Allow pill to size naturally to fit full text without wrapping or cropping!
+                pill.style.setProperty('flex', '0 0 auto', 'important');
+                pill.style.setProperty('min-width', 'auto', 'important');
+                pill.style.setProperty('max-width', 'none', 'important');
+                pill.style.setProperty('padding', '6px 10px', 'important');
+                pill.style.setProperty('margin-right', '8px', 'important');
+                pill.style.setProperty('margin-bottom', '8px', 'important');
                 pill.style.setProperty('display', 'flex', 'important');
                 pill.style.setProperty('align-items', 'center', 'important');
                 pill.style.setProperty('justify-content', 'flex-start', 'important');
-                pill.style.setProperty('gap', '4px', 'important');
                 pill.style.setProperty('height', 'auto', 'important');
                 pill.style.setProperty('box-shadow', 'none', 'important');
-                pill.style.setProperty('overflow', 'visible', 'important'); // Allow full height rendering without clipping!
+                pill.style.setProperty('overflow', 'visible', 'important'); // Allow full width/height rendering without clipping!
 
                 const orig = originalPills[idx];
                 if (orig instanceof HTMLElement) {
@@ -455,6 +462,13 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
                   pill.style.setProperty('border', '1px solid #cbd5e1', 'important');
                   pill.style.setProperty('border-radius', '8px', 'important');
                   pill.style.setProperty('color', '#334155', 'important');
+                }
+
+                // Add a robust margin to the SVG icon since flex gap doesn't render in html2canvas
+                const svg = pill.querySelector('svg');
+                if (svg instanceof HTMLElement) {
+                  svg.style.setProperty('margin-right', '6px', 'important');
+                  svg.style.setProperty('flex-shrink', '0', 'important');
                 }
 
                 // Tighten text inside pill
@@ -477,6 +491,18 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
             });
           }
 
+          // Ensure all section headers have a proper margin between their icon and text
+          const sectionHeaders = clonedElem.querySelectorAll('div[class*="flex"][class*="items-center"]');
+          sectionHeaders.forEach((sh) => {
+            if (sh instanceof HTMLElement) {
+              const icon = sh.querySelector('svg');
+              const text = sh.querySelector('h3, h4, span');
+              if (icon && text && icon.nextElementSibling === text) {
+                icon.style.setProperty('margin-right', '8px', 'important');
+              }
+            }
+          });
+
           // 6. Adjust sidebar typography and cards to remain beautifully legible
           if (rightSidebar instanceof HTMLElement) {
             const sidebarH4s = rightSidebar.querySelectorAll('h4');
@@ -497,7 +523,8 @@ export function sanitizeDocumentForHtml2Canvas(clonedDoc: Document, targetElemen
               }
             });
 
-            const sidebarCards = rightSidebar.querySelectorAll('div[class*="rounded-"], div[class*="border-"]');
+            // Target ONLY the actual cards to prevent destroying layout of other elements
+            const sidebarCards = rightSidebar.querySelectorAll('.resume-highlight-card');
             sidebarCards.forEach((card) => {
               if (card instanceof HTMLElement) {
                 card.style.setProperty('padding', '6px 8px', 'important');
