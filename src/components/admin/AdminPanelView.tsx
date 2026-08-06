@@ -464,14 +464,12 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({ user, onNavigate
       await FirestoreService.cancelUserSubscriptionAndAdjustRevenue(userToCancelSub.uid, userToCancelSub.email);
       // Update local allUsers state
       const nowIso = new Date().toISOString();
-      const trialExpiry = new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString();
       setAllUsers(prev => prev.map(u => u.uid === userToCancelSub.uid ? {
         ...u,
-        plan: 'free_trial',
-        freeTrialStartedAt: nowIso,
+        plan: 'none',
         planStartedAt: nowIso,
-        planExpiresAt: trialExpiry,
-        planCancelled: false,
+        planExpiresAt: nowIso,
+        planCancelled: true,
         planCancelledAt: nowIso
       } : u));
       

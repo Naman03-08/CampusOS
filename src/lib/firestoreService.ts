@@ -7,7 +7,8 @@ import {
   query, 
   where, 
   getDocs, 
-  deleteDoc 
+  deleteDoc,
+  onSnapshot
 } from 'firebase/firestore';
 import { 
   UserProfile, 
@@ -110,6 +111,25 @@ export class FirestoreService {
       console.warn("Firestore getProfile error:", e);
     }
     return null;
+  }
+
+  static subscribeToProfile(uid: string, callback: (profile: UserProfile | null) => void): () => void {
+    if (!db || !uid) return () => {};
+    try {
+      const docRef = doc(db, 'users', uid);
+      return onSnapshot(docRef, (snap) => {
+        if (snap.exists()) {
+          callback(snap.data() as UserProfile);
+        } else {
+          callback(null);
+        }
+      }, (error) => {
+        console.warn("Profile real-time subscription error:", error);
+      });
+    } catch (e) {
+      console.warn("subscribeToProfile error:", e);
+      return () => {};
+    }
   }
 
   // Admin Method: Get all registered users from Firestore
@@ -1062,11 +1082,10 @@ export class FirestoreService {
       // 1. Immediately update user profile document in Firestore (< 100ms)
       const userRef = doc(db, 'users', uid);
       await setDoc(userRef, {
-        plan: 'free_trial',
-        freeTrialStartedAt: now.toISOString(),
+        plan: 'none',
         planStartedAt: now.toISOString(),
-        planExpiresAt: expiresAt.toISOString(),
-        planCancelled: false,
+        planExpiresAt: now.toISOString(),
+        planCancelled: true,
         planCancelledAt: now.toISOString(),
         updatedAt: now.toISOString()
       }, { merge: true });

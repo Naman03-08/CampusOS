@@ -358,23 +358,30 @@ export function App() {
     await FirestoreService.saveProfile(updatedProfile);
   };
 
-  // Ensure current active user profile is saved/connected in Firestore database
-  useEffect(() => {
-    if (user && user.uid) {
-      FirestoreService.saveProfile(user).catch(err => {
-        console.warn("User profile sync warning:", err);
-      });
-    }
-  }, [user]);
-
-  // Listen to Firebase Auth state changes
+  // Listen to Firebase Auth state changes with real-time profile sync
   useEffect(() => {
     if (!auth) return;
+    let profileUnsubscribe: (() => void) | null = null;
+
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      if (profileUnsubscribe) {
+        profileUnsubscribe();
+        profileUnsubscribe = null;
+      }
+
       if (fbUser) {
         setIsLoggedIn(true);
         StorageService.setIsLoggedIn(true);
-        // Load Profile from Firestore
+
+        // Subscribe to real-time profile changes so admin edits take effect instantly
+        profileUnsubscribe = FirestoreService.subscribeToProfile(fbUser.uid, (updatedProfile) => {
+          if (updatedProfile) {
+            setUser(updatedProfile);
+            StorageService.saveProfile(updatedProfile);
+          }
+        });
+
+        // Load Profile from Firestore initially
         let fsProfile = await FirestoreService.getProfile(fbUser.uid);
         if (!fsProfile) {
           // Initialize NEW registered user with 100% ZERO data
@@ -384,11 +391,11 @@ export function App() {
             fbUser.email || '',
             fbUser.displayName || ''
           );
+          setUser(fsProfile);
+          StorageService.saveProfile(fsProfile);
         }
-        setUser(fsProfile);
-        StorageService.saveProfile(fsProfile);
 
-        if (typeof fsProfile.stats?.dsaStreak === 'number') {
+        if (fsProfile && typeof fsProfile.stats?.dsaStreak === 'number') {
           StreakService.syncStreak(fsProfile.stats.dsaStreak, fsProfile.stats.lastActiveAt);
         }
 
@@ -443,7 +450,12 @@ export function App() {
         }
       }
     });
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      if (profileUnsubscribe) {
+        profileUnsubscribe();
+      }
+    };
   }, []);
 
   const handleOpenAuth = (mode: 'login' | 'register') => {
