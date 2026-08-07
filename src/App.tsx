@@ -229,7 +229,7 @@ export function App() {
       case 'attendance': return 'Attendance Manager & Calculator';
       case 'habiturex': return 'Habiturex Daily Consistency OS';
       case 'resumebuilder': return 'AI Resume Builder';
-      case 'coverletter': return 'AI Cover Letter';
+      case 'coverletter': return 'Cover Letter';
       case 'coding': return 'Coding Hub & 375 DSA Roadmap Sheet';
       case 'courses': return 'Interactive Coding Courses & Academies';
       case 'interviewprep': return 'Technical Interview Prep & Question Bank';
