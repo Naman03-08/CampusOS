@@ -5408,43 +5408,45 @@ export const CodingCoursesView: React.FC<CodingCoursesViewProps> = ({ user, onNa
       <motion.div 
         initial={{ opacity: 0, y: 15 }}
         whileInView={{ opacity: 1, y: 0 }}
+        whileHover={{ scale: 1.02, y: -4 }}
+        whileTap={{ scale: 0.98 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="relative overflow-hidden rounded-3xl border border-dashed border-purple-200 dark:border-purple-850 bg-linear-to-r from-purple-500/[0.04] via-indigo-500/[0.02] to-transparent p-8 sm:p-10 text-center flex flex-col items-center justify-center gap-4 group"
+        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        className="relative overflow-hidden rounded-3xl border border-dashed border-purple-400/30 bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-8 sm:p-12 text-center flex flex-col items-center justify-center gap-5 group shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 cursor-pointer"
       >
         {/* Decorative corner accent blur */}
-        <div className="absolute -top-12 -right-12 w-24 h-24 bg-purple-200/20 rounded-full blur-2xl group-hover:bg-purple-200/30 transition-all duration-500" />
-        <div className="absolute -bottom-12 -left-12 w-24 h-24 bg-indigo-200/20 rounded-full blur-2xl group-hover:bg-indigo-200/30 transition-all duration-500" />
+        <div className="absolute -top-12 -right-12 w-32 h-32 bg-purple-600/10 rounded-full blur-3xl group-hover:bg-purple-600/20 transition-all duration-500" />
+        <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-indigo-600/10 rounded-full blur-3xl group-hover:bg-indigo-600/20 transition-all duration-500" />
 
-        <div className="relative p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-900 shadow-xs animate-bounce" style={{ animationDuration: '3s' }}>
-          <Zap className="w-7 h-7 fill-purple-200 dark:fill-purple-900/40" />
+        <div className="relative p-4 rounded-2xl bg-purple-500/10 text-purple-300 border border-purple-400/20 shadow-md shadow-purple-500/5 animate-pulse">
+          <Zap className="w-8 h-8 fill-purple-400/20" />
         </div>
 
-        <div className="space-y-3 max-w-2xl relative">
-          <p className="text-xs sm:text-sm font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest">
+        <div className="space-y-4 max-w-2xl relative">
+          <p className="text-xs sm:text-sm font-black text-purple-300 uppercase tracking-widest">
             More premium courses will be uploaded soon
           </p>
-          <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-800 dark:text-white font-display">
-            More Premium Courses Coming Soon! <span className="text-purple-600 dark:text-purple-400">🚀</span>
+          <h3 className="text-2xl sm:text-4xl font-black tracking-tight text-white font-display">
+            More Premium Courses Coming Soon! <span className="text-purple-400">🚀</span>
           </h3>
-          <div className="h-[2px] w-12 bg-purple-200 dark:bg-purple-800 mx-auto my-3 rounded-full" />
-          <p className="text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
+          <div className="h-[2px] w-16 bg-gradient-to-r from-transparent via-purple-400 to-transparent mx-auto my-3 rounded-full" />
+          <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-semibold px-4">
             We are curating world-class premium courses focused on Web Development, AI Agents Engineering, and Advanced SaaS Architecture. Prepare to elevate your coding skills to senior engineer level!
           </p>
-          <p className="text-xs sm:text-sm text-purple-600 dark:text-purple-400 font-bold italic mt-2">
+          <p className="text-xs sm:text-sm text-amber-300 font-extrabold italic mt-2">
             Stay tuned and keep learning, keep growing! ✨
           </p>
         </div>
 
         {/* Small subtle badge row */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
-          <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-850 text-slate-800 dark:text-slate-300 text-[10px] font-extrabold border border-slate-200 dark:border-slate-800">
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
+          <span className="px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-indigo-200 text-xs font-black border border-white/10 hover:scale-105 transition-all duration-200 shadow-xs cursor-default">
             NextJS & SaaS Batches
           </span>
-          <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-850 text-slate-800 dark:text-slate-300 text-[10px] font-extrabold border border-slate-200 dark:border-slate-800">
+          <span className="px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-indigo-200 text-xs font-black border border-white/10 hover:scale-105 transition-all duration-200 shadow-xs cursor-default">
             AI Agents Engineering
           </span>
-          <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-850 text-slate-800 dark:text-slate-300 text-[10px] font-extrabold border border-slate-200 dark:border-slate-800">
+          <span className="px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-indigo-200 text-xs font-black border border-white/10 hover:scale-105 transition-all duration-200 shadow-xs cursor-default">
             Advanced DevSecOps
           </span>
         </div>
