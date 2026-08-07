@@ -148,6 +148,7 @@ export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
   const [activeTab, setActiveTab] = useState<'overview' | 'complete'>('overview');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [copied, setCopied] = useState<boolean>(false);
+  const [suiteIdToDelete, setSuiteIdToDelete] = useState<string | null>(null);
 
   const loadSuiteAsSummary = (suite: StudySuite) => {
     if (suite.notesData) {
@@ -652,135 +653,94 @@ ${s.sectionParagraph ? s.sectionParagraph + '\n' : ''}${(s.bullets || []).map(b 
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {studySuites.map((suite) => (
-                <div 
-                  key={suite.id}
-                  className="flex flex-col justify-between p-5 rounded-2xl border border-slate-150/80 bg-slate-50/50 hover:bg-slate-50 hover:border-amber-300 transition-all shadow-sm hover:shadow-md group relative"
-                >
-                  <div className="space-y-2.5">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="px-2.5 py-1 rounded-lg bg-amber-100/70 text-amber-800 text-[10px] font-black uppercase tracking-wider">
-                        {suite.subject || 'General Study'}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (onDeleteSuite) {
-                            if (window.confirm(`Are you sure you want to delete "${suite.title}"?`)) {
-                              onDeleteSuite(suite.id);
-                            }
-                          }
-                        }}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer animate-fade-in"
-                        title="Delete Document"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+              {studySuites.map((suite) => {
+                const isDeleting = suiteIdToDelete === suite.id;
+                return (
+                  <div 
+                    key={suite.id}
+                    className="flex flex-col justify-between p-5 rounded-2xl border border-slate-150/80 bg-slate-50/50 hover:bg-slate-50 hover:border-amber-300 transition-all shadow-sm hover:shadow-md group relative min-h-[180px]"
+                  >
+                    {isDeleting ? (
+                      <div className="flex flex-col items-center justify-center text-center h-full my-auto space-y-4 py-4 animate-in fade-in duration-200">
+                        <p className="text-sm font-black text-slate-800">Delete this document?</p>
+                        <p className="text-xs text-slate-500 max-w-[200px] leading-relaxed">
+                          This action cannot be undone and will remove your notes permanently.
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSuiteIdToDelete(null);
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (onDeleteSuite) {
+                                onDeleteSuite(suite.id);
+                              }
+                              setSuiteIdToDelete(null);
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-all shadow-sm cursor-pointer"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="space-y-2.5">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="px-2.5 py-1 rounded-lg bg-amber-100/70 text-amber-800 text-[10px] font-black uppercase tracking-wider">
+                              {suite.subject || 'General Study'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSuiteIdToDelete(suite.id);
+                              }}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+                              title="Delete Document"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
 
-                    <h3 className="font-bold text-slate-800 text-sm line-clamp-2 leading-snug">
-                      {suite.title}
-                    </h3>
-                    
-                    <p className="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed">
-                      {suite.summary}
-                    </p>
+                          <h3 className="font-bold text-slate-800 text-sm line-clamp-2 leading-snug">
+                            {suite.title}
+                          </h3>
+                          
+                          <p className="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed">
+                            {suite.summary}
+                          </p>
+                        </div>
+
+                        <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 text-slate-400" />
+                            {suite.createdAt ? new Date(suite.createdAt).toLocaleDateString() : 'Past Session'}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() => loadSuiteAsSummary(suite)}
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500 text-white font-black text-xs hover:bg-amber-600 transition-all shadow-sm cursor-pointer"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            Open Summary
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-slate-400" />
-                      {suite.createdAt ? new Date(suite.createdAt).toLocaleDateString() : 'Past Session'}
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={() => loadSuiteAsSummary(suite)}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500 text-white font-black text-xs hover:bg-amber-600 transition-all shadow-sm cursor-pointer"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      Open Summary
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Saved Documents History */}
-        {!summaryData && studySuites && studySuites.length > 0 && (
-          <div className="bg-white/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-2xl shadow-slate-200/60 mt-8">
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-amber-100 text-amber-700">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-black text-slate-800">Your Saved Documents</h2>
-                  <p className="text-xs text-slate-500 font-semibold">Open past summarized notes instantly without using AI credits.</p>
-                </div>
-              </div>
-              <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
-                {studySuites.length} {studySuites.length === 1 ? 'Document' : 'Documents'}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {studySuites.map((suite) => (
-                <div 
-                  key={suite.id}
-                  className="flex flex-col justify-between p-5 rounded-2xl border border-slate-150/80 bg-slate-50/50 hover:bg-slate-50 hover:border-amber-300 transition-all shadow-sm hover:shadow-md group relative"
-                >
-                  <div className="space-y-2.5">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="px-2.5 py-1 rounded-lg bg-amber-100/70 text-amber-800 text-[10px] font-black uppercase tracking-wider">
-                        {suite.subject || 'General Study'}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (onDeleteSuite) {
-                            if (window.confirm(`Are you sure you want to delete "${suite.title}"?`)) {
-                              onDeleteSuite(suite.id);
-                            }
-                          }
-                        }}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
-                        title="Delete Document"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    <h3 className="font-bold text-slate-800 text-sm line-clamp-2 leading-snug">
-                      {suite.title}
-                    </h3>
-                    
-                    <p className="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed">
-                      {suite.summary}
-                    </p>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-slate-400" />
-                      {suite.createdAt ? new Date(suite.createdAt).toLocaleDateString() : 'Past Session'}
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={() => loadSuiteAsSummary(suite)}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500 text-white font-black text-xs hover:bg-amber-600 transition-all shadow-sm cursor-pointer"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      Open Summary
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
