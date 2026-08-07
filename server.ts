@@ -781,7 +781,7 @@ ${documentContext ? `Document Context:\n"""${documentContext}"""` : ""}`;
   }
 });
 
-// AI Coding Coach Route (Strictly restricted to use ONLY gemini-1.5-flash-lite)
+// AI Coding Coach Route (Strictly restricted to use ONLY gemini-3.1-flash-lite)
 app.post("/api/ai/coding-coach", async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -791,10 +791,10 @@ app.post("/api/ai/coding-coach", async (req, res) => {
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        console.log("[Gemini Engine] Querying ONLY gemini-1.5-flash-lite (Google Gemini 1.5 Flash-lite) for coding hub section");
+        console.log("[Gemini Engine] Querying ONLY gemini-3.1-flash-lite (Google Gemini 1.5 Flash-lite) for coding hub section");
         const response = await generateContentWithFallback({
           contents: prompt,
-          models: ["gemini-1.5-flash-lite", "gemini-1.5-flash-8b"],
+          models: ["gemini-3.1-flash-lite"],
           config: { maxOutputTokens: 3500 },
         });
         const replyText = response.text || "";
@@ -1328,10 +1328,10 @@ ${notesText && notesText.length > 50 ? `Extracted Full Text of the PDF Document:
           ];
         }
 
-        console.log("[Gemini Engine] Querying gemini-2.5-flash-lite (with gemini-1.5-flash fallback) for 100% full grounded PDF notes summary");
+        console.log("[Gemini Engine] Querying gemini-3.1-flash-lite (with gemini-3.6-flash fallback) for 100% full grounded PDF notes summary");
         const response: any = await generateContentWithFallback({
           contents: contentsPayload,
-          models: ["gemini-2.5-flash-lite", "gemini-1.5-flash"],
+          models: ["gemini-3.1-flash-lite", "gemini-3.6-flash"],
           config: {
             responseMimeType: "application/json",
             maxOutputTokens: 8192,
@@ -1598,7 +1598,7 @@ Return a JSON object with:
         }
 
         console.log("[Gemini Engine] Querying model for grounded quiz generation");
-        const modelList = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite"];
+        const modelList = ["gemini-3.6-flash", "gemini-3.1-flash-lite"];
         
         const responseSchemaObj = {
           type: Type.OBJECT,
