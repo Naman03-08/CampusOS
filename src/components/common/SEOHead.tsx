@@ -21,7 +21,7 @@ const TAB_SEO_CONFIG: Record<string, { title: string; description: string; keywo
   },
   quiz: {
     title: 'AI Quiz Generator from PDF — Free Instant MCQ & Exam Prep Tool | Placivo AI',
-    description: 'Upload any lecture slides, textbook PDF, or subject notes to automatically generate grounded MCQs, True/False, Fill in the Blanks, and Short Answer practice exams powered by Gemini AI.',
+    description: 'Upload any lecture slides, textbook PDF, or subject notes to automatically generate grounded MCQs, True/False, Fill in the Blanks, and Short Answer practice exams powered by Placivo AI.',
     keywords: 'AI Quiz Generator, AI PDF Quiz Generator, Quiz from PDF, Generate MCQs from PDF, Practice Test Generator, Exam Prep AI, Engineering Quiz Generator',
     path: '/ai-quiz-generator'
   },
@@ -245,7 +245,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({ activeTab = 'landing', customT
             'name': 'How does the AI PDF Quiz Generator work in Placivo AI?',
             'acceptedAnswer': {
               '@type': 'Answer',
-              'text': 'Simply upload your lecture slides, textbook PDF, or subject notes. Placivo AI uses grounded Gemini 3.5 Flash-Lite models to analyze the text and generate grounded MCQs, True/False questions, fill-in-the-blanks, and short answer practice tests.'
+              'text': 'Simply upload your lecture slides, textbook PDF, or subject notes. Placivo AI uses grounded Placivo AI models to analyze the text and generate grounded MCQs, True/False questions, fill-in-the-blanks, and short answer practice tests.'
             }
           },
           {

@@ -1354,7 +1354,7 @@ export const COURSES: CourseItem[] = [
   {
     id: 'genai-dsa-combo',
     title: 'Complete Generative AI And DSA Course',
-    tagline: 'Master Data Structures & Algorithms alongside LLMs, OpenAI/Gemini APIs, RAG, LangGraph & AI Agents.',
+    tagline: 'Master Data Structures & Algorithms alongside LLMs, OpenAI/Placivo AI APIs, RAG, LangGraph & AI Agents.',
     category: 'AI & Machine Learning',
     price: 399,
     linkType: 'telegram',
@@ -1628,7 +1628,7 @@ export const COURSES: CourseItem[] = [
       },
       {
         title: 'Module 4: LLM Architecture, Prompting, Ollama & Hugging Face',
-        description: 'Deep dive into GPT, transformers, tokenization, embeddings, OpenAI/Gemini APIs, prompt engineering, local LLMs with Ollama, and Hugging Face deployment.',
+        description: 'Deep dive into GPT, transformers, tokenization, embeddings, OpenAI/Placivo AI APIs, prompt engineering, local LLMs with Ollama, and Hugging Face deployment.',
         topics: [
           'Understanding Large Language Models (LLMs)',
           'Deep Dive into the GPT Architecture',
@@ -1641,8 +1641,8 @@ export const COURSES: CourseItem[] = [
           'Understanding Multi-Head Attention for Rich Context',
           'Configuring Your OpenAI Account',
           'Invoking OpenAI APIs with Python',
-          'Creating and Setting Up Google Gemini Account',
-          'Using Google Gemini with OpenAI-Compatible APIs',
+          'Creating and Setting Up Placivo AI Account',
+          'Using Placivo AI with OpenAI-Compatible APIs',
           'Prompt Fundamentals: Encoding Instructions for LLMs',
           'Prompting Types: Zero-Shot, Few-Shot, One-Shot',
           'One-Shot Prompting for Deterministic Inference',

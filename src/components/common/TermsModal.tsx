@@ -102,7 +102,7 @@ You are responsible for ensuring you have the necessary rights to upload any con
     {
       id: 'ai-services',
       title: '8. AI Services & Generative Content',
-      content: `Placivo AI uses artificial intelligence (powered by Google Gemini API & proprietary ML pipelines) to generate educational content.
+      content: `Placivo AI uses artificial intelligence (powered by Placivo AI & proprietary ML pipelines) to generate educational content.
 
 AI-generated responses:
 • are generated automatically,
@@ -194,7 +194,7 @@ Termination may result in the forfeiture of active subscriptions and revocation 
     {
       id: 'third-party',
       title: '17. Third-Party Services',
-      content: `Placivo AI integrates with third-party providers, including Firebase Authentication, Firestore Database, Google Gemini AI, payment gateways, and cloud storage.
+      content: `Placivo AI integrates with third-party providers, including Firebase Authentication, Firestore Database, Placivo AI, payment gateways, and cloud storage.
 
 We are not responsible for the availability, content, or security practices of third-party services. Your use of those services is governed by their respective terms and policies.`
     },
@@ -267,7 +267,7 @@ By using Placivo AI, you consent to the data practices described in this policy.
       id: 'privacy-security',
       title: '4. Data Storage & Security',
       content: `• Firestore Encryption: Data is stored securely in Firebase Firestore with strict database security rules.
-• Server-Side AI API: Gemini API keys and sensitive AI calls are processed exclusively server-side.
+• Server-Side AI API: Placivo AI keys and sensitive AI calls are processed exclusively server-side.
 • No Sale of Data: We NEVER sell, rent, or trade your personal information or uploaded documents to third parties or advertisers.`
     },
     {

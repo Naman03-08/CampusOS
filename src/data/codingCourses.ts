@@ -265,7 +265,7 @@ int knapsack(int W, const vector<int>& wt, const vector<int>& val, int n) {
     slug: 'genai-llm-engineering',
     category: 'AI & ML',
     badge: 'NEW & TRENDING',
-    description: 'Build intelligent AI agents, RAG (Retrieval-Augmented Generation) pipelines, vector database search, and multimodal applications using Gemini API & LangChain.',
+    description: 'Build intelligent AI agents, RAG (Retrieval-Augmented Generation) pipelines, vector database search, and multimodal applications using Placivo AI & LangChain.',
     instructor: {
       name: 'Dr. Michael Chen',
       role: 'AI Researcher & Co-founder at Neural AI Labs',
@@ -276,19 +276,19 @@ int knapsack(int W, const vector<int>& wt, const vector<int>& val, int n) {
     totalModules: 4,
     rating: 4.97,
     enrolledStudentsCount: 8940,
-    tags: ['Python', 'Gemini API', 'LLM', 'RAG', 'VectorDB', 'LangChain'],
+    tags: ['Python', 'Placivo AI', 'LLM', 'RAG', 'VectorDB', 'LangChain'],
     gradientBg: 'from-purple-600 via-fuchsia-600 to-pink-600',
     modules: [
       {
         id: 'ai-m1',
-        title: 'Module 1: Gemini API SDK & Prompt Engineering',
+        title: 'Module 1: Placivo AI SDK & Prompt Engineering',
         description: 'Understand zero-shot, few-shot prompting, structured JSON schema output, and system instructions.',
         lessons: [
           {
             id: 'ai-m1-l1',
-            title: '1.1 Structured JSON Output with Gemini SDK in TypeScript',
+            title: '1.1 Structured JSON Output with Placivo AI SDK in TypeScript',
             duration: '30 mins',
-            summary: 'Force Gemini models to generate strict JSON formats for automated data processing.',
+            summary: 'Force Placivo AI models to generate strict JSON formats for automated data processing.',
             codeSnippet: {
               language: 'typescript',
               starterCode: `import { GoogleGenAI } from '@google/genai';
@@ -310,15 +310,15 @@ async function generateStudyNotes(topic: string) {
   });
   return JSON.parse(response.text || '{}');
 }`,
-              instructions: 'Use the Gemini SDK to request structured JSON response.'
+              instructions: 'Use the Placivo AI SDK to request structured JSON response.'
             },
             quiz: [
               {
                 id: 'q-ai-1',
-                question: 'Which configuration parameter instructs Gemini to return clean JSON?',
+                question: 'Which configuration parameter instructs Placivo AI to return clean JSON?',
                 options: ['format: "json"', 'responseMimeType: "application/json"', 'dataType: "object"', 'jsonMode: true'],
                 correctAnswer: 1,
-                explanation: 'responseMimeType: "application/json" instructs the Gemini API to enforce structured JSON output.'
+                explanation: 'responseMimeType: "application/json" instructs the Placivo AI API to enforce structured JSON output.'
               }
             ]
           }
@@ -359,7 +359,7 @@ def chunk_text(text, chunk_size=500, overlap=50):
       description: 'Build a full-stack web app that accepts uploaded PDF textbooks, indexes them into a vector database, and answers user questions with exact page references.',
       deliverables: [
         'Document processor with vector embedding generation',
-        'Gemini API powered conversational agent',
+        'Placivo AI powered conversational agent',
         'Source citations and page highlighting UI'
       ]
     }

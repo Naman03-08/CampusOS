@@ -1061,7 +1061,7 @@ export const AICoverLetterView: React.FC = () => {
   const handleGenerateInterviewCheatSheet = async (letterCtx: CoverLetterData) => {
     setIsGeneratingCheatSheet(true);
     try {
-      // Craft a quick internal fetch prompt utilizing the Gemini interactions standard or custom server query if applicable
+      // Craft a quick internal fetch prompt utilizing the Placivo AI interactions standard or custom server query if applicable
       // To keep it clean and robust, we fetch from our companion AI route. If no backend route, we synthesize a beautiful dynamic one
       const response = await fetch('/api/ai/generate-cover-letter', { // we use the same flexible endpoint with custom instruction to build JSON
         method: 'POST',
@@ -1418,7 +1418,7 @@ export const AICoverLetterView: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 mb-1.5">
               <span className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-blue-700 bg-blue-50/85 rounded-full border border-blue-100/90 flex items-center gap-1 shadow-3xs">
-                <Zap className="h-3 w-3 fill-blue-600" /> GEMINI PRO ARCHITECT
+                <Zap className="h-3 w-3 fill-blue-600" /> PLACIVO AI PRO ARCHITECT
               </span>
               <span className="flex items-center gap-1 text-xs text-slate-400">
                 <Sparkles className="h-3.5 w-3.5 text-amber-500 animate-spin" /> Tailored Company Alignment
@@ -2632,7 +2632,7 @@ export const AICoverLetterView: React.FC = () => {
                                 <div className="font-extrabold text-xs text-slate-800 leading-snug">AI-Powered Document Intelligence Platform</div>
                                 <p className={`text-[10px] leading-relaxed ${bulletColor}`}>Built an AI document ingestion system extracting structured data from custom invoices using NLP.</p>
                                 <div className="flex flex-wrap gap-1 pt-1.5">
-                                  {["React.js", "Node.js", "Gemini API", "Tailwind"].map((tech, tidx) => (
+                                  {["React.js", "Node.js", "Placivo AI", "Tailwind"].map((tech, tidx) => (
                                     <span key={tidx} className={`text-[9px] font-semibold px-1.5 py-0.5 rounded border border-slate-200/50 ${chipBg}`}>
                                       {tech}
                                     </span>

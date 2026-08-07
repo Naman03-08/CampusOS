@@ -668,7 +668,7 @@ const INLINE_COURSES = [
   {
     id: 'genai-dsa-combo',
     title: 'Complete Generative AI And DSA Course',
-    tagline: 'Master Data Structures & Algorithms alongside LLMs, OpenAI/Gemini APIs, RAG, LangGraph & AI Agents.',
+    tagline: 'Master Data Structures & Algorithms alongside LLMs, OpenAI/Placivo AI APIs, RAG, LangGraph & AI Agents.',
     category: 'AI & Machine Learning',
     price: 399,
     linkType: 'telegram',
@@ -942,7 +942,7 @@ const INLINE_COURSES = [
       },
       {
         title: 'Module 4: LLM Architecture, Prompting, Ollama & Hugging Face',
-        description: 'Deep dive into GPT, transformers, tokenization, embeddings, OpenAI/Gemini APIs, prompt engineering, local LLMs with Ollama, and Hugging Face deployment.',
+        description: 'Deep dive into GPT, transformers, tokenization, embeddings, OpenAI/Placivo AI APIs, prompt engineering, local LLMs with Ollama, and Hugging Face deployment.',
         topics: [
           'Understanding Large Language Models (LLMs)',
           'Deep Dive into the GPT Architecture',
@@ -955,8 +955,8 @@ const INLINE_COURSES = [
           'Understanding Multi-Head Attention for Rich Context',
           'Configuring Your OpenAI Account',
           'Invoking OpenAI APIs with Python',
-          'Creating and Setting Up Google Gemini Account',
-          'Using Google Gemini with OpenAI-Compatible APIs',
+          'Creating and Setting Up Placivo AI Account',
+          'Using Placivo AI with OpenAI-Compatible APIs',
           'Prompt Fundamentals: Encoding Instructions for LLMs',
           'Prompting Types: Zero-Shot, Few-Shot, One-Shot',
           'One-Shot Prompting for Deterministic Inference',
@@ -1132,7 +1132,7 @@ const INLINE_COURSES = [
     icon: Brain,
     level: 'Beginner to Advanced',
     duration: '12 Weeks Batch',
-    description: 'Combine cutting-edge Data Science with Generative AI! Master Python data analytics (Pandas, NumPy, Matplotlib), Machine Learning models, Deep Neural Networks, Large Language Models (LLMs), Prompt Engineering, Retrieval-Augmented Generation (RAG) with Vector Databases (Pinecone/Chroma), and build custom AI autonomous agents with LangChain & OpenAI/Gemini APIs. Access the official Telegram channel for course materials and live batch sessions.',
+    description: 'Combine cutting-edge Data Science with Generative AI! Master Python data analytics (Pandas, NumPy, Matplotlib), Machine Learning models, Deep Neural Networks, Large Language Models (LLMs), Prompt Engineering, Retrieval-Augmented Generation (RAG) with Vector Databases (Pinecone/Chroma), and build custom AI autonomous agents with LangChain & OpenAI/Placivo AI APIs. Access the official Telegram channel for course materials and live batch sessions.',
     features: [
       'End-to-End Data Science & Exploratory Data Analysis (EDA)',
       'Machine Learning Algorithms & Deep Learning PyTorch',

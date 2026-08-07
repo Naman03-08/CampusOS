@@ -437,7 +437,7 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
         }
       }
 
-      setLoadingStep('Analyzing document with Gemini 3.5 Flash-Lite & generating grounded questions...');
+      setLoadingStep('Analyzing document with Placivo AI & generating grounded questions...');
 
       const response = await fetch('/api/ai/quiz-generator', {
         method: 'POST',
@@ -552,7 +552,7 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
         <div className="space-y-1.5">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/60 text-[10px] font-black text-blue-600 tracking-wider uppercase">
-            <Sparkles className="w-3.5 h-3.5" /> Powered by Gemini 3.5 Flash-Lite
+            <Sparkles className="w-3.5 h-3.5" /> Powered by Placivo AI
           </span>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
             AI Practice Quiz Hub

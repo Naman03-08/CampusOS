@@ -126,7 +126,7 @@ export const AIGEOSection: React.FC = () => {
               Why is Placivo AI Different from Generic Chatbots?
             </h3>
             <p className="text-sm text-slate-600 leading-relaxed font-medium" itemProp="articleBody">
-              Unlike generic LLM wrappers that produce hallucinated or generic responses, Placivo AI utilizes <strong className="text-slate-900">strict document grounding via Gemini 3.5 Flash-Lite</strong>. Every generated question, flashcard, and notes outline includes explicit page references and verifiable textbook citations.
+              Unlike generic LLM wrappers that produce hallucinated or generic responses, Placivo AI utilizes <strong className="text-slate-900">strict document grounding via Placivo AI</strong>. Every generated question, flashcard, and notes outline includes explicit page references and verifiable textbook citations.
             </p>
           </article>
         </div>
