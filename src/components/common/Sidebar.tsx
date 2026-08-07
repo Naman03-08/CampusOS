@@ -72,7 +72,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="font-black text-base text-slate-900 tracking-tight leading-none group-hover:text-blue-600 transition-colors" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Placivo<span className="text-blue-600">.ai</span>
+                Placivo<span className="text-blue-600">.AI</span>
               </span>
               <span className="text-[9px] font-black uppercase tracking-wider text-blue-700 bg-blue-100/90 px-1.5 py-0.5 rounded-md border border-blue-200 shadow-2xs">
                 PRO

@@ -30,7 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           />
           <div className="flex flex-col">
             <span className="font-black text-xl text-slate-900 tracking-tight leading-none group-hover:text-blue-600 transition-colors" style={{ fontFamily: "'Playfair Display', serif" }}>
-              Placivo<span className="text-blue-600">.ai</span>
+              Placivo<span className="text-blue-600">.AI</span>
             </span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
               Academic Operating System
