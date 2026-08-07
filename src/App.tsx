@@ -611,7 +611,7 @@ export function App() {
   };
 
   const planDetails = calculatePlanDetails(user);
-  const checkTabs = ['placement', 'interviewprep', 'courses'];
+  const checkTabs = ['placement', 'interviewprep'];
   const isCheckTab = checkTabs.includes(activeTab);
 
   const planIncludesTab = (planId: string, tabId: string): boolean => {
@@ -621,13 +621,13 @@ export function App() {
       return true;
     }
     if (normId === 'plan_199' || normId.includes('scholar')) {
-      // Pro Scholar includes everything except placement and courses
-      return tabId !== 'placement' && tabId !== 'courses';
+      // Pro Scholar includes everything except placement
+      return tabId !== 'placement';
     }
     if (normId === 'free_trial' || normId.includes('trial')) {
       // Free trial includes study suite, coding sheet, chats, resumebuilder, and attendance tracker
-      // But does NOT include placement, courses, and interviewprep
-      return tabId !== 'placement' && tabId !== 'courses' && tabId !== 'interviewprep';
+      // But does NOT include placement and interviewprep
+      return tabId !== 'placement' && tabId !== 'interviewprep';
     }
     return false;
   };
