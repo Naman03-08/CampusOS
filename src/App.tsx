@@ -764,7 +764,9 @@ export function App() {
                   <AINotesSummarizerView
                     user={user}
                     onSaveSuite={handleSaveSuite}
+                    onDeleteSuite={handleDeleteSuite}
                     onNavigateTab={handleNavigateTabWithGuard}
+                    studySuites={studySuites}
                   />
                 )}
 

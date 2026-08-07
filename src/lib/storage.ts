@@ -8,7 +8,8 @@ import {
   MockInterviewResult, 
   AppNotification, 
   UserProfile,
-  UserStats
+  UserStats,
+  SavedQuiz
 } from '../types';
 import { getPlacivoDSASheet } from '../data/dsaSheet375';
 
@@ -25,6 +26,7 @@ const STORAGE_KEYS = {
   NOTIFICATIONS: 'placivo_notifications',
   CHAT_MESSAGES: 'placivo_chat_messages',
   COURSE_PROGRESS: 'placivo_course_progress',
+  SAVED_QUIZZES: 'placivo_saved_quizzes',
 };
 
 // ZERO BASELINE GENERATORS FOR NEW REGISTERED USERS
@@ -345,6 +347,28 @@ export class StorageService {
     const progressMap = this.getCourseProgress();
     progressMap[courseId] = progressData;
     this.saveCourseProgress(progressMap);
+  }
+
+  // Saved Quizzes
+  static getSavedQuizzes(): SavedQuiz[] {
+    return this.get<SavedQuiz[]>(STORAGE_KEYS.SAVED_QUIZZES, []);
+  }
+
+  static saveSavedQuizzes(quizzes: SavedQuiz[]): void {
+    this.set(STORAGE_KEYS.SAVED_QUIZZES, quizzes);
+  }
+
+  static saveSavedQuiz(quiz: SavedQuiz): void {
+    const quizzes = this.getSavedQuizzes();
+    const index = quizzes.findIndex(q => q.id === quiz.id);
+    if (index >= 0) quizzes[index] = quiz;
+    else quizzes.unshift(quiz);
+    this.saveSavedQuizzes(quizzes);
+  }
+
+  static deleteSavedQuiz(id: string): void {
+    const quizzes = this.getSavedQuizzes().filter(q => q.id !== id);
+    this.saveSavedQuizzes(quizzes);
   }
 }
 

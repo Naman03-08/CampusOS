@@ -86,6 +86,7 @@ export interface StudySuite {
   vivaQuestions: { question: string; sampleAnswer: string }[];
   revisionPlan: { day: number; topic: string; tasks: string[] }[];
   createdAt: string;
+  notesData?: any;
 }
 
 export interface ChatMessage {
@@ -388,5 +389,67 @@ export interface AdminEmailPayload {
     fromEmail: string;
     fromName: string;
   };
+}
+
+export interface MCQQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+}
+
+export interface ShortAnswerQuestion {
+  question: string;
+  sampleAnswer: string;
+  explanation: string;
+}
+
+export interface LongAnswerQuestion {
+  question: string;
+  sampleAnswer: string;
+  explanation: string;
+}
+
+export interface FillBlankQuestion {
+  sentence: string;
+  answer: string;
+  clue: string;
+}
+
+export interface TrueFalseQuestion {
+  statement: string;
+  isTrue: boolean;
+  explanation: string;
+}
+
+export interface CodingSnippetQuestion {
+  question: string;
+  code: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+}
+
+export interface QuizData {
+  title: string;
+  subject: string;
+  mcqs: MCQQuestion[];
+  shortAnswers: ShortAnswerQuestion[];
+  longAnswers?: LongAnswerQuestion[];
+  fillBlanks: FillBlankQuestion[];
+  trueFalse: TrueFalseQuestion[];
+  codingSnippets?: CodingSnippetQuestion[];
+}
+
+export interface SavedQuiz {
+  id: string;
+  userId: string;
+  title: string;
+  subject: string;
+  questionType: string;
+  difficulty: string;
+  numQuestions: number;
+  quizData: QuizData;
+  createdAt: string;
 }
 

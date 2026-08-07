@@ -104,7 +104,9 @@ import { checkStudySuiteLimit, incrementFeatureUsage, getDailyKey, getWeeklyKey,
 interface AINotesSummarizerViewProps {
   user: UserProfile | null;
   onSaveSuite?: (suite: StudySuite) => void;
+  onDeleteSuite?: (id: string) => void;
   onNavigateTab?: (tabId: string) => void;
+  studySuites?: StudySuite[];
 }
 
 interface SummaryResult {
@@ -128,7 +130,9 @@ interface SummaryResult {
 export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
   user,
   onSaveSuite,
-  onNavigateTab
+  onDeleteSuite,
+  onNavigateTab,
+  studySuites = []
 }) => {
   const [activeInputMode, setActiveInputMode] = useState<'upload' | 'text'>('upload');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -144,6 +148,40 @@ export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
   const [activeTab, setActiveTab] = useState<'overview' | 'complete'>('overview');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [copied, setCopied] = useState<boolean>(false);
+
+  const loadSuiteAsSummary = (suite: StudySuite) => {
+    if (suite.notesData) {
+      setSummaryData(suite.notesData);
+    } else {
+      // Reconstruct fallback
+      const sections = (suite.fullNotes || '').split('### Section ').filter(Boolean).map((sec, i) => {
+        const lines = sec.trim().split('\n');
+        const headerLine = lines[0] || '';
+        const heading = headerLine.replace(/^\d+:\s*/, '').trim();
+        const contentLines = lines.slice(1).filter(l => !l.trim().startsWith('-'));
+        const bulletLines = lines.slice(1).filter(l => l.trim().startsWith('-')).map(l => l.trim().replace(/^-\s*/, ''));
+        return {
+          sectionNumber: i + 1,
+          heading: heading || `Section ${i + 1}`,
+          sectionParagraph: contentLines.join('\n').trim(),
+          content: contentLines.join('\n').trim(),
+          bullets: bulletLines.length > 0 ? bulletLines : ['Summary of section content.'],
+          keyTerms: []
+        };
+      });
+
+      setSummaryData({
+        title: suite.title,
+        subject: suite.subject,
+        executiveSummary: suite.summary,
+        executiveSummaryBullets: (suite.summary || '').split('\n').filter(Boolean),
+        importantTopics: [suite.subject],
+        completeLineByLineSummary: sections,
+        quickReviewBullets: (suite.summary || '').split('\n').filter(Boolean).slice(0, 5)
+      });
+    }
+    setActiveTab('overview');
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -274,7 +312,8 @@ export const AINotesSummarizerView: React.FC<AINotesSummarizerViewProps> = ({
           formulas: [],
           vivaQuestions: [],
           revisionPlan: [],
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          notesData: data
         };
         onSaveSuite(newSuite);
       }
@@ -590,6 +629,158 @@ ${s.sectionParagraph ? s.sectionParagraph + '\n' : ''}${(s.bullets || []).map(b 
                   </>
                 )}
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Saved Documents History */}
+        {!summaryData && studySuites && studySuites.length > 0 && (
+          <div className="bg-white/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-2xl shadow-slate-200/60 mt-8">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-amber-100 text-amber-700">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-slate-800">Your Saved Documents</h2>
+                  <p className="text-xs text-slate-500 font-semibold">Open past summarized notes instantly without using AI credits.</p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
+                {studySuites.length} {studySuites.length === 1 ? 'Document' : 'Documents'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {studySuites.map((suite) => (
+                <div 
+                  key={suite.id}
+                  className="flex flex-col justify-between p-5 rounded-2xl border border-slate-150/80 bg-slate-50/50 hover:bg-slate-50 hover:border-amber-300 transition-all shadow-sm hover:shadow-md group relative"
+                >
+                  <div className="space-y-2.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="px-2.5 py-1 rounded-lg bg-amber-100/70 text-amber-800 text-[10px] font-black uppercase tracking-wider">
+                        {suite.subject || 'General Study'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onDeleteSuite) {
+                            if (window.confirm(`Are you sure you want to delete "${suite.title}"?`)) {
+                              onDeleteSuite(suite.id);
+                            }
+                          }
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer animate-fade-in"
+                        title="Delete Document"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <h3 className="font-bold text-slate-800 text-sm line-clamp-2 leading-snug">
+                      {suite.title}
+                    </h3>
+                    
+                    <p className="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed">
+                      {suite.summary}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      {suite.createdAt ? new Date(suite.createdAt).toLocaleDateString() : 'Past Session'}
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => loadSuiteAsSummary(suite)}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500 text-white font-black text-xs hover:bg-amber-600 transition-all shadow-sm cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      Open Summary
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Saved Documents History */}
+        {!summaryData && studySuites && studySuites.length > 0 && (
+          <div className="bg-white/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-2xl shadow-slate-200/60 mt-8">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-amber-100 text-amber-700">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-slate-800">Your Saved Documents</h2>
+                  <p className="text-xs text-slate-500 font-semibold">Open past summarized notes instantly without using AI credits.</p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
+                {studySuites.length} {studySuites.length === 1 ? 'Document' : 'Documents'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {studySuites.map((suite) => (
+                <div 
+                  key={suite.id}
+                  className="flex flex-col justify-between p-5 rounded-2xl border border-slate-150/80 bg-slate-50/50 hover:bg-slate-50 hover:border-amber-300 transition-all shadow-sm hover:shadow-md group relative"
+                >
+                  <div className="space-y-2.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="px-2.5 py-1 rounded-lg bg-amber-100/70 text-amber-800 text-[10px] font-black uppercase tracking-wider">
+                        {suite.subject || 'General Study'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onDeleteSuite) {
+                            if (window.confirm(`Are you sure you want to delete "${suite.title}"?`)) {
+                              onDeleteSuite(suite.id);
+                            }
+                          }
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+                        title="Delete Document"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <h3 className="font-bold text-slate-800 text-sm line-clamp-2 leading-snug">
+                      {suite.title}
+                    </h3>
+                    
+                    <p className="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed">
+                      {suite.summary}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      {suite.createdAt ? new Date(suite.createdAt).toLocaleDateString() : 'Past Session'}
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => loadSuiteAsSummary(suite)}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500 text-white font-black text-xs hover:bg-amber-600 transition-all shadow-sm cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      Open Summary
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}

@@ -25,9 +25,13 @@ import {
   Globe,
   Search,
   Cpu,
-  Terminal
+  Terminal,
+  Trash2,
+  Eye
 } from 'lucide-react';
-import { UserProfile } from '../../types';
+import { UserProfile, SavedQuiz } from '../../types';
+import { StorageService } from '../../lib/storage';
+import { FirestoreService } from '../../lib/firestoreService';
 
 const QUIZ_THINKING_STEPS = [
   { text: 'Searching the web...', type: 'web' },
@@ -237,6 +241,61 @@ interface AIQuizHubViewProps {
 }
 
 export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
+  const [savedQuizzes, setSavedQuizzes] = useState<SavedQuiz[]>(StorageService.getSavedQuizzes());
+
+  useEffect(() => {
+    const loadQuizzes = async () => {
+      if (user?.uid) {
+        try {
+          const fsQuizzes = await FirestoreService.getSavedQuizzes(user.uid);
+          if (fsQuizzes && fsQuizzes.length > 0) {
+            setSavedQuizzes(fsQuizzes);
+            StorageService.saveSavedQuizzes(fsQuizzes);
+          }
+        } catch (err) {
+          console.warn('Error fetching saved quizzes from Firestore:', err);
+        }
+      }
+    };
+    loadQuizzes();
+  }, [user?.uid]);
+
+  const handleLoadSavedQuiz = (quiz: SavedQuiz) => {
+    const normalized = normalizeQuizData(quiz.quizData);
+    setQuizData(normalized);
+    
+    // Reset Interactive states
+    setMcqAnswers({});
+    setTrueFalseAnswers({});
+    setFillBlankAnswers({});
+    setFillBlankChecked({});
+    setShortAnswerReveled({});
+    setLongAnswerRevealed({});
+    setCodingAnswers({});
+
+    // Set active tab to the first format with questions
+    if (normalized.mcqs.length > 0) setQuizTab('mcq');
+    else if (normalized.trueFalse.length > 0) setQuizTab('tf');
+    else if (normalized.fillBlanks.length > 0) setQuizTab('blank');
+    else if (normalized.shortAnswers.length > 0) setQuizTab('short');
+    else if (normalized.longAnswers?.length && normalized.longAnswers.length > 0) setQuizTab('long');
+    else if (normalized.codingSnippets?.length && normalized.codingSnippets.length > 0) setQuizTab('coding');
+    else setQuizTab('mcq');
+  };
+
+  const handleDeleteSavedQuiz = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this practice quiz from history?')) {
+      StorageService.deleteSavedQuiz(id);
+      setSavedQuizzes(prev => prev.filter(q => q.id !== id));
+      try {
+        await FirestoreService.deleteSavedQuiz(id);
+      } catch (err) {
+        console.warn('Error deleting saved quiz from Firestore:', err);
+      }
+    }
+  };
+
   const [activeInputMode, setActiveInputMode] = useState<'upload' | 'text'>('upload');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileBase64, setFileBase64] = useState<string | null>(null);
@@ -401,6 +460,31 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
       const data = await response.json();
       const normalized = normalizeQuizData(data);
       setQuizData(normalized);
+
+      // Save generated quiz to storage history and Firestore
+      const quizId = 'quiz-' + Date.now();
+      const newSavedQuiz: SavedQuiz = {
+        id: quizId,
+        userId: user?.uid || 'guest',
+        title: normalized.title,
+        subject: normalized.subject,
+        questionType,
+        difficulty,
+        numQuestions,
+        quizData: normalized,
+        createdAt: new Date().toISOString()
+      };
+
+      StorageService.saveSavedQuiz(newSavedQuiz);
+      setSavedQuizzes(prev => [newSavedQuiz, ...prev]);
+
+      if (user?.uid) {
+        try {
+          await FirestoreService.saveSavedQuiz(user.uid, newSavedQuiz);
+        } catch (e) {
+          console.warn("Error saving quiz to Firestore:", e);
+        }
+      }
       
       // Reset Interactive states
       setMcqAnswers({});
@@ -790,6 +874,105 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Saved Quizzes History */}
+      {!quizData && !isLoading && savedQuizzes && savedQuizzes.length > 0 && (
+        <div className="bg-white/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-2xl shadow-slate-200/60 mt-8">
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-blue-100 text-blue-700">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-slate-800">Your Saved Practice Quizzes</h2>
+                <p className="text-xs text-slate-500 font-semibold">Start saved tests instantly without consuming AI generation credits.</p>
+              </div>
+            </div>
+            <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
+              {savedQuizzes.length} {savedQuizzes.length === 1 ? 'Quiz' : 'Quizzes'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {savedQuizzes.map((quiz) => {
+              const totalQuestions = 
+                (quiz.quizData.mcqs?.length || 0) +
+                (quiz.quizData.trueFalse?.length || 0) +
+                (quiz.quizData.fillBlanks?.length || 0) +
+                (quiz.quizData.shortAnswers?.length || 0) +
+                (quiz.quizData.longAnswers?.length || 0) +
+                (quiz.quizData.codingSnippets?.length || 0);
+
+              return (
+                <div 
+                  key={quiz.id}
+                  className="flex flex-col justify-between p-5 rounded-2xl border border-slate-150/80 bg-slate-50/50 hover:bg-slate-50 hover:border-blue-300 transition-all shadow-sm hover:shadow-md group relative"
+                >
+                  <div className="space-y-2.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="px-2.5 py-1 rounded-lg bg-blue-100/70 text-blue-800 text-[10px] font-black uppercase tracking-wider animate-fade-in truncate max-w-[150px]" title={quiz.subject}>
+                        {quiz.subject || 'General Practice'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => handleDeleteSavedQuiz(quiz.id, e)}
+                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+                        title="Delete Quiz"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <h3 className="font-bold text-slate-800 text-sm line-clamp-2 leading-snug">
+                      {quiz.title}
+                    </h3>
+                    
+                    {/* Question Breakdown Chips */}
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {quiz.quizData.mcqs && quiz.quizData.mcqs.length > 0 && (
+                        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-semibold">
+                          {quiz.quizData.mcqs.length} MCQs
+                        </span>
+                      )}
+                      {quiz.quizData.trueFalse && quiz.quizData.trueFalse.length > 0 && (
+                        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-semibold">
+                          {quiz.quizData.trueFalse.length} T/F
+                        </span>
+                      )}
+                      {quiz.quizData.fillBlanks && quiz.quizData.fillBlanks.length > 0 && (
+                        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-semibold">
+                          {quiz.quizData.fillBlanks.length} Blanks
+                        </span>
+                      )}
+                      {quiz.quizData.shortAnswers && quiz.quizData.shortAnswers.length > 0 && (
+                        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-semibold">
+                          {quiz.quizData.shortAnswers.length} Short
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      {quiz.createdAt ? new Date(quiz.createdAt).toLocaleDateString() : 'Past Test'}
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => handleLoadSavedQuiz(quiz)}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-500 text-white font-black text-xs hover:bg-blue-600 transition-all shadow-sm cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      Start Test
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

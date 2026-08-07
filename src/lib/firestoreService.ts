@@ -25,7 +25,8 @@ import {
   HabiturexData,
   StudentMarkRecord,
   GlobalBounty,
-  UserBountySubmission
+  UserBountySubmission,
+  SavedQuiz
 } from '../types';
 import { 
   getZeroAttendance, 
@@ -385,6 +386,39 @@ export class FirestoreService {
       await deleteDoc(doc(db, 'studySuites', id));
     } catch (e) {
       console.warn("Firestore deleteStudySuite error:", e);
+    }
+  }
+
+  // Saved Quizzes
+  static async saveSavedQuiz(uid: string, quiz: SavedQuiz): Promise<void> {
+    if (!db || !uid) return;
+    try {
+      await setDoc(doc(db, 'aiQuizzes', quiz.id), sanitizeForFirestore({ ...quiz, userId: uid }), { merge: true });
+    } catch (e) {
+      console.warn("Firestore saveSavedQuiz error:", e);
+    }
+  }
+
+  static async getSavedQuizzes(uid: string): Promise<SavedQuiz[]> {
+    if (!db || !uid) return [];
+    try {
+      const q = query(collection(db, 'aiQuizzes'), where('userId', '==', uid));
+      const snap = await getDocs(q);
+      const list: SavedQuiz[] = [];
+      snap.forEach(d => list.push(d.data() as SavedQuiz));
+      return list;
+    } catch (e) {
+      console.warn("Firestore getSavedQuizzes error:", e);
+      return [];
+    }
+  }
+
+  static async deleteSavedQuiz(id: string): Promise<void> {
+    if (!db) return;
+    try {
+      await deleteDoc(doc(db, 'aiQuizzes', id));
+    } catch (e) {
+      console.warn("Firestore deleteSavedQuiz error:", e);
     }
   }
 
