@@ -781,6 +781,39 @@ ${documentContext ? `Document Context:\n"""${documentContext}"""` : ""}`;
   }
 });
 
+// AI Coding Coach Route (Strictly restricted to use ONLY gemini-3.1-flash-lite)
+app.post("/api/ai/coding-coach", async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt || !prompt.trim()) {
+      return res.status(400).json({ error: "Prompt is required" });
+    }
+
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        console.log("[Gemini Engine] Querying ONLY gemini-3.1-flash-lite (Google Gemini 1.5 Flash-lite) for coding hub section");
+        const response = await generateContentWithFallback({
+          contents: prompt,
+          models: ["gemini-3.1-flash-lite"],
+          config: { maxOutputTokens: 3500 },
+        });
+        const replyText = response.text || "";
+        if (replyText.trim()) {
+          return res.json({ reply: replyText });
+        }
+      } catch (geminiErr: any) {
+        console.error("Gemini call error in coding coach:", geminiErr);
+        return res.status(500).json({ error: geminiErr?.message || "Failed to generate solution from Gemini" });
+      }
+    }
+
+    return res.status(503).json({ error: "Gemini API is unavailable or API key is missing." });
+  } catch (err: any) {
+    console.error("Error in Coding Coach API:", err);
+    res.status(500).json({ error: err.message || "Failed to generate solution" });
+  }
+});
+
 // 3. Assignment Solver Route (Feature & AI Usage Disabled)
 app.post("/api/ai/assignment-solver", async (_req, res) => {
   return res.status(403).json({
