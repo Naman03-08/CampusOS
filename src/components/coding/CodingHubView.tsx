@@ -241,6 +241,12 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ user, dsa, onToggleSol
   const [loadingAISolution, setLoadingAISolution] = useState<boolean>(false);
   const [aiLimitError, setAILimitError] = useState<string | null>(null);
 
+  const sanitizeAICoachSolution = (text: string): string => {
+    if (!text) return '';
+    // Strip specified unwanted characters: / * & ^ % $ # @ ! ) ( _ + ' ; . ,
+    return text.replace(/[\/\*&\^%\$#@!\)\(_\+';\.,]/g, '');
+  };
+
   const handleFetchAISolution = async (prob: DSAProblem) => {
     if (user) {
       const limitCheck = checkDSASolutionLimit(user, 0);
@@ -272,7 +278,7 @@ Structure the answer beautifully using bullet points and clean sections.`,
       });
       const data = await res.json();
       if (data.reply) {
-        setAICoachSolution(data.reply);
+        setAICoachSolution(sanitizeAICoachSolution(data.reply));
         if (user) {
           incrementFeatureUsage(user.uid, 'dsa_solution', getDailyKey());
         }

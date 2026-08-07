@@ -781,7 +781,7 @@ ${documentContext ? `Document Context:\n"""${documentContext}"""` : ""}`;
   }
 });
 
-// AI Coding Coach Route (Strictly restricted to use ONLY gemini-3.1-flash-lite)
+// AI Coding Coach Route (Strictly restricted to use ONLY gemini-1.5-flash-lite)
 app.post("/api/ai/coding-coach", async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -791,10 +791,10 @@ app.post("/api/ai/coding-coach", async (req, res) => {
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        console.log("[Gemini Engine] Querying ONLY gemini-3.1-flash-lite (Google Gemini 1.5 Flash-lite) for coding hub section");
+        console.log("[Gemini Engine] Querying ONLY gemini-1.5-flash-lite (Google Gemini 1.5 Flash-lite) for coding hub section");
         const response = await generateContentWithFallback({
           contents: prompt,
-          models: ["gemini-3.1-flash-lite"],
+          models: ["gemini-1.5-flash-lite", "gemini-1.5-flash-8b"],
           config: { maxOutputTokens: 3500 },
         });
         const replyText = response.text || "";
