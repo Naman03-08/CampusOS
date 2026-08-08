@@ -20,7 +20,7 @@ import {
 import { UserProfile } from '../../types';
 import placivoAILogo from '../landing/placivoAI.png';
 import dashboardImg from '../Dashboard.png';
-const aiLogoImg = '/AILogo.jpeg';
+import aiLogoImg from '../../assets/AILogo.jpeg';
 
 interface SidebarProps {
   activeTab: string;

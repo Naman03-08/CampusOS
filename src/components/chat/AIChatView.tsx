@@ -118,7 +118,7 @@ const renderStepIcon = (type: string) => {
   }
 };
 
-const aiLogoImg = '/AILogo.jpeg';
+import aiLogoImg from '../../assets/AILogo.jpeg';
 
 // Custom Personalized Mini Assistant Logo in Light Theme
 const PersonalAssistantMiniLogo: React.FC = () => {
