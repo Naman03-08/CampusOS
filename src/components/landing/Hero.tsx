@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import heroStudentsArt from '../../assets/images/campusos_blue_hoodies_art_1785350059169.jpg';
 import placivoAILogo from './placivoAI.png';
+import aiLogoImg from '../../assets/AILogo.jpeg';
 import { ProfessionalWorkspaceScene } from './ProfessionalWorkspaceScene';
 
 interface HeroProps {
@@ -479,11 +480,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAuth, onExploreDemo }) => {
                 )}
                 <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${activeHighlightIndex === 4 ? 'ring-2 ring-cyan-500 shadow-md' : 'border border-slate-200'}`}>
                   <img 
-                    src={placivoAILogo} 
+                    src={aiLogoImg} 
                     alt="AI Assistant" 
-                    className="w-full h-full object-contain" 
+                    className="w-full h-full object-cover" 
                     referrerPolicy="no-referrer"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placivoAI.png'; }}
                   />
                 </div>
                 <div className="text-left min-w-0">

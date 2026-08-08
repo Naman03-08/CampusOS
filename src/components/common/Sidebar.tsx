@@ -20,6 +20,7 @@ import {
 import { UserProfile } from '../../types';
 import placivoAILogo from '../landing/placivoAI.png';
 import dashboardImg from '../Dashboard.png';
+import aiLogoImg from '../../assets/AILogo.jpeg';
 
 interface SidebarProps {
   activeTab: string;
@@ -103,11 +104,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="flex items-center gap-2.5">
                   {item.id === 'studyhub' ? (
                     <img 
-                      src={placivoAILogo} 
+                      src={aiLogoImg} 
                       alt="Personal Assistant" 
-                      className={`w-4.5 h-4.5 object-contain rounded-md shrink-0 shadow-2xs transition-transform ${isActive ? 'scale-110 ring-1 ring-white/80' : 'border border-blue-200/80'}`} 
+                      className={`w-4.5 h-4.5 object-cover rounded-md shrink-0 shadow-2xs transition-transform ${isActive ? 'scale-110 ring-1 ring-white/80' : 'border border-blue-200/80'}`} 
                       referrerPolicy="no-referrer"
-                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placivoAI.png'; }}
                     />
                   ) : item.id === 'dashboard' ? (
                     <img 
