@@ -1088,66 +1088,74 @@ Structure the answer beautifully using bullet points and clean sections.`,
                     </div>
 
                     {/* Question Links */}
-                    <div className="flex items-center gap-1.5 flex-wrap shrink-0" style={{ transform: 'translateZ(20px)' }}>
-                      {linkUrl && (
+                    <div className="flex flex-wrap items-center gap-1.5 shrink-0 md:grid md:grid-cols-[90px_65px_90px_120px_130px] lg:grid-cols-[100px_70px_100px_130px_140px] md:gap-1.5 lg:gap-2.5" style={{ transform: 'translateZ(20px)' }}>
+                      {linkUrl ? (
                         <a
                           href={linkUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-gradient-to-r hover:from-cyan-600 hover:to-blue-600 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-2xs hover:shadow-md hover:scale-[1.03]"
+                          className="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-gradient-to-r hover:from-cyan-600 hover:to-blue-600 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-md hover:scale-[1.03] w-full text-center whitespace-nowrap"
                           title="Practice primary problem link"
                         >
                           <span>Practice</span>
-                          <ExternalLink className="w-3.5 h-3.5 text-white/80" />
+                          <ExternalLink className="w-3.5 h-3.5 text-white/80 shrink-0" />
                         </a>
+                      ) : (
+                        <div className="hidden md:block" />
                       )}
 
-                      {gfgUrl && (
+                      {gfgUrl ? (
                         <a
                           href={gfgUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-[11px] transition-all flex items-center gap-1 hover:scale-[1.03]"
+                          className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-[11px] transition-all flex items-center justify-center gap-1 hover:scale-[1.03] w-full text-center whitespace-nowrap"
                           title="Open GeeksforGeeks Problem"
                         >
                           <span>GFG</span>
-                          <ExternalLink className="w-3 h-3 text-emerald-600" />
+                          <ExternalLink className="w-3 h-3 text-emerald-600 shrink-0" />
                         </a>
+                      ) : (
+                        <div className="hidden md:block" />
                       )}
 
-                      {leetcodeUrl && (
+                      {leetcodeUrl ? (
                         <a
                           href={leetcodeUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-bold text-[11px] transition-all flex items-center gap-1 hover:scale-[1.03]"
+                          className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-bold text-[11px] transition-all flex items-center justify-center gap-1 hover:scale-[1.03] w-full text-center whitespace-nowrap"
                           title="Open LeetCode Problem"
                         >
                           <span>LeetCode</span>
-                          <ExternalLink className="w-3 h-3 text-amber-600" />
+                          <ExternalLink className="w-3 h-3 text-amber-600 shrink-0" />
                         </a>
+                      ) : (
+                        <div className="hidden md:block" />
                       )}
 
-                      {ytUrl && (
+                      {ytUrl ? (
                         <a
                           href={ytUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2.5 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold text-[11px] transition-all flex items-center gap-1 hover:scale-[1.03]"
+                          className="px-2.5 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold text-[11px] transition-all flex items-center justify-center gap-1 hover:scale-[1.03] w-full text-center whitespace-nowrap"
                           title="Search Placivo Video Solution"
                         >
                           <span>Video Solution</span>
-                          <ExternalLink className="w-3 h-3 text-red-500" />
+                          <ExternalLink className="w-3 h-3 text-red-500 shrink-0" />
                         </a>
+                      ) : (
+                        <div className="hidden md:block" />
                       )}
 
                       <button
                         onClick={() => handleFetchAISolution(prob)}
-                        className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-95 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-2xs hover:shadow-md hover:scale-[1.03] cursor-pointer"
+                        className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-95 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-md hover:scale-[1.03] cursor-pointer w-full text-center whitespace-nowrap"
                         title="Get Placivo AI custom step-by-step code solution"
                       >
-                        <Zap className="w-3.5 h-3.5 text-amber-300 animate-pulse fill-amber-300" />
-                        <span>AI Code Coach</span>
+                        <Zap className="w-3.5 h-3.5 text-amber-300 animate-pulse fill-amber-300 shrink-0" />
+                        <span className="whitespace-nowrap">AI Code Coach</span>
                       </button>
                     </div>
                   </motion.div>
