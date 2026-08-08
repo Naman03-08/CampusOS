@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, GraduationCap, Mail, Lock, User, ArrowRight, CheckCircle2, Phone, Building2, BookOpen, Bot, KeyRound, ShieldCheck, RefreshCw, ExternalLink, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { X, GraduationCap, Mail, Lock, User, ArrowRight, CheckCircle2, Phone, Building2, BookOpen, Bot, KeyRound, ShieldCheck, RefreshCw, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import { auth, googleProvider } from '../../lib/firebase';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail, updatePassword } from 'firebase/auth';
 import { UserProfile } from '../../types';

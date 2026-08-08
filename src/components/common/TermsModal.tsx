@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, FileText, Scale, ExternalLink, CheckCircle, Search, Mail, Phone, Building2, Lock, Sparkles, GraduationCap } from 'lucide-react';
+import { X, ShieldCheck, FileText, Scale, ExternalLink, CheckCircle, Search, Mail, Phone, Building2, Lock, GraduationCap } from 'lucide-react';
 import placivoAILogo from '../landing/placivoAI.png';
 
 interface TermsModalProps {

@@ -15,7 +15,7 @@ import {
   X,
   Volume2,
   Lightbulb,
-  Sparkles,
+  Zap,
   RotateCcw,
   BookMarked,
   Layers,
@@ -331,7 +331,7 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
       case 'search':
         return <Search className="w-6 h-6 text-indigo-600 animate-pulse" />;
       case 'think':
-        return <Sparkles className="w-6 h-6 text-sky-600 animate-bounce" />;
+        return <Zap className="w-6 h-6 text-sky-600 animate-bounce" />;
       case 'brain':
         return <Brain className="w-6 h-6 text-blue-600 animate-pulse" />;
       case 'work':
@@ -552,7 +552,7 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
         <div className="space-y-1.5">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/60 text-[10px] font-black text-blue-600 tracking-wider uppercase">
-            <Sparkles className="w-3.5 h-3.5" /> Powered by Placivo AI
+            <Brain className="w-3.5 h-3.5 text-blue-600" /> Powered by Placivo AI
           </span>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
             AI Practice Quiz Hub
@@ -817,7 +817,7 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
                 onClick={handleGenerateQuiz}
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs sm:text-sm tracking-wide shadow-md shadow-blue-500/10 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 btn-3d-blue"
               >
-                <Sparkles className="w-4 h-4 animate-pulse" /> Generate Expected Practice Quiz
+                <Brain className="w-4 h-4 animate-pulse" /> Generate Expected Practice Quiz
               </button>
             </div>
           </div>

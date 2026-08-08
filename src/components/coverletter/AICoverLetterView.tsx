@@ -14,7 +14,7 @@ import {
   deleteDoc
 } from 'firebase/firestore';
 import { 
-  Sparkles, 
+  Brain, 
   FileText, 
   Upload, 
   RefreshCw, 
@@ -1421,7 +1421,7 @@ export const AICoverLetterView: React.FC = () => {
                 <Zap className="h-3 w-3 fill-blue-600" /> PLACIVO AI PRO ARCHITECT
               </span>
               <span className="flex items-center gap-1 text-xs text-slate-400">
-                <Sparkles className="h-3.5 w-3.5 text-amber-500 animate-spin" /> Tailored Company Alignment
+                <Brain className="h-3.5 w-3.5 text-amber-500 animate-pulse" /> Tailored Company Alignment
               </span>
             </div>
             <h1 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-blue-700 via-indigo-600 to-violet-800 bg-clip-text text-transparent">
@@ -1749,7 +1749,7 @@ export const AICoverLetterView: React.FC = () => {
                       </>
                     ) : (
                       <>
-                        <Sparkles className="h-4 w-4 text-amber-300" />
+                        <Brain className="h-4 w-4 text-amber-300" />
                         AI Parse Resume Text
                       </>
                     )}
@@ -1906,7 +1906,7 @@ export const AICoverLetterView: React.FC = () => {
                   disabled={isGenerating}
                   className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.01] disabled:opacity-50"
                 >
-                  <Sparkles className="h-4.5 w-4.5 text-amber-300 animate-pulse" />
+                  <Brain className="h-4.5 w-4.5 text-amber-300 animate-pulse" />
                   Generate Cover Letter
                 </button>
               </div>
@@ -1990,7 +1990,7 @@ export const AICoverLetterView: React.FC = () => {
                 <div className="w-24 h-24 border-4 border-slate-100 border-t-blue-600 rounded-full animate-spin shadow-3xs"></div>
                 <div className="w-20 h-20 border-4 border-dashed border-indigo-50/80 border-t-cyan-500 rounded-full animate-spin absolute top-2 left-2 animate-[spin_3s_linear_infinite_reverse] shadow-4xs"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Sparkles className="h-8 w-8 text-blue-600 animate-[pulse_1.5s_ease-in-out_infinite]" />
+                  <Brain className="h-8 w-8 text-blue-600 animate-[pulse_1.5s_ease-in-out_infinite]" />
                 </div>
               </div>
               
@@ -2831,7 +2831,7 @@ export const AICoverLetterView: React.FC = () => {
               >
                 <div className="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
                   <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
-                    <Sparkles className="h-4.5 w-4.5 text-blue-500 animate-pulse" />
+                    <Brain className="h-4.5 w-4.5 text-blue-500 animate-pulse" />
                     Placivo AI Analytics Scorecard
                   </h3>
                   <span className="text-[10px] text-slate-400 font-bold uppercase">Real-Time Simulation</span>

@@ -16,8 +16,7 @@ import {
   X,
   Clock,
   AlertTriangle,
-  RotateCw,
-  Sparkles
+  RotateCw
 } from 'lucide-react';
 import { UserProfile } from '../../types';
 import { SectionUsageBanner } from '../common/SectionUsageBanner';
@@ -919,7 +918,7 @@ export const UpgradePlansView: React.FC<UpgradePlansProps> = ({ user, onUpdatePr
             {/* Typographical Headings */}
             <div className="space-y-2">
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase bg-indigo-50 text-indigo-700 border border-indigo-100">
-                <Sparkles className="w-3 h-3 text-indigo-500 animate-spin" style={{ animationDuration: '6s' }} /> Subscription Activated <Sparkles className="w-3 h-3 text-indigo-500 animate-spin" style={{ animationDuration: '6s' }} />
+                <Zap className="w-3 h-3 text-indigo-500 animate-spin" style={{ animationDuration: '6s' }} /> Subscription Activated <Zap className="w-3 h-3 text-indigo-500 animate-spin" style={{ animationDuration: '6s' }} />
               </span>
               <h2 className="text-3xl font-black tracking-tight leading-none bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Congratulations!

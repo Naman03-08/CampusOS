@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, RefreshCw, ShieldCheck, Clock, Sparkles, Crown, Zap, Rocket, Star } from 'lucide-react';
+import { CheckCircle2, RefreshCw, ShieldCheck, Clock, Crown, Zap, Rocket, Star } from 'lucide-react';
 
 interface PlanReloadModalProps {
   isOpen: boolean;
@@ -70,7 +70,7 @@ export const PlanReloadModal: React.FC<PlanReloadModalProps> = ({
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-sky-300/30 rounded-full blur-2xl pointer-events-none" />
           
           {/* Floating Light Confetti & Star Accents */}
-          <Sparkles className="absolute top-3 right-5 w-5 h-5 text-yellow-200/80 animate-bounce delay-150" />
+          <Zap className="absolute top-3 right-5 w-5 h-5 text-yellow-200/80 animate-bounce delay-150" />
           <Star className="absolute bottom-3 left-8 w-4 h-4 text-emerald-200/80 animate-pulse delay-300" />
           <Zap className="absolute top-4 left-1/2 w-4 h-4 text-amber-200/60 animate-ping delay-500" />
 
@@ -85,7 +85,7 @@ export const PlanReloadModal: React.FC<PlanReloadModalProps> = ({
 
             <div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md text-emerald-100 border border-white/30 shadow-2xs">
-                <Sparkles className="w-3.0 h-3.0 text-amber-300" />
+                <Zap className="w-3 h-3 text-amber-300" />
                 <span>Instant Provision Confirmed</span>
               </div>
               <h2 className="text-xl font-black text-white mt-1 tracking-tight drop-shadow-xs">

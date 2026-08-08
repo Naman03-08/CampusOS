@@ -1,6 +1,5 @@
 import React from 'react';
 import { 
-  Sparkles, 
   HelpCircle, 
   CheckCircle2, 
   FileText, 
@@ -24,7 +23,7 @@ export const AIGEOSection: React.FC = () => {
         {/* Header Badge */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
           <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-blue-700 bg-blue-100/80 px-3.5 py-1.5 rounded-full border border-blue-200 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+            <Zap className="w-3.5 h-3.5 text-blue-600" />
             AI Search Engine & GEO Fact Sheet
           </span>
           <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>

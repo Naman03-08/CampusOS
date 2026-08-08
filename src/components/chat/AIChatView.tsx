@@ -11,7 +11,7 @@ import {
   Zap, 
   Globe, 
   Search, 
-  Sparkles, 
+  Brain, 
   Cpu, 
   Terminal, 
   Loader2, 
@@ -106,7 +106,7 @@ const renderStepIcon = (type: string) => {
     case 'search':
       return <Search className="w-3.5 h-3.5 text-amber-500 animate-pulse" />;
     case 'think':
-      return <Sparkles className="w-3.5 h-3.5 text-indigo-500 animate-pulse" />;
+      return <Brain className="w-3.5 h-3.5 text-indigo-500 animate-pulse" />;
     case 'work':
       return <Cpu className="w-3.5 h-3.5 text-blue-500 animate-pulse" />;
     case 'code':
@@ -114,7 +114,7 @@ const renderStepIcon = (type: string) => {
     case 'draft':
       return <FileText className="w-3.5 h-3.5 text-purple-500" />;
     default:
-      return <Sparkles className="w-3.5 h-3.5 text-indigo-500" />;
+      return <Brain className="w-3.5 h-3.5 text-indigo-500" />;
   }
 };
 
@@ -321,7 +321,7 @@ export const AIChatView: React.FC<AIChatViewProps> = ({ user }) => {
     },
     {
       label: 'Math & Proofs',
-      icon: <Sparkles className="w-3.5 h-3.5 text-indigo-600" />,
+      icon: <Brain className="w-3.5 h-3.5 text-indigo-600" />,
       prompt: 'Derive the worst-case and average-case time complexity of QuickSort',
     },
     {
@@ -558,7 +558,7 @@ export const AIChatView: React.FC<AIChatViewProps> = ({ user }) => {
       {/* Suggested Quick Prompt Cards in Light Tone */}
       <div className="p-3 px-4 sm:px-6 bg-slate-50/80 border-t border-slate-200/80">
         <div className="flex items-center gap-2 mb-2">
-          <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+          <Brain className="w-3.5 h-3.5 text-blue-600 shrink-0" />
           <span className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Suggested Topics</span>
         </div>
 
