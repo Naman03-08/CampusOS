@@ -29,6 +29,7 @@ import { getGfgUrl, getLeetcodeUrl, getPracticeUrl } from '../../lib/dsaProblemL
 import { checkDSASolutionLimit, incrementFeatureUsage, getDailyKey, calculatePlanDetails } from '../../lib/planUtils';
 import { db } from '../../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import dsaHubImg from '../DSAHUB.png';
 
 // Bespoke Placivo Coding Hub 3D Orbiting Logo Component
 const CodingHubLogo: React.FC = () => {
@@ -72,42 +73,12 @@ const CodingHubLogo: React.FC = () => {
 
       {/* Solid Tech Core */}
       <div className="absolute inset-4 bg-gradient-to-br from-white to-slate-50 rounded-2xl border border-slate-200/95 shadow-md flex items-center justify-center overflow-hidden">
-        <svg viewBox="0 0 100 100" className="w-10/12 h-10/12 text-cyan-600">
-          <path d="M 25,35 L 75,35" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M 25,50 L 55,50" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M 25,65 L 65,65" stroke="#E2E8F0" strokeWidth="2.5" strokeLinecap="round" />
-          
-          {/* Rotating AI/Sparkle node */}
-          <motion.rect
-            x="32"
-            y="32"
-            width="36"
-            height="36"
-            rx="8"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            animate={{ rotate: [0, 90, 180, 270, 360] }}
-            transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-            className="text-cyan-500"
-          />
-          <motion.circle 
-            cx="50" 
-            cy="50" 
-            r="6" 
-            className="fill-cyan-50 text-cyan-500" 
-            stroke="currentColor" 
-            strokeWidth="1.5" 
-          />
-          <motion.path 
-            d="M 50,45 L 50,55 M 45,50 L 55,50" 
-            stroke="currentColor" 
-            strokeWidth="1.5" 
-            strokeLinecap="round"
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </svg>
+        <img 
+          src={dsaHubImg} 
+          alt="DSA Hub" 
+          className="w-full h-full object-cover"
+          referrerPolicy="no-referrer"
+        />
       </div>
     </motion.div>
   );
