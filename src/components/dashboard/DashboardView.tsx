@@ -20,6 +20,7 @@ import {
   Brain,
   Activity
 } from 'lucide-react';
+import dashboardImg from '../Dashboard.png';
 
 // ============================================================================
 // AI ANIMATED SYNAPSE CORE WIDGET
@@ -784,6 +785,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* Right Column (1 col): Quick Placement & AI Shortcuts */}
         <div className="space-y-6">
+          {/* System Telemetry Active Overview */}
+          <div className="p-1 bg-white border border-slate-200/80 rounded-3xl shadow-xs overflow-hidden">
+            <div className="relative rounded-2xl overflow-hidden border border-slate-100 bg-slate-50">
+              <img 
+                src={dashboardImg} 
+                alt="System Telemetry Dashboard" 
+                className="w-full h-auto object-cover rounded-xl"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+            <div className="p-4 space-y-1">
+              <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-2xs">
+                Active Telemetry Overview
+              </span>
+              <h3 className="text-sm font-black text-slate-900 mt-2">Personalized Command Center</h3>
+              <p className="text-xs text-slate-500 font-semibold leading-relaxed">
+                Real-time dashboard visualization illustrating active study telemetry, DSA metrics, and class tracking modules.
+              </p>
+            </div>
+          </div>
+
           {/* AI Career Assistant Launcher */}
           <DashboardCareerAssistantWidget
             user={user}
