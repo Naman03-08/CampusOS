@@ -23,93 +23,59 @@ import {
 import dashboardImg from '../Dashboard.png';
 
 // ============================================================================
-// AI ANIMATED SYNAPSE CORE WIDGET
+// AI ANIMATED SYNAPSE CORE WIDGET - SECTION LOGO
 // ============================================================================
-const DashboardAIProcessorWidget: React.FC = () => {
-  const [activeNodes, setActiveNodes] = useState<number[]>([0, 1]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveNodes(() => {
-        const count = Math.floor(Math.random() * 2) + 1;
-        const nodes: number[] = [];
-        for (let i = 0; i < count; i++) {
-          nodes.push(Math.floor(Math.random() * 4));
-        }
-        return nodes;
-      });
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const nodeLabels = ['AI Analytics', 'ATS Ingest', 'DSA Solved', 'Streak Core'];
-
+const DashboardLogo: React.FC = () => {
   return (
-    <div className="relative w-36 h-36 flex items-center justify-center bg-gradient-to-br from-indigo-500/10 via-transparent to-blue-500/10 rounded-full border border-indigo-500/20 shrink-0">
-      {/* Conic scanning scan line */}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-        className="absolute inset-0 rounded-full pointer-events-none"
-        style={{
-          background: 'conic-gradient(from 0deg, rgba(99, 102, 241, 0.15) 0deg, rgba(99, 102, 241, 0) 120deg, rgba(99, 102, 241, 0) 360deg)'
-        }}
-      />
+    <motion.div 
+      className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center shrink-0"
+      whileHover={{ scale: 1.08, rotate: 5 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+      id="dashboard-logo-container"
+    >
+      {/* Glow aura */}
+      <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '3.5s' }} id="dashboard-logo-glow" />
+      <div className="absolute inset-3 bg-blue-500/20 rounded-full blur-lg" />
 
-      {/* Orbit Rings */}
-      <motion.div
+      {/* Outer rotating orbit rings */}
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-0 rounded-full border border-dashed border-indigo-400/80"
+      />
+      <motion.div 
         animate={{ rotate: -360 }}
-        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-        className="absolute w-32 h-32 border border-dashed border-indigo-400/20 rounded-full"
-      />
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-        className="absolute w-22 h-22 border border-dotted border-blue-400/30 rounded-full"
+        transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-2 rounded-full border border-blue-400/50"
       />
 
-      {/* Central brain element */}
-      <motion.div
-        animate={{ scale: [1, 1.08, 1] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/20 z-10"
+      {/* Orbiting sub-nodes */}
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-0"
       >
-        <Brain className="w-5 h-5 text-indigo-50 animate-pulse" />
+        <span className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-indigo-500 shadow-md animate-pulse" />
+      </motion.div>
+      <motion.div 
+        animate={{ rotate: -360 }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-2"
+      >
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-400 shadow-sm" />
       </motion.div>
 
-      {/* Connection Nodes */}
-      {[...Array(4)].map((_, i) => {
-        const angle = (i * 360) / 4;
-        const radius = 48;
-        const rad = (angle * Math.PI) / 180;
-        const x = Math.cos(rad) * radius;
-        const y = Math.sin(rad) * radius;
-
-        const isActive = activeNodes.includes(i);
-
-        return (
-          <div
-            key={i}
-            className="absolute flex flex-col items-center justify-center"
-            style={{ transform: `translate(${x}px, ${y}px)` }}
-          >
-            <motion.div
-              animate={{
-                scale: isActive ? [1, 1.25, 1] : 1,
-                backgroundColor: isActive ? '#6366F1' : '#475569',
-                boxShadow: isActive ? '0 0 10px #6366F1, 0 0 4px #3B82F6' : 'none'
-              }}
-              transition={{ duration: 1.0 }}
-              className="w-2 h-2 rounded-full border border-white/50 cursor-pointer relative group"
-            >
-              <div className="absolute bottom-3.5 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded bg-slate-900 text-[8px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20 shadow-sm border border-slate-700">
-                {nodeLabels[i]}
-              </div>
-            </motion.div>
-          </div>
-        );
-      })}
-    </div>
+      {/* Solid Tech Core containing dashboard.png */}
+      <div className="absolute inset-4 bg-gradient-to-br from-white to-slate-50 rounded-2xl border border-slate-200/95 shadow-md flex items-center justify-center overflow-hidden" id="dashboard-logo-core">
+        <img 
+          src={dashboardImg} 
+          alt="Dashboard Section Logo" 
+          className="w-full h-full object-cover"
+          referrerPolicy="no-referrer"
+          id="dashboard-logo-image"
+        />
+      </div>
+    </motion.div>
   );
 };
 
@@ -638,7 +604,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           <div className="hidden md:block">
-            <DashboardAIProcessorWidget />
+            <DashboardLogo />
           </div>
         </div>
       </div>
@@ -785,27 +751,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* Right Column (1 col): Quick Placement & AI Shortcuts */}
         <div className="space-y-6">
-          {/* System Telemetry Active Overview */}
-          <div className="p-1 bg-white border border-slate-200/80 rounded-3xl shadow-xs overflow-hidden">
-            <div className="relative rounded-2xl overflow-hidden border border-slate-100 bg-slate-50">
-              <img 
-                src={dashboardImg} 
-                alt="System Telemetry Dashboard" 
-                className="w-full h-auto object-cover rounded-xl"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <div className="p-4 space-y-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-2xs">
-                Active Telemetry Overview
-              </span>
-              <h3 className="text-sm font-black text-slate-900 mt-2">Personalized Command Center</h3>
-              <p className="text-xs text-slate-500 font-semibold leading-relaxed">
-                Real-time dashboard visualization illustrating active study telemetry, DSA metrics, and class tracking modules.
-              </p>
-            </div>
-          </div>
-
           {/* AI Career Assistant Launcher */}
           <DashboardCareerAssistantWidget
             user={user}
