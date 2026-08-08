@@ -283,17 +283,24 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
     else setQuizTab('mcq');
   };
 
-  const handleDeleteSavedQuiz = async (id: string, e: React.MouseEvent) => {
+  const [quizToDelete, setQuizToDelete] = useState<SavedQuiz | null>(null);
+
+  const handleDeleteSavedQuiz = (quiz: SavedQuiz, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm('Are you sure you want to delete this practice quiz from history?')) {
-      StorageService.deleteSavedQuiz(id);
-      setSavedQuizzes(prev => prev.filter(q => q.id !== id));
-      try {
-        await FirestoreService.deleteSavedQuiz(id);
-      } catch (err) {
-        console.warn('Error deleting saved quiz from Firestore:', err);
-      }
+    setQuizToDelete(quiz);
+  };
+
+  const confirmDeleteSavedQuiz = async () => {
+    if (!quizToDelete) return;
+    const id = quizToDelete.id;
+    StorageService.deleteSavedQuiz(id);
+    setSavedQuizzes(prev => prev.filter(q => q.id !== id));
+    try {
+      await FirestoreService.deleteSavedQuiz(id);
+    } catch (err) {
+      console.warn('Error deleting saved quiz from Firestore:', err);
     }
+    setQuizToDelete(null);
   };
 
   const [activeInputMode, setActiveInputMode] = useState<'upload' | 'text'>('upload');
@@ -918,8 +925,8 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
                       </span>
                       <button
                         type="button"
-                        onClick={(e) => handleDeleteSavedQuiz(quiz.id, e)}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+                        onClick={(e) => handleDeleteSavedQuiz(quiz, e)}
+                        className="opacity-70 group-hover:opacity-100 md:opacity-0 group-hover:md:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
                         title="Delete Quiz"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1593,6 +1600,43 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* Custom Confirmation Modal for Deleting Saved Quiz */}
+      {quizToDelete && (
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in" id="delete-quiz-modal-backdrop">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-slate-100 shadow-xl space-y-4 animate-scale-up" id="delete-quiz-modal-container">
+            <div className="flex items-start gap-3">
+              <div className="p-3 bg-red-50 text-red-600 rounded-2xl" id="delete-quiz-modal-icon">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-black text-slate-900" id="delete-quiz-modal-title">Delete Practice Quiz</h3>
+                <p className="text-xs text-slate-500 font-medium" id="delete-quiz-modal-description">
+                  Are you sure you want to delete <span className="font-bold text-slate-700">"{quizToDelete.title}"</span> from your history? This action cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                id="delete-quiz-modal-cancel"
+                onClick={() => setQuizToDelete(null)}
+                className="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 font-extrabold text-xs transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                id="delete-quiz-modal-confirm"
+                onClick={confirmDeleteSavedQuiz}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs transition-all cursor-pointer shadow-sm shadow-red-200"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
