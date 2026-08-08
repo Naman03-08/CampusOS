@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { X, GraduationCap, Mail, Lock, User, ArrowRight, CheckCircle2, Phone, Building2, BookOpen, Bot, KeyRound, ShieldCheck, RefreshCw, ExternalLink, Eye, EyeOff } from 'lucide-react';
-import { auth, googleProvider } from '../../lib/firebase';
+import { auth, googleProvider, db } from '../../lib/firebase';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail, updatePassword } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { getDailyKey } from '../../lib/planUtils';
 import { UserProfile } from '../../types';
 import { StorageService } from '../../lib/storage';
 import { FirestoreService } from '../../lib/firestoreService';
@@ -48,6 +50,65 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   // Hold Google Auth User credentials when completing Google onboarding
   const [googleAuthUser, setGoogleAuthUser] = useState<any>(null);
+
+  // Helper to check and increment daily auth rate limits
+  const checkAndIncrementAuthLimit = async (emailStr: string): Promise<{ allowed: boolean; count: number }> => {
+    const cleanEmail = emailStr.trim().toLowerCase();
+    if (!cleanEmail) return { allowed: true, count: 0 };
+
+    const dailyKey = getDailyKey();
+
+    // 1. LocalStorage count check
+    const localKey = `auth_attempts_${cleanEmail}_${dailyKey}`;
+    const localCount = parseInt(localStorage.getItem(localKey) || '0', 10);
+
+    if (localCount >= 5) {
+      return { allowed: false, count: localCount };
+    }
+
+    // 2. Firestore count check (cross-device & persistent)
+    let firestoreCount = 0;
+    if (db) {
+      try {
+        const docRef = doc(db, 'authRateLimits', `${cleanEmail}_${dailyKey}`);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          firestoreCount = snap.data().count || 0;
+        }
+      } catch (e) {
+        console.warn('Firestore check auth rate limit error:', e);
+      }
+    }
+
+    const currentMax = Math.max(localCount, firestoreCount);
+
+    if (currentMax >= 5) {
+      if (localCount < currentMax) {
+        localStorage.setItem(localKey, currentMax.toString());
+      }
+      return { allowed: false, count: currentMax };
+    }
+
+    // 3. Increment both local & Firestore
+    const nextCount = currentMax + 1;
+    localStorage.setItem(localKey, nextCount.toString());
+
+    if (db) {
+      try {
+        const docRef = doc(db, 'authRateLimits', `${cleanEmail}_${dailyKey}`);
+        await setDoc(docRef, {
+          email: cleanEmail,
+          date: dailyKey,
+          count: nextCount,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      } catch (e) {
+        console.warn('Firestore increment auth rate limit error:', e);
+      }
+    }
+
+    return { allowed: true, count: nextCount };
+  };
 
   // Sync mode with initialMode and reset errors when modal opens
   useEffect(() => {
@@ -337,6 +398,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         const result = await signInWithPopup(auth, googleProvider);
         const fbUser = result.user;
         
+        const targetEmail = fbUser.email || '';
+        if (targetEmail) {
+          const limitCheck = await checkAndIncrementAuthLimit(targetEmail);
+          if (!limitCheck.allowed) {
+            setErrorMsg('Your limit is exceeded, please try after some time.');
+            try {
+              await auth.signOut();
+            } catch (e) {}
+            setLoading(false);
+            return;
+          }
+        }
+
         // Try fetching existing profile from Firestore
         let existingProfile = await FirestoreService.getProfile(fbUser.uid);
 
@@ -364,6 +438,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         setMode('google-onboarding');
       } else {
         // Fallback local Google Auth prompt
+        const targetEmail = email || 'student@campus.edu';
+        const limitCheck = await checkAndIncrementAuthLimit(targetEmail);
+        if (!limitCheck.allowed) {
+          setErrorMsg('Your limit is exceeded, please try after some time.');
+          setLoading(false);
+          return;
+        }
+
         setGoogleAuthUser({
           uid: 'google_local_' + Date.now(),
           email: email || '',
@@ -383,7 +465,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  const handleInstantGuestLogin = () => {
+  const handleInstantGuestLogin = async () => {
+    setErrorMsg('');
+    const targetEmail = email || 'student@campus.edu';
+    const limitCheck = await checkAndIncrementAuthLimit(targetEmail);
+    if (!limitCheck.allowed) {
+      setErrorMsg('Your limit is exceeded, please try after some time.');
+      return;
+    }
+
     const profile: UserProfile = {
       uid: 'guest_' + Date.now(),
       email: email || 'student@campus.edu',
@@ -404,7 +494,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     onSuccess(profile);
   };
 
-  const handleAdminInstantLogin = () => {
+  const handleAdminInstantLogin = async () => {
+    setErrorMsg('');
+    const targetEmail = 'naman03mgs@gmail.com';
+    const limitCheck = await checkAndIncrementAuthLimit(targetEmail);
+    if (!limitCheck.allowed) {
+      setErrorMsg('Your limit is exceeded, please try after some time.');
+      return;
+    }
+
     const profile: UserProfile = {
       uid: 'admin_naman03mgs',
       email: 'naman03mgs@gmail.com',
@@ -500,6 +598,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       }
 
       if (mode === 'login') {
+        const targetEmail = email.trim().toLowerCase();
+        if (!targetEmail) {
+          setErrorMsg('Please enter your email address.');
+          setLoading(false);
+          return;
+        }
+
+        const limitCheck = await checkAndIncrementAuthLimit(targetEmail);
+        if (!limitCheck.allowed) {
+          setErrorMsg('Your limit is exceeded, please try after some time.');
+          setLoading(false);
+          return;
+        }
+
         if (auth) {
           try {
             const res = await signInWithEmailAndPassword(auth, email, password);
