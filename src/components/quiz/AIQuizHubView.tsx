@@ -32,7 +32,7 @@ import {
 import { UserProfile, SavedQuiz } from '../../types';
 import { StorageService } from '../../lib/storage';
 import { FirestoreService } from '../../lib/firestoreService';
-import aiNotesImg from '../AINOTES.png';
+import quizImg from '../quiz.png';
 
 const QUIZ_THINKING_STEPS = [
   { text: 'Searching the web...', type: 'web' },
@@ -835,7 +835,7 @@ export const AIQuizHubView: React.FC<AIQuizHubViewProps> = ({ user }) => {
             <div className="bg-slate-50/60 border border-slate-100 rounded-3xl p-6 sm:p-8 space-y-6">
               <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-1 shadow-xs">
                 <img 
-                  src={aiNotesImg} 
+                  src={quizImg} 
                   alt="AI Quiz Practice Illustration" 
                   className="w-full h-auto object-cover rounded-xl"
                   referrerPolicy="no-referrer"
