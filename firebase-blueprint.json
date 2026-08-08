@@ -250,6 +250,20 @@
         "createdAt": { "type": "string" }
       },
       "required": ["id", "userId", "targetCompany", "targetJobRole"]
+    },
+    "codingCoachSolutions": {
+      "title": "AI Coding Coach Solutions Cache",
+      "description": "Cached optimal solutions for DSA problems, shared globally across all users.",
+      "type": "object",
+      "properties": {
+        "problemId": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "difficulty": { "type": "string" },
+        "solution": { "type": "string" },
+        "savedAt": { "type": "string" }
+      },
+      "required": ["problemId", "title", "solution"]
     }
   },
   "securityRules": {
@@ -312,6 +326,10 @@
     "coverLetters": {
       "read": "auth != null && auth.uid == resource.data.userId",
       "write": "auth != null && auth.uid == request.resource.data.userId"
+    },
+    "codingCoachSolutions": {
+      "read": "true",
+      "write": "auth != null"
     }
   }
 }

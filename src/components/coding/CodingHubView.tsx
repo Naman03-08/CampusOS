@@ -27,6 +27,8 @@ import { getPlacivoDSASheet } from '../../data/dsaSheet375';
 import { StreakService } from '../../lib/streakService';
 import { getGfgUrl, getLeetcodeUrl, getPracticeUrl } from '../../lib/dsaProblemLinks';
 import { checkDSASolutionLimit, incrementFeatureUsage, getDailyKey, calculatePlanDetails } from '../../lib/planUtils';
+import { db } from '../../lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 // Bespoke Placivo Coding Hub 3D Orbiting Logo Component
 const CodingHubLogo: React.FC = () => {
@@ -248,19 +250,45 @@ export const CodingHubView: React.FC<CodingHubProps> = ({ user, dsa, onToggleSol
   };
 
   const handleFetchAISolution = async (prob: DSAProblem) => {
+    // Generate a secure, user-independent Firestore cache key based on the problem title
+    const cacheKey = prob.title.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+    
+    // First, set selected problem and clear existing states
+    setSelectedAIProblem(prob);
+    setAILimitError(null);
+    setLoadingAISolution(true);
+    setAICoachSolution(null);
+
+    // Check for cached solution in Firestore first
+    let cachedSolution: string | null = null;
+    if (db) {
+      try {
+        const cachedDoc = await getDoc(doc(db, 'codingCoachSolutions', cacheKey));
+        if (cachedDoc.exists()) {
+          cachedSolution = cachedDoc.data().solution;
+        }
+      } catch (e) {
+        console.warn('Error fetching cached AI solution:', e);
+      }
+    }
+
+    if (cachedSolution) {
+      // Found cached answer! Display it directly and bypass AI calling & limits
+      setAICoachSolution(cachedSolution);
+      setLoadingAISolution(false);
+      return;
+    }
+
+    // No cached answer found. This is the first request for this question. Proceed with AI.
     if (user) {
       const limitCheck = checkDSASolutionLimit(user, 0);
       if (!limitCheck.allowed) {
         setAILimitError(limitCheck.message);
-        setSelectedAIProblem(prob);
         setAICoachSolution(null);
+        setLoadingAISolution(false);
         return;
       }
     }
-    setAILimitError(null);
-    setSelectedAIProblem(prob);
-    setLoadingAISolution(true);
-    setAICoachSolution(null);
 
     try {
       const res = await fetch('/api/ai/coding-coach', {
@@ -278,7 +306,25 @@ Structure the answer beautifully using bullet points and clean sections.`,
       });
       const data = await res.json();
       if (data.reply) {
-        setAICoachSolution(sanitizeAICoachSolution(data.reply));
+        const sanitized = sanitizeAICoachSolution(data.reply);
+        setAICoachSolution(sanitized);
+        
+        // Save to cache collection for all future users
+        if (db) {
+          try {
+            await setDoc(doc(db, 'codingCoachSolutions', cacheKey), {
+              problemId: prob.id,
+              title: prob.title,
+              category: prob.category,
+              difficulty: prob.difficulty,
+              solution: sanitized,
+              savedAt: new Date().toISOString()
+            });
+          } catch (saveErr) {
+            console.warn('Error caching AI solution in Firestore:', saveErr);
+          }
+        }
+
         if (user) {
           incrementFeatureUsage(user.uid, 'dsa_solution', getDailyKey());
         }
