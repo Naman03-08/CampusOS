@@ -100,6 +100,7 @@ import {
 } from 'lucide-react';
 import { UserProfile, StudySuite } from '../../types';
 import { checkStudySuiteLimit, incrementFeatureUsage, getDailyKey, getWeeklyKey, calculatePlanDetails } from '../../lib/planUtils';
+import aiNotesImg from '../AINOTES.png';
 
 interface AINotesSummarizerViewProps {
   user: UserProfile | null;
@@ -522,114 +523,170 @@ ${s.sectionParagraph ? s.sectionParagraph + '\n' : ''}${(s.bullets || []).map(b 
 
         {/* PDF Input Section */}
         {!summaryData && (
-          <div className="bg-white/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-2xl shadow-slate-200/60 transform transition-all hover:shadow-amber-100/50">
-            
-            {/* Custom Title Input */}
-            <div className="mb-6 space-y-2">
-              <label className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                <BookOpen className="w-3.5 h-3.5 text-amber-500" />
-                Document Title (Optional)
-              </label>
-              <input
-                type="text"
-                placeholder="e.g., Computer Architecture Chapter 4: Pipelining & Cache"
-                value={customTitle}
-                onChange={(e) => setCustomTitle(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:bg-white transition-all"
-              />
-            </div>
-
-            {/* PDF File Drag & Drop */}
-            <div
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center transition-all cursor-pointer group ${
-                selectedFile
-                  ? 'border-emerald-400 bg-emerald-50/40'
-                  : 'border-slate-300 hover:border-amber-400 bg-slate-50/50 hover:bg-amber-50/30'
-              }`}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="application/pdf"
-                className="hidden"
-              />
-
-              {selectedFile ? (
-                <div className="space-y-4">
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-lg shadow-emerald-100">
-                    <FileCheck className="w-8 h-8 animate-bounce" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-black text-slate-900">{selectedFile.name}</h4>
-                    <p className="text-xs text-slate-500 font-bold mt-1">
-                      {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Ready for AI Line-by-Line Summarization
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveFile();
-                    }}
-                    className="px-3.5 py-1.5 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 font-extrabold text-xs transition-all inline-flex items-center gap-1 cursor-pointer"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    Remove File
-                  </button>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-7 bg-white/90 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-2xl shadow-slate-200/60 transform transition-all hover:shadow-amber-100/50 flex flex-col justify-between" id="notes-summarizer-input-container">
+              <div>
+                {/* Custom Title Input */}
+                <div className="mb-6 space-y-2">
+                  <label className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                    <BookOpen className="w-3.5 h-3.5 text-amber-500" />
+                    Document Title (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Computer Architecture Chapter 4: Pipelining & Cache"
+                    value={customTitle}
+                    onChange={(e) => setCustomTitle(e.target.value)}
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:bg-white transition-all"
+                  />
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-lg shadow-amber-100">
-                    <Upload className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h4 className="text-base sm:text-lg font-black text-slate-900">
-                      Drop your PDF document here, or <span className="text-amber-600 underline">browse</span>
-                    </h4>
-                    <p className="text-xs text-slate-500 font-semibold mt-1">
-                      Upload textbook chapters, research papers, or lecture slide PDFs up to 50MB
-                    </p>
-                  </div>
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-extrabold">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                    Line 1 to End Complete PDF Extraction
-                  </div>
+
+                {/* PDF File Drag & Drop */}
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center transition-all cursor-pointer group ${
+                    selectedFile
+                      ? 'border-emerald-400 bg-emerald-50/40'
+                      : 'border-slate-300 hover:border-amber-400 bg-slate-50/50 hover:bg-amber-50/30'
+                  }`}
+                >
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="application/pdf"
+                    className="hidden"
+                  />
+
+                  {selectedFile ? (
+                    <div className="space-y-4">
+                      <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-lg shadow-emerald-100">
+                        <FileCheck className="w-8 h-8 animate-bounce" />
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-black text-slate-900">{selectedFile.name}</h4>
+                        <p className="text-xs text-slate-500 font-bold mt-1">
+                          {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Ready for AI Line-by-Line Summarization
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveFile();
+                        }}
+                        className="px-3.5 py-1.5 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 font-extrabold text-xs transition-all inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Remove File
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-lg shadow-amber-100">
+                        <Upload className="w-8 h-8" />
+                      </div>
+                      <div>
+                        <h4 className="text-base sm:text-lg font-black text-slate-900">
+                          Drop your PDF document here, or <span className="text-amber-600 underline">browse</span>
+                        </h4>
+                        <p className="text-xs text-slate-500 font-semibold mt-1">
+                          Upload textbook chapters, research papers, or lecture slide PDFs up to 50MB
+                        </p>
+                      </div>
+                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-extrabold">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        Line 1 to End Complete PDF Extraction
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="mt-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-bold flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
+                  <span>{error}</span>
                 </div>
               )}
+
+              {/* Submit Button */}
+              <div className="mt-8 flex justify-end">
+                <button
+                  onClick={handleSummarize}
+                  disabled={isLoading}
+                  className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-slate-950 font-black text-base shadow-xl shadow-amber-400/30 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <>
+                      <RefreshCw className="w-5 h-5 animate-spin text-slate-950" />
+                      <span>Analyzing PDF with Placivo AI...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-5 h-5 text-slate-950 fill-slate-950" />
+                      <span>Generate AI Notes & Quiz Suite</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="mt-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-bold flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
+            {/* AI Notes Summarizer Logo / Card Section */}
+            <div className="lg:col-span-5 space-y-6" id="notes-summarizer-logo-section">
+              <div className="bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl shadow-slate-200/60">
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-1 shadow-xs">
+                  <img 
+                    src={aiNotesImg} 
+                    alt="AI Notes Summarizer Illustration" 
+                    className="w-full h-auto object-cover rounded-xl"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-black text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    Intelligent Document Summarizer
+                  </h3>
+                  <p className="text-xs text-slate-600 font-semibold leading-relaxed">
+                    Turn long lecture slides, massive PDF textbooks, or research papers into concise, highly organized exam prep sheets instantly.
+                  </p>
+                </div>
+                <div className="space-y-3.5 pt-2">
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 rounded-lg bg-amber-100 text-amber-700 shrink-0">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-black text-slate-800">Complete Document Parsing</h4>
+                      <p className="text-[11px] text-slate-500 font-medium">Extracts and sanitizes text from all uploaded pages for deep context parsing.</p>
+                    </div>
+                  </div>
 
-            {/* Submit Button */}
-            <div className="mt-8 flex justify-end">
-              <button
-                onClick={handleSummarize}
-                disabled={isLoading}
-                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-slate-950 font-black text-base shadow-xl shadow-amber-400/30 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <>
-                    <RefreshCw className="w-5 h-5 animate-spin text-slate-950" />
-                    <span>Analyzing PDF with Placivo AI...</span>
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-5 h-5 text-slate-950 fill-slate-950" />
-                    <span>Generate AI Notes & Quiz Suite</span>
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </button>
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 rounded-lg bg-indigo-100 text-indigo-700 shrink-0">
+                      <Zap className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-black text-slate-800">Line-by-Line Breakdown</h4>
+                      <p className="text-[11px] text-slate-500 font-medium">Generates highly detailed structured outlines of topics, definitions, and key formulas.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 rounded-lg bg-emerald-100 text-emerald-700 shrink-0">
+                      <GraduationCap className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-black text-slate-800">100% PDF Grounded Quizzes</h4>
+                      <p className="text-[11px] text-slate-500 font-medium">Creates dynamic diagnostic and revision quizzes strictly from your uploaded files.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
