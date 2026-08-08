@@ -295,8 +295,8 @@ const GEMINI_MODELS = [
 ];
 
 const GEMINI_LOW_MODELS = [
-  "gemini-2.5-flash-lite",
   "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
   "gemini-1.5-flash"
 ];
 
@@ -796,7 +796,7 @@ app.post("/api/ai/coding-coach", async (req, res) => {
         console.log("[Gemini Engine] Querying stable models for coding hub section");
         const response = await generateContentWithFallback({
           contents: prompt,
-          models: ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-1.5-flash"],
+          models: ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"],
           config: { maxOutputTokens: 3500 },
         });
         const replyText = response.text || "";
@@ -905,10 +905,10 @@ Return ONLY a valid JSON object matching the requested schema.`;
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        console.log("[Gemini Engine] Analyzing resume text with gemini-2.5-flash-lite");
+        console.log("[Gemini Engine] Analyzing resume text with gemini-2.5-flash");
         const response = await generateContentWithFallback({
           contents: prompt,
-          models: ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-1.5-flash"],
+          models: ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"],
           config: {
             responseMimeType: "application/json",
             responseSchema: {
